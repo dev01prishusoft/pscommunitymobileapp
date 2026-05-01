@@ -12,14 +12,14 @@ class LoginController extends GetxController {
   final Rxn<AuthTokens> tokens = Rxn<AuthTokens>();
 
   Future<bool> login({
-    required String email,
+    required String mobile,
     required String password,
   }) async {
     isLoading.value = true;
     error.value = null;
 
     try {
-      tokens.value = await _loginUseCase.call(email: email, password: password);
+      tokens.value = await _loginUseCase.call(mobile: mobile, password: password);
       return true;
     } catch (e) {
       error.value = e.toString().replaceFirst('Exception: ', '');

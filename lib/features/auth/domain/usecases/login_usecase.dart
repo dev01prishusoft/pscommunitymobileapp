@@ -7,9 +7,9 @@ class LoginUseCase {
   LoginUseCase(this._repository);
 
   Future<AuthTokens> call({
-    required String email,
+    required String mobile,
     required String password,
   }) {
-    return _repository.login(email: email, password: password);
+    return _repository.login(mobile: mobile, password: password);
   }
 }

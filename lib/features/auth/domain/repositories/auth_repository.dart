@@ -2,7 +2,7 @@ import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.d
 
 abstract class AuthRepository {
   Future<AuthTokens> login({
-    required String email,
+    required String mobile,
     required String password,
   });
 }

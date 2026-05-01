@@ -15,7 +15,7 @@ import 'package:pscommunitymobileapp/features/auth/presentation/controllers/logi
 class _FakeAuthRepository implements AuthRepository {
   @override
   Future<AuthTokens> login({
-    required String email,
+    required String mobile,
     required String password,
   }) async {
     return const AuthTokens(accessToken: 'token', refreshToken: 'refresh');

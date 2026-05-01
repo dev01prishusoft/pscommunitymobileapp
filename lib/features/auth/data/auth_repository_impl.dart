@@ -10,13 +10,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthTokens> login({
-    required String email,
+    required String mobile,
     required String password,
   }) async {
     final response = await _apiClient.post(
       ApiConstants.loginPath,
       body: <String, dynamic>{
-        'email': email,
+        'mobile': mobile,
         'password': password,
         'ipAddress': 'mobile-app',
       },
