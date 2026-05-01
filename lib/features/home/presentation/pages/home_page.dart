@@ -14,6 +14,13 @@ class HomePage extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 24),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildLanguageDropdown(),
+                  ),
+                ),
                 _buildHeader(),
                 const SizedBox(height: 10),
                 Expanded(
