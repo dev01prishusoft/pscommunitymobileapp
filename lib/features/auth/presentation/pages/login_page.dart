@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_inline_error.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   final _mobileController = TextEditingController();
   final _passwordController = TextEditingController();
   late final LoginController _controller;
-  bool _obscurePassword = true;
   final _mobileRegex = RegExp(r'^[0-9]{10}$');
 
   @override
@@ -35,26 +35,19 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _submit() async {
-    // ── UI-REVIEW BYPASS (re-enable for production) ──────────────────────────
-    Navigator.of(context).pushReplacementNamed(AppRouter.resetPassword);
-    return;
-    // ────────────────────────────────────────────────────────────────────────
+    if (kUiReviewMode) {
+      Get.offNamed(AppRouter.postLoginSplash);
+      return;
+    }
 
-    // ignore: dead_code
     if (!_formKey.currentState!.validate()) return;
 
-    // ignore: dead_code
     final success = await _controller.login(
       mobile: _mobileController.text.trim(),
       password: _passwordController.text,
     );
 
-    // ignore: dead_code
-    if (!mounted) return;
-    // ignore: dead_code
-    if (success) {
-      Navigator.of(context).pushReplacementNamed(AppRouter.resetPassword);
-    }
+    if (success) Get.offNamed(AppRouter.postLoginSplash);
   }
 
   @override
@@ -242,15 +235,11 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: _passwordController,
                                 hint: '........'.tr,
                                 icon: Icons.lock_outline_rounded,
-                                obscureText: _obscurePassword,
+                                obscureText: _controller.obscurePassword.value,
                                 suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
+                                  onPressed: _controller.togglePasswordVisibility,
                                   icon: Icon(
-                                    _obscurePassword
+                                    _controller.obscurePassword.value
                                         ? Icons.visibility_outlined
                                         : Icons.visibility_off_outlined,
                                     color: AppColors.mutedForeground,
@@ -310,15 +299,7 @@ class _LoginPageState extends State<LoginPage> {
                                 AppInlineError(message: errorMessage),
                               ],
 
-                              const SizedBox(height: 24),
-                              Text(
-                                'Use your admin credentials to continue.'.tr,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: AppColors.mutedForeground,
-                                  fontSize: 13,
-                                ),
-                              ),
+                             
                             ],
                           ),
                         ),

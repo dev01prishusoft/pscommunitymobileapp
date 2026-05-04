@@ -3,56 +3,38 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
-class ResetPasswordPage extends StatefulWidget {
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
+import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
+
+class ResetPasswordPage extends StatelessWidget {
   const ResetPasswordPage({super.key});
 
   @override
-  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
-}
-
-class _ResetPasswordPageState extends State<ResetPasswordPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  bool _obscureNewPassword = true;
-  bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
-
-  @override
-  void dispose() {
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    // ── UI-REVIEW BYPASS (re-enable for production) ──────────────────────────
-    Navigator.of(context).pushReplacementNamed(AppRouter.postLoginSplash);
-    return;
-    // ────────────────────────────────────────────────────────────────────────
-
-    // ignore: dead_code
-    if (!_formKey.currentState!.validate()) return;
-
-    // ignore: dead_code
-    setState(() => _isLoading = true);
-
-    // Simulate API call for password reset
-    // ignore: dead_code
-    await Future.delayed(const Duration(seconds: 1));
-
-    // ignore: dead_code
-    if (!mounted) return;
-    // ignore: dead_code
-    setState(() => _isLoading = false);
-
-    // Navigate to post login splash screen
-    // ignore: dead_code
-    Navigator.of(context).pushReplacementNamed(AppRouter.postLoginSplash);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Lazily register the controller if not already present
+    if (!Get.isRegistered<ResetPasswordController>()) {
+      Get.put(ResetPasswordController());
+    }
+    final controller = Get.find<ResetPasswordController>();
+    final formKey = GlobalKey<FormState>();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    Future<void> submit() async {
+      if (kUiReviewMode) {
+        Get.offNamed(AppRouter.postLoginSplash);
+        return;
+      }
+
+      if (!formKey.currentState!.validate()) return;
+
+      final success = await controller.resetPassword(newPasswordController.text);
+
+      if (success && context.mounted) {
+        Get.offNamed(AppRouter.postLoginSplash);
+      }
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -104,8 +86,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Floating Card Form
-                    Container(
+                    Obx(() => Container(
                       constraints: const BoxConstraints(maxWidth: 500),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
@@ -123,7 +104,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         ],
                       ),
                       child: Form(
-                        key: _formKey,
+                        key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -150,23 +131,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                             const SizedBox(height: 8),
                             _buildTextField(
-                              controller: _newPasswordController,
-                              hint: '........'.tr,
-                              icon: Icons.lock_outline_rounded,
-                              obscureText: _obscureNewPassword,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureNewPassword = !_obscureNewPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _obscureNewPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: AppColors.mutedForeground,
-                                ),
-                              ),
+                               controller: newPasswordController,
+                               hint: '........'.tr,
+                               icon: Icons.lock_outline_rounded,
+                               obscureText: controller.obscureNewPassword.value,
+                               suffixIcon: IconButton(
+                                 onPressed: controller.toggleNewPasswordVisibility,
+                                 icon: Icon(
+                                   controller.obscureNewPassword.value
+                                       ? Icons.visibility_outlined
+                                       : Icons.visibility_off_outlined,
+                                   color: AppColors.mutedForeground,
+                                 ),
+                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter new password'.tr;
@@ -187,28 +164,24 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                             const SizedBox(height: 8),
                             _buildTextField(
-                              controller: _confirmPasswordController,
-                              hint: '........'.tr,
-                              icon: Icons.lock_outline_rounded,
-                              obscureText: _obscureConfirmPassword,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _obscureConfirmPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: AppColors.mutedForeground,
-                                ),
-                              ),
+                               controller: confirmPasswordController,
+                               hint: '........'.tr,
+                               icon: Icons.lock_outline_rounded,
+                               obscureText: controller.obscureConfirmPassword.value,
+                               suffixIcon: IconButton(
+                                 onPressed: controller.toggleConfirmPasswordVisibility,
+                                 icon: Icon(
+                                   controller.obscureConfirmPassword.value
+                                       ? Icons.visibility_outlined
+                                       : Icons.visibility_off_outlined,
+                                   color: AppColors.mutedForeground,
+                                 ),
+                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter new password'.tr;
                                 }
-                                if (value != _newPasswordController.text) {
+                                 if (value != newPasswordController.text) {
                                   return 'Passwords do not match'.tr;
                                 }
                                 return null;
@@ -229,8 +202,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                   ),
                                 ],
                               ),
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _submit,
+                               child: ElevatedButton(
+                                 onPressed: controller.isLoading.value ? null : submit,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: Colors.white,
@@ -239,7 +212,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                child: _isLoading
+                                 child: controller.isLoading.value
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
@@ -261,7 +234,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           ],
                         ),
                       ),
-                    ),
+                    )),
                   ],
                 ),
               ),

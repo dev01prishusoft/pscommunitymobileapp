@@ -295,92 +295,18 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                         ),
                       ),
                       const Divider(height: 1, color: Color(0xFFF1F5F9)),
-                      ...members.asMap().entries.map((entry) {
-                        final memberIndex = entry.key;
-                        final member = entry.value;
-                        return Column(
-                          children: [
-                            if (memberIndex > 0)
-                              const Divider(height: 1, color: Color(0xFFF1F5F9), indent: 70, endIndent: 16),
-                            InkWell(
-                              onTap: () {
-                                // Tap handler (e.g. view details)
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Row(
-                                  children: [
-                                    // Avatar
-                                    CircleAvatar(
-                                      radius: 20,
-                                      backgroundColor: member['color'],
-                                      child: Text(
-                                        member['id'],
-                                        style: TextStyle(
-                                          color: member['textColor'],
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    // Member Details
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Flexible(
-                                                child: Text(
-                                                  member['name'],
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14,
-                                                    color: Color(0xFF1E293B),
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              if (member['isHead']) ...[
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(0xFFDCFCE7),
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    'Family Head'.tr,
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF16A34A),
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ]
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${member['gender'].toString().tr}  •  ${member['relation'].toString().tr}  •  ${member['maritalStatus'].toString().tr}  •  ${member['occupation'].toString().tr}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF64748B),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1), size: 20),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
+                      // Use ListView.builder for lazy, indexed member rendering
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: members.length,
+                        itemBuilder: (context, memberIndex) {
+                          return _MemberTile(
+                            member: members[memberIndex] as Map<String, dynamic>,
+                            showDivider: memberIndex > 0,
+                          );
+                        },
+                      ),
                     ],
                   ),
                 );
@@ -389,6 +315,102 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A single member row inside a family card.
+/// Extracted from the O(N) inline map to allow const construction and lazy build.
+class _MemberTile extends StatelessWidget {
+  const _MemberTile({
+    required this.member,
+    required this.showDivider,
+  });
+
+  final Map<String, dynamic> member;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (showDivider)
+          const Divider(height: 1, color: Color(0xFFF1F5F9), indent: 70, endIndent: 16),
+        InkWell(
+          onTap: () {
+            // TODO: navigate to member detail page
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: member['color'] as Color,
+                  child: Text(
+                    member['id'] as String,
+                    style: TextStyle(
+                      color: member['textColor'] as Color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              member['name'] as String,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xFF1E293B),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (member['isHead'] as bool) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDCFCE7),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Family Head'.tr,
+                                style: const TextStyle(
+                                  color: Color(0xFF16A34A),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${(member['gender'] as String).tr}  •  ${(member['relation'] as String).tr}  •  ${(member['maritalStatus'] as String).tr}  •  ${(member['occupation'] as String).tr}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1), size: 20),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
