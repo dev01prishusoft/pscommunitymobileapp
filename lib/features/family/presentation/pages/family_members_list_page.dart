@@ -294,7 +294,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                           ),
                         ),
                       ),
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                      const Divider(),
                       // Use ListView.builder for lazy, indexed member rendering
                       ListView.builder(
                         shrinkWrap: true,
@@ -335,7 +335,7 @@ class _MemberTile extends StatelessWidget {
     return Column(
       children: [
         if (showDivider)
-          const Divider(height: 1, color: Color(0xFFF1F5F9), indent: 70, endIndent: 16),
+          const Divider(indent: 70, endIndent: 16),
         InkWell(
           onTap: () {
             // TODO: navigate to member detail page

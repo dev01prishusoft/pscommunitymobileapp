@@ -118,7 +118,9 @@ class HomePage extends StatelessWidget {
             context,
             icon: Icons.groups,
             title: 'Committee'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.committeeMembers);
+            },
           ),
           _buildMenuItem(
             context,
@@ -128,17 +130,27 @@ class HomePage extends StatelessWidget {
           ),
           _buildMenuItem(
             context,
-            icon: Icons.business_center,
-            title: 'Business'.tr,
+            icon: Icons.work,
+            title: 'Occupation Directory'.tr,
             onTap: () {
-              Navigator.pushNamed(context, AppRouter.business);
+              Navigator.pushNamed(context, AppRouter.occupationDirectory);
+            },
+          ),
+          _buildMenuItem(
+            context,
+            icon: Icons.contact_support,
+            title: 'Contact Us'.tr,
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.support);
             },
           ),
           _buildMenuItem(
             context,
             icon: Icons.wc,
             title: 'Matrimonial'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.marriage);
+            },
           ),
           _buildMenuItem(
             context,

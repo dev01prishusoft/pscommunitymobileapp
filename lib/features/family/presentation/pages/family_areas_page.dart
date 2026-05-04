@@ -140,7 +140,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
                     padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
                     child: Column(
                       children: [
-                        const Divider(height: 1, thickness: 0.7, color: Color.fromARGB(255, 204, 205, 206)),
+                        const Divider(),
                         const SizedBox(height: 16),
                         CustomExpandableDropdown(
                           hint: 'Select State'.tr,

@@ -129,6 +129,11 @@ class AppTheme {
 
     // 📏 Divider / Border
     dividerColor: AppColors.border,
+    dividerTheme: const DividerThemeData(
+      color: Color(0xFFF1F5F9),
+      thickness: 1,
+      space: 1,
+    ),
 
     // 🔵 AppBar
     appBarTheme: const AppBarTheme(
