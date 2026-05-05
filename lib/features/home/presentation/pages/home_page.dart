@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -104,65 +105,49 @@ class HomePage extends StatelessWidget {
             context,
             icon: Icons.family_restroom,
             title: 'Family'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.familyAreas);
-            },
+            onTap: () => Get.toNamed(AppRouter.familyAreas),
           ),
           _buildMenuItem(
             context,
             icon: Icons.person_search,
             title: 'Find Member'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.findMember);
-            },
+            onTap: () => Get.toNamed(AppRouter.findMember),
           ),
           _buildMenuItem(
             context,
             icon: Icons.groups_outlined,
             title: 'Committee'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.committees);
-            },
+            onTap: () => Get.toNamed(AppRouter.committees),
           ),
           _buildMenuItem(
             context,
             icon: Icons.account_balance_wallet,
             title: 'Payment'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.paymentHistory);
-            },
+            onTap: () => Get.toNamed(AppRouter.paymentHistory),
           ),
           _buildMenuItem(
             context,
             icon: Icons.work,
             title: 'Occupation Directory'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.occupationDirectory);
-            },
+            onTap: () => Get.toNamed(AppRouter.occupationDirectory),
           ),
           _buildMenuItem(
             context,
             icon: Icons.wc,
             title: 'Matrimonial'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.marriage);
-            },
+            onTap: () => Get.toNamed(AppRouter.marriage),
           ),
           _buildMenuItem(
             context,
             icon: Icons.share,
             title: 'Share'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.shareApp);
-            },
+            onTap: () => Get.toNamed(AppRouter.shareApp),
           ),
           _buildMenuItem(
             context,
             icon: Icons.info_outline,
             title: 'Samaj Info'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.samajProfile);
-            },
+            onTap: () => Get.toNamed(AppRouter.samajProfile),
           ),
         ],
       ),
@@ -253,10 +238,11 @@ class HomePage extends StatelessWidget {
             DropdownMenuItem(value: 'GU', child: Text(' GU')),
           ],
           onChanged: (String? newValue) {
+            final loc = Get.find<LocalizationService>();
             if (newValue == 'EN') {
-              Get.updateLocale(const Locale('en', 'US'));
+              loc.changeLocale('en', 'US');
             } else if (newValue == 'GU') {
-              Get.updateLocale(const Locale('gu', 'IN'));
+              loc.changeLocale('gu', 'IN');
             }
           },
         ),

@@ -13,7 +13,7 @@ class FindMemberPage extends StatefulWidget {
 }
 
 class _FindMemberPageState extends State<FindMemberPage> {
-  final FindMemberController _controller = Get.put(FindMemberController());
+  final FindMemberController _controller = Get.find<FindMemberController>();
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -32,7 +32,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(),
         ),
         title: Text(
           'Find Member'.tr,
@@ -80,7 +80,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   style: const TextStyle(color: AppColors.mutedForeground, fontSize: 15),
                 ),
                 Text(
-                  '${_controller.filteredMembers.length}'.tr,
+                  '${_controller.filteredMembers.length}',
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -100,6 +100,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
             child: Obx(() => AppStateView(
               state: _controller.state.value,
               emptyMessage: 'No members found'.tr,
+              onRetry: _controller.loadMembers,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _controller.filteredMembers.length,
@@ -162,9 +163,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                         ],
                       ),
                       trailing: const Icon(Icons.arrow_forward, color: AppColors.primary),
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRouter.memberProfile);
-                      },
+                      onTap: () => Get.toNamed(AppRouter.memberProfile),
                     ),
                   );
                 },

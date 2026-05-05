@@ -1,44 +1,68 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-import 'package:pscommunitymobileapp/core/constants/api_constants.dart';
+import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:pscommunitymobileapp/core/network/auth_interceptor.dart';
+import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
+import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart';
+import 'package:pscommunitymobileapp/core/network/certificate_pinning.dart';
+import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class ApiClient {
-  final http.Client _client;
+  late final Dio _dio;
+  final ConnectivityService _connectivity;
 
-  ApiClient({http.Client? client}) : _client = client ?? http.Client();
+  ApiClient({
+    required TokenManager tokenManager,
+    required ConnectivityService connectivity,
+    required VoidCallback onAuthFailure,
+  }) : _connectivity = connectivity {
+    _dio = Dio(BaseOptions(
+      baseUrl: AppEnvironment.I.apiBaseUrl,
+      connectTimeout: AppEnvironment.I.connectTimeout,
+      receiveTimeout: AppEnvironment.I.receiveTimeout,
+    ));
 
-  void close() {
-    _client.close();
+    final refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl));
+
+    CertificatePinning.configure(_dio);
+
+    _dio.interceptors.addAll([
+      AuthInterceptor(
+        tokenManager: tokenManager,
+        refreshDio: refreshDio,
+        onAuthFailure: onAuthFailure,
+      ),
+      RetryInterceptor(),
+      ErrorMappingInterceptor(),
+      if (AppEnvironment.I.enableLogging)
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+          compact: true,
+        ),
+    ]);
   }
 
-  Future<Map<String, dynamic>> post(
-    String path, {
-    required Map<String, dynamic> body,
-    Map<String, String>? headers,
-  }) async {
-    final response = await _client.post(
-      Uri.parse('${ApiConstants.baseUrl}$path'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        ...?headers,
-      },
-      body: jsonEncode(body),
-    ).timeout(
-      const Duration(seconds: 30),
-      onTimeout: () => throw Exception('Request timed out'),
-    );
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+    await _checkConnectivity();
+    return _dio.get(path, queryParameters: queryParameters);
+  }
 
-    final decoded = response.body.isNotEmpty
-        ? jsonDecode(response.body) as Map<String, dynamic>
-        : <String, dynamic>{};
+  Future<Response> post(String path, {dynamic data}) async {
+    await _checkConnectivity();
+    return _dio.post(path, data: data);
+  }
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final errorMessage = decoded['message']?.toString() ??
-          'Request failed (${response.statusCode})';
-      throw Exception(errorMessage);
+  Future<void> _checkConnectivity() async {
+    if (!await _connectivity.hasConnection()) {
+      throw const NetworkFailure();
     }
+  }
 
-    return decoded;
+  void close() {
+    _dio.close();
   }
 }

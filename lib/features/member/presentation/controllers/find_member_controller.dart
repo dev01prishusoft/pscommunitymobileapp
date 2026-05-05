@@ -1,45 +1,42 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class FindMemberController extends GetxController {
-  final Rx<AppState> state = AppState.data.obs;
+  final MemberRepository _repository;
+
+  FindMemberController(this._repository);
+
+  final Rx<AppState> state = AppState.loading.obs;
+  final RxList<Map<String, String>> allMembers = <Map<String, String>>[].obs;
   final RxList<Map<String, String>> filteredMembers = <Map<String, String>>[].obs;
   final RxString searchQuery = ''.obs;
-
-  static const List<Map<String, String>> allMembers = [
-    {
-      'name': 'Rajesh Kumar Patel',
-      'info': 'Male • Self • Married • Engineer',
-      'location': 'Satellite, Daskroi',
-    },
-    {
-      'name': 'Priya Rajesh Patel',
-      'info': 'Female • Wife • Married • Teacher',
-      'location': 'Satellite, Daskroi',
-    },
-    {
-      'name': 'Amit Mehta',
-      'info': 'Male • Self • Married • Business',
-      'location': 'Naranpura, Daskroi',
-    },
-    {
-      'name': 'Neha Mehta',
-      'info': 'Female • Wife • Married • Doctor',
-      'location': 'Naranpura, Daskroi',
-    },
-  ];
 
   @override
   void onInit() {
     super.onInit();
-    filteredMembers.assignAll(allMembers);
+    loadMembers();
+  }
+
+  Future<void> loadMembers() async {
+    state.value = AppState.loading;
+    try {
+      final members = await _repository.getMembers();
+      allMembers.assignAll(members);
+      filteredMembers.assignAll(members);
+      state.value = members.isEmpty ? AppState.empty : AppState.data;
+    } catch (e, stack) {
+      AppLogger.e('Failed to load members', e, stack);
+      state.value = AppState.error;
+    }
   }
 
   void search(String query) {
     searchQuery.value = query;
     if (query.isEmpty) {
       filteredMembers.assignAll(allMembers);
-      state.value = AppState.data;
+      state.value = allMembers.isEmpty ? AppState.empty : AppState.data;
     } else {
       final results = allMembers.where((m) {
         final name = m['name']?.toLowerCase() ?? '';
@@ -57,6 +54,6 @@ class FindMemberController extends GetxController {
   void clearSearch() {
     searchQuery.value = '';
     filteredMembers.assignAll(allMembers);
-    state.value = AppState.data;
+    state.value = allMembers.isEmpty ? AppState.empty : AppState.data;
   }
 }

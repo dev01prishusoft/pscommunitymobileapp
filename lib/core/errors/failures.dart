@@ -1,0 +1,41 @@
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+
+abstract class Failure implements Exception {
+  final String message;
+  final String translationKey;
+
+  const Failure(this.message, {required this.translationKey});
+
+  @override
+  String toString() => message;
+}
+
+class ServerFailure extends Failure {
+  const ServerFailure([super.message = 'Server error occurred'])
+      : super(translationKey: LK.errorServer);
+}
+
+class NetworkFailure extends Failure {
+  const NetworkFailure([super.message = 'No internet connection'])
+      : super(translationKey: LK.errorNoInternet);
+}
+
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure([super.message = 'Unauthorized access'])
+      : super(translationKey: LK.errorUnauthorized);
+}
+
+class TimeoutFailure extends Failure {
+  const TimeoutFailure([super.message = 'Request timed out'])
+      : super(translationKey: LK.errorTimeout);
+}
+
+class CertificatePinningFailure extends Failure {
+  const CertificatePinningFailure([super.message = 'Certificate pinning mismatch'])
+      : super(translationKey: LK.errorCertificatePinning);
+}
+
+class ValidationFailure extends Failure {
+  const ValidationFailure(super.message)
+      : super(translationKey: LK.errorValidation);
+}

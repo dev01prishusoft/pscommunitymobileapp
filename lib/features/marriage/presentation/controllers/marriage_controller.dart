@@ -1,9 +1,14 @@
 import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class MarriageController extends GetxController {
-  final Rx<AppState> state = AppState.data.obs;
+  final MarriageRepository _repository;
+
+  MarriageController(this._repository);
+
+  final Rx<AppState> state = AppState.loading.obs;
   
   // Filter Observables
   final RxBool lookingForMarriage = true.obs;
@@ -27,48 +32,25 @@ class MarriageController extends GetxController {
   
   final RxString searchQuery = ''.obs;
 
-  static final List<Map<String, dynamic>> allMembers = [
-    {
-      'name': 'Rajesh Patel',
-      'age': '28 yrs',
-      'occupation': 'Engineer',
-      'gotra': 'Kashyap Gotra',
-      'location': 'Ahmedabad, Daskroi, Satellite',
-      'lookingForMarriage': true,
-      'gender': 'Male',
-      'avatarColor': Color(0xFFBBDEFB),
-      'avatarIconColor': Colors.blue,
-    },
-    {
-      'name': 'Priya Shah',
-      'age': '26 yrs',
-      'occupation': 'Doctor',
-      'gotra': 'Bharadwaj Gotra',
-      'location': 'Ahmedabad, Daskroi, Naranpura',
-      'lookingForMarriage': true,
-      'gender': 'Female',
-      'avatarColor': Color(0xFFF8BBD0),
-      'avatarIconColor': Colors.pink,
-    },
-    {
-      'name': 'Amit Mehta',
-      'age': '32 yrs',
-      'occupation': 'Business',
-      'gotra': 'Vashishtha Gotra',
-      'location': 'Gandhinagar, City, Sector 21',
-      'lookingForMarriage': false,
-      'gender': 'Male',
-      'avatarColor': Color(0xFFBBDEFB),
-      'avatarIconColor': Colors.blue,
-    },
-  ];
-
+  final RxList<Map<String, dynamic>> allMembers = <Map<String, dynamic>>[].obs;
   final RxList<Map<String, dynamic>> filteredMembers = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    applyFilters();
+    loadProfiles();
+  }
+
+  Future<void> loadProfiles() async {
+    state.value = AppState.loading;
+    try {
+      final profiles = await _repository.getMatrimonialProfiles();
+      allMembers.assignAll(profiles);
+      applyFilters();
+    } catch (e, stack) {
+      AppLogger.e('Failed to load matrimonial profiles', e, stack);
+      state.value = AppState.error;
+    }
   }
 
   void applyFilters() {
@@ -83,7 +65,6 @@ class MarriageController extends GetxController {
         if (!name.contains(searchQuery.value.toLowerCase())) return false;
       }
       
-      // Advanced filters (omitted for brevity in mock, but structure is here)
       return true;
     }).toList();
     
@@ -99,7 +80,6 @@ class MarriageController extends GetxController {
     selectedGender.value = 'All';
     lookingForMarriage.value = true;
     searchQuery.value = '';
-    // Reset all other filters...
     applyFilters();
   }
 }

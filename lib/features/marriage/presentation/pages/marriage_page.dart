@@ -12,7 +12,7 @@ class MarriagePage extends StatefulWidget {
 }
 
 class _MarriagePageState extends State<MarriagePage> {
-  final MarriageController _controller = Get.put(MarriageController());
+  final MarriageController _controller = Get.find<MarriageController>();
   final TextEditingController _searchController = TextEditingController();
 
   // Constants for Dropdowns (kept here for UI list)
@@ -40,7 +40,7 @@ class _MarriagePageState extends State<MarriagePage> {
         title: Text('Marriage'.tr),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(),
         ),
       ),
       body: Stack(

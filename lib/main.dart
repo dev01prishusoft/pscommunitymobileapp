@@ -1,25 +1,22 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/app/app.dart';
-import 'package:pscommunitymobileapp/core/localization/app_translations.dart';
+import 'package:pscommunitymobileapp/core/di/di.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Load translations from JSON assets in parallel
-  final results = await Future.wait([
-    rootBundle.loadString('assets/locales/en_US.json'),
-    rootBundle.loadString('assets/locales/gu_IN.json'),
-  ]);
-  
-  final enUSMap = Map<String, String>.from(jsonDecode(results[0]));
-  final guINMap = Map<String, String>.from(jsonDecode(results[1]));
+    // Orientation Lock
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  final translations = AppTranslations({
-    'en_US': enUSMap,
-    'gu_IN': guINMap,
-  });
+    // Bootstrap DI (hydrates tokens, locale, config)
+    await DI.bootstrap();
 
-  runApp(PsCommunityApp(translations: translations));
+    runApp(const PsCommunityApp());
+  } catch (e, stack) {
+    AppLogger.e('Fatal crash during bootstrap', e, stack);
+    // You could show a fatal error screen here
+  }
 }

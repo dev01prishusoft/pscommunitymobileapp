@@ -326,5 +326,17 @@
   "MEM001234": "MEM001234",
   "TXN123456": "TXN123456",
   "555588855": "555588855",
-  "0": "0"
+  "0": "0",
+  "PS Community": "PS કોમ્યુનિટી",
+  "Welcome to Prishusoft Samaj": "પ્રિશુસોફ્ટ સમાજમાં આપનું સ્વાગત છે",
+  "An error occurred on the server. Please try again.": "સર્વર પર ભૂલ આવી. કૃપા કરીને ફરી પ્રયાસ કરો.",
+  "No internet connection. Please check your network.": "ઇન્ટરનેટ કનેક્શન નથી. કૃપા કરીને તમારું નેટવર્ક તપાસો.",
+  "Unauthorized access. Please login again.": "અનધિકૃત ઍક્સેસ. કૃપા કરીને ફરીથી લોગિન કરો.",
+  "Connection timed out. Please try again.": "કનેક્શન સમયસીમા સમાપ્ત થઈ ગઈ. કૃપા કરીને ફરી પ્રયાસ કરો.",
+  "Security verification failed. Please update the app.": "સુરક્ષા ચકાસણી નિષ્ફળ રહી. કૃપા કરીને એપ અપડેટ કરો.",
+  "Validation error occurred.": "માન્યતા ભૂલ આવી.",
+  "Invalid mobile number or password": "અમાન્ય મોબાઇલ નંબર અથવા પાસવર્ડ",
+  "Update Available": "અપડેટ ઉપલબ્ધ છે",
+  "Update Now": "હમણાં અપડેટ કરો",
+  "Later": "પછીથી"
 }

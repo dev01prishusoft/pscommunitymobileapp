@@ -319,5 +319,17 @@
   "MEM001234": "MEM001234",
   "TXN123456": "TXN123456",
   "555588855": "555588855",
-  "0": "0"
+  "0": "0",
+  "PS Community": "PS Community",
+  "Welcome to Prishusoft Samaj": "Welcome to Prishusoft Samaj",
+  "An error occurred on the server. Please try again.": "An error occurred on the server. Please try again.",
+  "No internet connection. Please check your network.": "No internet connection. Please check your network.",
+  "Unauthorized access. Please login again.": "Unauthorized access. Please login again.",
+  "Connection timed out. Please try again.": "Connection timed out. Please try again.",
+  "Security verification failed. Please update the app.": "Security verification failed. Please update the app.",
+  "Validation error occurred.": "Validation error occurred.",
+  "Invalid mobile number or password": "Invalid mobile number or password",
+  "Update Available": "Update Available",
+  "Update Now": "Update Now",
+  "Later": "Later"
 }

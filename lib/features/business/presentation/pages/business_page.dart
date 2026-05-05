@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
+import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
 
 class BusinessPage extends StatelessWidget {
   const BusinessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<BusinessController>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -23,6 +28,10 @@ class BusinessPage extends StatelessWidget {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(24),
@@ -30,77 +39,40 @@ class BusinessPage extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.9,
-            children: [
-              _buildCategoryCard(
-                context,
-                icon: Icons.directions_car_rounded,
-                title: 'Automobile'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
+        child: Obx(() => AppStateView(
+          state: controller.state.value,
+          onRetry: controller.loadCategories,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.9,
               ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.more_horiz_rounded,
-                title: 'Other'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.chair_rounded,
-                title: 'Furniture'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.school_rounded,
-                title: 'Education / Training'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.local_hospital_rounded,
-                title: 'Health / Medical'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.electrical_services_rounded,
-                title: 'Electronics / Electrician'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.dry_cleaning_rounded,
-                title: 'Tailor / Garments'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-              _buildCategoryCard(
-                context,
-                icon: Icons.face_retouching_natural_rounded,
-                title: 'Beauty / Cosmetics'.tr,
-                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
-              ),
-            ],
+              itemCount: controller.categories.length,
+              itemBuilder: (context, index) {
+                final category = controller.categories[index];
+                return _CategoryCard(category: category);
+              },
+            ),
           ),
-        ),
+        )),
       ),
     );
   }
+}
 
-  Widget _buildCategoryCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
+class _CategoryCard extends StatelessWidget {
+  final BusinessCategory category;
+
+  const _CategoryCard({required this.category});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => Get.toNamed(AppRouter.occupationDirectory),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.card,
@@ -116,20 +88,19 @@ class BusinessPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Premium Icon Container
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 40, color: AppColors.primary),
+              child: Icon(category.icon, size: 40, color: AppColors.primary),
             ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                title,
+                category.title.tr,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.foreground,

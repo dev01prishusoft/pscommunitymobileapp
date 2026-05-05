@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 
 class PostLoginSplashPage extends StatefulWidget {
   const PostLoginSplashPage({super.key});
@@ -19,11 +20,6 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
   @override
   void initState() {
     super.initState();
-
-    // Set primary language to Gujarati as requested
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.updateLocale(const Locale('gu', 'IN'));
-    });
 
     // Animation setup
     _controller = AnimationController(
@@ -44,7 +40,7 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
     // Navigate after delay
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRouter.home);
+        Get.offNamed(AppRouter.home);
       }
     });
   }
@@ -57,7 +53,8 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppUpdateGate(
+      child: Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
@@ -190,6 +187,7 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
             ),
           ),
         ],
+      ),
       ),
     );
   }

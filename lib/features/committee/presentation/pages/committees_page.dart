@@ -1,57 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 
-class CommitteesPage extends StatefulWidget {
+class CommitteesPage extends StatelessWidget {
   const CommitteesPage({super.key});
 
   @override
-  State<CommitteesPage> createState() => _CommitteesPageState();
-}
-
-class _CommitteesPageState extends State<CommitteesPage> {
-  final List<CommitteeNode> _committees = [
-    CommitteeNode(
-      name: 'Executive Board',
-      memberCount: 5,
-      isExpanded: true,
-      children: [
-        CommitteeNode(
-          name: 'Managing Committee',
-          memberCount: 12,
-          isExpanded: true,
-          children: [
-            CommitteeNode(
-              name: 'Finance Sub-Committee',
-              memberCount: 4,
-            ),
-          ],
-        ),
-        CommitteeNode(
-          name: 'Election Committee',
-          memberCount: 5,
-        ),
-      ],
-    ),
-    CommitteeNode(
-      name: 'Standing Committees',
-      memberCount: 0, // Not explicitly shown in image for parent
-      isExpanded: true,
-      children: [
-        CommitteeNode(
-          name: 'Temple Committee',
-          memberCount: 8,
-        ),
-        CommitteeNode(
-          name: 'Education Committee',
-          memberCount: 6,
-        ),
-      ],
-    ),
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<CommitteeController>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -59,20 +20,37 @@ class _CommitteesPageState extends State<CommitteesPage> {
           'Committees'.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF0066CC),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _committees.length,
-        itemBuilder: (context, index) {
-          return _buildCommitteeCard(_committees[index]);
-        },
-      ),
+      body: Obx(() => AppStateView(
+        state: controller.state.value,
+        onRetry: controller.loadCommittees,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: controller.committees.length,
+          itemBuilder: (context, index) {
+            return _CommitteeCard(node: controller.committees[index]);
+          },
+        ),
+      )),
     );
   }
+}
 
-  Widget _buildCommitteeCard(CommitteeNode node) {
+class _CommitteeCard extends StatelessWidget {
+  final CommitteeNode node;
+
+  const _CommitteeCard({required this.node});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<CommitteeController>();
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -88,21 +66,28 @@ class _CommitteesPageState extends State<CommitteesPage> {
       ),
       child: Column(
         children: [
-          _buildCommitteeTile(node, isRoot: true),
+          _CommitteeTile(node: node, isRoot: true),
           if (node.isExpanded && node.children.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildChildrenList(node.children, depth: 1),
+              child: _ChildrenList(children: node.children, depth: 1),
             ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildChildrenList(List<CommitteeNode> children, {int depth = 1}) {
+class _ChildrenList extends StatelessWidget {
+  final List<CommitteeNode> children;
+  final int depth;
+
+  const _ChildrenList({required this.children, this.depth = 1});
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Vertical line for tree structure
         Positioned(
           left: 32.0 * depth - 16,
           top: 0,
@@ -116,22 +101,36 @@ class _CommitteesPageState extends State<CommitteesPage> {
           children: children.map((child) {
             return Column(
               children: [
-                _buildCommitteeTile(child, depth: depth),
+                _CommitteeTile(node: child, depth: depth),
                 if (child.isExpanded && child.children.isNotEmpty)
-                  _buildChildrenList(child.children, depth: depth + 1),
+                  _ChildrenList(children: child.children, depth: depth + 1),
               ],
             );
           }).toList(),
-        ), 
+        ),
       ],
     );
   }
+}
 
-  Widget _buildCommitteeTile(CommitteeNode node, {int depth = 0, bool isRoot = false}) {
+class _CommitteeTile extends StatelessWidget {
+  final CommitteeNode node;
+  final int depth;
+  final bool isRoot;
+
+  const _CommitteeTile({
+    required this.node,
+    this.depth = 0,
+    this.isRoot = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<CommitteeController>();
+
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(
-          context,
+        Get.toNamed(
           AppRouter.committeeDetails,
           arguments: node.getAllNames(),
         );
@@ -148,16 +147,12 @@ class _CommitteesPageState extends State<CommitteesPage> {
             GestureDetector(
               onTap: node.children.isEmpty
                   ? null
-                  : () {
-                      setState(() {
-                        node.isExpanded = !node.isExpanded;
-                      });
-                    },
+                  : () => controller.toggleNode(node),
               child: Icon(
                 node.children.isEmpty
                     ? Icons.chevron_right
                     : (node.isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right),
-                color: const Color(0xFF0066CC),
+                color: AppColors.primary,
                 size: 24,
               ),
             ),
@@ -171,7 +166,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
                     style: TextStyle(
                       fontWeight: isRoot ? FontWeight.bold : FontWeight.w600,
                       fontSize: isRoot ? 16 : 14,
-                      color: const Color(0xFF1E293B),
+                      color: AppColors.secondary,
                     ),
                   ),
                   if (node.memberCount > 0)
@@ -179,9 +174,9 @@ class _CommitteesPageState extends State<CommitteesPage> {
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
                         '${'Members'.tr}: ${node.memberCount}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: AppColors.mutedForeground,
                         ),
                       ),
                     ),
@@ -190,34 +185,12 @@ class _CommitteesPageState extends State<CommitteesPage> {
             ),
             const Icon(
               Icons.arrow_forward,
-              color: Color(0xFF0066CC),
+              color: AppColors.primary,
               size: 20,
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class CommitteeNode {
-  final String name;
-  final int memberCount;
-  final List<CommitteeNode> children;
-  bool isExpanded;
-
-  CommitteeNode({
-    required this.name,
-    this.memberCount = 0,
-    this.children = const [],
-    this.isExpanded = false,
-  });
-
-  List<String> getAllNames() {
-    List<String> names = [name];
-    for (var child in children) {
-      names.addAll(child.getAllNames());
-    }
-    return names;
   }
 }

@@ -6,4 +6,7 @@
 ///
 /// ⚠️  MUST be `false` before any production / staging build.
 /// ─────────────────────────────────────────────────────────────────────────────
-const bool kUiReviewMode = true; // ← flip to false for production
+const bool kUiReviewMode = bool.fromEnvironment(
+  'UI_REVIEW_MODE',
+  defaultValue: true,
+);

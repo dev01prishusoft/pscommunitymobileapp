@@ -50,5 +50,21 @@
 		<string>https</string>
 		<string>tel</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>gu</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take profile pictures.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to upload profile pictures.</string>
 </dict>
 </plist>

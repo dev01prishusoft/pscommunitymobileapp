@@ -1,7 +1,8 @@
-import 'package:pscommunitymobileapp/core/constants/api_constants.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/repositories/auth_repository.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final ApiClient _apiClient;
@@ -14,25 +15,28 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     final response = await _apiClient.post(
-      ApiConstants.loginPath,
-      body: <String, dynamic>{
+      ApiEndpoints.login,
+      data: {
         'mobile': mobile,
         'password': password,
         'ipAddress': '',
       },
     );
 
-    final succeeded = response['succeeded'] as bool? ?? false;
+    final data = response.data;
+    final succeeded = data['succeeded'] as bool? ?? false;
+    
     if (!succeeded) {
-      throw Exception(response['message']?.toString() ?? 'Login failed');
+      final msg = data['message']?.toString() ?? 'Login failed';
+      throw ServerFailure(msg);
     }
 
-    final data = response['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
-    final accessToken = data['accessToken']?.toString() ?? '';
-    final refreshToken = data['refreshToken']?.toString() ?? '';
+    final authData = data['data'] as Map<String, dynamic>? ?? {};
+    final accessToken = authData['accessToken']?.toString() ?? '';
+    final refreshToken = authData['refreshToken']?.toString() ?? '';
 
     if (accessToken.isEmpty || refreshToken.isEmpty) {
-      throw Exception('Login response is missing authentication tokens');
+      throw const ServerFailure('Login response is missing authentication tokens');
     }
 
     return AuthTokens(
