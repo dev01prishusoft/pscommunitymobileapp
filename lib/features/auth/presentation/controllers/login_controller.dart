@@ -47,7 +47,14 @@ class LoginController extends GetxController {
       tokens.value = newTokens;
       return true;
     } catch (e) {
-      error.value = e.toString().replaceFirst('Exception: ', '');
+      final errorMessage = e.toString();
+      if (errorMessage.contains('401')) {
+        error.value = 'Invalid mobile number or password'.tr;
+      } else if (errorMessage.contains('TimeoutException')) {
+        error.value = 'Connection timed out. Please try again.'.tr;
+      } else {
+        error.value = 'Login failed. Please check your credentials.'.tr;
+      }
       return false;
     } finally {
       isLoading.value = false;

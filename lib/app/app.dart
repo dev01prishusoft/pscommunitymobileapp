@@ -57,14 +57,14 @@ class _PsCommunityAppState extends State<PsCommunityApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'PS Community',
+      title: 'PS Community'.tr,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       translations: widget.translations ?? AppTranslations({}),
       locale: const Locale('en', 'US'),
       fallbackLocale: const Locale('en', 'US'),
       initialRoute: AppRouter.login,
-      routes: AppRouter.routes,
+      getPages: AppRouter.pages,
     );
   }
 }

@@ -18,7 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
       body: <String, dynamic>{
         'mobile': mobile,
         'password': password,
-        'ipAddress': 'mobile-app',
+        'ipAddress': '',
       },
     );
 

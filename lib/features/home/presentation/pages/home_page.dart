@@ -112,21 +112,25 @@ class HomePage extends StatelessWidget {
             context,
             icon: Icons.person_search,
             title: 'Find Member'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.findMember);
+            },
           ),
           _buildMenuItem(
             context,
-            icon: Icons.groups,
+            icon: Icons.groups_outlined,
             title: 'Committee'.tr,
             onTap: () {
-              Navigator.pushNamed(context, AppRouter.committeeMembers);
+              Navigator.pushNamed(context, AppRouter.committees);
             },
           ),
           _buildMenuItem(
             context,
             icon: Icons.account_balance_wallet,
             title: 'Payment'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.paymentHistory);
+            },
           ),
           _buildMenuItem(
             context,
@@ -134,14 +138,6 @@ class HomePage extends StatelessWidget {
             title: 'Occupation Directory'.tr,
             onTap: () {
               Navigator.pushNamed(context, AppRouter.occupationDirectory);
-            },
-          ),
-          _buildMenuItem(
-            context,
-            icon: Icons.contact_support,
-            title: 'Contact Us'.tr,
-            onTap: () {
-              Navigator.pushNamed(context, AppRouter.support);
             },
           ),
           _buildMenuItem(
@@ -154,21 +150,19 @@ class HomePage extends StatelessWidget {
           ),
           _buildMenuItem(
             context,
-            icon: Icons.headset_mic,
-            title: 'Support'.tr,
-            onTap: () {},
-          ),
-          _buildMenuItem(
-            context,
             icon: Icons.share,
             title: 'Share'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.shareApp);
+            },
           ),
           _buildMenuItem(
             context,
             icon: Icons.info_outline,
             title: 'Samaj Info'.tr,
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, AppRouter.samajProfile);
+            },
           ),
         ],
       ),

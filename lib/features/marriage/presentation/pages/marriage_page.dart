@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
 
 class MarriagePage extends StatefulWidget {
   const MarriagePage({super.key});
@@ -10,27 +12,10 @@ class MarriagePage extends StatefulWidget {
 }
 
 class _MarriagePageState extends State<MarriagePage> {
-  bool _lookingForMarriage = true;
-  String _selectedGender = 'All';
-  bool _isAdvancedFiltersOpen = true;
-  bool _excludeSameGotra = false;
+  final MarriageController _controller = Get.put(MarriageController());
+  final TextEditingController _searchController = TextEditingController();
 
-  // Filter State Variables
-  String _selectedAgeFrom = '18';
-  String _selectedAgeTo = '60';
-  String _selectedHeightFrom = '4.5 ft';
-  String _selectedHeightTo = '6.5 ft';
-  String _selectedGotra = 'Any';
-  String _selectedMaritalStatus = 'All';
-  String _selectedState = 'All';
-  String _selectedDistrict = 'All';
-  String _selectedTaluka = 'All';
-  String _selectedEducation = 'Any';
-  String _selectedOccupation = 'Any';
-  String _selectedIncomeFrom = 'Any';
-  String _selectedIncomeTo = 'Any';
-
-  // Constants for Dropdowns
+  // Constants for Dropdowns (kept here for UI list)
   final List<String> _ages = List.generate(43, (i) => (18 + i).toString());
   final List<String> _heights = List.generate(31, (i) => '${(4.0 + i * 0.1).toStringAsFixed(1)} ft');
   final List<String> _gotras = ['Any', 'Kashyap Gotra', 'Bharadwaj Gotra', 'Vashishtha Gotra'];
@@ -42,41 +27,11 @@ class _MarriagePageState extends State<MarriagePage> {
   final List<String> _occupations = ['Any', 'Business', 'Engineer', 'Doctor', 'Teacher', 'Student', 'Homemaker'];
   final List<String> _incomeRanges = ['Any', '1-2 Lakh', '2-5 Lakh', '5-10 Lakh', '10+ Lakh'];
 
-  final List<Map<String, dynamic>> _members = [
-    {
-      'name': 'Rajesh Patel',
-      'age': '28 yrs',
-      'occupation': 'Engineer',
-      'gotra': 'Kashyap Gotra',
-      'location': 'Ahmedabad, Daskroi, Satellite',
-      'lookingForMarriage': true,
-      'gender': 'Male',
-      'avatarColor': Colors.blue.shade100,
-      'avatarIconColor': Colors.blue,
-    },
-    {
-      'name': 'Priya Shah',
-      'age': '26 yrs',
-      'occupation': 'Doctor',
-      'gotra': 'Bharadwaj Gotra',
-      'location': 'Ahmedabad, Daskroi, Naranpura',
-      'lookingForMarriage': true,
-      'gender': 'Female',
-      'avatarColor': Colors.pink.shade100,
-      'avatarIconColor': Colors.pink,
-    },
-    {
-      'name': 'Amit Mehta',
-      'age': '32 yrs',
-      'occupation': 'Business',
-      'gotra': 'Vashishtha Gotra',
-      'location': 'Gandhinagar, City, Sector 21',
-      'lookingForMarriage': false,
-      'gender': 'Male',
-      'avatarColor': Colors.blue.shade100,
-      'avatarIconColor': Colors.blue,
-    },
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,15 +93,17 @@ class _MarriagePageState extends State<MarriagePage> {
                                 maxLines: 1,
                               ),
                             ),
-                            Transform.scale(
+                            Obx(() => Transform.scale(
                               scale: 0.7,
                               child: Switch(
-                                value: _lookingForMarriage,
-                                onChanged: (val) =>
-                                    setState(() => _lookingForMarriage = val),
+                                value: _controller.lookingForMarriage.value,
+                                onChanged: (val) {
+                                  _controller.lookingForMarriage.value = val;
+                                  _controller.applyFilters();
+                                },
                                 activeThumbColor: AppColors.primary,
                               ),
-                            ),
+                            )),
                           ],
                         ),
                       ),
@@ -163,8 +120,8 @@ class _MarriagePageState extends State<MarriagePage> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _selectedGender,
+                              child: Obx(() => DropdownButton<String>(
+                                value: _controller.selectedGender.value,
                                 isDense: true,
                                 items: ['All', 'Male', 'Female']
                                     .map((e) => DropdownMenuItem(
@@ -173,9 +130,11 @@ class _MarriagePageState extends State<MarriagePage> {
                                               style: const TextStyle(fontSize: 11)),
                                         ))
                                     .toList(),
-                                onChanged: (val) =>
-                                    setState(() => _selectedGender = val!),
-                              ),
+                                onChanged: (val) {
+                                  _controller.selectedGender.value = val!;
+                                  _controller.applyFilters();
+                                },
+                              )),
                             ),
                           ),
                         ],
@@ -191,12 +150,21 @@ class _MarriagePageState extends State<MarriagePage> {
                     children: [
                       Expanded(
                         child: TextField(
+                          controller: _searchController,
+                          onChanged: (val) {
+                            _controller.searchQuery.value = val;
+                            _controller.applyFilters();
+                          },
                           decoration: InputDecoration(
                             hintText: 'Search by name or member ID...'.tr,
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.close),
-                              onPressed: () {},
+                              onPressed: () {
+                                _searchController.clear();
+                                _controller.searchQuery.value = '';
+                                _controller.applyFilters();
+                              },
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
@@ -206,13 +174,12 @@ class _MarriagePageState extends State<MarriagePage> {
                       ),
                       const SizedBox(width: 8),
                       // Filter Toggle Button
-                      InkWell(
-                        onTap: () => setState(() =>
-                            _isAdvancedFiltersOpen = !_isAdvancedFiltersOpen),
+                      Obx(() => InkWell(
+                        onTap: () => _controller.toggleAdvancedFilters(),
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _isAdvancedFiltersOpen
+                            color: _controller.isAdvancedFiltersOpen.value
                                 ? AppColors.primary
                                 : Colors.white,
                             border: Border.all(color: AppColors.border),
@@ -221,44 +188,50 @@ class _MarriagePageState extends State<MarriagePage> {
                           child: Icon(
                             Icons.tune,
                             size: 20,
-                            color: _isAdvancedFiltersOpen
+                            color: _controller.isAdvancedFiltersOpen.value
                                 ? Colors.white
                                 : AppColors.secondary,
                           ),
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ),
 
                 // Member List
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _members.length,
-                  itemBuilder: (context, index) {
-                    return _buildMemberCard(_members[index]);
-                  },
-                ),
+                Obx(() => AppStateView(
+                  state: _controller.state.value,
+                  emptyMessage: 'No matches found'.tr,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _controller.filteredMembers.length,
+                    itemBuilder: (context, index) {
+                      return _buildMemberCard(_controller.filteredMembers[index]);
+                    },
+                  ),
+                )),
                 const SizedBox(height: 80), // Space for bottom
               ],
             ),
           ),
 
           // Sliding Advanced Filters Panel
-          if (_isAdvancedFiltersOpen)
-            GestureDetector(
-              onTap: () => setState(() => _isAdvancedFiltersOpen = false),
-              child: Container(
-                color: Colors.black26,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            ),
-          AnimatedPositioned(
+          Obx(() => _controller.isAdvancedFiltersOpen.value
+            ? GestureDetector(
+                onTap: () => _controller.isAdvancedFiltersOpen.value = false,
+                child: Container(
+                  color: Colors.black26,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              )
+            : const SizedBox.shrink()),
+          
+          Obx(() => AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            top: _isAdvancedFiltersOpen ? 0 : -MediaQuery.of(context).size.height,
+            top: _controller.isAdvancedFiltersOpen.value ? 0 : -MediaQuery.of(context).size.height,
             left: 0,
             right: 0,
             child: Container(
@@ -299,7 +272,7 @@ class _MarriagePageState extends State<MarriagePage> {
                         IconButton(
                           icon: const Icon(Icons.close),
                           onPressed: () =>
-                              setState(() => _isAdvancedFiltersOpen = false),
+                              _controller.isAdvancedFiltersOpen.value = false,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         ),
@@ -315,24 +288,24 @@ class _MarriagePageState extends State<MarriagePage> {
                         children: [
                           _buildFilterRow(
                             label: 'Age Range:'.tr,
-                            fromValue: _selectedAgeFrom,
-                            toValue: _selectedAgeTo,
+                            fromValue: _controller.selectedAgeFrom.value,
+                            toValue: _controller.selectedAgeTo.value,
                             items: _ages,
                             onFromChanged: (val) =>
-                                setState(() => _selectedAgeFrom = val!),
+                                _controller.selectedAgeFrom.value = val!,
                             onToChanged: (val) =>
-                                setState(() => _selectedAgeTo = val!),
+                                _controller.selectedAgeTo.value = val!,
                           ),
                           const SizedBox(height: 12),
                           _buildFilterRow(
                             label: 'Height Range:'.tr,
-                            fromValue: _selectedHeightFrom,
-                            toValue: _selectedHeightTo,
+                            fromValue: _controller.selectedHeightFrom.value,
+                            toValue: _controller.selectedHeightTo.value,
                             items: _heights,
                             onFromChanged: (val) =>
-                                setState(() => _selectedHeightFrom = val!),
+                                _controller.selectedHeightFrom.value = val!,
                             onToChanged: (val) =>
-                                setState(() => _selectedHeightTo = val!),
+                                _controller.selectedHeightTo.value = val!,
                           ),
                           const SizedBox(height: 12),
                           Row(
@@ -344,19 +317,19 @@ class _MarriagePageState extends State<MarriagePage> {
                               ),
                               Expanded(
                                 child: _buildDropdownField(
-                                  value: _selectedGotra,
+                                  value: _controller.selectedGotra.value,
                                   items: _gotras,
                                   onChanged: (val) =>
-                                      setState(() => _selectedGotra = val!),
+                                      _controller.selectedGotra.value = val!,
                                 ),
                               ),
                               const SizedBox(width: 8),
                               Checkbox(
-                                value: _excludeSameGotra,
+                                value: _controller.excludeSameGotra.value,
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                                 onChanged: (val) =>
-                                    setState(() => _excludeSameGotra = val!),
+                                    _controller.excludeSameGotra.value = val!,
                               ),
                               Flexible(
                                 child: Text('Exclude same gotra'.tr,
@@ -374,10 +347,9 @@ class _MarriagePageState extends State<MarriagePage> {
                               ),
                               Expanded(
                                 child: _buildDropdownField(
-                                  value: _selectedMaritalStatus,
+                                  value: _controller.selectedMaritalStatus.value,
                                   items: _maritalStatuses,
-                                  onChanged: (val) => setState(
-                                      () => _selectedMaritalStatus = val!),
+                                  onChanged: (val) => _controller.selectedMaritalStatus.value = val!,
                                 ),
                               ),
                             ],
@@ -404,10 +376,9 @@ class _MarriagePageState extends State<MarriagePage> {
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: _buildDropdownField(
-                                            value: _selectedState,
+                                            value: _controller.selectedState.value,
                                             items: _states,
-                                            onChanged: (val) => setState(
-                                                () => _selectedState = val!),
+                                            onChanged: (val) => _controller.selectedState.value = val!,
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -416,10 +387,9 @@ class _MarriagePageState extends State<MarriagePage> {
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: _buildDropdownField(
-                                            value: _selectedDistrict,
+                                            value: _controller.selectedDistrict.value,
                                             items: _districts,
-                                            onChanged: (val) => setState(
-                                                () => _selectedDistrict = val!),
+                                            onChanged: (val) => _controller.selectedDistrict.value = val!,
                                           ),
                                         ),
                                       ],
@@ -432,10 +402,9 @@ class _MarriagePageState extends State<MarriagePage> {
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: _buildDropdownField(
-                                            value: _selectedTaluka,
+                                            value: _controller.selectedTaluka.value,
                                             items: _talukas,
-                                            onChanged: (val) => setState(
-                                                () => _selectedTaluka = val!),
+                                            onChanged: (val) => _controller.selectedTaluka.value = val!,
                                           ),
                                         ),
                                       ],
@@ -455,10 +424,10 @@ class _MarriagePageState extends State<MarriagePage> {
                               ),
                               Expanded(
                                 child: _buildDropdownField(
-                                  value: _selectedEducation,
+                                  value: _controller.selectedEducation.value,
                                   items: _educations,
                                   onChanged: (val) =>
-                                      setState(() => _selectedEducation = val!),
+                                      _controller.selectedEducation.value = val!,
                                 ),
                               ),
                             ],
@@ -473,10 +442,10 @@ class _MarriagePageState extends State<MarriagePage> {
                               ),
                               Expanded(
                                 child: _buildDropdownField(
-                                  value: _selectedOccupation,
+                                  value: _controller.selectedOccupation.value,
                                   items: _occupations,
                                   onChanged: (val) =>
-                                      setState(() => _selectedOccupation = val!),
+                                      _controller.selectedOccupation.value = val!,
                                 ),
                               ),
                             ],
@@ -484,28 +453,30 @@ class _MarriagePageState extends State<MarriagePage> {
                           const SizedBox(height: 12),
                           _buildFilterRow(
                             label: 'Income Range:'.tr,
-                            fromValue: _selectedIncomeFrom,
-                            toValue: _selectedIncomeTo,
+                            fromValue: _controller.selectedIncomeFrom.value,
+                            toValue: _controller.selectedIncomeTo.value,
                             items: _incomeRanges,
                             onFromChanged: (val) =>
-                                setState(() => _selectedIncomeFrom = val!),
+                                _controller.selectedIncomeFrom.value = val!,
                             onToChanged: (val) =>
-                                setState(() => _selectedIncomeTo = val!),
+                                _controller.selectedIncomeTo.value = val!,
                           ),
                           const SizedBox(height: 24),
                           Row(
                             children: [
                               Expanded(
                                 child: ElevatedButton(
-                                  onPressed: () => setState(
-                                      () => _isAdvancedFiltersOpen = false),
+                                  onPressed: () {
+                                    _controller.applyFilters();
+                                    _controller.isAdvancedFiltersOpen.value = false;
+                                  },
                                   child: Text('Apply Filters'.tr),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: OutlinedButton(
-                                  onPressed: () {},
+                                  onPressed: () => _controller.clearFilters(),
                                   child: Text('Clear All'.tr),
                                 ),
                               ),
@@ -518,7 +489,7 @@ class _MarriagePageState extends State<MarriagePage> {
                 ],
               ),
             ),
-          ),
+          )),
         ],
       ),
     );
@@ -622,13 +593,7 @@ class _MarriagePageState extends State<MarriagePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           side: const BorderSide(color: AppColors.primary),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('View'.tr, style: const TextStyle(fontSize: 12)),
-                            
-                          ],
-                        ),
+                        child: Text('View'.tr, style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),

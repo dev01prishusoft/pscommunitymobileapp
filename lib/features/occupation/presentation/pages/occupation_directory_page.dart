@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
@@ -103,22 +104,26 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   }
 
   Widget _buildOccupationCard(Map<String, dynamic> occ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, AppRouter.occupationProfile);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
           Icon(
             occ['icon'] as IconData,
             size: 40,
@@ -149,6 +154,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

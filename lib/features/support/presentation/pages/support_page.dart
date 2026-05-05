@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -6,7 +7,7 @@ class SupportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Support')),
+      appBar: AppBar(title: Text('Support'.tr)),
       body: Center(
         child: const Padding(
           padding: EdgeInsets.all(16),

@@ -24,6 +24,9 @@ class ApiClient {
         ...?headers,
       },
       body: jsonEncode(body),
+    ).timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => throw Exception('Request timed out'),
     );
 
     final decoded = response.body.isNotEmpty

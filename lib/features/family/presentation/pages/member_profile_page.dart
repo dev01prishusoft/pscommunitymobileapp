@@ -17,7 +17,7 @@ class MemberProfilePage extends StatelessWidget {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      debugPrint('Could not launch $urlString: $e');
+      debugPrint('Could not launch URL');
     }
   }
 
@@ -30,7 +30,7 @@ class MemberProfilePage extends StatelessWidget {
           'Member Details'.tr,
           style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary),
         ),
-        centerTitle: true,
+        centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(

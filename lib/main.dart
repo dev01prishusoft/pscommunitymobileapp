@@ -7,12 +7,14 @@ import 'package:pscommunitymobileapp/core/localization/app_translations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load translations from JSON assets
-  final enUSString = await rootBundle.loadString('assets/locales/en_US.json');
-  final guINString = await rootBundle.loadString('assets/locales/gu_IN.json');
-
-  final enUSMap = Map<String, String>.from(jsonDecode(enUSString));
-  final guINMap = Map<String, String>.from(jsonDecode(guINString));
+  // Load translations from JSON assets in parallel
+  final results = await Future.wait([
+    rootBundle.loadString('assets/locales/en_US.json'),
+    rootBundle.loadString('assets/locales/gu_IN.json'),
+  ]);
+  
+  final enUSMap = Map<String, String>.from(jsonDecode(results[0]));
+  final guINMap = Map<String, String>.from(jsonDecode(results[1]));
 
   final translations = AppTranslations({
     'en_US': enUSMap,

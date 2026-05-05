@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
@@ -182,7 +183,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        centerTitle: true,
+        centerTitle: false,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -338,7 +339,7 @@ class _MemberTile extends StatelessWidget {
           const Divider(indent: 70, endIndent: 16),
         InkWell(
           onTap: () {
-            // TODO: navigate to member detail page
+            Navigator.pushNamed(context, AppRouter.memberProfile);
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),

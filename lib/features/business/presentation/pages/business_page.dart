@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class BusinessPage extends StatelessWidget {
@@ -41,49 +42,49 @@ class BusinessPage extends StatelessWidget {
                 context,
                 icon: Icons.directions_car_rounded,
                 title: 'Automobile'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.more_horiz_rounded,
                 title: 'Other'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.chair_rounded,
                 title: 'Furniture'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.school_rounded,
                 title: 'Education / Training'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.local_hospital_rounded,
                 title: 'Health / Medical'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.electrical_services_rounded,
                 title: 'Electronics / Electrician'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.dry_cleaning_rounded,
                 title: 'Tailor / Garments'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
               _buildCategoryCard(
                 context,
                 icon: Icons.face_retouching_natural_rounded,
                 title: 'Beauty / Cosmetics'.tr,
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRouter.occupationDirectory),
               ),
             ],
           ),

@@ -70,8 +70,32 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     },
   ];
 
+  List<Map<String, dynamic>> get _filteredCommitteeData {
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments == null || arguments is! List<String>) {
+      return _committeeData;
+    }
+
+    final List<String> allowedCommittees = arguments;
+    return _committeeData.map((group) {
+      final List<Map<String, dynamic>> members =
+          List<Map<String, dynamic>>.from(group['members']);
+      final filteredMembers = members.where((member) {
+        return allowedCommittees.contains(member['committee']);
+      }).toList();
+
+      return {
+        ...group,
+        'members': filteredMembers,
+        'count': filteredMembers.length,
+      };
+    }).where((group) => (group['members'] as List).isNotEmpty).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final filteredData = _filteredCommitteeData;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -102,14 +126,29 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
 
           // Member List
           Expanded(
-            child: ListView.builder(
-              itemCount: _committeeData.length,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (context, index) {
-                final group = _committeeData[index];
-                return _buildRoleGroup(group);
-              },
-            ),
+            child: filteredData.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person_off_outlined,
+                            size: 64, color: Colors.grey.shade300),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No members found for this committee'.tr,
+                          style: TextStyle(color: Colors.grey.shade500),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: filteredData.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      final group = filteredData[index];
+                      return _buildRoleGroup(group);
+                    },
+                  ),
           ),
         ],
       ),
