@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,7 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FD), // Very light blue-ish white bg
+      backgroundColor: AppColors.surfaceVariant,
       body: Stack(
         children: [
           SafeArea(
@@ -49,11 +51,11 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Samaj Name'.tr,
+                  LK.samajName.tr,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF002B5B), // Dark Navy Blue
+                    color: AppColors.navyBlue,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -104,50 +106,50 @@ class HomePage extends StatelessWidget {
           _buildMenuItem(
             context,
             icon: Icons.family_restroom,
-            title: 'Family'.tr,
-            onTap: () => Get.toNamed(AppRouter.familyAreas),
+            title: LK.family.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.familyAreas),
           ),
           _buildMenuItem(
             context,
             icon: Icons.person_search,
-            title: 'Find Member'.tr,
-            onTap: () => Get.toNamed(AppRouter.findMember),
+            title: LK.findMember.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.findMember),
           ),
           _buildMenuItem(
             context,
             icon: Icons.groups_outlined,
-            title: 'Committee'.tr,
-            onTap: () => Get.toNamed(AppRouter.committees),
+            title: LK.committee.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.committees),
           ),
           _buildMenuItem(
             context,
             icon: Icons.account_balance_wallet,
-            title: 'Payment'.tr,
-            onTap: () => Get.toNamed(AppRouter.paymentHistory),
+            title: LK.payment.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
           ),
           _buildMenuItem(
             context,
             icon: Icons.work,
-            title: 'Occupation Directory'.tr,
-            onTap: () => Get.toNamed(AppRouter.occupationDirectory),
+            title: LK.occupationDirectory.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
           ),
           _buildMenuItem(
             context,
             icon: Icons.wc,
-            title: 'Matrimonial'.tr,
-            onTap: () => Get.toNamed(AppRouter.marriage),
+            title: LK.matrimonial.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.marriage),
           ),
           _buildMenuItem(
             context,
             icon: Icons.share,
-            title: 'Share'.tr,
-            onTap: () => Get.toNamed(AppRouter.shareApp),
+            title: LK.share.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.shareApp),
           ),
           _buildMenuItem(
             context,
             icon: Icons.info_outline,
-            title: 'Samaj Info'.tr,
-            onTap: () => Get.toNamed(AppRouter.samajProfile),
+            title: LK.samajInfo.tr,
+            onTap: () => Get.toNamed<void>(AppRouter.samajProfile),
           ),
         ],
       ),
@@ -180,13 +182,13 @@ class HomePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: const BoxDecoration(
-                color: Color(0xFFF0F7FF), // Very light blue circle
+                color: AppColors.lightBlue,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 32,
-                color: const Color(0xFF002B5B),
+                color: AppColors.navyBlue,
               ), // Dark Navy
             ),
             const SizedBox(height: 12),
@@ -196,7 +198,7 @@ class HomePage extends StatelessWidget {
                 title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF002B5B),
+                  color: AppColors.navyBlue,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -227,9 +229,9 @@ class HomePage extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: Get.locale?.languageCode == 'gu' ? 'GU' : 'EN',
-          icon: const Icon(Icons.language, color: Color(0xFF002B5B), size: 18),
+          icon: const Icon(Icons.language, color: AppColors.navyBlue, size: 18),
           style: const TextStyle(
-            color: Color(0xFF002B5B),
+            color: AppColors.navyBlue,
             fontWeight: FontWeight.bold,
             fontSize: 12,
           ),

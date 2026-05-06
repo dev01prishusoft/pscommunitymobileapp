@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 
 class CommitteeController extends GetxController {
   final CommitteeRepository _repository;

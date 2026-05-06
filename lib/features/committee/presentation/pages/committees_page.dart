@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 
 class CommitteesPage extends StatelessWidget {
   const CommitteesPage({super.key});

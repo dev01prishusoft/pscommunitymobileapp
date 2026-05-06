@@ -81,7 +81,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         .where((group) => _selectedRole == 'All' || group['role'] == _selectedRole)
         .map((group) {
       final List<Map<String, dynamic>> members =
-          List<Map<String, dynamic>>.from(group['members']);
+          List<Map<String, dynamic>>.from(group['members'] as Iterable);
       final filteredMembers = members.where((member) {
         final matchesCommittee = _selectedCommittee == 'All' ||
             member['committee'] == _selectedCommittee;
@@ -233,7 +233,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           InkWell(
             onTap: () {
               setState(() {
-                group['isExpanded'] = !group['isExpanded'];
+                group['isExpanded'] = !(group['isExpanded'] as bool? ?? false);
               });
             },
             child: Container(
@@ -247,7 +247,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   const Icon(Icons.group, color: AppColors.primary, size: 20),
                   const SizedBox(width: 12),
                   Text(
-                    '${group['role']} (${group['count']})'.tr,
+                    '${(group['role'] as String).tr} (${group['count']})',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -256,7 +256,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   ),
                   const Spacer(),
                   Icon(
-                    group['isExpanded'] ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    (group['isExpanded'] as bool? ?? false) ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                     color: AppColors.primary,
                     size: 20,
                   ),
@@ -267,15 +267,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           const Divider(),
 
           // Members List
-          if (group['isExpanded'])
+          if (group['isExpanded'] as bool? ?? false)
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: (group['members'] as List).length,
               separatorBuilder: (context, index) => const Divider(),
               itemBuilder: (context, index) {
-                final member = group['members'][index];
-                return _buildMemberTile(member, group['role']);
+                final member = (group['members'] as List)[index] as Map<String, dynamic>;
+                return _buildMemberTile(member, group['role'] as String? ?? '');
               },
             ),
         ],
@@ -292,7 +292,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   }
 
   void _showMemberDetails(Map<String, dynamic> member, String role) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -539,7 +539,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4.0),
         child: Text(
-          '${'Since:'.tr} ${_translateDate(member['since'])}  |  ${'Until:'.tr} ${_translateDate(member['until'])}',
+          '${'Since:'.tr} ${_translateDate(member['since'] as String? ?? '')}  |  ${'Until:'.tr} ${_translateDate(member['until'] as String? ?? '')}',
           style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
         ),
       ),

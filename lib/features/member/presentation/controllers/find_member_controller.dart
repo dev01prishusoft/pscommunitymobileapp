@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class FindMemberController extends GetxController {
   final MemberRepository _repository;
@@ -9,8 +10,8 @@ class FindMemberController extends GetxController {
   FindMemberController(this._repository);
 
   final Rx<AppState> state = AppState.loading.obs;
-  final RxList<Map<String, String>> allMembers = <Map<String, String>>[].obs;
-  final RxList<Map<String, String>> filteredMembers = <Map<String, String>>[].obs;
+  final RxList<Member> allMembers = <Member>[].obs;
+  final RxList<Member> filteredMembers = <Member>[].obs;
   final RxString searchQuery = ''.obs;
 
   @override
@@ -39,9 +40,9 @@ class FindMemberController extends GetxController {
       state.value = allMembers.isEmpty ? AppState.empty : AppState.data;
     } else {
       final results = allMembers.where((m) {
-        final name = m['name']?.toLowerCase() ?? '';
-        final info = m['info']?.toLowerCase() ?? '';
-        final location = m['location']?.toLowerCase() ?? '';
+        final name = m.name.toLowerCase();
+        final info = m.info.toLowerCase();
+        final location = m.location.toLowerCase();
         final search = query.toLowerCase();
         return name.contains(search) || info.contains(search) || location.contains(search);
       }).toList();

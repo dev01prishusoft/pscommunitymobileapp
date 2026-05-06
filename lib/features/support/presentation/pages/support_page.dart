@@ -9,14 +9,21 @@ class SupportPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Support'.tr)),
       body: Center(
-        child: const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'Need help?\n\n'
-            'Email: support@yourdomain.com\n'
-            'Phone: +91-00000-00000\n'
-            'Working hours: 10:00 AM - 6:00 PM',
-            textAlign: TextAlign.center,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Need help?'.tr,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Text('support_email'.tr),
+              Text('support_phone'.tr),
+              const SizedBox(height: 10),
+              Text('support_hours'.tr),
+            ],
           ),
         ),
       ),

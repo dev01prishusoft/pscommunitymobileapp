@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 
 class OccupationRepositoryImpl implements OccupationRepository {
   // ignore: unused_field
@@ -10,19 +10,16 @@ class OccupationRepositoryImpl implements OccupationRepository {
 
   @override
   Future<List<OccupationItem>> getOccupations() async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 600));
     
-    return const [
-      OccupationItem(name: 'Engineer', count: 24, icon: Icons.engineering),
-      OccupationItem(name: 'Doctor', count: 12, icon: Icons.local_hospital),
-      OccupationItem(name: 'Teacher', count: 10, icon: Icons.school),
-      OccupationItem(name: 'Trader', count: 8, icon: Icons.business_center),
-      OccupationItem(name: 'Lawyer', count: 6, icon: Icons.gavel),
-      OccupationItem(name: 'Business Owner', count: 5, icon: Icons.factory),
-      OccupationItem(name: 'Accountant', count: 4, icon: Icons.analytics),
-      OccupationItem(name: 'Architect', count: 3, icon: Icons.account_balance),
-      OccupationItem(name: 'Software Dev', count: 7, icon: Icons.code),
+    return [
+      const OccupationItem(name: 'Business', count: 450, iconKey: 'business'),
+      const OccupationItem(name: 'Software Engineer', count: 320, iconKey: 'computer'),
+      const OccupationItem(name: 'Doctor', count: 85, iconKey: 'medical_services'),
+      const OccupationItem(name: 'Teacher', count: 180, iconKey: 'school'),
+      const OccupationItem(name: 'Agriculture', count: 650, iconKey: 'agriculture'),
+      const OccupationItem(name: 'Government Service', count: 120, iconKey: 'account_balance'),
+      const OccupationItem(name: 'Real Estate', count: 95, iconKey: 'home_work'),
     ];
   }
 }

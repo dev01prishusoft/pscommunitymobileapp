@@ -1,14 +1,4 @@
-import 'package:flutter/material.dart';
-
-class BusinessCategory {
-  final String title;
-  final IconData icon;
-
-  const BusinessCategory({
-    required this.title,
-    required this.icon,
-  });
-}
+import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
 abstract class BusinessRepository {
   Future<List<BusinessCategory>> getCategories();

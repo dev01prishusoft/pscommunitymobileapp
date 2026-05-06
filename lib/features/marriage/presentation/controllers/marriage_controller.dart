@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
 
 class MarriageController extends GetxController {
   final MarriageRepository _repository;
@@ -33,8 +34,8 @@ class MarriageController extends GetxController {
   
   final RxString searchQuery = ''.obs;
 
-  final RxList<Map<String, dynamic>> allMembers = <Map<String, dynamic>>[].obs;
-  final RxList<Map<String, dynamic>> filteredMembers = <Map<String, dynamic>>[].obs;
+  final RxList<MarriageProfile> allMembers = <MarriageProfile>[].obs;
+  final RxList<MarriageProfile> filteredMembers = <MarriageProfile>[].obs;
 
   @override
   void onInit() {
@@ -55,14 +56,15 @@ class MarriageController extends GetxController {
   }
 
   void applyFilters() {
-    var results = allMembers.where((m) {
+    final results = allMembers.where((m) {
       // Basic Filters
-      if (lookingForMarriage.value && !m['lookingForMarriage']) return false;
-      if (selectedGender.value != 'All' && m['gender'] != selectedGender.value) return false;
+      if (lookingForMarriage.value && !m.lookingForMarriage) return false;
+      
+      if (selectedGender.value != 'All' && m.gender != selectedGender.value) return false;
       
       // Search Filter
       if (searchQuery.value.isNotEmpty) {
-        final name = (m['name'] as String).toLowerCase();
+        final name = m.name.toLowerCase();
         if (!name.contains(searchQuery.value.toLowerCase())) return false;
       }
       

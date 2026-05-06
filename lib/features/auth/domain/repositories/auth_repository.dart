@@ -5,4 +5,14 @@ abstract class AuthRepository {
     required String mobile,
     required String password,
   });
+
+  Future<AuthTokens> memberLogin({
+    required String mobile,
+    required String password,
+  });
+
+  Future<void> memberUpdatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }

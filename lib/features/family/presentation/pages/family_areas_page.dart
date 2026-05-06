@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
+import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class FamilyAreasPage extends StatelessWidget {

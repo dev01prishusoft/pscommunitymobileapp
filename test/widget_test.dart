@@ -18,11 +18,18 @@ void main() {
     // Setup minimal DI for test
     final storage = SecureStorageService();
     final tokenManager = TokenManager(storage);
+    final localization = LocalizationService(storage);
+    
+    // Manual bootstrap for test to avoid rootBundle load errors
+    localization.keys = {
+      'en_US': {'common_app_title': 'PS Community', 'Sign In': 'Sign In'},
+      'gu_IN': {'common_app_title': 'PS Community', 'Sign In': 'Sign In'},
+    };
+    
     Get.put(tokenManager);
-    Get.put(LocalizationService(storage));
+    Get.put(localization);
     
     await tester.pumpWidget(const PsCommunityApp());
-    // Since it's localized now, we might need to check for the key or translated text
-    // But for this fix, we'll just ensure it builds
+    expect(find.byType(PsCommunityApp), findsOneWidget);
   });
 }

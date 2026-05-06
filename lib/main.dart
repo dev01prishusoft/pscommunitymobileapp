@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/app/app.dart';
 import 'package:pscommunitymobileapp/core/di/di.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/core/widgets/fatal_error_screen.dart';
 
 void main() async {
   try {
@@ -17,6 +18,6 @@ void main() async {
     runApp(const PsCommunityApp());
   } catch (e, stack) {
     AppLogger.e('Fatal crash during bootstrap', e, stack);
-    // You could show a fatal error screen here
+    runApp(FatalErrorScreen(error: e, stackTrace: stack));
   }
 }

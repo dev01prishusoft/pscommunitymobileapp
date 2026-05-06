@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 
 class PaymentHistoryPage extends StatelessWidget {
   const PaymentHistoryPage({super.key});
@@ -115,6 +115,23 @@ class PaymentHistoryPage extends StatelessWidget {
   }
 }
 
+class _PaymentStyle {
+  final IconData icon;
+  final Color color;
+  _PaymentStyle(this.icon, this.color);
+}
+
+_PaymentStyle _getPaymentStyle(String type) {
+  switch (type) {
+    case 'maintenance':
+      return _PaymentStyle(Icons.build, Colors.orange);
+    case 'subscription':
+      return _PaymentStyle(Icons.calendar_today, Colors.blue);
+    default:
+      return _PaymentStyle(Icons.payment, Colors.grey);
+  }
+}
+
 class _PaymentCard extends StatelessWidget {
   final PaymentItem payment;
 
@@ -122,6 +139,8 @@ class _PaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = _getPaymentStyle(payment.type);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -142,10 +161,10 @@ class _PaymentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: payment.iconColor.withValues(alpha: 0.1),
+              color: style.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(payment.icon, color: payment.iconColor, size: 28),
+            child: Icon(style.icon, color: style.color, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(

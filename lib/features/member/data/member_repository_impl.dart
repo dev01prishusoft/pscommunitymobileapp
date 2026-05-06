@@ -1,5 +1,6 @@
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class MemberRepositoryImpl implements MemberRepository {
   // ignore: unused_field
@@ -8,34 +9,35 @@ class MemberRepositoryImpl implements MemberRepository {
   MemberRepositoryImpl(this._apiClient);
 
   @override
-  Future<List<Map<String, String>>> getMembers() async {
-    // In production, this would call the API
-    // final response = await _apiClient.get(ApiEndpoints.members);
-    // For now, we return the mock data but through a repository
-    
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate delay
+  Future<List<Member>> getMembers() async {
+    await Future.delayed(const Duration(milliseconds: 600));
     
     return [
-      {
-        'name': 'Rajesh Kumar Patel',
-        'info': 'Male • Self • Married • Engineer',
-        'location': 'Satellite, Daskroi',
-      },
-      {
-        'name': 'Priya Rajesh Patel',
-        'info': 'Female • Wife • Married • Teacher',
-        'location': 'Satellite, Daskroi',
-      },
-      {
-        'name': 'Amit Mehta',
-        'info': 'Male • Self • Married • Business',
-        'location': 'Naranpura, Daskroi',
-      },
-      {
-        'name': 'Neha Mehta',
-        'info': 'Female • Wife • Married • Doctor',
-        'location': 'Naranpura, Daskroi',
-      },
+      const Member(
+        name: 'Rajesh Kumar Patel',
+        info: 'Male • 32 yrs • Married',
+        location: 'Ahmedabad',
+      ),
+      const Member(
+        name: 'Suresh Bhai Mehta',
+        info: 'Male • 55 yrs • Married',
+        location: 'Vadodara',
+      ),
+      const Member(
+        name: 'Priya Ben Shah',
+        info: 'Female • 28 yrs • Unmarried',
+        location: 'Surat',
+      ),
+      const Member(
+        name: 'Amit Kumar Joshi',
+        info: 'Male • 40 yrs • Married',
+        location: 'Rajkot',
+      ),
+      const Member(
+        name: 'Meena Kumari Patel',
+        info: 'Female • 50 yrs • Widow',
+        location: 'Ahmedabad',
+      ),
     ];
   }
 }

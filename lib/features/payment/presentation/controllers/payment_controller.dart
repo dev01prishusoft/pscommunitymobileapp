@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 
 class PaymentController extends GetxController {
   final PaymentRepository _repository;

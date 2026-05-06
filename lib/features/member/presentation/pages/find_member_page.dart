@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
 
@@ -35,7 +36,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Find Member'.tr,
+          LK.findMember.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -50,7 +51,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
               controller: _searchController,
               onChanged: _controller.search,
               decoration: InputDecoration(
-                hintText: 'Search by name or mobile or email...'.tr,
+                hintText: LK.searchHint.tr,
                 prefixIcon: const Icon(Icons.search, color: AppColors.mutedForeground),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.close, color: AppColors.mutedForeground),
@@ -76,7 +77,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
             child: Row(
               children: [
                 Text(
-                  'Showing '.tr,
+                  LK.showing.tr,
                   style: const TextStyle(color: AppColors.mutedForeground, fontSize: 15),
                 ),
                 Text(
@@ -88,7 +89,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   ),
                 ),
                 Text(
-                  ' members'.tr,
+                  LK.membersCount.tr,
                   style: const TextStyle(color: AppColors.mutedForeground, fontSize: 15),
                 ),
               ],
@@ -128,7 +129,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                         child: Icon(Icons.person, color: AppColors.mutedForeground, size: 30),
                       ),
                       title: Text(
-                        member['name']!.tr,
+                        member.name.tr,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.secondary,
@@ -140,7 +141,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                         children: [
                           const SizedBox(height: 4),
                           Text(
-                            member['info']!.tr,
+                            member.info.tr,
                             style: const TextStyle(
                               color: AppColors.mutedForeground,
                               fontSize: 13,
@@ -152,7 +153,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                               const Icon(Icons.location_on, size: 16, color: AppColors.primary),
                               const SizedBox(width: 4),
                               Text(
-                                member['location']!.tr,
+                                member.location.tr,
                                 style: const TextStyle(
                                   color: AppColors.mutedForeground,
                                   fontSize: 13,

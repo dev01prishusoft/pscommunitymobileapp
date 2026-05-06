@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
 class BusinessController extends GetxController {
   final BusinessRepository _repository;

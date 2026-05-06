@@ -6,14 +6,17 @@ import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 class AuthInterceptor extends Interceptor {
   final TokenManager _tokenManager;
   final Dio _refreshDio;
+  final Dio _mainDio;
   final VoidCallback _onAuthFailure;
 
   AuthInterceptor({
     required TokenManager tokenManager,
     required Dio refreshDio,
+    required Dio mainDio,
     required VoidCallback onAuthFailure,
   })  : _tokenManager = tokenManager,
         _refreshDio = refreshDio,
+        _mainDio = mainDio,
         _onAuthFailure = onAuthFailure;
 
   Completer<String?>? _refreshCompleter;
@@ -21,7 +24,7 @@ class AuthInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final token = _tokenManager.accessToken.value;
-    if (token != null) {
+    if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);
@@ -45,8 +48,7 @@ class AuthInterceptor extends Interceptor {
         final options = err.requestOptions;
         options.headers['Authorization'] = 'Bearer $newToken';
         
-        final dio = Dio(); // Basic dio for retry
-        final response = await dio.fetch(options);
+        final response = await _mainDio.fetch<Map<String, dynamic>>(options);
         return handler.resolve(response);
       }
     } catch (e) {
@@ -64,13 +66,15 @@ class AuthInterceptor extends Interceptor {
     _refreshCompleter = c;
 
     try {
-      final response = await _refreshDio.post(
+      final response = await _refreshDio.post<Map<String, dynamic>>(
         ApiEndpoints.refreshToken,
-        data: {'refresh_token': refreshToken},
+        data: {'refreshToken': refreshToken},
       );
       
-      final access = response.data['access_token'];
-      final refresh = response.data['refresh_token'];
+      final data = response.data ?? {};
+      final authData = data['data'] as Map<String, dynamic>? ?? {};
+      final access = authData['accessToken'] as String?;
+      final refresh = authData['refreshToken'] as String?;
       
       if (access != null && refresh != null) {
         await _tokenManager.saveTokens(access, refresh);

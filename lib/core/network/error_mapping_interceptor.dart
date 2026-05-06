@@ -22,7 +22,11 @@ class ErrorMappingInterceptor extends Interceptor {
         } else if (status != null && status >= 500) {
           failure = const ServerFailure();
         } else {
-          final msg = err.response?.data?['message'] ?? 'Server request failed';
+          final data = err.response?.data;
+          String msg = 'Server request failed';
+          if (data is Map<String, dynamic>) {
+            msg = data['message'] as String? ?? msg;
+          }
           failure = ServerFailure(msg);
         }
         break;

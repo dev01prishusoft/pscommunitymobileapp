@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ShareAppPage extends StatelessWidget {
@@ -65,7 +66,7 @@ class ShareAppPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Shree Patel Samaj'.tr,
+                    LK.samajName.tr,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,

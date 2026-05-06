@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
+import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
 class BusinessPage extends StatelessWidget {
   const BusinessPage({super.key});
@@ -94,7 +94,11 @@ class _CategoryCard extends StatelessWidget {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(category.icon, size: 40, color: AppColors.primary),
+              child: Icon(
+                _getIconData(category.iconKey),
+                size: 40,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: 16),
             Padding(
@@ -116,5 +120,24 @@ class _CategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getIconData(String key) {
+    switch (key) {
+      case 'code':
+        return Icons.code_rounded;
+      case 'factory':
+        return Icons.factory_rounded;
+      case 'storefront':
+        return Icons.storefront_rounded;
+      case 'home_work':
+        return Icons.home_work_rounded;
+      case 'agriculture':
+        return Icons.agriculture_rounded;
+      case 'medical':
+        return Icons.medical_services_rounded;
+      default:
+        return Icons.business_center_rounded;
+    }
   }
 }

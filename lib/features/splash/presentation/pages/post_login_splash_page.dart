@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class PostLoginSplashPage extends StatefulWidget {
   const PostLoginSplashPage({super.key});
@@ -63,8 +64,8 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFFFFFFF),
-                  Color(0xFFE2F1FB), // accent soft blue
+                  AppColors.background,
+                  AppColors.lightBlue,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -119,12 +120,12 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      'Samaj Name'.tr,
+                      LK.samajName.tr,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF002B5B), // Dark Navy Blue matching trident
+                        color: AppColors.navyBlue,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -135,27 +136,27 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                 // Decorative Divider
                 FadeTransition(
                   opacity: _fadeAnimation,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 80.0),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Divider(
-                            color: Color(0xFF0096FF), // Bright Sky Blue matching swoosh
+                            color: AppColors.primary,
                             thickness: 1.5,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: Icon(
                             Icons.diamond_outlined,
                             size: 12,
-                            color: const Color(0xFF0096FF).withValues(alpha: 0.7),
+                            color: AppColors.primary,
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           child: Divider(
-                            color: Color(0xFF0096FF), // Bright Sky Blue
+                            color: AppColors.primary,
                             thickness: 1.5,
                           ),
                         ),
@@ -172,8 +173,8 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                        Text(
-                        'welcomes you'.tr,
-                        style:  TextStyle(
+                        LK.welcomesYou.tr,
+                        style:  const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary, // Bright Sky Blue

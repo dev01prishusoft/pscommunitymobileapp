@@ -32,19 +32,25 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit() async {
     if (kUiReviewMode) {
-      Get.offNamed(AppRouter.postLoginSplash);
+      Get.offNamed<void>(AppRouter.postLoginSplash);
       return;
     }
 
     if (!_formKey.currentState!.validate()) return;
 
     final controller = Get.find<LoginController>();
-    final success = await controller.login(
+    final tokens = await controller.login(
       mobile: _mobileController.text.trim(),
       password: _passwordController.text,
     );
 
-    if (success) Get.offNamed(AppRouter.postLoginSplash);
+    if (tokens != null) {
+      if (tokens.isDefaultPassword) {
+        Get.offNamed(AppRouter.resetPassword);
+      } else {
+        Get.offNamed<void>(AppRouter.postLoginSplash);
+      }
+    }
   }
 
   @override
@@ -129,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => Get.toNamed(AppRouter.resetPassword),
+                                onPressed: () => Get.toNamed<void>(AppRouter.resetPassword),
                                 style: TextButton.styleFrom(
                                   foregroundColor: AppColors.primary,
                                   padding: EdgeInsets.zero,

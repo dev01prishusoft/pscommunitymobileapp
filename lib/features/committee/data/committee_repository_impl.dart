@@ -1,5 +1,6 @@
 import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 
 class CommitteeRepositoryImpl implements CommitteeRepository {
   // ignore: unused_field
@@ -9,8 +10,7 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
 
   @override
   Future<List<CommitteeNode>> getCommittees() async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 600));
     
     return [
       CommitteeNode(
@@ -18,38 +18,29 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
         memberCount: 5,
         isExpanded: true,
         children: [
-          CommitteeNode(
-            name: 'Managing Committee',
-            memberCount: 12,
-            isExpanded: true,
-            children: [
-              CommitteeNode(
-                name: 'Finance Sub-Committee',
-                memberCount: 4,
-              ),
-            ],
-          ),
-          CommitteeNode(
-            name: 'Election Committee',
-            memberCount: 5,
-          ),
+          CommitteeNode(name: 'President', memberCount: 1),
+          CommitteeNode(name: 'Secretary', memberCount: 1),
+          CommitteeNode(name: 'Treasurer', memberCount: 1),
+        ],
+      ),
+      CommitteeNode(
+        name: 'Managing Committee',
+        memberCount: 15,
+        children: [
+          CommitteeNode(name: 'Zonal Heads', memberCount: 4),
+          CommitteeNode(name: 'Area Leads', memberCount: 11),
         ],
       ),
       CommitteeNode(
         name: 'Standing Committees',
-        memberCount: 0,
-        isExpanded: true,
+        memberCount: 20,
         children: [
-          CommitteeNode(
-            name: 'Temple Committee',
-            memberCount: 8,
-          ),
-          CommitteeNode(
-            name: 'Education Committee',
-            memberCount: 6,
-          ),
+          CommitteeNode(name: 'Education Committee', memberCount: 7),
+          CommitteeNode(name: 'Temple Committee', memberCount: 8),
+          CommitteeNode(name: 'Finance Sub-Committee', memberCount: 5),
         ],
       ),
+      CommitteeNode(name: 'Election Committee', memberCount: 3),
     ];
   }
 }

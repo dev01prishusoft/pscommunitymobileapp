@@ -32,9 +32,10 @@ class ApiClient {
       AuthInterceptor(
         tokenManager: tokenManager,
         refreshDio: refreshDio,
+        mainDio: _dio,
         onAuthFailure: onAuthFailure,
       ),
-      RetryInterceptor(),
+      RetryInterceptor(dio: _dio),
       ErrorMappingInterceptor(),
       if (AppEnvironment.I.enableLogging)
         PrettyDioLogger(

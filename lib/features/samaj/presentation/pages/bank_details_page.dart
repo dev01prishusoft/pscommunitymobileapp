@@ -26,7 +26,7 @@ class BankDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -92,7 +92,7 @@ class BankDetailsPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF002B5B),
+                  color: AppColors.navyBlue,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.account_balance,
@@ -119,13 +119,13 @@ class BankDetailsPage extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: AppColors.lightGreen,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Primary'.tr,
                     style: const TextStyle(
-                      color: Color(0xFF1B8D5E),
+                      color: AppColors.deepGreen,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -151,14 +151,14 @@ class BankDetailsPage extends StatelessWidget {
                 Text(
                   'View Details'.tr,
                   style: const TextStyle(
-                    color: Color(0xFF1E5BB6),
+                    color: AppColors.deepBlue,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
                 const SizedBox(width: 4),
                 const Icon(Icons.arrow_forward,
-                    color: Color(0xFF1E5BB6), size: 16),
+                    color: AppColors.deepBlue, size: 16),
               ],
             ),
           ),

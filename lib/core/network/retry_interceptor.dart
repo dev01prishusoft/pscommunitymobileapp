@@ -3,10 +3,12 @@ import 'package:dio/dio.dart';
 import 'dart:math';
 
 class RetryInterceptor extends Interceptor {
+  final Dio dio;
   final int maxRetries;
   final Duration initialDelay;
 
   RetryInterceptor({
+    required this.dio,
     this.maxRetries = 3,
     this.initialDelay = const Duration(milliseconds: 1000),
   });
@@ -14,9 +16,17 @@ class RetryInterceptor extends Interceptor {
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     final options = err.requestOptions;
-    final retryCount = options.extra['retryCount'] ?? 0;
+    final int retryCount = (options.extra['retryCount'] as int?) ?? 0;
 
     if (retryCount >= maxRetries || !_shouldRetry(err)) {
+      return handler.next(err);
+    }
+
+    // Only retry idempotent methods (GET, HEAD, PUT, DELETE) 
+    // unless explicitly marked as retryable.
+    final isIdempotent = const ['GET', 'HEAD', 'PUT', 'DELETE'].contains(options.method.toUpperCase());
+    final bool retryable = options.extra['retryable'] as bool? ?? false;
+    if (!isIdempotent && !retryable) {
       return handler.next(err);
     }
 
@@ -30,20 +40,22 @@ class RetryInterceptor extends Interceptor {
     await Future.delayed(delay + jitter);
 
     try {
-      final dio = Dio(options.toBaseOptions());
-      final response = await dio.fetch(options);
+      final response = await dio.fetch<dynamic>(options);
       return handler.resolve(response);
+    } on DioException catch (retryErr) {
+      // Re-trigger the interceptor chain for the new error
+      return handler.next(retryErr);
     } catch (e) {
-      // If retry fails, we might end up here
+      return handler.next(err);
     }
-
-    handler.next(err);
   }
 
   bool _shouldRetry(DioException err) {
     // Only retry on connection errors or transient server errors
     if (err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
+        err.type == DioExceptionType.receiveTimeout ||
         err.type == DioExceptionType.unknown) {
       return true;
     }
@@ -54,20 +66,5 @@ class RetryInterceptor extends Interceptor {
     }
     
     return false;
-  }
-}
-
-extension on RequestOptions {
-  BaseOptions toBaseOptions() {
-    return BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: connectTimeout,
-      receiveTimeout: receiveTimeout,
-      sendTimeout: sendTimeout,
-      headers: headers,
-      contentType: contentType,
-      responseType: responseType,
-      extra: extra,
-    );
   }
 }

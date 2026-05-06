@@ -51,6 +51,15 @@ class AppColors {
   static const sidebarPrimary = Color(0xFF1AA3E8);
   static const sidebarAccent = Color(0xFF1A2C4F);
   static const sidebarBorder = Color(0xFF1F3257);
+
+  // 🏛️ Extra symbolic colors
+  static const navyBlue = Color(0xFF002B5B);
+  static const deepBlue = Color(0xFF1E5BB6);
+  static const deepGreen = Color(0xFF1B8D5E);
+  static const lightGreen = Color(0xFFE8F5E9);
+  static const lightBlue = Color(0xFFE2F1FB);
+  static const slate = Color(0xFFF1F5F9);
+  static const surfaceVariant = Color(0xFFF8FAFC);
 }
 
 class AppTheme {

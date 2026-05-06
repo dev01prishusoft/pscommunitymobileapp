@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 
 class OccupationController extends GetxController {
   final OccupationRepository _repository;

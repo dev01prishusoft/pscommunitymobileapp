@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
 
 class MarriageRepositoryImpl implements MarriageRepository {
   // ignore: unused_field
@@ -9,44 +9,46 @@ class MarriageRepositoryImpl implements MarriageRepository {
   MarriageRepositoryImpl(this._apiClient);
 
   @override
-  Future<List<Map<String, dynamic>>> getMatrimonialProfiles() async {
-    // Simulate API delay
+  Future<List<MarriageProfile>> getMatrimonialProfiles() async {
     await Future.delayed(const Duration(milliseconds: 600));
     
     return [
-      {
-        'name': 'Rajesh Patel',
-        'age': '28 yrs',
-        'occupation': 'Engineer',
-        'gotra': 'Kashyap Gotra',
-        'location': 'Ahmedabad, Daskroi, Satellite',
-        'lookingForMarriage': true,
-        'gender': 'Male',
-        'avatarColor': const Color(0xFFBBDEFB),
-        'avatarIconColor': Colors.blue,
-      },
-      {
-        'name': 'Priya Shah',
-        'age': '26 yrs',
-        'occupation': 'Doctor',
-        'gotra': 'Bharadwaj Gotra',
-        'location': 'Ahmedabad, Daskroi, Naranpura',
-        'lookingForMarriage': true,
-        'gender': 'Female',
-        'avatarColor': const Color(0xFFF8BBD0),
-        'avatarIconColor': Colors.pink,
-      },
-      {
-        'name': 'Amit Mehta',
-        'age': '32 yrs',
-        'occupation': 'Business',
-        'gotra': 'Vashishtha Gotra',
-        'location': 'Gandhinagar, City, Sector 21',
-        'lookingForMarriage': false,
-        'gender': 'Male',
-        'avatarColor': const Color(0xFFBBDEFB),
-        'avatarIconColor': Colors.blue,
-      },
+      const MarriageProfile(
+        name: 'Rajesh Patel',
+        age: '28 yrs',
+        occupation: 'Engineer',
+        gotra: 'Kashyap Gotra',
+        location: 'Ahmedabad, Daskroi, Satellite',
+        lookingForMarriage: true,
+        gender: 'Male',
+      ),
+      const MarriageProfile(
+        name: 'Priya Shah',
+        age: '25 yrs',
+        occupation: 'Teacher',
+        gotra: 'Vashishtha Gotra',
+        location: 'Vadodara, Karelibaug',
+        lookingForMarriage: true,
+        gender: 'Female',
+      ),
+      const MarriageProfile(
+        name: 'Amit Mehta',
+        age: '30 yrs',
+        occupation: 'Business',
+        gotra: 'Bharadwaj Gotra',
+        location: 'Surat, Adajan',
+        lookingForMarriage: true,
+        gender: 'Male',
+      ),
+      const MarriageProfile(
+        name: 'Neha Gupta',
+        age: '24 yrs',
+        occupation: 'Doctor',
+        gotra: 'Kashyap Gotra',
+        location: 'Rajkot, Kalavad Road',
+        lookingForMarriage: true,
+        gender: 'Female',
+      ),
     ];
   }
 }

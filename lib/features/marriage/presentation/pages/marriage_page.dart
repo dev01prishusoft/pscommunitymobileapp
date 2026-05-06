@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
 
 class MarriagePage extends StatefulWidget {
   const MarriagePage({super.key});
@@ -551,7 +552,9 @@ class _MarriagePageState extends State<MarriagePage> {
     );
   }
 
-  Widget _buildMemberCard(Map<String, dynamic> member) {
+  Widget _buildMemberCard(MarriageProfile member) {
+    final avatarColors = _getAvatarColors(member.gender);
+    
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -561,8 +564,8 @@ class _MarriagePageState extends State<MarriagePage> {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundColor: member['avatarColor'],
-              child: Icon(Icons.person, color: member['avatarIconColor'], size: 30),
+              backgroundColor: avatarColors.background,
+              child: Icon(Icons.person, color: avatarColors.icon, size: 30),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -570,7 +573,7 @@ class _MarriagePageState extends State<MarriagePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (member['name'] as String).tr,
+                    member.name.tr,
                     style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -578,7 +581,7 @@ class _MarriagePageState extends State<MarriagePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${(member['age'] as String).tr} | ${(member['occupation'] as String).tr} | ${(member['gotra'] as String).tr}',
+                    '${member.age.tr} | ${member.occupation.tr} | ${member.gotra.tr}',
                     style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                   ),
                   const SizedBox(height: 4),
@@ -588,7 +591,7 @@ class _MarriagePageState extends State<MarriagePage> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          (member['location'] as String).tr,
+                          member.location.tr,
                           style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                         ),
                       ),
@@ -601,11 +604,11 @@ class _MarriagePageState extends State<MarriagePage> {
                           style: const TextStyle(fontSize: 13)),
                       const SizedBox(width: 4),
                       Text(
-                        member['lookingForMarriage'] ? 'Yes'.tr : 'No'.tr,
+                        member.lookingForMarriage ? 'Yes'.tr : 'No'.tr,
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: member['lookingForMarriage']
+                            color: member.lookingForMarriage
                                 ? Colors.green
                                 : Colors.red),
                       ),
@@ -627,6 +630,13 @@ class _MarriagePageState extends State<MarriagePage> {
         ),
       ),
     );
+  }
+
+  ({Color background, Color icon}) _getAvatarColors(String gender) {
+    if (gender == 'Female') {
+      return (background: const Color(0xFFFCE4EC), icon: Colors.pink);
+    }
+    return (background: const Color(0xFFE3F2FD), icon: Colors.blue);
   }
 
   Widget _buildFilterRow({

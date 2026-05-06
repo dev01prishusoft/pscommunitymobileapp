@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 import 'package:share_plus/share_plus.dart';
 
@@ -29,7 +30,7 @@ class PaymentReceiptPage extends StatelessWidget {
         actions: [
           TextButton.icon(
             onPressed: () {
-              SharePlus.instance.share(ShareParams(text: 'Check out my payment receipt for Shree Patel Samaj'));
+              SharePlus.instance.share(ShareParams(text: 'Check out my payment receipt for ${LK.samajName.tr}'));
             },
             icon: const Icon(Icons.share, size: 18),
             label: Text('Share'.tr),
@@ -55,7 +56,7 @@ class PaymentReceiptPage extends StatelessWidget {
                   const Icon(Icons.account_balance, size: 60, color: Color(0xFF002B5B)),
                   const SizedBox(height: 16),
                   Text(
-                    'Shree Patel Samaj'.tr,
+                    LK.samajName.tr,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,

@@ -13,6 +13,7 @@ class AppUpdateGate extends StatelessWidget {
     return UpgradeAlert(
       upgrader: Upgrader(
         durationUntilAlertAgain: const Duration(hours: 12),
+        messages: CustomUpgraderMessages(),
       ),
       child: child,
     );

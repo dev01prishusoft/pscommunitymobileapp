@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {
   // ignore: unused_field
@@ -10,18 +10,17 @@ class BusinessRepositoryImpl implements BusinessRepository {
 
   @override
   Future<List<BusinessCategory>> getCategories() async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 350));
+    await Future.delayed(const Duration(milliseconds: 600));
     
-    return const [
-      BusinessCategory(title: 'Automobile', icon: Icons.directions_car_rounded),
-      BusinessCategory(title: 'Other', icon: Icons.more_horiz_rounded),
-      BusinessCategory(title: 'Furniture', icon: Icons.chair_rounded),
-      BusinessCategory(title: 'Education / Training', icon: Icons.school_rounded),
-      BusinessCategory(title: 'Health / Medical', icon: Icons.local_hospital_rounded),
-      BusinessCategory(title: 'Electronics / Electrician', icon: Icons.electrical_services_rounded),
-      BusinessCategory(title: 'Tailor / Garments', icon: Icons.dry_cleaning_rounded),
-      BusinessCategory(title: 'Beauty / Cosmetics', icon: Icons.face_retouching_natural_rounded),
+    return [
+      const BusinessCategory(title: 'IT & Software', iconKey: 'computer'),
+      const BusinessCategory(title: 'Manufacturing', iconKey: 'settings'),
+      const BusinessCategory(title: 'Retail & Shop', iconKey: 'shopping_bag'),
+      const BusinessCategory(title: 'Real Estate', iconKey: 'home_work'),
+      const BusinessCategory(title: 'Agriculture', iconKey: 'agriculture'),
+      const BusinessCategory(title: 'Medical & Health', iconKey: 'medical_services'),
+      const BusinessCategory(title: 'Education', iconKey: 'school'),
+      const BusinessCategory(title: 'Finance', iconKey: 'account_balance'),
     ];
   }
 }

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository {
   // ignore: unused_field
@@ -10,45 +10,32 @@ class PaymentRepositoryImpl implements PaymentRepository {
 
   @override
   Future<List<PaymentItem>> getPaymentHistory() async {
-    // Simulate API delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 600));
     
-    return const [
-      PaymentItem(
-        title: 'Membership Fee - Annual',
-        amount: '₹2,000',
-        date: '15 Mar 2025',
+    return [
+      const PaymentItem(
+        title: 'Annual Membership 2024',
+        amount: '₹ 1,000',
+        date: '15 Jan 2024',
         method: 'UPI',
         status: 'Success',
-        icon: Icons.assignment,
-        iconColor: Color(0xFF1E5BB6),
+        type: 'membership',
       ),
-      PaymentItem(
-        title: 'Donation - General',
-        amount: '₹500',
-        date: '10 Feb 2025',
-        method: 'Card',
+      const PaymentItem(
+        title: 'Donation - Education Fund',
+        amount: '₹ 5,000',
+        date: '20 Dec 2023',
+        method: 'Net Banking',
         status: 'Success',
-        icon: Icons.volunteer_activism,
-        iconColor: Color(0xFF1B8D5E),
+        type: 'donation',
       ),
-      PaymentItem(
-        title: 'Temple Fund - Annual',
-        amount: '₹1,000',
-        date: '05 Jan 2025',
-        method: 'Cash',
+      const PaymentItem(
+        title: 'Temple Maintenance',
+        amount: '₹ 500',
+        date: '05 Nov 2023',
+        method: 'UPI',
         status: 'Success',
-        icon: Icons.account_balance,
-        iconColor: Color(0xFF002B5B),
-      ),
-      PaymentItem(
-        title: 'Membership Fee - Life Member',
-        amount: '₹5,000',
-        date: '10 Dec 2024',
-        method: 'Cheque',
-        status: 'Success',
-        icon: Icons.badge,
-        iconColor: Color(0xFFE67E22),
+        type: 'temple',
       ),
     ];
   }

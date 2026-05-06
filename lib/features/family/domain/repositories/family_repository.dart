@@ -1,17 +1,7 @@
-class FamilyArea {
-  final String title;
-  final String location;
-  final int members;
-  final int families;
-
-  const FamilyArea({
-    required this.title,
-    required this.location,
-    required this.members,
-    required this.families,
-  });
-}
+import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
+import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 
 abstract class FamilyRepository {
   Future<List<FamilyArea>> getFamilyAreas();
+  Future<List<Family>> getFamilies(String areaName);
 }

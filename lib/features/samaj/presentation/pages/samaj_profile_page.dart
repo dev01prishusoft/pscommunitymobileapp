@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class SamajProfilePage extends StatelessWidget {
   const SamajProfilePage({super.key});
@@ -9,7 +10,7 @@ class SamajProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -49,10 +50,10 @@ class SamajProfilePage extends StatelessWidget {
               child: Column(
                 children: [
                   const Icon(Icons.account_balance,
-                      size: 60, color: Color(0xFF002B5B)),
+                      size: 60, color: AppColors.navyBlue),
                   const SizedBox(height: 16),
                   Text(
-                    'Shree Patel Samaj'.tr,
+                    LK.samajName.tr,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -76,7 +77,7 @@ class SamajProfilePage extends StatelessWidget {
               context,
               title: 'Samaj Sanstha'.tr,
               icon: Icons.account_balance,
-              iconColor: const Color(0xFF1E5BB6),
+              iconColor: AppColors.deepBlue,
               onTap: () => Navigator.pushNamed(context, AppRouter.samajSanstha),
               isLast: false,
             ),
@@ -84,7 +85,7 @@ class SamajProfilePage extends StatelessWidget {
               context,
               title: 'Bank Details'.tr,
               icon: Icons.account_balance,
-              iconColor: const Color(0xFF1B8D5E),
+              iconColor: AppColors.deepGreen,
               onTap: () => Navigator.pushNamed(context, AppRouter.bankDetails),
               isLast: true,
               isGreen: true,
@@ -118,7 +119,7 @@ class SamajProfilePage extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: isGreen ? const Color(0xFFE8F5E9) : Colors.white,
+              color: isGreen ? AppColors.lightGreen : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isGreen ? const Color(0xFFC8E6C9) : AppColors.primary.withValues(alpha: 0.2),
@@ -136,7 +137,7 @@ class SamajProfilePage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: isGreen ? const Color(0xFF1B8D5E) : const Color(0xFF1E5BB6),
+                    color: isGreen ? AppColors.deepGreen : AppColors.deepBlue,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: Colors.white, size: 24),
@@ -164,7 +165,7 @@ class SamajProfilePage extends StatelessWidget {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right,
-                  color: isGreen ? const Color(0xFF1B8D5E) : AppColors.primary,
+                  color: isGreen ? AppColors.deepGreen : AppColors.primary,
                 ),
               ],
             ),
