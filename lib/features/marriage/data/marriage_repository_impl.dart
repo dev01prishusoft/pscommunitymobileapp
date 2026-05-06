@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marri
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class MarriageRepositoryImpl implements MarriageRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   MarriageRepositoryImpl(this._apiClient);

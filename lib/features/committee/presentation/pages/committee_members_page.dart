@@ -11,6 +11,9 @@ class CommitteeMembersPage extends StatefulWidget {
 }
 
 class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
+  String _selectedRole = 'All';
+  String _selectedCommittee = 'All';
+
   final List<Map<String, dynamic>> _committeeData = [
     {
       'role': 'PRESIDENT',
@@ -70,18 +73,19 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     },
   ];
 
-  List<Map<String, dynamic>> get _filteredCommitteeData {
-    final arguments = ModalRoute.of(context)?.settings.arguments;
-    if (arguments == null || arguments is! List<String>) {
-      return _committeeData;
-    }
+  List<String> get _allRoles => ['All', ..._committeeData.map((g) => g['role'] as String).toSet()];
+  List<String> get _allCommittees => ['All', ..._committeeData.expand((g) => (g['members'] as List).map((m) => m['committee'] as String)).toSet()];
 
-    final List<String> allowedCommittees = arguments;
-    return _committeeData.map((group) {
+  List<Map<String, dynamic>> get _filteredCommitteeData {
+    return _committeeData
+        .where((group) => _selectedRole == 'All' || group['role'] == _selectedRole)
+        .map((group) {
       final List<Map<String, dynamic>> members =
           List<Map<String, dynamic>>.from(group['members']);
       final filteredMembers = members.where((member) {
-        return allowedCommittees.contains(member['committee']);
+        final matchesCommittee = _selectedCommittee == 'All' ||
+            member['committee'] == _selectedCommittee;
+        return matchesCommittee;
       }).toList();
 
       return {
@@ -117,9 +121,23 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Expanded(child: _buildFilterDropdown('Role:'.tr, 'All'.tr)),
+                Expanded(
+                  child: _buildFilterDropdown(
+                    'Role:'.tr,
+                    _selectedRole,
+                    _allRoles,
+                    (val) => setState(() => _selectedRole = val!),
+                  ),
+                ),
                 const SizedBox(width: 16),
-                Expanded(child: _buildFilterDropdown('Committee:'.tr, 'All'.tr)),
+                Expanded(
+                  child: _buildFilterDropdown(
+                    'Committee:'.tr,
+                    _selectedCommittee,
+                    _allCommittees,
+                    (val) => setState(() => _selectedCommittee = val!),
+                  ),
+                ),
               ],
             ),
           ),
@@ -155,21 +173,41 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 
-  Widget _buildFilterDropdown(String label, String value) {
+  Widget _buildFilterDropdown(String label, String value, List<String> options, ValueChanged<String?> onChanged) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.border),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        children: [
-          Text('$label ', style: const TextStyle(color: AppColors.mutedForeground, fontSize: 13)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          const Spacer(),
-          const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 20),
-        ],
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          itemHeight: 56,
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 20),
+          style: const TextStyle(color: AppColors.secondary, fontSize: 13),
+          onChanged: onChanged,
+          items: options.map<DropdownMenuItem<String>>((String val) {
+            return DropdownMenuItem<String>(
+              value: val,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label.replaceAll(':', ''), style: const TextStyle(color: AppColors.mutedForeground, fontSize: 11)),
+                  Text(
+                    val.tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

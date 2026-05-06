@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
@@ -23,6 +24,7 @@ class _MarriagePageState extends State<MarriagePage> {
   final List<String> _states = ['All', 'Gujarat', 'Maharashtra', 'Rajasthan'];
   final List<String> _districts = ['All', 'Ahmedabad', 'Gandhinagar', 'Vadodara', 'Surat'];
   final List<String> _talukas = ['All', 'Daskroi', 'City', 'Sector 21'];
+  final List<String> _areas = ['All', 'Satellite', 'Bopal', 'Prahladnagar'];
   final List<String> _educations = ['Any', 'Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD'];
   final List<String> _occupations = ['Any', 'Business', 'Engineer', 'Doctor', 'Teacher', 'Student', 'Homemaker'];
   final List<String> _incomeRanges = ['Any', '1-2 Lakh', '2-5 Lakh', '5-10 Lakh', '10+ Lakh'];
@@ -407,6 +409,27 @@ class _MarriagePageState extends State<MarriagePage> {
                                             onChanged: (val) => _controller.selectedTaluka.value = val!,
                                           ),
                                         ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Area:'.tr,
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: _buildDropdownField(
+                                              value: _controller
+                                                  .selectedArea
+                                                  .value,
+                                              items: _areas,
+                                              onChanged: (val) =>
+                                                  _controller
+                                                          .selectedArea
+                                                          .value =
+                                                      val!,
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ],
@@ -588,7 +611,7 @@ class _MarriagePageState extends State<MarriagePage> {
                       ),
                       const Spacer(),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () => Get.toNamed(AppRouter.memberProfile),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           side: const BorderSide(color: AppColors.primary),

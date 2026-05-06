@@ -25,6 +25,7 @@ class MarriageController extends GetxController {
   final RxString selectedState = 'All'.obs;
   final RxString selectedDistrict = 'All'.obs;
   final RxString selectedTaluka = 'All'.obs;
+  final RxString selectedArea = 'All'.obs;
   final RxString selectedEducation = 'Any'.obs;
   final RxString selectedOccupation = 'Any'.obs;
   final RxString selectedIncomeFrom = 'Any'.obs;
@@ -80,6 +81,21 @@ class MarriageController extends GetxController {
     selectedGender.value = 'All';
     lookingForMarriage.value = true;
     searchQuery.value = '';
+    selectedAgeFrom.value = '18';
+    selectedAgeTo.value = '60';
+    selectedHeightFrom.value = '4.5 ft';
+    selectedHeightTo.value = '6.5 ft';
+    selectedGotra.value = 'Any';
+    selectedMaritalStatus.value = 'All';
+    selectedState.value = 'All';
+    selectedDistrict.value = 'All';
+    selectedTaluka.value = 'All';
+    selectedArea.value = 'All';
+    selectedEducation.value = 'Any';
+    selectedOccupation.value = 'Any';
+    selectedIncomeFrom.value = 'Any';
+    selectedIncomeTo.value = 'Any';
+    excludeSameGotra.value = false;
     applyFilters();
   }
 }

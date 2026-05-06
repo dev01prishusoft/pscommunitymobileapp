@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occ
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class OccupationRepositoryImpl implements OccupationRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   OccupationRepositoryImpl(this._apiClient);

@@ -65,4 +65,5 @@ class LK {
   static const String updateAvailable = 'Update Available';
   static const String updateNow = 'Update Now';
   static const String updateLater = 'Later';
+  static const String reset = 'Reset';
 }

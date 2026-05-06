@@ -63,7 +63,7 @@ class CommitteeDetailsPage extends StatelessWidget {
                 children: [
                   _buildInfoRow('Name:'.tr, 'Managing Committee'.tr),
                   _buildInfoRow('Parent:'.tr, 'Executive Board'.tr),
-                  const Divider(height: 24),
+                  const Divider(height: 12, thickness: 0.5),
                   _buildInfoRow('Description:'.tr,
                       'Governing body for daily operations'.tr),
                 ],

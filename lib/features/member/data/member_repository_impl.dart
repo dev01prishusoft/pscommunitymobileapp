@@ -2,6 +2,7 @@ import 'package:pscommunitymobileapp/features/member/domain/repositories/member_
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class MemberRepositoryImpl implements MemberRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   MemberRepositoryImpl(this._apiClient);

@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/features/payment/domain/repositories/paymen
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   PaymentRepositoryImpl(this._apiClient);

@@ -2,6 +2,7 @@ import 'package:pscommunitymobileapp/features/family/domain/repositories/family_
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class FamilyRepositoryImpl implements FamilyRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   FamilyRepositoryImpl(this._apiClient);

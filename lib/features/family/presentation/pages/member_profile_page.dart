@@ -108,29 +108,90 @@ class MemberProfilePage extends StatelessWidget {
             ),
 
             _buildSection(
-              child: GridView.count(
+              child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: 2.8,
-                children: [
-                  _buildGridItem(Icons.person_outline, 'Gender (Relationship)'.tr, 'Male (Self)'.tr),
-                  _buildGridItem(Icons.water_drop_outlined, 'Blood Group'.tr, 'O+'),
-                  _buildGridItem(Icons.calendar_today_outlined, 'Birth Date (Age)'.tr, '15 Mar 1992 (32 yrs)'.tr),
-                  _buildGridItem(Icons.height, 'Height'.tr, '5 ft 9 in'),
-                  _buildGridItem(Icons.access_time, 'Birth Time'.tr, '08:45 AM'),
-                  _buildGridItem(Icons.monitor_weight_outlined, 'Weight'.tr, '72 kg'),
-                  _buildGridItem(Icons.star_outline, 'Zodiac Sign'.tr, 'Aries'.tr),
-                  _buildGridItem(Icons.person_outline, "Father's Name".tr, 'Shri Amritlal Patel'.tr),
-                  _buildGridItem(Icons.work_outline, 'Occupation'.tr, 'Engineer'.tr),
-                  _buildGridItem(Icons.location_on_outlined, "Father's Area".tr, 'Daskroi (Satellite)'.tr),
-                  _buildGridItem(Icons.school_outlined, 'Last Education'.tr, 'B.Tech - Gujarat Univ'.tr),
-                  _buildGridItem(Icons.favorite_border, 'Marital Status'.tr, 'Married'.tr),
-                  _buildGridItem(Icons.phone_outlined, 'Mobile No'.tr, '9876543210', 
-                    onTap: () => _launchUrl('tel:9876543210')),
-                  _buildGridItem(Icons.calendar_month_outlined, 'Date of Marriage'.tr, '10 Feb 2018'),
-                  _buildGridItem(Icons.opacity, 'Gotra'.tr, 'Kashyap'.tr),
-                ],
+                padding: EdgeInsets.zero,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 52,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: 15,
+                itemBuilder: (context, index) {
+                  final items = [
+                    _buildGridItem(
+                      Icons.person_outline,
+                      'Gender (Relationship)'.tr,
+                      'Male (Self)'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.water_drop_outlined,
+                      'Blood Group'.tr,
+                      'O+',
+                    ),
+                    _buildGridItem(
+                      Icons.calendar_today_outlined,
+                      'Birth Date (Age)'.tr,
+                      '15 Mar 1992 (32 yrs)'.tr,
+                    ),
+                    _buildGridItem(Icons.height, 'Height'.tr, '5 ft 9 in'),
+                    _buildGridItem(
+                      Icons.access_time,
+                      'Birth Time'.tr,
+                      '08:45 AM',
+                    ),
+                    _buildGridItem(
+                      Icons.monitor_weight_outlined,
+                      'Weight'.tr,
+                      '72 kg',
+                    ),
+                    _buildGridItem(
+                      Icons.star_outline,
+                      'Zodiac Sign'.tr,
+                      'Aries'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.person_outline,
+                      "Father's Name".tr,
+                      'Shri Amritlal Patel'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.work_outline,
+                      'Occupation'.tr,
+                      'Engineer'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.location_on_outlined,
+                      "Father's Area".tr,
+                      'Daskroi (Satellite)'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.school_outlined,
+                      'Last Education'.tr,
+                      'B.Tech - Gujarat Univ'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.favorite_border,
+                      'Marital Status'.tr,
+                      'Married'.tr,
+                    ),
+                    _buildGridItem(
+                      Icons.phone_outlined,
+                      'Mobile No'.tr,
+                      '9876543210',
+                      onTap: () => _launchUrl('tel:9876543210'),
+                    ),
+                    _buildGridItem(
+                      Icons.calendar_month_outlined,
+                      'Date of Marriage'.tr,
+                      '10 Feb 2018',
+                    ),
+                    _buildGridItem(Icons.opacity, 'Gotra'.tr, 'Kashyap'.tr),
+                  ];
+                  return items[index];
+                },
               ),
             ),
 
@@ -166,21 +227,52 @@ class MemberProfilePage extends StatelessWidget {
             _buildSection(
               title: 'SOCIAL MEDIA'.tr,
               icon: Icons.share_outlined,
-              child: GridView.count(
+              child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: 3.5,
-                children: [
-                  _buildSocialItem(Icons.facebook, 'Facebook'.tr, 'facebook.com/rajesh', Colors.blue,
-                    onTap: () => _launchUrl('https://facebook.com/rajesh')),
-                  _buildSocialItem(Icons.camera_alt_outlined, 'Instagram'.tr, '@rajesh_patel', Colors.pink,
-                    onTap: () => _launchUrl('https://instagram.com/rajesh_patel')),
-                  _buildSocialItem(Icons.chat_bubble_outline, 'WhatsApp'.tr, '+91 9876543210', Colors.green,
-                    onTap: () => _launchUrl('https://wa.me/919876543210')),
-                  _buildSocialItem(Icons.alternate_email, 'Twitter / X'.tr, '@rajeshpatel', Colors.black,
-                    onTap: () => _launchUrl('https://twitter.com/rajeshpatel')),
-                ],
+                padding: EdgeInsets.zero,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 48,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  final items = [
+                    _buildSocialItem(
+                      Icons.facebook,
+                      'Facebook'.tr,
+                      'facebook.com/rajesh',
+                      Colors.blue,
+                      onTap: () => _launchUrl('https://facebook.com/rajesh'),
+                    ),
+                    _buildSocialItem(
+                      Icons.camera_alt_outlined,
+                      'Instagram'.tr,
+                      '@rajesh_patel',
+                      Colors.pink,
+                      onTap: () =>
+                          _launchUrl('https://instagram.com/rajesh_patel'),
+                    ),
+                    _buildSocialItem(
+                      Icons.chat_bubble_outline,
+                      'WhatsApp'.tr,
+                      '+91 9876543210',
+                      Colors.green,
+                      onTap: () => _launchUrl('https://wa.me/919876543210'),
+                    ),
+                    _buildSocialItem(
+                      Icons.alternate_email,
+                      'Twitter / X'.tr,
+                      '@rajeshpatel',
+                      Colors.black,
+                      onTap: () =>
+                          _launchUrl('https://twitter.com/rajeshpatel'),
+                    ),
+                  ];
+                  return items[index];
+                },
               ),
             ),
 
@@ -240,7 +332,7 @@ class MemberProfilePage extends StatelessWidget {
           ],
           child,
         ],
-      ),
+      ), 
     );
   }
 

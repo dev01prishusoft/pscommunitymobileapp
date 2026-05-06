@@ -35,6 +35,15 @@ class ResetPasswordPage extends StatelessWidget {
     }
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.secondary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: AppGradientBackground(
         child: SafeArea(
           child: Center(

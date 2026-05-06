@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/features/business/domain/repositories/busin
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   BusinessRepositoryImpl(this._apiClient);

@@ -29,6 +29,8 @@ class AppEnvironment {
       apiBaseUrl: flavor == Flavor.prod 
           ? ApiConstants.baseUrl 
           : ApiConstants.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
       enableLogging: flavor == Flavor.dev,
     );
   }

@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class FamilyAreasPage extends StatelessWidget {
   const FamilyAreasPage({super.key});
@@ -133,6 +134,27 @@ class _FilterSection extends StatelessWidget {
                           options: const ['Option 1', 'Option 2', 'Option 3'],
                           onChanged: (val) => controller.selectedTaluka.value = val,
                         ),
+                        if (controller.selectedState.value != null ||
+                            controller.selectedDistrict.value != null ||
+                            controller.selectedTaluka.value != null) ...[
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: controller.resetFilters,
+                              icon: const Icon(Icons.refresh, size: 18),
+                              label: Text(LK.reset.tr),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                side: const BorderSide(color: AppColors.primary),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   )
@@ -151,7 +173,7 @@ class _ResultsHeader extends StatelessWidget {
     return Obx(() {
       if (controller.filteredAreas.isEmpty) return const SizedBox.shrink();
       return Text(
-        '${'Total Areas in Daskroi Taluka: 8'.tr}', // In real app, make dynamic
+        'Total Areas in Daskroi Taluka: 8'.tr, // In real app, make dynamic
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,

@@ -2,6 +2,7 @@ import 'package:pscommunitymobileapp/features/committee/domain/repositories/comm
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class CommitteeRepositoryImpl implements CommitteeRepository {
+  // ignore: unused_field
   final ApiClient _apiClient;
 
   CommitteeRepositoryImpl(this._apiClient);

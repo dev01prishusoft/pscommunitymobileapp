@@ -40,4 +40,10 @@ class FamilyController extends GetxController {
     }
     return areas;
   }
+
+  void resetFilters() {
+    selectedState.value = null;
+    selectedDistrict.value = null;
+    selectedTaluka.value = null;
+  }
 }
