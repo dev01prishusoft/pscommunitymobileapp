@@ -1,46 +1,35 @@
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 
 class CommitteeRepositoryImpl implements CommitteeRepository {
-  // ignore: unused_field
-  final ApiClient _apiClient;
-
   CommitteeRepositoryImpl(this._apiClient);
+  
+  final ApiClient _apiClient;
 
   @override
   Future<List<CommitteeNode>> getCommittees() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    
-    return [
-      CommitteeNode(
-        name: 'Executive Board',
-        memberCount: 5,
-        isExpanded: true,
-        children: [
-          CommitteeNode(name: 'President', memberCount: 1),
-          CommitteeNode(name: 'Secretary', memberCount: 1),
-          CommitteeNode(name: 'Treasurer', memberCount: 1),
-        ],
-      ),
-      CommitteeNode(
-        name: 'Managing Committee',
-        memberCount: 15,
-        children: [
-          CommitteeNode(name: 'Zonal Heads', memberCount: 4),
-          CommitteeNode(name: 'Area Leads', memberCount: 11),
-        ],
-      ),
-      CommitteeNode(
-        name: 'Standing Committees',
-        memberCount: 20,
-        children: [
-          CommitteeNode(name: 'Education Committee', memberCount: 7),
-          CommitteeNode(name: 'Temple Committee', memberCount: 8),
-          CommitteeNode(name: 'Finance Sub-Committee', memberCount: 5),
-        ],
-      ),
-      CommitteeNode(name: 'Election Committee', memberCount: 3),
-    ];
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.committees,
+        queryParameters: {
+          'PageNumber': 1,
+          'PageSize': 100, // Load all for tree structure
+        },
+      );
+
+      final json = response.data as Map<String, dynamic>;
+      if (json['succeeded'] != true) return [];
+
+      final dataObj = json['data'] as Map<String, dynamic>? ?? {};
+      final list = dataObj['committees'] as List? ?? [];
+
+      return list.map((e) => CommitteeNode.fromJson(e as Map<String, dynamic>)).toList();
+    } on Exception catch (e) {
+      AppLogger.e('GetCommittees Error', e);
+      rethrow;
+    }
   }
 }

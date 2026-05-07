@@ -10,34 +10,38 @@ class MemberRepositoryImpl implements MemberRepository {
 
   @override
   Future<List<Member>> getMembers() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    
-    return [
-      const Member(
-        name: 'Rajesh Kumar Patel',
-        info: 'Male • 32 yrs • Married',
-        location: 'Ahmedabad',
-      ),
-      const Member(
-        name: 'Suresh Bhai Mehta',
-        info: 'Male • 55 yrs • Married',
-        location: 'Vadodara',
-      ),
-      const Member(
-        name: 'Priya Ben Shah',
-        info: 'Female • 28 yrs • Unmarried',
-        location: 'Surat',
-      ),
-      const Member(
-        name: 'Amit Kumar Joshi',
-        info: 'Male • 40 yrs • Married',
-        location: 'Rajkot',
-      ),
-      const Member(
-        name: 'Meena Kumari Patel',
-        info: 'Female • 50 yrs • Widow',
-        location: 'Ahmedabad',
-      ),
-    ];
+    return searchMembers(pageNumber: 1, pageSize: 50);
+  }
+
+  @override
+  Future<List<Member>> searchMembers({
+    String? query,
+    int? genderId,
+    bool? lookingForMarriage,
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
+    final queryParameters = <String, dynamic>{
+      'pageNumber': pageNumber,
+      'pageSize': pageSize,
+      if (query != null && query.isNotEmpty) 'search': query,
+      if (genderId != null) 'genderId': genderId,
+      if (lookingForMarriage != null) 'lookingForMarriage': lookingForMarriage,
+    };
+
+    final response = await _apiClient.get(
+      '/api/v1/member/MemberSearch',
+      queryParameters: queryParameters,
+    );
+
+    final json = response.data as Map<String, dynamic>;
+    if (json['succeeded'] != true) return [];
+
+    final data = json['data'] as Map<String, dynamic>? ?? {};
+    final members = data['members'] as List? ?? [];
+
+    return members
+        .map((e) => Member.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }

@@ -60,7 +60,7 @@ class AppRouter {
     GetPage(name: resetPassword, page: () => const ResetPasswordPage()),
     
     // Protected Routes
-    GetPage(name: home, page: () => const HomePage(), middlewares: [AuthGuard()]),
+    GetPage(name: home, page: () => HomePage(), middlewares: [AuthGuard()]),
     GetPage(name: shareApp, page: () => const ShareAppPage(), middlewares: [AuthGuard()]),
     GetPage(name: findMember, page: () => const FindMemberPage(), middlewares: [AuthGuard()]),
     GetPage(name: makePayment, page: () => const MakePaymentPage(), middlewares: [AuthGuard()]),

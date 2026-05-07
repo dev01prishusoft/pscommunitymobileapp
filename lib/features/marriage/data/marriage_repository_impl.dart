@@ -1,54 +1,37 @@
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/entities/unmarried_count.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
 
 class MarriageRepositoryImpl implements MarriageRepository {
-  // ignore: unused_field
   final ApiClient _apiClient;
 
   MarriageRepositoryImpl(this._apiClient);
 
   @override
   Future<List<MarriageProfile>> getMatrimonialProfiles() async {
-    await Future.delayed(const Duration(milliseconds: 600));
+    final response = await _apiClient.get(ApiEndpoints.marriage);
     
-    return [
-      const MarriageProfile(
-        name: 'Rajesh Patel',
-        age: '28 yrs',
-        occupation: 'Engineer',
-        gotra: 'Kashyap Gotra',
-        location: 'Ahmedabad, Daskroi, Satellite',
-        lookingForMarriage: true,
-        gender: 'Male',
-      ),
-      const MarriageProfile(
-        name: 'Priya Shah',
-        age: '25 yrs',
-        occupation: 'Teacher',
-        gotra: 'Vashishtha Gotra',
-        location: 'Vadodara, Karelibaug',
-        lookingForMarriage: true,
-        gender: 'Female',
-      ),
-      const MarriageProfile(
-        name: 'Amit Mehta',
-        age: '30 yrs',
-        occupation: 'Business',
-        gotra: 'Bharadwaj Gotra',
-        location: 'Surat, Adajan',
-        lookingForMarriage: true,
-        gender: 'Male',
-      ),
-      const MarriageProfile(
-        name: 'Neha Gupta',
-        age: '24 yrs',
-        occupation: 'Doctor',
-        gotra: 'Kashyap Gotra',
-        location: 'Rajkot, Kalavad Road',
-        lookingForMarriage: true,
-        gender: 'Female',
-      ),
-    ];
+    final json = response.data as Map<String, dynamic>;
+    if (json['succeeded'] != true) return [];
+
+    final dataObj = json['data'] as Map<String, dynamic>? ?? {};
+    final list = dataObj['members'] as List? ?? [];
+
+    return list.map((e) => MarriageProfile.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<List<UnmarriedCount>> getUnmarriedCounts() async {
+    final response = await _apiClient.get(ApiEndpoints.unmarriedCount);
+    
+    final json = response.data as Map<String, dynamic>;
+    if (json['succeeded'] != true) return [];
+
+    final dataObj = json['data'] as Map<String, dynamic>? ?? {};
+    final list = dataObj['unMarriedCount'] as List? ?? [];
+
+    return list.map((e) => UnmarriedCount.fromJson(e as Map<String, dynamic>)).toList();
   }
 }

@@ -15,19 +15,21 @@ class ErrorMappingInterceptor extends Interceptor {
         break;
       case DioExceptionType.badResponse:
         final status = err.response?.statusCode;
+        final data = err.response?.data;
+        String? apiMessage;
+        
+        if (data is Map<String, dynamic>) {
+          apiMessage = data['message']?.toString() ?? data['Message']?.toString();
+        }
+
         if (status == 401) {
-          failure = const UnauthorizedFailure();
+          failure = UnauthorizedFailure(apiMessage ?? 'Unauthorized access');
         } else if (status == 403) {
-          failure = const UnauthorizedFailure('Access Forbidden');
+          failure = UnauthorizedFailure(apiMessage ?? 'Access Forbidden');
         } else if (status != null && status >= 500) {
-          failure = const ServerFailure();
+          failure = ServerFailure(apiMessage ?? 'Server error occurred');
         } else {
-          final data = err.response?.data;
-          String msg = 'Server request failed';
-          if (data is Map<String, dynamic>) {
-            msg = data['message'] as String? ?? msg;
-          }
-          failure = ServerFailure(msg);
+          failure = ServerFailure(apiMessage ?? 'Server request failed');
         }
         break;
       case DioExceptionType.connectionError:

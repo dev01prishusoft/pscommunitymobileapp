@@ -12,7 +12,8 @@ abstract class AuthRepository {
   });
 
   Future<void> memberUpdatePassword({
-    required String currentPassword,
+    required String mobileNo,
+    required String oldPassword,
     required String newPassword,
   });
 }

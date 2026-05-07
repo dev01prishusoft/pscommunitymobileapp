@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
 
 class BankAccountDetailsPage extends StatelessWidget {
   const BankAccountDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bank = Get.arguments as BankAccount;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -49,8 +52,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF002B5B),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF002B5B),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.account_balance,
@@ -58,22 +61,25 @@ class BankAccountDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'HDFC Bank'.tr,
+                    bank.bankName.tr,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.secondary,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Primary Account'.tr,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF1B8D5E),
-                      fontWeight: FontWeight.bold,
+                  if (bank.isPrimary)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        'Primary Account'.tr,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF1B8D5E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -81,15 +87,15 @@ class BankAccountDetailsPage extends StatelessWidget {
 
             // Details Section
             _buildDetailsCard([
-              _buildDetailItem('Account Holder Name:'.tr, 'Shree Patel Samaj'.tr),
-              _buildDetailItem('Account Number:'.tr, 'XXXXXXXXXX1234'),
-              _buildDetailItem('Account Type:'.tr, 'Savings'.tr),
-              _buildDetailItem('Bank Name:'.tr, 'HDFC Bank'.tr),
-              _buildDetailItem('Branch Name:'.tr, 'Satellite, Ahmedabad'.tr),
-              _buildDetailItem('IFSC Code:'.tr, 'HDFC0001234'),
-              _buildDetailItem('MICR Code:'.tr, '380240002'),
-              _buildDetailItem('SWIFT Code:'.tr, 'HDFCINBB'),
-              _buildDetailItem('UPI ID:'.tr, 'samaj@hdfcbank'),
+              _buildDetailItem('Account Holder Name:'.tr, bank.accountHolderName.tr),
+              _buildDetailItem('Account Number:'.tr, bank.accountNumber),
+              _buildDetailItem('Account Type:'.tr, bank.accountType.tr),
+              _buildDetailItem('Bank Name:'.tr, bank.bankName.tr),
+              _buildDetailItem('Branch Name:'.tr, bank.branchName.tr),
+              _buildDetailItem('IFSC Code:'.tr, bank.ifscCode),
+              _buildDetailItem('MICR Code:'.tr, bank.micrCode),
+              _buildDetailItem('SWIFT Code:'.tr, bank.swiftCode),
+              _buildDetailItem('UPI ID:'.tr, bank.upiId),
             ]),
             const SizedBox(height: 20),
 

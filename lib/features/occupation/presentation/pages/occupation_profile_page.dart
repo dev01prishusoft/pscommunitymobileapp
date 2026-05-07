@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
 
 class OccupationProfilePage extends StatefulWidget {
   const OccupationProfilePage({super.key});
@@ -11,8 +13,18 @@ class OccupationProfilePage extends StatefulWidget {
 }
 
 class _OccupationProfilePageState extends State<OccupationProfilePage> {
-  final String _businessAddress =
-      '42, Shanti Nagar Society, Near Satellite Road, Satellite, Daskroi Taluka, Ahmedabad District, Gujarat, Pin: 380015';
+  final controller = Get.find<OccupationController>();
+  int _occupationId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('occupationId')) {
+      _occupationId = args['occupationId'] as int;
+      controller.loadOccupationDetails(_occupationId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +35,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           'Occupation Profile'.tr,
@@ -33,147 +45,167 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
           ),
         ),
         centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close, color: AppColors.primary),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Profile Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: const BoxDecoration(
-                      color: AppColors.muted,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 60,
-                      color: AppColors.mutedForeground,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Rajesh Patel'.tr,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Engineer at Tata Motors'.tr,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.mutedForeground,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
+      body: Obx(() => AppStateView(
+            state: controller.detailsState.value,
+            onRetry: () => controller.loadOccupationDetails(_occupationId),
+            child: _buildProfileContent(),
+          )),
+    );
+  }
 
-            // Occupation Details Section
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.business_center,
-                          color: AppColors.primary, size: 24),
-                      const SizedBox(width: 12),
-                      Text(
-                        'OCCUPATION'.tr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                          fontSize: 16,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
+  Widget _buildProfileContent() {
+    final occ = controller.selectedOccupation.value;
+    if (occ == null) return const SizedBox.shrink();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // Profile Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    color: AppColors.muted,
+                    shape: BoxShape.circle,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.0),
-                    child: Divider(),
-                  ),
-                  _buildDetailRow(
-                      Icons.person_outline, 'Occupation Type:'.tr, 'Service'.tr),
-                  _buildDetailRow(
-                      Icons.business_center_outlined, 'Occupation:'.tr, 'Engineer'.tr),
-                  _buildDetailRow(
-                      Icons.apartment, 'Company Name:'.tr, 'Tata Motors'.tr),
-                  
-                  // Expandable Address Row
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 20, color: AppColors.primary),
-                        const SizedBox(width: 12),
-                        SizedBox(
-                          width: 140,
-                          child: Text(
-                            'Business Address:'.tr,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
+                  child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            occ.logoUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.person,
+                              size: 60,
                               color: AppColors.mutedForeground,
-                              fontSize: 14,
                             ),
                           ),
+                        )
+                      : const Icon(
+                          Icons.person,
+                          size: 60,
+                          color: AppColors.mutedForeground,
                         ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                _businessAddress.tr,
-                                textAlign: TextAlign.right,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  (occ.memberName ?? 'N/A').tr,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${occ.name} at ${occ.companyName ?? 'N/A'}'.tr,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.mutedForeground,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Occupation Details Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.business_center,
+                        color: AppColors.primary, size: 24),
+                    const SizedBox(width: 12),
+                    Text(
+                      'OCCUPATION'.tr,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                        fontSize: 16,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Divider(),
+                ),
+                _buildDetailRow(Icons.person_outline, 'Occupation Type:'.tr,
+                    (occ.occupationType ?? 'N/A').tr),
+                _buildDetailRow(Icons.business_center_outlined,
+                    'Occupation:'.tr, (occ.name).tr),
+                _buildDetailRow(Icons.apartment, 'Company Name:'.tr,
+                    (occ.companyName ?? 'N/A').tr),
+
+                // Expandable Address Row
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          size: 20, color: AppColors.primary),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 140,
+                        child: Text(
+                          'Business Address:'.tr,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.mutedForeground,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              (occ.businessAddress ?? 'N/A').tr,
+                              textAlign: TextAlign.right,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
                               ),
+                            ),
+                            if (occ.businessAddress != null)
                               GestureDetector(
                                 onTap: () {
-                                  _showAddressPopup();
+                                  _showAddressPopup(occ.businessAddress!);
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
@@ -187,26 +219,30 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  _buildDetailRow(
-                      Icons.phone_outlined, 'Mobile:'.tr, '555588855'.tr),
-                  _buildDetailRow(
-                      Icons.description_outlined, 'Description:'.tr, 'Senior Software Engineer'.tr),
-                ],
-              ),
+                _buildDetailRow(Icons.phone_outlined, 'Mobile:'.tr,
+                    (occ.mobile ?? 'N/A').tr),
+                _buildDetailRow(Icons.description_outlined, 'Description:'.tr,
+                    (occ.description ?? 'N/A').tr),
+              ],
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 24),
 
-            // Bottom Button
+          // Bottom Button
+          if (occ.memberId != null)
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, AppRouter.memberProfile);
+                Get.toNamed<void>(
+                  AppRouter.memberProfile,
+                  arguments: {'memberId': occ.memberId},
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
@@ -234,13 +270,12 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ],
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
 
-  void _showAddressPopup() {
+  void _showAddressPopup(String address) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -253,7 +288,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
           ],
         ),
         content: Text(
-          _businessAddress.tr,
+          address.tr,
           style: const TextStyle(
             fontSize: 14,
             color: AppColors.secondary,

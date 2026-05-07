@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/localization/models/language.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 
 class LocalizationService {
   LocalizationService(this._storage);
@@ -10,6 +13,8 @@ class LocalizationService {
   final SecureStorageService _storage;
   static const _localeKey = 'app_locale';
   final Rx<Locale> currentLocale = const Locale('en', 'US').obs;
+  
+  final RxList<Language> languages = <Language>[].obs;
 
   late Map<String, Map<String, String>> keys;
 
@@ -34,6 +39,20 @@ class LocalizationService {
         currentLocale.value = locale;
         await Get.updateLocale(locale);
       }
+    }
+  }
+
+  Future<void> fetchLanguages() async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(ApiEndpoints.languageDropdown);
+      final json = response.data as Map<String, dynamic>;
+      if (json['succeeded'] == true) {
+        final data = json['data'] as List? ?? [];
+        languages.assignAll(data.map((e) => Language.fromJson(e as Map<String, dynamic>)).toList());
+      }
+    } catch (e) {
+      // Fallback or log
     }
   }
 

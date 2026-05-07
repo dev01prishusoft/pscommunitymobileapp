@@ -18,12 +18,13 @@ class FamilyMember {
   });
 
   factory FamilyMember.fromJson(Map<String, dynamic> json) {
+    final dynamic rawId = json['memberId'] ?? json['MemberId'] ?? json['id'] ?? json['Id'];
     return FamilyMember(
-      id: json['id'] as String? ?? '',
+      id: rawId?.toString() ?? '0',
       name: json['name'] as String? ?? '',
       isHead: json['isHead'] as bool? ?? false,
       gender: json['gender'] as String? ?? '',
-      relation: json['relation'] as String? ?? '',
+      relation: json['relationWithHead'] as String? ?? '',
       maritalStatus: json['maritalStatus'] as String? ?? '',
       occupation: json['occupation'] as String? ?? '',
     );
@@ -41,7 +42,7 @@ class Family {
 
   factory Family.fromJson(Map<String, dynamic> json) {
     return Family(
-      familyName: json['familyName'] as String? ?? '',
+      familyName: json['name'] as String? ?? '',
       members: json['members'] != null
           ? (json['members'] as List<dynamic>).map((i) => FamilyMember.fromJson(i as Map<String, dynamic>)).toList()
           : const [],

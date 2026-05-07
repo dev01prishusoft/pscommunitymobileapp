@@ -13,8 +13,8 @@ class CommitteeNode {
 
   factory CommitteeNode.fromJson(Map<String, dynamic> json) {
     return CommitteeNode(
-      name: json['name'] as String? ?? '',
-      memberCount: json['memberCount'] as int? ?? 0,
+      name: (json['committeeName'] ?? json['name']) as String? ?? '',
+      memberCount: (json['totalMembers'] ?? json['memberCount']) as int? ?? 0,
       isExpanded: json['isExpanded'] as bool? ?? false,
       children: json['children'] != null
           ? (json['children'] as List<dynamic>)

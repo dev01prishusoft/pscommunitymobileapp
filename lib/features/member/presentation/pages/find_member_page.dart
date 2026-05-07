@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
 
 class FindMemberPage extends StatefulWidget {
@@ -16,10 +17,26 @@ class FindMemberPage extends StatefulWidget {
 class _FindMemberPageState extends State<FindMemberPage> {
   final FindMemberController _controller = Get.find<FindMemberController>();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.loadMembers();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _controller.loadMoreMembers();
+    }
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -33,7 +50,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.findMember.tr,
@@ -49,7 +66,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
             color: Colors.white,
             child: TextField(
               controller: _searchController,
-              onChanged: _controller.search,
+              onChanged: _controller.onSearchChanged,
               decoration: InputDecoration(
                 hintText: LK.searchHint.tr,
                 prefixIcon: const Icon(Icons.search, color: AppColors.mutedForeground),
@@ -81,7 +98,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   style: const TextStyle(color: AppColors.mutedForeground, fontSize: 15),
                 ),
                 Text(
-                  '${_controller.filteredMembers.length}',
+                    ' ${_controller.members.length} ',
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -103,76 +120,117 @@ class _FindMemberPageState extends State<FindMemberPage> {
               emptyMessage: 'No members found'.tr,
               onRetry: _controller.loadMembers,
               child: ListView.builder(
+                  controller: _scrollController,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _controller.filteredMembers.length,
+                  itemCount:
+                      _controller.members.length +
+                      (_controller.hasMore.value ? 1 : 0),
                 itemBuilder: (context, index) {
-                  final member = _controller.filteredMembers[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      leading: const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Color(0xFFE2E8F0),
-                        child: Icon(Icons.person, color: AppColors.mutedForeground, size: 30),
-                      ),
-                      title: Text(
-                        member.name.tr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
-                          fontSize: 16,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            member.info.tr,
-                            style: const TextStyle(
-                              color: AppColors.mutedForeground,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                              const SizedBox(width: 4),
-                              Text(
-                                member.location.tr,
-                                style: const TextStyle(
-                                  color: AppColors.mutedForeground,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      trailing: const Icon(Icons.arrow_forward, color: AppColors.primary),
-                      onTap: () => Get.toNamed(AppRouter.memberProfile),
-                    ),
-                  );
-                },
+                    if (index == _controller.members.length) {
+                      return _buildLoader();
+                    }
+
+                    final member = _controller.members[index];
+                    return _buildMemberCard(member);
+                  },
+                ),
               ),
-            )),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMemberCard(Member member) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: CircleAvatar(
+          radius: 30,
+          backgroundColor: const Color(0xFFE2E8F0),
+          child: Text(
+            member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+        title: Text(
+          member.name,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondary,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              '${member.gender} • ${member.age} yrs • ${member.occupation}',
+              style: const TextStyle(
+                color: AppColors.mutedForeground,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (member.area.isNotEmpty)
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      member.area,
+                      style: const TextStyle(
+                        color: AppColors.mutedForeground,
+                        fontSize: 13,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+        trailing: const Icon(Icons.arrow_forward, color: AppColors.primary),
+        onTap: () => Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': member.memberId},
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return Obx(
+      () => _controller.isLoadingMore.value
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : const SizedBox(height: 24),
     );
   }
 }

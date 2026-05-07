@@ -18,6 +18,12 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _controller.loadOccupations(occupationTypeId: 6);
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -36,7 +42,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
       ),
       body: Column(
@@ -116,7 +122,10 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
 
   Widget _buildOccupationCard(OccupationItem occ) {
     return InkWell(
-      onTap: () => Get.toNamed(AppRouter.occupationProfile),
+      onTap: () => Get.toNamed(
+        AppRouter.occupationProfile,
+        arguments: {'occupationId': occ.id},
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -133,11 +142,39 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              _getIconData(occ.iconKey),
-              size: 40,
-              color: AppColors.primary,
-            ),
+            occ.logoUrl != null && occ.logoUrl!.isNotEmpty
+                ? Image.network(
+                    occ.logoUrl!,
+                    height: 40,
+                    width: 40,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Icon(
+                      _getIconData(occ.iconKey),
+                      size: 40,
+                      color: AppColors.primary,
+                    ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Icon(
+                    _getIconData(occ.iconKey),
+                    size: 40,
+                    color: AppColors.primary,
+                  ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -153,22 +190,14 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '${occ.count}',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  IconData _getIconData(String key) {
+  IconData _getIconData(String? key) {
+    if (key == null) return Icons.work_rounded;
     switch (key) {
       case 'computer':
         return Icons.computer_rounded;

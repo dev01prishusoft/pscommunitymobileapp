@@ -9,17 +9,37 @@ class OccupationRepositoryImpl implements OccupationRepository {
   OccupationRepositoryImpl(this._apiClient);
 
   @override
-  Future<List<OccupationItem>> getOccupations() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    
-    return [
-      const OccupationItem(name: 'Business', count: 450, iconKey: 'business'),
-      const OccupationItem(name: 'Software Engineer', count: 320, iconKey: 'computer'),
-      const OccupationItem(name: 'Doctor', count: 85, iconKey: 'medical_services'),
-      const OccupationItem(name: 'Teacher', count: 180, iconKey: 'school'),
-      const OccupationItem(name: 'Agriculture', count: 650, iconKey: 'agriculture'),
-      const OccupationItem(name: 'Government Service', count: 120, iconKey: 'account_balance'),
-      const OccupationItem(name: 'Real Estate', count: 95, iconKey: 'home_work'),
-    ];
+  Future<List<OccupationItem>> getOccupations({int? occupationTypeId}) async {
+    final queryParameters = <String, dynamic>{
+      if (occupationTypeId != null) 'occupationTypeId': occupationTypeId,
+      'pageNumber': 1,
+      'pageSize': 100,
+    };
+
+    final response = await _apiClient.get(
+      '/api/v1/Occupation/list',
+      queryParameters: queryParameters,
+    );
+
+    final json = response.data as Map<String, dynamic>;
+    if (json['succeeded'] != true) return [];
+
+    final dataObj = json['data'] as Map<String, dynamic>? ?? {};
+    final list = dataObj['data'] as List? ?? [];
+
+    return list.map((e) => OccupationItem.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<OccupationItem> getOccupationDetails(int id) async {
+    final response = await _apiClient.get('/api/v1/Occupation/$id');
+
+    final json = response.data as Map<String, dynamic>;
+    if (json['succeeded'] != true) {
+      throw Exception(json['message'] ?? 'Failed to load occupation details');
+    }
+
+    final data = json['data'] as Map<String, dynamic>;
+    return OccupationItem.fromJson(data);
   }
 }

@@ -24,6 +24,7 @@ import 'package:pscommunitymobileapp/features/family/data/family_repository_impl
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/business/data/business_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class DI {
   static Future<void> bootstrap() async {
@@ -70,7 +71,7 @@ class DI {
 
     // 8. Marriage Feature
     final marriageRepository = MarriageRepositoryImpl(apiClient);
-    Get.put(MarriageController(marriageRepository), permanent: true);
+    Get.put(MarriageController(marriageRepository, memberRepository), permanent: true);
 
     // 9. Committee Feature
     final committeeRepository = CommitteeRepositoryImpl(apiClient);
@@ -91,5 +92,13 @@ class DI {
     // 13. Business Feature
     final businessRepository = BusinessRepositoryImpl(apiClient);
     Get.put(BusinessController(businessRepository), permanent: true);
+
+    // 14. Global Samaj Detail
+    final samajController = Get.put(SamajController(apiClient), permanent: true);
+    
+    // Auto-fetch if already logged in
+    if (authState.isAuthenticated.value) {
+      samajController.fetchSamajDetail();
+    }
   }
 }

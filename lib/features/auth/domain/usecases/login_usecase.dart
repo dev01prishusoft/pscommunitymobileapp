@@ -2,14 +2,14 @@ import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.d
 import 'package:pscommunitymobileapp/features/auth/domain/repositories/auth_repository.dart';
 
 class LoginUseCase {
-  final AuthRepository _repository;
 
   LoginUseCase(this._repository);
+  final AuthRepository _repository;
 
   Future<AuthTokens> call({
     required String mobile,
     required String password,
   }) {
-    return _repository.login(mobile: mobile, password: password);
+    return _repository.memberLogin(mobile: mobile, password: password);
   }
 }

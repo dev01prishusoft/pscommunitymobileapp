@@ -10,20 +10,33 @@ class OccupationController extends GetxController {
   OccupationController(this._repository);
 
   final Rx<AppState> state = AppState.loading.obs;
+  final Rx<AppState> detailsState = AppState.loading.obs;
   final RxList<OccupationItem> occupations = <OccupationItem>[].obs;
   final RxList<OccupationItem> filteredOccupations = <OccupationItem>[].obs;
   final RxString searchQuery = ''.obs;
+  final Rxn<OccupationItem> selectedOccupation = Rxn<OccupationItem>();
 
   @override
   void onInit() {
     super.onInit();
-    loadOccupations();
   }
 
-  Future<void> loadOccupations() async {
+  Future<void> loadOccupationDetails(int id) async {
+    detailsState.value = AppState.loading;
+    try {
+      final details = await _repository.getOccupationDetails(id);
+      selectedOccupation.value = details;
+      detailsState.value = AppState.data;
+    } catch (e, stack) {
+      AppLogger.e('Failed to load occupation details for id: $id', e, stack);
+      detailsState.value = AppState.error;
+    }
+  }
+
+  Future<void> loadOccupations({int? occupationTypeId}) async {
     state.value = AppState.loading;
     try {
-      final results = await _repository.getOccupations();
+      final results = await _repository.getOccupations(occupationTypeId: occupationTypeId);
       occupations.assignAll(results);
       filteredOccupations.assignAll(results);
       state.value = results.isEmpty ? AppState.empty : AppState.data;

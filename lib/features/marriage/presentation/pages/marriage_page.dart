@@ -4,7 +4,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
-import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class MarriagePage extends StatefulWidget {
   const MarriagePage({super.key});
@@ -16,6 +16,12 @@ class MarriagePage extends StatefulWidget {
 class _MarriagePageState extends State<MarriagePage> {
   final MarriageController _controller = Get.find<MarriageController>();
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.loadProfiles();
+  }
 
   // Constants for Dropdowns (kept here for UI list)
   final List<String> _ages = List.generate(43, (i) => (18 + i).toString());
@@ -54,28 +60,41 @@ class _MarriagePageState extends State<MarriagePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Summary Cards
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      _buildSummaryCard(
-                        label: 'Unmarried Male'.tr,
-                        count: '45',
-                        icon: Icons.group,
-                        iconColor: Colors.blue,
-                        textColor: Colors.blue,
-                      ),
-                      const SizedBox(width: 16),
-                      _buildSummaryCard(
-                        label: 'Unmarried Female'.tr,
-                        count: '38',
-                        icon: Icons.person,
-                        iconColor: Colors.pink,
-                        textColor: Colors.pink,
-                      ),
-                    ],
-                  ),
-                ),
+                Obx(() {
+                  final maleCount = _controller.unmarriedCounts
+                      .firstWhereOrNull((e) => e.genderId == 1)
+                      ?.count ?? 0;
+                  final femaleCount = _controller.unmarriedCounts
+                      .firstWhereOrNull((e) => e.genderId == 6)
+                      ?.count ?? 0;
+                      
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryCard(
+                            label: 'Unmarried Male'.tr,
+                            count: maleCount.toString(),
+                            icon: Icons.group,
+                            iconColor: Colors.blue,
+                            textColor: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildSummaryCard(
+                            label: 'Unmarried Female'.tr,
+                            count: femaleCount.toString(),
+                            icon: Icons.person,
+                            iconColor: Colors.pink,
+                            textColor: Colors.pink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
 
                 // Filters Row (Gender & Looking for)
                 Padding(
@@ -552,7 +571,7 @@ class _MarriagePageState extends State<MarriagePage> {
     );
   }
 
-  Widget _buildMemberCard(MarriageProfile member) {
+  Widget _buildMemberCard(Member member) {
     final avatarColors = _getAvatarColors(member.gender);
     
     return Card(
@@ -581,22 +600,23 @@ class _MarriagePageState extends State<MarriagePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${member.age.tr} | ${member.occupation.tr} | ${member.gotra.tr}',
+                    '${member.age} yrs | ${member.occupation.tr} | ${member.gotra.tr}',
                     style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          member.location.tr,
-                          style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
+                  if (member.area.isNotEmpty)
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on, size: 16, color: AppColors.primary),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            member.area.tr,
+                            style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -604,17 +624,20 @@ class _MarriagePageState extends State<MarriagePage> {
                           style: const TextStyle(fontSize: 13)),
                       const SizedBox(width: 4),
                       Text(
-                        member.lookingForMarriage ? 'Yes'.tr : 'No'.tr,
+                        (member.isLookingforMarriage ?? false) ? 'Yes'.tr : 'No'.tr,
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: member.lookingForMarriage
+                            color: (member.isLookingforMarriage ?? false)
                                 ? Colors.green
                                 : Colors.red),
                       ),
                       const Spacer(),
                       OutlinedButton(
-                        onPressed: () => Get.toNamed(AppRouter.memberProfile),
+                        onPressed: () => Get.toNamed<void>(
+                          AppRouter.memberProfile,
+                          arguments: {'memberId': member.memberId},
+                        ),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           side: const BorderSide(color: AppColors.primary),

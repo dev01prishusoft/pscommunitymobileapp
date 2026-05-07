@@ -19,7 +19,7 @@ class AuthRepositoryImpl implements AuthRepository {
       data: {
         'mobile': mobile,
         'password': password,
-        'ipAddress': '',
+        'ipAddress': '192.168.1.1',
       },
     );
 
@@ -34,9 +34,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await _apiClient.post(
       ApiEndpoints.memberLogin,
       data: {
-        'email': mobile, // Assuming email/mobile field name from user snippet
+        'mobileNo': mobile,
         'password': password,
-        'ipAddress': '',
+        'ipAddress': '192.168.1.1',
       },
     );
 
@@ -45,13 +45,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> memberUpdatePassword({
-    required String currentPassword,
+    required String mobileNo,
+    required String oldPassword,
     required String newPassword,
   }) async {
     final response = await _apiClient.post(
       ApiEndpoints.memberUpdatePassword,
       data: {
-        'currentPassword': currentPassword,
+        'mobileNo': mobileNo,
+        'oldPassword': oldPassword,
         'newPassword': newPassword,
       },
     );
@@ -86,6 +88,13 @@ class AuthRepositoryImpl implements AuthRepository {
       accessToken: accessToken,
       refreshToken: refreshToken,
       isDefaultPassword: isDefault,
+      accessTokenExpiry: authData['accessTokenExpiry']?.toString(),
+      memberId: authData['memberId'] as int?,
+      samajId: authData['samajId'] as int?,
+      firstName: authData['firstName']?.toString(),
+      middleName: authData['middleName']?.toString(),
+      lastName: authData['lastName']?.toString(),
+      email: authData['email']?.toString(),
     );
   }
 }

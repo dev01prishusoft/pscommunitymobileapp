@@ -6,13 +6,24 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 
-class CommitteesPage extends StatelessWidget {
+class CommitteesPage extends StatefulWidget {
   const CommitteesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<CommitteeController>();
+  State<CommitteesPage> createState() => _CommitteesPageState();
+}
 
+class _CommitteesPageState extends State<CommitteesPage> {
+  final controller = Get.find<CommitteeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.loadCommittees();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -27,17 +38,52 @@ class CommitteesPage extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: Obx(() => AppStateView(
-        state: controller.state.value,
-        onRetry: controller.loadCommittees,
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.committees.length,
-          itemBuilder: (context, index) {
-            return _CommitteeCard(node: controller.committees[index]);
-          },
-        ),
-      )),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              onChanged: controller.onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search committees...'.tr,
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          controller.onSearchChanged('');
+                        },
+                      )
+                    : const SizedBox.shrink()),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Obx(() => AppStateView(
+              state: controller.state.value,
+              onRetry: controller.loadCommittees,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: controller.committees.length,
+                itemBuilder: (context, index) {
+                  return _CommitteeCard(node: controller.committees[index]);
+                },
+              ),
+            )),
+          ),
+        ],
+      ),
     );
   }
 }

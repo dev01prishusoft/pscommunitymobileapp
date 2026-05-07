@@ -15,7 +15,6 @@ class BusinessController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadCategories();
   }
 
   Future<void> loadCategories() async {

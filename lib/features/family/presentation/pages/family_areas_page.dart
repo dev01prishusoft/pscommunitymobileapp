@@ -6,13 +6,27 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 
-class FamilyAreasPage extends StatelessWidget {
+class FamilyAreasPage extends StatefulWidget {
   const FamilyAreasPage({super.key});
 
   @override
+  State<FamilyAreasPage> createState() => _FamilyAreasPageState();
+}
+
+class _FamilyAreasPageState extends State<FamilyAreasPage> {
+  final controller = Get.find<FamilyController>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.loadStates();
+    controller.loadAreas();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.find<FamilyController>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -117,22 +131,28 @@ class _FilterSection extends StatelessWidget {
                         _CustomDropdown(
                           hint: 'Select State'.tr,
                           value: controller.selectedState.value,
-                          options: const ['Option 1', 'Option 2', 'Option 3'],
-                          onChanged: (val) => controller.selectedState.value = val,
+                            options: controller.states,
+                            onChanged: controller.onStateChanged,
+                            isLoading: controller.isStatesLoading.value,
                         ),
                         const SizedBox(height: 12),
                         _CustomDropdown(
                           hint: 'Select District'.tr,
                           value: controller.selectedDistrict.value,
-                          options: const ['Option 1', 'Option 2', 'Option 3'],
-                          onChanged: (val) => controller.selectedDistrict.value = val,
+                            options: controller.districts,
+                            onChanged: controller.onDistrictChanged,
+                            isEnabled: controller.selectedState.value != null,
+                            isLoading: controller.isDistrictsLoading.value,
                         ),
                         const SizedBox(height: 12),
                         _CustomDropdown(
                           hint: 'Select Taluka'.tr,
                           value: controller.selectedTaluka.value,
-                          options: const ['Option 1', 'Option 2', 'Option 3'],
-                          onChanged: (val) => controller.selectedTaluka.value = val,
+                            options: controller.talukas,
+                            onChanged: controller.onTalukaChanged,
+                            isEnabled:
+                                controller.selectedDistrict.value != null,
+                            isLoading: controller.isTalukasLoading.value,
                         ),
                         if (controller.selectedState.value != null ||
                             controller.selectedDistrict.value != null ||
@@ -185,9 +205,9 @@ class _ResultsHeader extends StatelessWidget {
 }
 
 class _AreasList extends StatelessWidget {
-  final List<FamilyArea> areas;
 
   const _AreasList({required this.areas});
+  final List<FamilyArea> areas;
 
   @override
   Widget build(BuildContext context) {
@@ -217,6 +237,7 @@ class _AreasList extends StatelessWidget {
               Get.toNamed(
                 AppRouter.familyMembers,
                 arguments: {
+                  'areaId': area.id,
                   'areaName': '${area.location.tr} (${area.title.tr})',
                   'membersCount': area.members,
                   'familiesCount': area.families,
@@ -330,15 +351,19 @@ class _EmptyState extends StatelessWidget {
 
 class _CustomDropdown extends StatefulWidget {
   final String hint;
-  final String? value;
-  final List<String> options;
-  final Function(String?) onChanged;
+  final DropdownItem? value;
+  final List<DropdownItem> options;
+  final Function(DropdownItem?) onChanged;
+  final bool isEnabled;
+  final bool isLoading;
 
   const _CustomDropdown({
     required this.hint,
     required this.value,
     required this.options,
     required this.onChanged,
+    this.isEnabled = true,
+    this.isLoading = false,
   });
 
   @override
@@ -350,78 +375,134 @@ class _CustomDropdownState extends State<_CustomDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => setState(() => _isExpanded = !_isExpanded),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.value != null ? widget.value!.tr : widget.hint,
-                      style: TextStyle(
-                        color: widget.value != null ? AppColors.secondary : AppColors.mutedForeground,
-                        fontSize: 14,
-                        fontWeight: widget.value != null ? FontWeight.w500 : FontWeight.normal,
+    final opacity = widget.isEnabled ? 1.0 : 0.5;
+
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: widget.isEnabled
+                  ? () => setState(() => _isExpanded = !_isExpanded)
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.value != null ? widget.value!.text : widget.hint,
+                        style: TextStyle(
+                          color: widget.value != null
+                              ? AppColors.secondary
+                              : AppColors.mutedForeground,
+                          fontSize: 14,
+                          fontWeight: widget.value != null
+                              ? FontWeight.w500
+                              : FontWeight.normal,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                    _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                    color: AppColors.mutedForeground,
-                  ),
-                ],
+                    widget.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            _isExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: AppColors.mutedForeground,
+                          ),
+                  ],
+                ),
               ),
             ),
-          ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            child: _isExpanded
-                ? Column(
-                    children: widget.options.map((option) {
-                      final isSelected = option == widget.value;
-                      return InkWell(
-                        onTap: () {
-                          widget.onChanged(option);
-                          setState(() => _isExpanded = false);
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                          color: isSelected ? const Color(0xFFF0F7FF) : Colors.transparent,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  option.tr,
-                                  style: TextStyle(
-                                    color: isSelected ? AppColors.primary : AppColors.secondary,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                    fontSize: 14,
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: _isExpanded && widget.isEnabled
+                  ? widget.options.isEmpty
+                        ? Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 12.0,
+                            ),
+                            child: Text(
+                              'No items found'.tr,
+                              style: const TextStyle(
+                                color: AppColors.mutedForeground,
+                                fontSize: 14,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          )
+                        : Column(
+                            children: widget.options.map((option) {
+                              final isSelected = option == widget.value;
+                              return InkWell(
+                                onTap: () {
+                                  widget.onChanged(option);
+                                  setState(() => _isExpanded = false);
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                    vertical: 12.0,
+                                  ),
+                                  color: isSelected
+                                      ? const Color(0xFFF0F7FF)
+                                      : Colors.transparent,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          option.text,
+                                          style: TextStyle(
+                                            color: isSelected
+                                                ? AppColors.primary
+                                                : AppColors.secondary,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.normal,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        const Icon(
+                                          Icons.check,
+                                          color: AppColors.primary,
+                                          size: 18,
+                                        ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              if (isSelected)
-                                const Icon(Icons.check, color: AppColors.primary, size: 18),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
+                              );
+                            }).toList(),
+                          )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }

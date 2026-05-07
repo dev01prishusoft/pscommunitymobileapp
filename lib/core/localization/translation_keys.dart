@@ -66,6 +66,7 @@ class LK {
   static const String updateNow = 'Update Now';
   static const String updateLater = 'Update Later';
   static const String reset = 'Reset';
+  static const String home = 'Home';
 
   // Extra keys used in UI but missing from LK
   static const String samajName = 'Andhariya Ganata Samaj';

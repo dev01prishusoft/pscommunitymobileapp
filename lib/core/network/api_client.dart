@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/network/auth_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart';
+import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/certificate_pinning.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
@@ -29,6 +30,7 @@ class ApiClient {
     CertificatePinning.configure(_dio);
 
     _dio.interceptors.addAll([
+      LanguageInterceptor(),
       AuthInterceptor(
         tokenManager: tokenManager,
         refreshDio: refreshDio,
@@ -49,12 +51,22 @@ class ApiClient {
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
     await _checkConnectivity();
-    return _dio.get(path, queryParameters: queryParameters);
+    try {
+      return await _dio.get(path, queryParameters: queryParameters);
+    } on DioException catch (e) {
+      if (e.error is Failure) throw e.error as Failure;
+      rethrow;
+    }
   }
 
   Future<Response> post(String path, {dynamic data}) async {
     await _checkConnectivity();
-    return _dio.post(path, data: data);
+    try {
+      return await _dio.post(path, data: data);
+    } on DioException catch (e) {
+      if (e.error is Failure) throw e.error as Failure;
+      rethrow;
+    }
   }
 
   Future<void> _checkConnectivity() async {

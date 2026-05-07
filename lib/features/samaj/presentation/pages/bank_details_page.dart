@@ -2,29 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
 
 class BankDetailsPage extends StatelessWidget {
   const BankDetailsPage({super.key});
 
-  static const List<Map<String, dynamic>> _banks = [
-    {
-      'bankName': 'HDFC Bank',
-      'branch': 'Satellite, Ahmedabad',
-      'accountNo': 'XXXXXXXXXX1234',
-      'ifsc': 'HDFC0001234',
-      'isPrimary': true,
-    },
-    {
-      'bankName': 'SBI Bank',
-      'branch': 'Naranpura, Ahmedabad',
-      'accountNo': 'XXXXXXXXXX5678',
-      'ifsc': 'SBIN0005678',
-      'isPrimary': false,
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final samajController = Get.find<SamajController>();
+
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
@@ -43,33 +30,36 @@ class BankDetailsPage extends StatelessWidget {
         ),
         centerTitle: false,
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(20),
-        itemCount: _banks.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final bank = _banks[index];
-          return _buildBankCard(
-            context,
-            bankName: bank['bankName'] as String,
-            branch: bank['branch'] as String,
-            accountNo: bank['accountNo'] as String,
-            ifsc: bank['ifsc'] as String,
-            isPrimary: bank['isPrimary'] as bool,
+      body: Obx(() {
+        if (samajController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final accounts = samajController.samaj.value?.bankAccounts ?? [];
+
+        if (accounts.isEmpty) {
+          return Center(
+            child: Text(
+              'No bank accounts found'.tr,
+              style: const TextStyle(color: AppColors.mutedForeground),
+            ),
           );
-        },
-      ),
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(20),
+          itemCount: accounts.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final bank = accounts[index];
+            return _buildBankCard(context, bank);
+          },
+        );
+      }),
     );
   }
 
-  Widget _buildBankCard(
-    BuildContext context, {
-    required String bankName,
-    required String branch,
-    required String accountNo,
-    required String ifsc,
-    bool isPrimary = false,
-  }) {
+  Widget _buildBankCard(BuildContext context, BankAccount bank) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -104,7 +94,7 @@ class BankDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      bankName.tr,
+                      bank.bankName.tr,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -114,7 +104,7 @@ class BankDetailsPage extends StatelessWidget {
                   ],
                 ),
               ),
-              if (isPrimary)
+              if (bank.isPrimary)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -134,16 +124,19 @@ class BankDetailsPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _buildDetailRow('Branch:'.tr, branch.tr),
-          _buildDetailRow('A/C:'.tr, accountNo),
-          _buildDetailRow('IFSC:'.tr, ifsc),
+          _buildDetailRow('Branch:'.tr, bank.branchName.tr),
+          _buildDetailRow('A/C:'.tr, bank.accountNumber),
+          _buildDetailRow('IFSC:'.tr, bank.ifscCode),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12.0),
             child: Divider(),
           ),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, AppRouter.bankAccountDetails);
+              Get.toNamed<void>(
+                AppRouter.bankAccountDetails,
+                arguments: bank,
+              );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,

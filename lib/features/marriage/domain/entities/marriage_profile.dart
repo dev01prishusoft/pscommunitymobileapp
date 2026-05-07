@@ -1,4 +1,5 @@
 class MarriageProfile {
+  final int memberId;
   final String name;
   final String age;
   final String occupation;
@@ -8,6 +9,7 @@ class MarriageProfile {
   final String gender;
 
   const MarriageProfile({
+    required this.memberId,
     required this.name,
     required this.age,
     required this.occupation,
@@ -19,13 +21,14 @@ class MarriageProfile {
 
   factory MarriageProfile.fromJson(Map<String, dynamic> json) {
     return MarriageProfile(
-      name: json['name'] as String? ?? '',
-      age: json['age'] as String? ?? '',
-      occupation: json['occupation'] as String? ?? '',
-      gotra: json['gotra'] as String? ?? '',
-      location: json['location'] as String? ?? '',
-      lookingForMarriage: json['lookingForMarriage'] as bool? ?? false,
-      gender: json['gender'] as String? ?? '',
+      memberId: json['memberId'] as int? ?? 0,
+      name: json['fullName'] as String? ?? json['name'] as String? ?? '',
+      age: (json['age'] ?? '').toString(),
+      occupation: json['occupationTypeName'] as String? ?? json['occupation'] as String? ?? '',
+      gotra: json['gotraName'] as String? ?? json['gotra'] as String? ?? '',
+      location: json['areaName'] as String? ?? json['location'] as String? ?? '',
+      lookingForMarriage: json['isLookingforMarriage'] as bool? ?? json['lookingForMarriage'] as bool? ?? false,
+      gender: json['genderName'] as String? ?? json['gender'] as String? ?? '',
     );
   }
 }

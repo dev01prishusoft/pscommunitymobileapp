@@ -16,6 +16,7 @@ class FamilyMembersListPage extends StatefulWidget {
 class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   final FamilyController _controller = Get.find<FamilyController>();
   final TextEditingController _searchController = TextEditingController();
+  int _areaId = 0;
   String _areaName = 'Daskroi (Satellite)';
   int _membersCount = 31;
   int _familiesCount = 15;
@@ -28,12 +29,13 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
       final args = Get.arguments as Map<String, dynamic>?;
       if (args != null) {
         setState(() {
+          _areaId = (args['areaId'] as int?) ?? 0;
           _areaName = (args['areaName'] as String?) ?? _areaName;
           _membersCount = (args['membersCount'] as int?) ?? _membersCount;
           _familiesCount = (args['familiesCount'] as int?) ?? _familiesCount;
         });
       }
-      _controller.loadFamilies(_areaName);
+      _controller.loadFamilies(_areaId);
     });
   }
 
@@ -129,7 +131,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
           Expanded(
             child: Obx(() => AppStateView(
               state: _controller.familyListState.value,
-              onRetry: () => _controller.loadFamilies(_areaName),
+              onRetry: () => _controller.loadFamilies(_areaId),
               child: _filteredFamilies.isEmpty
                   ? Center(
                       child: Column(
@@ -208,7 +210,10 @@ class _MemberTile extends StatelessWidget {
         if (showDivider)
           const Divider(indent: 70, endIndent: 16),
         InkWell(
-          onTap: () => Get.toNamed(AppRouter.memberProfile),
+          onTap: () => Get.toNamed(
+            AppRouter.memberProfile,
+            arguments: {'memberId': int.tryParse(member.id) ?? 0},
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(

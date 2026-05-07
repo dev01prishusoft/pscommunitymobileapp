@@ -10,22 +10,36 @@ class FindMemberController extends GetxController {
   FindMemberController(this._repository);
 
   final Rx<AppState> state = AppState.loading.obs;
-  final RxList<Member> allMembers = <Member>[].obs;
-  final RxList<Member> filteredMembers = <Member>[].obs;
+  final RxList<Member> members = <Member>[].obs;
   final RxString searchQuery = ''.obs;
+  
+  // Pagination
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  final RxBool hasMore = true.obs;
+  final RxBool isLoadingMore = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadMembers();
+    // Debounce search to avoid too many API calls
+    debounce(searchQuery, (_) => loadMembers(), time: const Duration(milliseconds: 500));
   }
 
-  Future<void> loadMembers() async {
-    state.value = AppState.loading;
+  Future<void> loadMembers({bool showLoading = true}) async {
+    if (showLoading) state.value = AppState.loading;
+    _currentPage = 1;
+    hasMore.value = true;
+    
     try {
-      final members = await _repository.getMembers();
-      allMembers.assignAll(members);
-      filteredMembers.assignAll(members);
+      final results = await _repository.searchMembers(
+        query: searchQuery.value,
+        pageNumber: _currentPage,
+        pageSize: _pageSize,
+      );
+      
+      members.assignAll(results);
+      hasMore.value = results.length >= _pageSize;
       state.value = members.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load members', e, stack);
@@ -33,28 +47,39 @@ class FindMemberController extends GetxController {
     }
   }
 
-  void search(String query) {
-    searchQuery.value = query;
-    if (query.isEmpty) {
-      filteredMembers.assignAll(allMembers);
-      state.value = allMembers.isEmpty ? AppState.empty : AppState.data;
-    } else {
-      final results = allMembers.where((m) {
-        final name = m.name.toLowerCase();
-        final info = m.info.toLowerCase();
-        final location = m.location.toLowerCase();
-        final search = query.toLowerCase();
-        return name.contains(search) || info.contains(search) || location.contains(search);
-      }).toList();
+  Future<void> loadMoreMembers() async {
+    if (isLoadingMore.value || !hasMore.value) return;
+    
+    isLoadingMore.value = true;
+    _currentPage++;
+    
+    try {
+      final results = await _repository.searchMembers(
+        query: searchQuery.value,
+        pageNumber: _currentPage,
+        pageSize: _pageSize,
+      );
       
-      filteredMembers.assignAll(results);
-      state.value = results.isEmpty ? AppState.empty : AppState.data;
+      if (results.isEmpty) {
+        hasMore.value = false;
+      } else {
+        members.addAll(results);
+        hasMore.value = results.length >= _pageSize;
+      }
+    } catch (e, stack) {
+      AppLogger.e('Failed to load more members', e, stack);
+      _currentPage--; // Revert page on error
+    } finally {
+      isLoadingMore.value = false;
     }
+  }
+
+  void onSearchChanged(String query) {
+    searchQuery.value = query;
   }
 
   void clearSearch() {
     searchQuery.value = '';
-    filteredMembers.assignAll(allMembers);
-    state.value = allMembers.isEmpty ? AppState.empty : AppState.data;
+    loadMembers();
   }
 }

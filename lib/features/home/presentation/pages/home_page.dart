@@ -4,26 +4,35 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+
+import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.surfaceVariant,
+      drawer: const AppDrawer(),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.navyBlue),
+        actions: [
+          _buildLanguageDropdown(),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: Stack(
         children: [
           SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, right: 24),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: _buildLanguageDropdown(),
-                  ),
-                ),
                 _buildHeader(),
                 const SizedBox(height: 10),
                 Expanded(
@@ -41,8 +50,10 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildHeader() {
+    final samajController = Get.find<SamajController>();
+    
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 24, right: 24),
+      padding: const EdgeInsets.only(top: 10, left: 24, right: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -50,43 +61,58 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  LK.samajName.tr,
+                Obx(
+                  () => Text(
+                    samajController.samaj.value?.name ?? LK.samajName.tr,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     color: AppColors.navyBlue,
                     letterSpacing: 0.2,
                   ),
+                  ),
                 ),
                 const SizedBox(height: 6),
               ],
             ),
           ),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: ClipOval(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  'assets/images/prishusoft_logo.png',
-                  fit: BoxFit.contain,
+          Obx(() {
+            final logoUrl = samajController.samaj.value?.logoUrl;
+            return Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: logoUrl != null && logoUrl.isNotEmpty
+                      ? Image.network(
+                          logoUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset(
+                                'assets/images/prishusoft_logo.png',
+                                fit: BoxFit.contain,
+                              ),
+                        )
+                      : Image.asset(
+                          'assets/images/prishusoft_logo.png',
+                          fit: BoxFit.contain,
+                        ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
@@ -213,43 +239,64 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLanguageDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: Get.locale?.languageCode == 'gu' ? 'GU' : 'EN',
-          icon: const Icon(Icons.language, color: AppColors.navyBlue, size: 18),
-          style: const TextStyle(
-            color: AppColors.navyBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-          items: const [
-            DropdownMenuItem(value: 'EN', child: Text(' EN')),
-            DropdownMenuItem(value: 'GU', child: Text(' GU')),
+    final loc = Get.find<LocalizationService>();
+    if (loc.languages.isEmpty) {
+      loc.fetchLanguages();
+    }
+
+    return Obx(() {
+      final currentLang = Get.locale?.languageCode ?? 'en';
+      
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
           ],
-          onChanged: (String? newValue) {
-            final loc = Get.find<LocalizationService>();
-            if (newValue == 'EN') {
-              loc.changeLocale('en', 'US');
-            } else if (newValue == 'GU') {
-              loc.changeLocale('gu', 'IN');
-            }
-          },
         ),
-      ),
-    );
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: currentLang.toUpperCase(),
+            icon: const Icon(
+              Icons.language,
+              color: AppColors.navyBlue,
+              size: 18,
+            ),
+            style: const TextStyle(
+              color: AppColors.navyBlue,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+            items: loc.languages.isEmpty
+                ? [
+                    const DropdownMenuItem(value: 'EN', child: Text(' EN')),
+                    const DropdownMenuItem(value: 'GU', child: Text(' GU')),
+                  ]
+                : loc.languages
+                      .map(
+                        (lang) => DropdownMenuItem(
+                          value: lang.code.toUpperCase(),
+                          child: Text(' ${lang.code.toUpperCase()}'),
+                        ),
+                      )
+                      .toList(),
+            onChanged: (String? newValue) {
+              if (newValue == 'EN') {
+                loc.changeLocale('en', 'US');
+              } else if (newValue == 'GU') {
+                loc.changeLocale('gu', 'IN');
+              }
+            },
+          ),
+        ),
+      );
+    });
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class PostLoginSplashPage extends StatefulWidget {
   const PostLoginSplashPage({super.key});
@@ -54,6 +55,7 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
 
   @override
   Widget build(BuildContext context) {
+    final samajController = Get.find<SamajController>();
     return AppUpdateGate(
       child: Scaffold(
       backgroundColor: AppColors.background,
@@ -107,10 +109,23 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                 // Logo
                 ScaleTransition(
                   scale: _scaleAnimation,
-                  child: Image.asset(
-                    "assets/images/prishusoft_logo.png",
-                    width: 300,
-                  ),
+                  child: Obx(() {
+                    final logoUrl = samajController.samaj.value?.logoUrl;
+                    if (logoUrl != null && logoUrl.isNotEmpty) {
+                      return Image.network(
+                        logoUrl,
+                        width: 300,
+                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                          "assets/images/prishusoft_logo.png",
+                          width: 300,
+                        ),
+                      );
+                    }
+                    return Image.asset(
+                      "assets/images/prishusoft_logo.png",
+                      width: 300,
+                    );
+                  }),
                 ),
                 const SizedBox(height: 32),
 
@@ -119,8 +134,8 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                   opacity: _fadeAnimation,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Text(
-                      LK.samajName.tr,
+                    child: Obx(() => Text(
+                      samajController.samaj.value?.name ?? LK.samajName.tr,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 32,
@@ -128,7 +143,7 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                         color: AppColors.navyBlue,
                         letterSpacing: 0.2,
                       ),
-                    ),
+                    )),
                   ),
                 ),
                 const SizedBox(height: 8),

@@ -2,14 +2,18 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/entities/unmarried_count.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 
 class MarriageController extends GetxController {
   final MarriageRepository _repository;
+  final MemberRepository _memberRepository;
 
-  MarriageController(this._repository);
+  MarriageController(this._repository, this._memberRepository);
 
   final Rx<AppState> state = AppState.loading.obs;
+  final RxList<UnmarriedCount> unmarriedCounts = <UnmarriedCount>[].obs;
   
   // Filter Observables
   final RxBool lookingForMarriage = true.obs;
@@ -34,45 +38,40 @@ class MarriageController extends GetxController {
   
   final RxString searchQuery = ''.obs;
 
-  final RxList<MarriageProfile> allMembers = <MarriageProfile>[].obs;
-  final RxList<MarriageProfile> filteredMembers = <MarriageProfile>[].obs;
+  final RxList<Member> filteredMembers = <Member>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadProfiles();
   }
 
-  Future<void> loadProfiles() async {
-    state.value = AppState.loading;
+  Future<void> loadProfiles({bool showLoading = true}) async {
+    if (showLoading) state.value = AppState.loading;
     try {
-      final profiles = await _repository.getMatrimonialProfiles();
-      allMembers.assignAll(profiles);
-      applyFilters();
+      int? genderId;
+      if (selectedGender.value == 'Male') genderId = 1;
+      else if (selectedGender.value == 'Female') genderId = 6;
+
+      final results = await Future.wait([
+        _memberRepository.searchMembers(
+          query: searchQuery.value,
+          genderId: genderId,
+        ),
+        _repository.getUnmarriedCounts(),
+      ]);
+      
+      filteredMembers.assignAll(results[0] as List<Member>);
+      unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
+      
+      state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
-      AppLogger.e('Failed to load matrimonial profiles', e, stack);
+      AppLogger.e('Failed to load matrimonial data', e, stack);
       state.value = AppState.error;
     }
   }
 
   void applyFilters() {
-    final results = allMembers.where((m) {
-      // Basic Filters
-      if (lookingForMarriage.value && !m.lookingForMarriage) return false;
-      
-      if (selectedGender.value != 'All' && m.gender != selectedGender.value) return false;
-      
-      // Search Filter
-      if (searchQuery.value.isNotEmpty) {
-        final name = m.name.toLowerCase();
-        if (!name.contains(searchQuery.value.toLowerCase())) return false;
-      }
-      
-      return true;
-    }).toList();
-    
-    filteredMembers.assignAll(results);
-    state.value = results.isEmpty ? AppState.empty : AppState.data;
+    loadProfiles(showLoading: false);
   }
 
   void toggleAdvancedFilters() {
@@ -83,6 +82,7 @@ class MarriageController extends GetxController {
     selectedGender.value = 'All';
     lookingForMarriage.value = true;
     searchQuery.value = '';
+    // Reset advanced filters too
     selectedAgeFrom.value = '18';
     selectedAgeTo.value = '60';
     selectedHeightFrom.value = '4.5 ft';
@@ -98,6 +98,6 @@ class MarriageController extends GetxController {
     selectedIncomeFrom.value = 'Any';
     selectedIncomeTo.value = 'Any';
     excludeSameGotra.value = false;
-    applyFilters();
+    loadProfiles();
   }
 }

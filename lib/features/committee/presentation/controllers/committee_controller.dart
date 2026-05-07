@@ -11,23 +11,36 @@ class CommitteeController extends GetxController {
 
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<CommitteeNode> committees = <CommitteeNode>[].obs;
+  final RxString searchQuery = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadCommittees();
+    debounce(searchQuery, (_) => loadCommittees(), time: const Duration(milliseconds: 500));
   }
 
   Future<void> loadCommittees() async {
     state.value = AppState.loading;
     try {
       final results = await _repository.getCommittees();
-      committees.assignAll(results);
-      state.value = results.isEmpty ? AppState.empty : AppState.data;
+      
+      if (searchQuery.value.isNotEmpty) {
+        // Simple client side filter if API doesn't support deep search yet
+        // but the repository is now calling the production endpoint
+        committees.assignAll(results.where((c) => c.name.toLowerCase().contains(searchQuery.value.toLowerCase())).toList());
+      } else {
+        committees.assignAll(results);
+      }
+      
+      state.value = committees.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load committees', e, stack);
       state.value = AppState.error;
     }
+  }
+
+  void onSearchChanged(String query) {
+    searchQuery.value = query;
   }
 
   void toggleNode(CommitteeNode node) {

@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.d
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class LoginController extends GetxController {
 
@@ -29,9 +30,13 @@ class LoginController extends GetxController {
     try {
       final newTokens = await _loginUseCase.call(mobile: mobile, password: password);
       await _tokenManager.saveTokens(newTokens.accessToken, newTokens.refreshToken);
+      
+      // Fetch Samaj details globally
+      Get.find<SamajController>().fetchSamajDetail();
+      
       return newTokens;
     } on Failure catch (f) {
-      error.value = f.translationKey.tr;
+      error.value = f.message;
       return null;
     } catch (e) {
       error.value = LK.errorServer.tr;

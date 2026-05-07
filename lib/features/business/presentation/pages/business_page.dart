@@ -6,13 +6,24 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
 import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
-class BusinessPage extends StatelessWidget {
+class BusinessPage extends StatefulWidget {
   const BusinessPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<BusinessController>();
+  State<BusinessPage> createState() => _BusinessPageState();
+}
 
+class _BusinessPageState extends State<BusinessPage> {
+  final controller = Get.find<BusinessController>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.loadCategories();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
