@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class MakePaymentPage extends StatelessWidget {
   const MakePaymentPage({super.key});
@@ -17,7 +18,7 @@ class MakePaymentPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Make Payment'.tr,
+          LK.makePaymentLabel.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -30,17 +31,17 @@ class MakePaymentPage extends StatelessWidget {
         child: Column(
           children: [
             // Payment Type Section
-            _buildSectionHeader('PAYMENT TYPE'.tr),
-            _buildDropdownField('Select Payment Type'.tr),
+            _buildSectionHeader(LK.paymentTypeHeader.tr),
+            _buildDropdownField(LK.selectPaymentType.tr),
             const SizedBox(height: 24),
 
             // Category Section
-            _buildSectionHeader('CATEGORY'.tr),
-            _buildDropdownField('Select Category'.tr),
+            _buildSectionHeader(LK.categoryHeader.tr),
+            _buildDropdownField(LK.selectCategory.tr),
             const SizedBox(height: 24),
 
             // Amount Section
-            _buildSectionHeader('AMOUNT'.tr),
+            _buildSectionHeader(LK.amountHeader.tr),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -54,16 +55,16 @@ class MakePaymentPage extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Amount:'.tr,
+                        LK.amountLabel.tr,
                         style: const TextStyle(
                           color: AppColors.mutedForeground,
                           fontSize: 16,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        '₹'.tr,
-                        style: const TextStyle(
+                      const Text(
+                        '₹',
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: AppColors.secondary,
@@ -93,14 +94,14 @@ class MakePaymentPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Min: ₹100'.tr,
+                        LK.minAmountLabel.tr,
                         style: const TextStyle(
                           color: AppColors.mutedForeground,
                           fontSize: 12,
                         ),
                       ),
                       Text(
-                        'Max: ₹50,000'.tr,
+                        LK.maxAmountLabel.tr,
                         style: const TextStyle(
                           color: AppColors.mutedForeground,
                           fontSize: 12,
@@ -125,7 +126,7 @@ class MakePaymentPage extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                'PAY NOW'.tr,
+                LK.payNow.tr,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

@@ -27,17 +27,17 @@ class CustomUpgraderMessages extends UpgraderMessages {
       case UpgraderMessage.title:
         return LK.updateAvailable.tr;
       case UpgraderMessage.body:
-        return 'A new version is available!'.tr;
+        return LK.newVersionAvailable.tr;
       case UpgraderMessage.prompt:
-        return 'Would you like to update now?'.tr;
+        return LK.wouldYouLikeToUpdate.tr;
       case UpgraderMessage.releaseNotes:
-        return 'Release Notes'.tr;
+        return LK.releaseNotes.tr;
       case UpgraderMessage.buttonTitleUpdate:
         return LK.updateNow.tr;
       case UpgraderMessage.buttonTitleLater:
         return LK.updateLater.tr;
       case UpgraderMessage.buttonTitleIgnore:
-        return 'Ignore'.tr;
+        return LK.ignore.tr;
     }
   }
 }

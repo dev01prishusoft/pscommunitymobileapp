@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class CommitteesPage extends StatefulWidget {
   const CommitteesPage({super.key});
@@ -28,7 +29,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
-          'Committees'.tr,
+          LK.committees.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
@@ -45,7 +46,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
             child: TextField(
               onChanged: controller.onSearchChanged,
               decoration: InputDecoration(
-                hintText: 'Search committees...'.tr,
+                hintText: LK.searchCommittees.tr,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
                     ? IconButton(
@@ -111,7 +112,7 @@ class _CommitteeCard extends StatelessWidget {
       child: Column(
         children: [
           _CommitteeTile(node: node, isRoot: true),
-          if (node.isExpanded && node.children.isNotEmpty)
+          if (node.children.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _ChildrenList(children: node.children, depth: 1),
@@ -146,7 +147,7 @@ class _ChildrenList extends StatelessWidget {
             return Column(
               children: [
                 _CommitteeTile(node: child, depth: depth),
-                if (child.isExpanded && child.children.isNotEmpty)
+                if (child.children.isNotEmpty)
                   _ChildrenList(children: child.children, depth: depth + 1),
               ],
             );
@@ -170,13 +171,11 @@ class _CommitteeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<CommitteeController>();
-
     return InkWell(
       onTap: () {
         Get.toNamed(
           AppRouter.committeeDetails,
-          arguments: node.getAllNames(),
+          arguments: node,
         );
       },
       child: Container(
@@ -188,18 +187,18 @@ class _CommitteeTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: node.children.isEmpty
-                  ? null
-                  : () => controller.toggleNode(node),
-              child: Icon(
-                node.children.isEmpty
-                    ? Icons.chevron_right
-                    : (node.isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right),
+            if (node.children.isNotEmpty)
+              const Icon(
+                Icons.keyboard_arrow_down,
+                color: AppColors.primary,
+                size: 24,
+              )
+            else
+              const Icon(
+                Icons.chevron_right,
                 color: AppColors.primary,
                 size: 24,
               ),
-            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

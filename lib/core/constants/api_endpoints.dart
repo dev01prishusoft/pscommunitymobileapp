@@ -13,6 +13,7 @@ class ApiEndpoints {
   static const String getFamiliesByArea = '/api/v1/family/GetFamilyByArea';
   static const String families = '/api/v1/Area/list';
   static const String committees = '/api/v1/committee/list';
+  static const String committeeDetail = '/api/v1/committee';
   static const String payments = '/api/v1/PaymentMode/list';
   static const String occupations = '/api/v1/Occupation/list';
   static const String business = '/api/v1/AddressType/list';
@@ -27,4 +28,5 @@ class ApiEndpoints {
   static const String stateDropdown = '/api/v1/state/dropdown';
   static const String districtDropdown = '/api/v1/district/dropdown';
   static const String talukaDropdown = '/api/v1/Taluka/dropdown';
+  static const String occupationDropdown = '/api/v1/Occupation/dropdown';
 }

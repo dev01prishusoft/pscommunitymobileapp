@@ -33,13 +33,14 @@ class ErrorMappingInterceptor extends Interceptor {
         }
         break;
       case DioExceptionType.connectionError:
-        failure = const NetworkFailure();
+        failure = NetworkFailure(err.message ?? 'No internet connection');
         break;
       case DioExceptionType.unknown:
         if (err.error is SocketException) {
-          failure = const NetworkFailure();
+          final socketErr = err.error as SocketException;
+          failure = NetworkFailure('Network Error: ${socketErr.message}');
         } else {
-          failure = const ServerFailure('An unexpected error occurred');
+          failure = ServerFailure(err.message ?? 'An unexpected error occurred');
         }
         break;
       default:

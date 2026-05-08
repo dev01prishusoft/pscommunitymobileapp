@@ -2,9 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 
-class CommitteeDetailsPage extends StatelessWidget {
+class CommitteeDetailsPage extends StatefulWidget {
   const CommitteeDetailsPage({super.key});
+
+  @override
+  State<CommitteeDetailsPage> createState() => _CommitteeDetailsPageState();
+}
+
+class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
+  final controller = Get.find<CommitteeController>();
+  late CommitteeNode node;
+
+  @override
+  void initState() {
+    super.initState();
+    node = Get.arguments as CommitteeNode;
+    controller.loadCommitteeDetail(node.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,137 +34,141 @@ class CommitteeDetailsPage extends StatelessWidget {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         title: Text(
-          'Managing Committee'.tr,
+          node.name,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'share') {
-                // Share logic would go here
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  value: 'share',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.share, size: 20),
-                      const SizedBox(width: 8),
-                      Text('Share'.tr),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'report',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.report, size: 20),
-                      const SizedBox(width: 8),
-                      Text('Report Issue'.tr),
-                    ],
-                  ),
-                ),
-              ];
-            },
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // COMMITTEE INFO Section
-            _buildSection(
-              title: 'COMMITTEE INFO'.tr,
-              icon: Icons.account_balance,
-              child: Column(
-                children: [
-                  _buildInfoRow('Name:'.tr, 'Managing Committee'.tr),
-                  _buildInfoRow('Parent:'.tr, 'Executive Board'.tr),
-                  const Divider(height: 12, thickness: 0.5),
-                  _buildInfoRow('Description:'.tr,
-                      'Governing body for daily operations'.tr),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ROLES Section
-            _buildSection(
-              title: '${'ROLES'.tr} (7)',
-              icon: Icons.verified_user,
-              child: Column(
-                children: [
-                  _buildRoleTile(
-                      Icons.person, 'President (PRES)'.tr, 'Leadership'.tr, 1),
-                  const Divider(),
-                  _buildRoleTile(
-                      Icons.assignment, 'Secretary (SEC)'.tr, 'Administrative'.tr, 2),
-                  const Divider(),
-                  _buildRoleTile(
-                      Icons.currency_rupee, 'Treasurer (TRE)'.tr, 'Financial'.tr, 3),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // MEMBERS Section
-            _buildSection(
-              title: '${'MEMBERS'.tr} (12)',
-              icon: Icons.groups,
-              child: Column(
-                children: [
-                  _buildMemberTile(
-                    context,
-                    'Rajesh Patel'.tr,
-                    'Jan 2024'.tr,
-                    'Executive Board'.tr,
-                    'President'.tr,
-                    'assets/images/member1.png',
-                  ),
-                  const Divider(),
-                  _buildMemberTile(
-                    context,
-                    'Meera Shah'.tr,
-                    'Jan 2024'.tr,
-                    'President'.tr,
-                    'Secretary'.tr,
-                    'assets/images/member2.png',
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRouter.committeeMembers,
-                        arguments: ModalRoute.of(context)?.settings.arguments,
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Show All'.tr,
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.arrow_forward,
-                            size: 16, color: AppColors.primary),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      body: Obx(
+        () => AppStateView(
+          state: controller.detailState.value,
+          onRetry: () => controller.loadCommitteeDetail(node.id),
+          child: _buildContent(controller.committeeDetail.value),
         ),
       ),
     );
+  }
+
+  Widget _buildContent(CommitteeDetail? detail) {
+    if (detail == null) return const SizedBox.shrink();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // COMMITTEE INFO Section
+          _buildSection(
+            title: LK.committeeInfo.tr,
+            icon: Icons.account_balance,
+            child: Column(
+              children: [
+                _buildInfoRow(LK.nameLabel.tr, detail.name),
+                _buildInfoRow(LK.familiesCount.tr, node.memberCount.toString()),
+                const Divider(height: 12, thickness: 0.5),
+                _buildInfoRow(LK.descriptionLabel.tr, detail.description),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ROLES Section
+          if (detail.roles.isNotEmpty)
+            _buildSection(
+              title:
+                  '${LK.roles.tr} ${LK.at.tr.toUpperCase()} (${detail.roles.length})',
+              icon: Icons.verified_user,
+              child: Column(
+                children: detail.roles.asMap().entries.map((entry) {
+                  final role = entry.value;
+                  final isLast = entry.key == detail.roles.length - 1;
+                  return Column(
+                    children: [
+                      _buildRoleTile(
+                        _getRoleIcon(role.roleTypeName),
+                        role.roleName,
+                        role.roleTypeName,
+                        role.memberCount,
+                      ),
+                      if (!isLast) const Divider(),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          const SizedBox(height: 16),
+
+          // MEMBERS Section
+          _buildSection(
+            title: '${LK.membersCount.tr} (${detail.members.length})',
+            icon: Icons.groups,
+            child: Column(
+              children: [
+                if (detail.members.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(LK.noMembersFound.tr),
+                  )
+                else
+                  Column(
+                    children: detail.members.take(3).map((member) {
+                      return _buildMemberTile(
+                        context,
+                        member.memberId,
+                        member.name,
+                        member.startDate?.split('T').first ?? '',
+                        '--', // Reports to not in API yet
+                        member.roleName,
+                        '',
+                      );
+                    }).toList(),
+                  ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRouter.committeeMembers,
+                      arguments: node,
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        LK.showMore.tr,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.arrow_forward,
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _getRoleIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'head':
+      case 'leadership':
+        return Icons.person;
+      case 'administrative':
+        return Icons.assignment;
+      case 'financial':
+        return Icons.currency_rupee;
+      default:
+        return Icons.verified_user;
+    }
   }
 
   Widget _buildSection(
@@ -289,11 +313,16 @@ class CommitteeDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMemberTile(BuildContext context, String name, String since, String reportsTo,
+  Widget _buildMemberTile(
+    BuildContext context,
+    int memberId,
+    String name,
+    String since,
+    String reportsTo,
       String tag, String imageUrl) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, AppRouter.memberProfile);
+        Get.toNamed(AppRouter.memberProfile, arguments: {'memberId': memberId});
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),

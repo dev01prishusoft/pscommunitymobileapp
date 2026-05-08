@@ -17,12 +17,26 @@ class FamilyAreasPage extends StatefulWidget {
 
 class _FamilyAreasPageState extends State<FamilyAreasPage> {
   final controller = Get.find<FamilyController>();
+  final ScrollController _scrollController = ScrollController();
+ 
+   @override
+   void initState() {
+     super.initState();
+     controller.loadStates();
+     controller.loadAreas();
+     _scrollController.addListener(_onScroll);
+   }
 
   @override
-  void initState() {
-    super.initState();
-    controller.loadStates();
-    controller.loadAreas();
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      controller.loadAreas(refresh: false);
+    }
   }
 
   @override
@@ -39,7 +53,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Family - Areas'.tr,
+          LK.family.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -48,6 +62,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -62,7 +77,16 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
                 onRetry: controller.loadAreas,
                 child: controller.filteredAreas.isEmpty 
                     ? _EmptyState() 
-                    : _AreasList(areas: controller.filteredAreas),
+                    : Column(
+                        children: [
+                          _AreasList(areas: controller.areas),
+                          if (controller.isNextPageLoading.value)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                        ],
+                      ),
               )),
             ],
           ),
@@ -102,7 +126,7 @@ class _FilterSection extends StatelessWidget {
                   const Icon(Icons.filter_list, color: AppColors.primary, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Location Filters'.tr,
+                    LK.locationFilters.tr,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.secondary,
@@ -193,7 +217,10 @@ class _ResultsHeader extends StatelessWidget {
     return Obx(() {
       if (controller.filteredAreas.isEmpty) return const SizedBox.shrink();
       return Text(
-        'Total Areas in Daskroi Taluka: 8'.tr, // In real app, make dynamic
+        LK.totalAreasLabel.trParams({
+          'taluka': controller.selectedTaluka.value?.text ?? 'All',
+          'count': controller.filteredAreas.length.toString(),
+        }),
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
@@ -264,7 +291,7 @@ class _AreasList extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              '${area.members} ${'Members'.tr}',
+                              '${area.members} ${LK.membersCount.tr}',
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -276,7 +303,7 @@ class _AreasList extends StatelessWidget {
                               child: Text('|', style: TextStyle(color: AppColors.border)),
                             ),
                             Text(
-                              '${area.families} ${'Families'.tr}',
+                              '${area.families} ${LK.familiesCount.tr}',
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,

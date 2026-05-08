@@ -5,6 +5,8 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
   const OccupationDirectoryPage({super.key});
@@ -20,7 +22,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   @override
   void initState() {
     super.initState();
-    _controller.loadOccupations(occupationTypeId: 6);
   }
 
   @override
@@ -35,7 +36,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'Occupation Directory'.tr,
+          LK.occupationDirectoryLabel.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
@@ -54,7 +55,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               controller: _searchController,
               onChanged: _controller.search,
               decoration: InputDecoration(
-                hintText: 'Search occupation...'.tr,
+                hintText: LK.searchOccupation.tr,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.close),
@@ -68,25 +69,40 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             ),
           ),
 
-          // Occupation Dropdown (Static for now as per original UI)
+          // Occupation Dropdown
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.border),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
-                children: [
-                  Text('${'Occupation:'.tr} ',
-                      style: const TextStyle(color: AppColors.mutedForeground)),
-                  Text('All'.tr,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
-                ],
-              ),
+              child: Obx(() => DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  value: _controller.selectedOccupationType.value?.id ?? 0,
+                  isExpanded: true,
+                  icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
+                  items: _controller.occupationTypes.map((type) {
+                    return DropdownMenuItem<int>(
+                      value: type.id,
+                      child: Row(
+                        children: [
+                          Text(LK.occupationColon.tr,
+                              style: const TextStyle(color: AppColors.mutedForeground)),
+                          const SizedBox(width: 4),
+                          Text(type.text.tr,
+                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (id) {
+                    final type = _controller.occupationTypes.firstWhere((t) => t.id == id);
+                    _controller.onOccupationTypeChanged(id == 0 ? null : type);
+                  },
+                ),
+              )),
             ),
           ),
 
@@ -122,7 +138,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
 
   Widget _buildOccupationCard(OccupationItem occ) {
     return InkWell(
-      onTap: () => Get.toNamed(
+      onTap: () => Get.toNamed<void>(
         AppRouter.occupationProfile,
         arguments: {'occupationId': occ.id},
       ),
@@ -143,32 +159,21 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             occ.logoUrl != null && occ.logoUrl!.isNotEmpty
-                ? Image.network(
-                    occ.logoUrl!,
+                ? CachedNetworkImage(
+                    imageUrl: occ.logoUrl!,
                     height: 40,
                     width: 40,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Icon(
+                    placeholder: (context, url) => const SizedBox(
+                      height: 40,
+                      width: 40,
+                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    ),
+                    errorWidget: (context, url, error) => Icon(
                       _getIconData(occ.iconKey),
                       size: 40,
                       color: AppColors.primary,
                     ),
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    },
                   )
                 : Icon(
                     _getIconData(occ.iconKey),

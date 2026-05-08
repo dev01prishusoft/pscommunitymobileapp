@@ -58,7 +58,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     AppLogger.d('Districts Request for stateId: $stateId');
     final response = await _apiClient.get(
       ApiEndpoints.districtDropdown,
-      queryParameters: {'stateId': stateId},
+      queryParameters: {'StateId': stateId},
     );
     final json = response.data as Map<String, dynamic>;
     AppLogger.d('Districts Response: $json');
@@ -74,7 +74,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     AppLogger.d('Talukas Request for districtId: $districtId');
     final response = await _apiClient.get(
       ApiEndpoints.talukaDropdown,
-      queryParameters: {'districtId': districtId},
+      queryParameters: {'DistrictId': districtId},
     );
     final json = response.data as Map<String, dynamic>;
     AppLogger.d('Talukas Response: $json');
@@ -90,13 +90,15 @@ class FamilyRepositoryImpl implements FamilyRepository {
     int? stateId,
     int? districtId,
     int? talukaId,
+    int pageNo = 1,
+    int pageSize = 20,
   }) async {
     final queryParameters = <String, dynamic>{
       if (stateId != null && stateId > 0) 'StateId': stateId,
       if (districtId != null && districtId > 0) 'DistrictId': districtId,
       if (talukaId != null && talukaId > 0) 'TalukaId': talukaId,
-      'PageNumber': 1,
-      'PageSize': 100,
+      'PageNumber': pageNo,
+      'PageSize': pageSize,
     };
 
     AppLogger.d('Family Areas Request: $queryParameters');
@@ -125,11 +127,11 @@ class FamilyRepositoryImpl implements FamilyRepository {
   }
 
   @override
-  Future<List<Family>> getFamiliesByArea(int areaId) async {
+  Future<List<Family>> getFamiliesByArea(int areaId, {int pageNo = 1, int pageSize = 20}) async {
     final queryParameters = <String, dynamic>{
       'areaId': areaId,
-      'pageNumber': 1,
-      'pageSize': 20,
+      'pageNumber': pageNo,
+      'pageSize': pageSize,
     };
 
     AppLogger.d('Families By Area Request: $queryParameters');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
 
 class BankAccountDetailsPage extends StatelessWidget {
@@ -20,7 +21,7 @@ class BankAccountDetailsPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Bank Account Details'.tr,
+          LK.bankAccountDetails.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -61,7 +62,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    bank.bankName.tr,
+                    bank.bankName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -72,7 +73,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
-                        'Primary Account'.tr,
+                        LK.primaryAccount.tr,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF1B8D5E),
@@ -87,15 +88,15 @@ class BankAccountDetailsPage extends StatelessWidget {
 
             // Details Section
             _buildDetailsCard([
-              _buildDetailItem('Account Holder Name:'.tr, bank.accountHolderName.tr),
-              _buildDetailItem('Account Number:'.tr, bank.accountNumber),
-              _buildDetailItem('Account Type:'.tr, bank.accountType.tr),
-              _buildDetailItem('Bank Name:'.tr, bank.bankName.tr),
-              _buildDetailItem('Branch Name:'.tr, bank.branchName.tr),
-              _buildDetailItem('IFSC Code:'.tr, bank.ifscCode),
-              _buildDetailItem('MICR Code:'.tr, bank.micrCode),
-              _buildDetailItem('SWIFT Code:'.tr, bank.swiftCode),
-              _buildDetailItem('UPI ID:'.tr, bank.upiId),
+              _buildDetailItem(LK.accountHolderNameLabel.tr, bank.accountHolderName),
+              _buildDetailItem(LK.accountNumberLabel.tr, bank.accountNumber),
+              _buildDetailItem(LK.accountTypeLabel.tr, bank.accountType),
+              _buildDetailItem(LK.bankNameLabel.tr, bank.bankName),
+              _buildDetailItem(LK.branchNameLabel.tr, bank.branchName),
+              _buildDetailItem(LK.ifscCodeLabel.tr, bank.ifscCode),
+              _buildDetailItem(LK.micrCodeLabel.tr, bank.micrCode),
+              _buildDetailItem(LK.swiftCodeLabel.tr, bank.swiftCode),
+              _buildDetailItem(LK.upiIdLabel.tr, bank.upiId),
             ]),
             const SizedBox(height: 20),
 
@@ -111,7 +112,7 @@ class BankAccountDetailsPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Scan to Pay'.tr,
+                    LK.scanToPay.tr,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.secondary,

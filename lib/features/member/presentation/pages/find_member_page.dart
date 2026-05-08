@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class FindMemberPage extends StatefulWidget {
   const FindMemberPage({super.key});
@@ -117,7 +118,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
           Expanded(
             child: Obx(() => AppStateView(
               state: _controller.state.value,
-              emptyMessage: 'No members found'.tr,
+              emptyMessage: LK.noMembersFound.tr,
               onRetry: _controller.loadMembers,
               child: ListView.builder(
                   controller: _scrollController,
@@ -159,20 +160,45 @@ class _FindMemberPageState extends State<FindMemberPage> {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
-          radius: 30,
-          backgroundColor: const Color(0xFFE2E8F0),
-          child: Text(
-            member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
+        leading: member.profilePhotoFullUrl != null && member.profilePhotoFullUrl!.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: member.profilePhotoFullUrl!,
+                imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
+                  radius: 30,
+                  backgroundImage: imageProvider,
+                ),
+                placeholder: (context, url) => const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Color(0xFFE2E8F0),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => CircleAvatar(
+                  radius: 30,
+                  backgroundColor: const Color(0xFFE2E8F0),
+                  child: Text(
+                    member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              )
+            : CircleAvatar(
+                radius: 30,
+                backgroundColor: const Color(0xFFE2E8F0),
+                child: Text(
+                  member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
         title: Text(
-          member.name,
+          member.name.tr,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.secondary,
@@ -184,7 +210,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
           children: [
             const SizedBox(height: 4),
             Text(
-              '${member.gender} • ${member.age} yrs • ${member.occupation}',
+              '${member.gender.tr} • ${member.age} ${LK.ageYears.tr} • ${member.occupation.tr}',
               style: const TextStyle(
                 color: AppColors.mutedForeground,
                 fontSize: 13,

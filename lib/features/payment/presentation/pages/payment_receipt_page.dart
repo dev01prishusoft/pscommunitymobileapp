@@ -10,6 +10,18 @@ class PaymentReceiptPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final payment = Get.arguments as Map<String, dynamic>?;
+    final receiptNo = (payment?['receiptNo'] ?? 'N/A').toString();
+    final date = (payment?['date'] ?? 'N/A').toString();
+    final name = (payment?['name'] ?? 'N/A').toString();
+    final memberNo = (payment?['memberNo'] ?? 'N/A').toString();
+    final type = (payment?['type'] ?? 'N/A').toString();
+    final category = (payment?['category'] ?? 'N/A').toString();
+    final amount = (payment?['amount'] ?? 'N/A').toString();
+    final mode = (payment?['mode'] ?? 'N/A').toString();
+    final status = (payment?['status'] ?? 'N/A').toString();
+    final txnId = (payment?['transactionId'] ?? 'N/A').toString();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -20,7 +32,7 @@ class PaymentReceiptPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Payment Receipt'.tr,
+          LK.paymentReceipt.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -33,7 +45,7 @@ class PaymentReceiptPage extends StatelessWidget {
               SharePlus.instance.share(ShareParams(text: 'Check out my payment receipt for ${LK.samajName.tr}'));
             },
             icon: const Icon(Icons.share, size: 18),
-            label: Text('Share'.tr),
+            label: Text(LK.share.tr),
             style: TextButton.styleFrom(foregroundColor: AppColors.primary),
           ),
         ],
@@ -65,7 +77,7 @@ class PaymentReceiptPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Official Payment Receipt'.tr,
+                    LK.officialPaymentReceipt.tr,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.mutedForeground,
@@ -78,30 +90,30 @@ class PaymentReceiptPage extends StatelessWidget {
 
             // Details Sections
             _buildReceiptSection(
-              'RECEIPT DETAILS'.tr,
+              LK.receiptDetailsLabel.tr,
               [
-                _buildInfoRow('Receipt No:'.tr, 'REC20250315001'.tr),
-                _buildInfoRow('Date:'.tr, '15 Mar 2025'.tr),
+                _buildInfoRow(LK.receiptNoLabel.tr, receiptNo),
+                _buildInfoRow(LK.dateLabel.tr, date),
               ],
             ),
             const SizedBox(height: 16),
             _buildReceiptSection(
-              'MEMBER DETAILS'.tr,
+              LK.memberDetailsLabel.tr,
               [
-                _buildInfoRow('Name:'.tr, 'Rajesh Patel'.tr),
-                _buildInfoRow('Member No:'.tr, 'MEM001234'.tr),
+                _buildInfoRow(LK.nameLabel.tr, name),
+                _buildInfoRow(LK.memberNoLabel.tr, memberNo),
               ],
             ),
             const SizedBox(height: 16),
             _buildReceiptSection(
-              'PAYMENT DETAILS'.tr,
+              LK.paymentDetailsLabel.tr,
               [
-                _buildInfoRow('Type:'.tr, 'Membership Fee'.tr),
-                _buildInfoRow('Category:'.tr, 'Annual Membership'.tr),
-                _buildInfoRow('Amount:'.tr, '₹2,000'.tr),
-                _buildInfoRow('Mode:'.tr, 'UPI'.tr),
-                _buildStatusRow('Status:'.tr, 'Success'.tr),
-                _buildInfoRow('Transaction ID:'.tr, 'TXN123456'.tr),
+                _buildInfoRow(LK.typeLabel.tr, type),
+                _buildInfoRow(LK.categoryLabel.tr, category),
+                _buildInfoRow(LK.amountLabel.tr, amount),
+                _buildInfoRow(LK.modeLabel.tr, mode),
+                _buildStatusRow(LK.statusLabel.tr, status),
+                _buildInfoRow(LK.transactionIdLabel.tr, txnId),
               ],
             ),
             const SizedBox(height: 32),
@@ -110,12 +122,12 @@ class PaymentReceiptPage extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Coming Soon'.tr)),
+                  SnackBar(content: Text(LK.comingSoon.tr)),
                 );
               },
               icon: const Icon(Icons.file_download, color: Colors.white),
               label: Text(
-                'DOWNLOAD PDF'.tr,
+                LK.downloadPdf.tr,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

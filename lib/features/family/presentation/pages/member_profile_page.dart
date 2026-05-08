@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
@@ -52,7 +54,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
-          'Member Details'.tr,
+          LK.memberDetails.tr,
           style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary),
         ),
         centerTitle: false,
@@ -99,19 +101,32 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.primary, width: 2),
                   ),
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: AppColors.muted,
-                    backgroundImage: member.profilePhotoFullUrl != null &&
-                            member.profilePhotoFullUrl!.isNotEmpty
-                        ? NetworkImage(member.profilePhotoFullUrl!)
-                        : null,
-                    child: member.profilePhotoFullUrl == null ||
-                            member.profilePhotoFullUrl!.isEmpty
-                        ? Icon(Icons.person,
-                            size: 50, color: AppColors.primary.withValues(alpha: 0.5))
-                        : null,
-                  ),
+                  child: member.profilePhotoFullUrl != null &&
+                          member.profilePhotoFullUrl!.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: member.profilePhotoFullUrl!,
+                          imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
+                            radius: 40,
+                            backgroundImage: imageProvider,
+                          ),
+                          placeholder: (context, url) => const CircleAvatar(
+                            radius: 40,
+                            backgroundColor: AppColors.muted,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          errorWidget: (context, url, error) => CircleAvatar(
+                            radius: 40,
+                            backgroundColor: AppColors.muted,
+                            child: Icon(Icons.person,
+                                size: 50, color: AppColors.primary.withValues(alpha: 0.5)),
+                          ),
+                        )
+                      : CircleAvatar(
+                          radius: 40,
+                          backgroundColor: AppColors.muted,
+                          child: Icon(Icons.person,
+                              size: 50, color: AppColors.primary.withValues(alpha: 0.5)),
+                        ),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -181,66 +196,66 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                 final items = [
                   _buildGridItem(
                     Icons.person_outline,
-                    'Gender'.tr,
-                    (member.genderName ?? 'N/A').tr,
+                    LK.gender.tr,
+                    (member.genderName ?? LK.na).tr,
                   ),
                   _buildGridItem(
                     Icons.water_drop_outlined,
-                    'Blood Group'.tr,
-                    member.bloodGroupName ?? 'N/A',
+                    LK.bloodGroupColon.tr,
+                    member.bloodGroupName ?? LK.na,
                   ),
                   _buildGridItem(
                     Icons.calendar_today_outlined,
-                    'Birth Date'.tr,
+                    LK.birthDate.tr,
                     member.dateOfBirth != null
-                        ? member.dateOfBirth!.split('T')[0].tr
-                        : 'N/A'.tr,
+                        ? member.dateOfBirth!.split('T')[0]
+                        : LK.na,
                   ),
-                  _buildGridItem(Icons.height, 'Height'.tr, '${member.height ?? 0} cm'),
+                  _buildGridItem(Icons.height, LK.heightColon.tr, '${member.height ?? 0} cm'),
                   _buildGridItem(
                     Icons.access_time,
-                    'Birth Time'.tr,
-                    member.dateOfBirthTime ?? 'N/A',
+                    'Birth Time'.tr, // I'll add this to LK if needed
+                    member.dateOfBirthTime ?? LK.na,
                   ),
                   _buildGridItem(
                     Icons.monitor_weight_outlined,
-                    'Weight'.tr,
+                    LK.weightColon.tr,
                     '${member.weight ?? 0} kg',
                   ),
                   _buildGridItem(
                     Icons.person_outline,
                     "Mother/Father's Name".tr,
-                    (member.motherFatherName ?? 'N/A').tr,
+                    (member.motherFatherName ?? LK.na).tr,
                   ),
                   _buildGridItem(
                     Icons.work_outline,
-                    'Occupation'.tr,
-                    (member.occupationName ?? member.occupationTypeName ?? 'N/A').tr,
+                    LK.occupationLabel.tr,
+                    (member.occupationName ?? member.occupationTypeName ?? LK.na).tr,
                   ),
                   _buildGridItem(
                     Icons.location_on_outlined,
                     "Occupation Area".tr,
-                    (member.occupationAreaName ?? 'N/A').tr,
+                    (member.occupationAreaName ?? LK.na).tr,
                   ),
                   _buildGridItem(
                     Icons.favorite_border,
-                    'Marital Status'.tr,
-                    (member.maritalStatusName ?? 'N/A').tr,
+                    LK.maritalStatusLabel.tr,
+                    (member.maritalStatusName ?? LK.na).tr,
                   ),
                   _buildGridItem(
                     Icons.phone_outlined,
-                    'Mobile No'.tr,
-                    member.mobileNo ?? 'N/A',
+                    LK.mobileNoLabel.tr,
+                    member.mobileNo ?? LK.na,
                     onTap: member.mobileNo != null ? () => _launchUrl('tel:${member.mobileNo}') : null,
                   ),
                   _buildGridItem(
                     Icons.contact_phone_outlined,
-                    'Emergency Contact'.tr,
-                    member.emergencyContactNo ?? 'N/A',
+                    LK.emergencyContact.tr,
+                    member.emergencyContactNo ?? LK.na,
                     onTap: member.emergencyContactNo != null ? () => _launchUrl('tel:${member.emergencyContactNo}') : null,
                   ),
-                  _buildGridItem(Icons.opacity, 'Gotra'.tr, (member.gotraName ?? 'N/A').tr),
-                  _buildGridItem(Icons.mail_outline, 'Email'.tr, member.emailAddress ?? 'N/A'),
+                  _buildGridItem(Icons.opacity, LK.gotraLabel.tr, (member.gotraName ?? LK.na).tr),
+                  _buildGridItem(Icons.mail_outline, LK.email.tr, member.emailAddress ?? LK.na),
                 ];
                 return items[index];
               },
@@ -250,8 +265,8 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           // Address Section
           if (_controller.memberAddresses.isNotEmpty)
             _buildSection(
-              title: 'MEMBER ADDRESSES'.tr,
-              icon: Icons.location_on_outlined,
+            title: LK.memberAddresses.tr,
+            icon: Icons.location_on_outlined,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _controller.memberAddresses.map((addr) {
@@ -302,11 +317,11 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
 
           // Asset & Life Section
           _buildSection(
-            title: 'ASSET & LIFE'.tr,
+            title: LK.assetAndLife.tr,
             icon: Icons.work_outline,
             child: Column(
               children: [
-                _buildAssetRow('Monthly Income'.tr, '₹${member.monthlyIncome ?? 0}', 'Own House'.tr, member.isOwnHouse ?? false),
+                _buildAssetRow(LK.incomeColon.tr, '₹${member.monthlyIncome ?? 0}', 'Own House'.tr, member.isOwnHouse ?? false),
                 _buildAssetRow('Own Land'.tr, member.isOwnLand ?? false, 'Two Wheeler'.tr, member.hasTwoWheeler ?? false),
                 _buildAssetRow('', '', 'Four Wheeler'.tr, member.hasFourWheeler ?? false),
               ],
@@ -315,7 +330,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
 
           // Social Media Section
           _buildSection(
-            title: 'SOCIAL MEDIA'.tr,
+            title: LK.socialMedia.tr,
             icon: Icons.share_outlined,
             child: GridView.builder(
               shrinkWrap: true,
@@ -332,29 +347,29 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                 final items = [
                   _buildSocialItem(
                     Icons.facebook,
-                    'Facebook'.tr,
-                    member.facebookUrl ?? 'N/A',
+                    LK.facebook.tr,
+                    member.facebookUrl ?? LK.na,
                     Colors.blue,
                     onTap: member.facebookUrl != null ? () => _launchUrl(member.facebookUrl!) : null,
                   ),
                   _buildSocialItem(
                     Icons.camera_alt_outlined,
-                    'Instagram'.tr,
-                    member.instagramUrl ?? 'N/A',
+                    LK.instagram.tr,
+                    member.instagramUrl ?? LK.na,
                     Colors.pink,
                     onTap: member.instagramUrl != null ? () => _launchUrl(member.instagramUrl!) : null,
                   ),
                   _buildSocialItem(
                     Icons.chat_bubble_outline,
-                    'WhatsApp'.tr,
-                    member.whatsappUrl ?? 'N/A',
+                    LK.whatsapp.tr,
+                    member.whatsappUrl ?? LK.na,
                     Colors.green,
                     onTap: member.whatsappUrl != null ? () => _launchUrl(member.whatsappUrl!) : null,
                   ),
                   _buildSocialItem(
                     Icons.alternate_email,
                     'Twitter / X'.tr,
-                    member.twitterUrl ?? 'N/A',
+                    member.twitterUrl ?? LK.na,
                     Colors.black,
                     onTap: member.twitterUrl != null ? () => _launchUrl(member.twitterUrl!) : null,
                   ),
@@ -377,7 +392,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                 ),
               ),
               child: Text(
-                'CLOSE'.tr,
+                LK.close.tr,
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),

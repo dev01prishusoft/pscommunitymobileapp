@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -7,7 +8,7 @@ class SupportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Support'.tr)),
+      appBar: AppBar(title: Text(LK.support.tr)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -15,14 +16,14 @@ class SupportPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Need help?'.tr,
+                LK.needHelp.tr,
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              Text('support_email'.tr),
-              Text('support_phone'.tr),
+              Text(LK.supportEmail.tr),
+              Text(LK.supportPhone.tr),
               const SizedBox(height: 10),
-              Text('support_hours'.tr),
+              Text(LK.supportHours.tr),
             ],
           ),
         ),

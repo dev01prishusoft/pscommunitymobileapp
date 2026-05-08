@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
@@ -70,7 +71,11 @@ class ApiClient {
   }
 
   Future<void> _checkConnectivity() async {
-    if (!await _connectivity.hasConnection()) {
+    final hasConnection = await _connectivity.hasConnection();
+    if (kDebugMode && !hasConnection) {
+      print('CONNECTIVITY CHECK: No internet detected by connectivity_plus');
+    }
+    if (!hasConnection) {
       throw const NetworkFailure();
     }
   }

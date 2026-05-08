@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/pages/login_page.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/pages/business_page.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/pages/home_page.dart';
@@ -56,32 +57,36 @@ class AppRouter {
 
   static final List<GetPage> pages = [
     // Public Routes
-    GetPage(name: login, page: () => const LoginPage()),
-    GetPage(name: resetPassword, page: () => const ResetPasswordPage()),
+    GetPage<void>(name: login, page: () => const LoginPage()),
+    GetPage<void>(name: resetPassword, page: () => const ResetPasswordPage()),
     
     // Protected Routes
-    GetPage(name: home, page: () => HomePage(), middlewares: [AuthGuard()]),
-    GetPage(name: shareApp, page: () => const ShareAppPage(), middlewares: [AuthGuard()]),
-    GetPage(name: findMember, page: () => const FindMemberPage(), middlewares: [AuthGuard()]),
-    GetPage(name: makePayment, page: () => const MakePaymentPage(), middlewares: [AuthGuard()]),
-    GetPage(name: paymentHistory, page: () => const PaymentHistoryPage(), middlewares: [AuthGuard()]),
-    GetPage(name: paymentReceipt, page: () => const PaymentReceiptPage(), middlewares: [AuthGuard()]),
-    GetPage(name: samajProfile, page: () => const SamajProfilePage(), middlewares: [AuthGuard()]),
-    GetPage(name: samajSanstha, page: () => const SamajSansthaPage(), middlewares: [AuthGuard()]),
-    GetPage(name: bankDetails, page: () => const BankDetailsPage(), middlewares: [AuthGuard()]),
-    GetPage(name: bankAccountDetails, page: () => const BankAccountDetailsPage(), middlewares: [AuthGuard()]),
-    GetPage(name: privacy, page: () => const PrivacyPage(), middlewares: [AuthGuard()]),
-    GetPage(name: support, page: () => const SupportPage(), middlewares: [AuthGuard()]),
-    GetPage(name: business, page: () => const BusinessPage(), middlewares: [AuthGuard()]),
-    GetPage(name: postLoginSplash, page: () => const PostLoginSplashPage(), middlewares: [AuthGuard()]),
-    GetPage(name: familyAreas, page: () => const FamilyAreasPage(), middlewares: [AuthGuard()]),
-    GetPage(name: familyMembers, page: () => const FamilyMembersListPage(), middlewares: [AuthGuard()]),
-    GetPage(name: marriage, page: () => const MarriagePage(), middlewares: [AuthGuard()]),
-    GetPage(name: occupationDirectory, page: () => const OccupationDirectoryPage(), middlewares: [AuthGuard()]),
-    GetPage(name: committeeMembers, page: () => const CommitteeMembersPage(), middlewares: [AuthGuard()]),
-    GetPage(name: committeeDetails, page: () => const CommitteeDetailsPage(), middlewares: [AuthGuard()]),
-    GetPage(name: committees, page: () => const CommitteesPage(), middlewares: [AuthGuard()]),
-    GetPage(name: occupationProfile, page: () => const OccupationProfilePage(), middlewares: [AuthGuard()]),
-    GetPage(name: memberProfile, page: () => const MemberProfilePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: home, page: () => HomePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: shareApp, page: () => const ShareAppPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: findMember, page: () => const FindMemberPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: makePayment, page: () => const MakePaymentPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: paymentHistory, page: () => const PaymentHistoryPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: paymentReceipt, page: () => const PaymentReceiptPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: samajProfile, page: () => const SamajProfilePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: samajSanstha, page: () => const SamajSansthaPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: bankDetails, page: () => const BankDetailsPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: bankAccountDetails, page: () => const BankAccountDetailsPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: privacy, page: () => const PrivacyPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: support, page: () => const SupportPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: business, page: () => const BusinessPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: postLoginSplash, page: () => const PostLoginSplashPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: familyAreas, page: () => const FamilyAreasPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: familyMembers, page: () => const FamilyMembersListPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: marriage, page: () => const MarriagePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: occupationDirectory, page: () => const OccupationDirectoryPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(
+      name: committeeMembers,
+      page: () => const CommitteeMembersPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(name: committeeDetails, page: () => const CommitteeDetailsPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: committees, page: () => const CommitteesPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: occupationProfile, page: () => const OccupationProfilePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: memberProfile, page: () => const MemberProfilePage(), middlewares: [AuthGuard()]),
   ];
 }

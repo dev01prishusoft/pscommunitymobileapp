@@ -77,7 +77,7 @@ class FamilyController extends GetxController {
     talukas.clear();
 
     // Refresh list with new filter
-    loadAreas();
+    await loadAreas();
 
     if (state != null) {
       isDistrictsLoading.value = true;
@@ -98,7 +98,7 @@ class FamilyController extends GetxController {
     talukas.clear();
 
     // Refresh list with new filter
-    loadAreas();
+    await loadAreas();
 
     if (district != null) {
       isTalukasLoading.value = true;
@@ -123,24 +123,48 @@ class FamilyController extends GetxController {
     loadAreas();
   }
 
-  Future<void> loadAreas() async {
-    state.value = AppState.loading;
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  final RxBool hasMore = true.obs;
+  final RxBool isNextPageLoading = false.obs;
+
+  Future<void> loadAreas({bool refresh = true}) async {
+    if (refresh) {
+      _currentPage = 1;
+      hasMore.value = true;
+      state.value = AppState.loading;
+      areas.clear();
+    } else {
+      if (!hasMore.value || isNextPageLoading.value) return;
+      isNextPageLoading.value = true;
+    }
+
     try {
       final results = await _repository.getFamilyAreas(
         stateId: selectedState.value?.id ?? 0,
         districtId: selectedDistrict.value?.id ?? 0,
         talukaId: selectedTaluka.value?.id ?? 0,
+        pageNo: _currentPage,
+        pageSize: _pageSize,
       );
-      areas.assignAll(results);
-      // Set to data so it shows the custom _EmptyState if areas is empty
+
+      if (results.isEmpty) {
+        hasMore.value = false;
+      } else {
+        areas.addAll(results);
+        _currentPage++;
+        if (results.length < _pageSize) {
+          hasMore.value = false;
+        }
+      }
       state.value = AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load family areas', e, stack);
-      
-      // Clear areas so it shows the empty state
-      areas.clear();
-      // Set to data state as requested to use the custom _EmptyState layout
-      state.value = AppState.data;
+      if (refresh) {
+        state.value = AppState.error;
+      }
+    } finally {
+      isNextPageLoading.value = false;
     }
   }
 

@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class OccupationProfilePage extends StatefulWidget {
   const OccupationProfilePage({super.key});
@@ -38,7 +40,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
-          'Occupation Profile'.tr,
+          LK.occupationProfile.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -89,10 +91,13 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   ),
                   child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
                       ? ClipOval(
-                          child: Image.network(
-                            occ.logoUrl!,
+                          child: CachedNetworkImage(
+                            imageUrl: occ.logoUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            errorWidget: (_, __, ___) => const Icon(
                               Icons.person,
                               size: 60,
                               color: AppColors.mutedForeground,
@@ -107,7 +112,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  (occ.memberName ?? 'N/A').tr,
+                  (occ.memberName ?? LK.na.tr).tr,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -116,7 +121,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${occ.name} at ${occ.companyName ?? 'N/A'}'.tr,
+                  '${occ.name.tr} ${LK.at.tr} ${(occ.companyName ?? LK.na.tr).tr}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: AppColors.mutedForeground,
@@ -146,7 +151,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                         color: AppColors.primary, size: 24),
                     const SizedBox(width: 12),
                     Text(
-                      'OCCUPATION'.tr,
+                      LK.occupationLabel.tr,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -160,12 +165,12 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: Divider(),
                 ),
-                _buildDetailRow(Icons.person_outline, 'Occupation Type:'.tr,
-                    (occ.occupationType ?? 'N/A').tr),
+                _buildDetailRow(Icons.person_outline, LK.occupationTypeLabel.tr,
+                    (occ.occupationType ?? LK.na.tr).tr),
                 _buildDetailRow(Icons.business_center_outlined,
-                    'Occupation:'.tr, (occ.name).tr),
-                _buildDetailRow(Icons.apartment, 'Company Name:'.tr,
-                    (occ.companyName ?? 'N/A').tr),
+                    LK.occupationLabel.tr, occ.name.tr),
+                _buildDetailRow(Icons.apartment, LK.companyNameLabel.tr,
+                    (occ.companyName ?? LK.na.tr).tr),
 
                 // Expandable Address Row
                 Padding(
@@ -179,7 +184,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                       SizedBox(
                         width: 140,
                         child: Text(
-                          'Business Address:'.tr,
+                          LK.businessAddressLabel.tr,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             color: AppColors.mutedForeground,
@@ -192,7 +197,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              (occ.businessAddress ?? 'N/A').tr,
+                              occ.businessAddress ?? LK.na.tr,
                               textAlign: TextAlign.right,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -210,7 +215,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
-                                    'Show more'.tr,
+                                    LK.showMore.tr,
                                     style: const TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -226,10 +231,10 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   ),
                 ),
 
-                _buildDetailRow(Icons.phone_outlined, 'Mobile:'.tr,
-                    (occ.mobile ?? 'N/A').tr),
-                _buildDetailRow(Icons.description_outlined, 'Description:'.tr,
-                    (occ.description ?? 'N/A').tr),
+                _buildDetailRow(Icons.phone_outlined, LK.mobileColon.tr,
+                    occ.mobile ?? LK.na.tr),
+                _buildDetailRow(Icons.description_outlined, LK.descriptionLabel.tr,
+                    occ.description ?? LK.na.tr),
               ],
             ),
           ),
@@ -258,7 +263,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   const Icon(Icons.person_outline, color: Colors.white),
                   const SizedBox(width: 12),
                   Text(
-                    'View Full Member Profile'.tr,
+                    LK.viewFullMemberProfile.tr,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -284,11 +289,11 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
           children: [
             const Icon(Icons.location_on, color: AppColors.primary),
             const SizedBox(width: 10),
-            Text('Full Address'.tr),
+            Text(LK.fullAddress.tr),
           ],
         ),
         content: Text(
-          address.tr,
+          address,
           style: const TextStyle(
             fontSize: 14,
             color: AppColors.secondary,
@@ -299,7 +304,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Close'.tr,
+              LK.close.tr,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

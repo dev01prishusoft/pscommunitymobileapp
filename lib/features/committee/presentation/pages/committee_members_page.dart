@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -11,165 +16,138 @@ class CommitteeMembersPage extends StatefulWidget {
 }
 
 class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
+  final controller = Get.find<CommitteeController>();
+  late CommitteeNode node;
   String _selectedRole = 'All';
-  String _selectedCommittee = 'All';
+  String _searchQuery = '';
+  final Map<String, bool> _expandedGroups = {};
 
-  final List<Map<String, dynamic>> _committeeData = [
-    {
-      'role': 'PRESIDENT',
-      'count': 2,
-      'isExpanded': true,
-      'members': [
-        {
-          'name': 'Rajesh Patel',
-          'committee': 'Managing Committee',
-          'since': 'Jan 2024',
-          'until': 'Dec 2027',
-          'reportsTo': 'Amit Mehta (Treasurer)',
-        },
-        {
-          'name': 'Neha Kapoor',
-          'committee': 'Executive Board',
-          'since': 'Jan 2024',
-          'until': 'Dec 2026',
-          'reportsTo': 'Amit Mehta (Treasurer)',
-        },
-      ]
-    },
-    {
-      'role': 'SECRETARY',
-      'count': 3,
-      'isExpanded': true,
-      'members': [
-        {
-          'name': 'Meera Shah',
-          'committee': 'Managing Committee',
-          'since': 'Jan 2024',
-          'until': 'Dec 2027',
-          'reportsTo': 'Rajesh Patel (President)',
-        },
-        {
-          'name': 'Kiran Shah',
-          'committee': 'Election Committee',
-          'since': 'Feb 2024',
-          'until': 'Dec 2025',
-          'reportsTo': 'Rajesh Patel (President)',
-        },
-      ]
-    },
-    {
-      'role': 'TREASURER',
-      'count': 1,
-      'isExpanded': true,
-      'members': [
-        {
-          'name': 'Amit Mehta',
-          'committee': 'Managing Committee',
-          'since': 'Jan 2024',
-          'until': 'Dec 2027',
-          'reportsTo': 'Rajesh Patel (President)',
-        },
-      ]
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    node = Get.arguments as CommitteeNode;
+    if (controller.committeeDetail.value == null || 
+        controller.committeeDetail.value?.name != node.name) {
+      controller.loadCommitteeDetail(node.id);
+    }
+  }
 
-  List<String> get _allRoles => ['All', ..._committeeData.map((g) => g['role'] as String).toSet()];
-  List<String> get _allCommittees => ['All', ..._committeeData.expand((g) => (g['members'] as List).map((m) => m['committee'] as String)).toSet()];
+  List<String> _getRoles(List<CommitteeMember> members) {
+    final roles = members.map((m) => m.roleName).toSet();
+    return ['All', ...roles.where((r) => r != 'All')];
+  }
 
-  List<Map<String, dynamic>> get _filteredCommitteeData {
-    return _committeeData
-        .where((group) => _selectedRole == 'All' || group['role'] == _selectedRole)
-        .map((group) {
-      final List<Map<String, dynamic>> members =
-          List<Map<String, dynamic>>.from(group['members'] as Iterable);
-      final filteredMembers = members.where((member) {
-        final matchesCommittee = _selectedCommittee == 'All' ||
-            member['committee'] == _selectedCommittee;
-        return matchesCommittee;
-      }).toList();
+  Map<String, List<CommitteeMember>> _getGroupedMembers(List<CommitteeMember> members) {
+    final roles = _getRoles(members);
+    if (!roles.contains(_selectedRole)) {
+      _selectedRole = 'All';
+    }
+    final filtered = members.where((m) {
+      final matchesRole = _selectedRole == 'All' || m.roleName == _selectedRole;
+      final matchesSearch = _searchQuery.isEmpty || 
+          m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          m.roleName.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesRole && matchesSearch;
+    }).toList();
 
-      return {
-        ...group,
-        'members': filteredMembers,
-        'count': filteredMembers.length,
-      };
-    }).where((group) => (group['members'] as List).isNotEmpty).toList();
+    final Map<String, List<CommitteeMember>> groups = {};
+    for (var member in filtered) {
+      groups.putIfAbsent(member.roleName, () => []).add(member);
+    }
+    return groups;
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredData = _filteredCommitteeData;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
-          'Committee Members'.tr,
+          LK.committeeMembers.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          // Filters
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildFilterDropdown(
-                    'Role:'.tr,
-                    _selectedRole,
-                    _allRoles,
-                    (val) => setState(() => _selectedRole = val!),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildFilterDropdown(
-                    'Committee:'.tr,
-                    _selectedCommittee,
-                    _allCommittees,
-                    (val) => setState(() => _selectedCommittee = val!),
-                  ),
-                ),
-              ],
-            ),
-          ),
+      body: Obx(() {
+        final detail = controller.committeeDetail.value;
+        return AppStateView(
+          state: controller.detailState.value,
+          onRetry: () => controller.loadCommitteeDetail(node.id),
+          child: detail == null ? const SizedBox.shrink() : _buildContent(detail),
+        );
+      }),
+    );
+  }
 
-          // Member List
-          Expanded(
-            child: filteredData.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.person_off_outlined,
-                            size: 64, color: Colors.grey.shade300),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No members found for this committee'.tr,
-                          style: TextStyle(color: Colors.grey.shade500),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: filteredData.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (context, index) {
-                      final group = filteredData[index];
-                      return _buildRoleGroup(group);
-                    },
+  Widget _buildContent(CommitteeDetail detail) {
+    final roles = _getRoles(detail.members);
+    final groups = _getGroupedMembers(detail.members);
+
+    return Column(
+      children: [
+        // Filters & Search
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                onChanged: (val) => setState(() => _searchQuery = val),
+                decoration: InputDecoration(
+                  hintText: LK.searchCommittees.tr,
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildFilterDropdown(
+                      '${LK.role.tr}:',
+                      _selectedRole,
+                      roles,
+                      (val) => setState(() => _selectedRole = val!),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+
+        // Member List
+        Expanded(
+          child: groups.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person_off_outlined,
+                          size: 64, color: Colors.grey.shade300),
+                      const SizedBox(height: 16),
+                      Text(
+                        LK.noMembersFound.tr,
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: groups.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (context, index) {
+                    final role = groups.keys.elementAt(index);
+                    final members = groups[role]!;
+                    return _buildRoleGroup(role, members);
+                  },
+                ),
+        ),
+      ],
     );
   }
 
@@ -212,7 +190,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 
-  Widget _buildRoleGroup(Map<String, dynamic> group) {
+  Widget _buildRoleGroup(String role, List<CommitteeMember> members) {
+    final isExpanded = _expandedGroups[role] ?? true;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -229,13 +208,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       ),
       child: Column(
         children: [
-          // Group Header
           InkWell(
-            onTap: () {
-              setState(() {
-                group['isExpanded'] = !(group['isExpanded'] as bool? ?? false);
-              });
-            },
+            onTap: () => setState(() => _expandedGroups[role] = !isExpanded),
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -247,7 +221,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   const Icon(Icons.group, color: AppColors.primary, size: 20),
                   const SizedBox(width: 12),
                   Text(
-                    '${(group['role'] as String).tr} (${group['count']})',
+                    '${role.toUpperCase().tr} (${members.length})',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -256,7 +230,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   ),
                   const Spacer(),
                   Icon(
-                    (group['isExpanded'] as bool? ?? false) ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                     color: AppColors.primary,
                     size: 20,
                   ),
@@ -264,18 +238,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               ),
             ),
           ),
-          const Divider(),
-
-          // Members List
-          if (group['isExpanded'] as bool? ?? false)
+          const Divider(height: 1),
+          if (isExpanded)
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: (group['members'] as List).length,
-              separatorBuilder: (context, index) => const Divider(),
+              itemCount: members.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
-                final member = (group['members'] as List)[index] as Map<String, dynamic>;
-                return _buildMemberTile(member, group['role'] as String? ?? '');
+                return _buildMemberTile(members[index]);
               },
             ),
         ],
@@ -283,15 +254,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 
-  String _translateDate(String date) {
-    List<String> parts = date.split(' ');
-    if (parts.length == 2) {
-      return '${parts[0].tr} ${parts[1]}';
-    }
-    return date.tr;
-  }
-
-  void _showMemberDetails(Map<String, dynamic> member, String role) {
+  void _showMemberDetails(CommitteeMember member) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -304,7 +267,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         ),
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -315,7 +277,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Committee Member Details'.tr,
+                      LK.memberDetails.tr,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 18,
@@ -324,18 +286,16 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // Spacer for centering
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
             const Divider(height: 1),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    // Profile Section
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
@@ -356,12 +316,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                           CircleAvatar(
                             radius: 45,
                             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                            child: const Icon(Icons.person,
-                                size: 50, color: AppColors.primary),
+                            child: const Icon(Icons.person, size: 50, color: AppColors.primary),
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            (member['name'] as String).tr,
+                            member.name.tr,
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -370,7 +329,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${role.tr} - ${(member['committee'] as String).tr}',
+                            '${member.roleName.tr} (${member.roleTypeName.tr})',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -381,8 +340,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Committee Details Section
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
@@ -402,12 +359,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                                   color: AppColors.primary.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.assignment,
-                                    size: 18, color: AppColors.primary),
+                                child: const Icon(Icons.assignment, size: 18, color: AppColors.primary),
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                'COMMITTEE DETAILS'.tr,
+                                LK.committeeInfo.tr.toUpperCase(),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
@@ -421,13 +377,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             padding: EdgeInsets.symmetric(vertical: 12.0),
                             child: Divider(),
                           ),
-                          _buildDetailRow('Committee Name'.tr, (member['committee'] as String).tr),
-                          _buildDetailRow('Role'.tr, role.tr),
-                          _buildDetailRow('Start Date'.tr, '01 ${member['since']}'),
-                          _buildDetailRow('End Date'.tr, '31 ${member['until']}'),
-                          _buildDetailRow('Reports to'.tr,
-                              (member['reportsTo'] as String?)?.tr ??
-                                  'Amit Mehta (Treasurer)'.tr),
+                          _buildDetailRow(LK.nameLabel.tr, (controller.committeeDetail.value?.name ?? '--').tr),
+                          _buildDetailRow(LK.role.tr, member.roleName.tr),
+                          _buildDetailRow(LK.startDateLabel.tr, member.startDate?.split('T').first ?? '--'),
+                          if (member.endDate != null)
+                            _buildDetailRow(LK.endDateLabel.tr, member.endDate!.split('T').first),
                         ],
                       ),
                     ),
@@ -435,20 +389,20 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close bottom sheet
-                  Navigator.pushNamed(context, AppRouter.memberProfile);
+                  Get.back();
+                  Get.toNamed(
+                    AppRouter.memberProfile,
+                    arguments: {'memberId': member.memberId},
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 54),
                   backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -456,12 +410,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                     const Icon(Icons.account_circle_outlined, color: Colors.white),
                     const SizedBox(width: 12),
                     Text(
-                      'View Full Member Profile'.tr,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      LK.viewProfile.tr,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ],
                 ),
@@ -483,22 +433,14 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             width: 120,
             child: Text(
               label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.secondary,
-                fontSize: 13,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.secondary, fontSize: 13),
             ),
           ),
-          const Text('  :   ',
-              style: TextStyle(color: AppColors.mutedForeground)),
+          const Text('  :   ', style: TextStyle(color: AppColors.mutedForeground)),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontSize: 13,
-              ),
+              style: const TextStyle(color: AppColors.secondary, fontSize: 13),
             ),
           ),
         ],
@@ -506,7 +448,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 
-  Widget _buildMemberTile(Map<String, dynamic> member, String role) {
+  Widget _buildMemberTile(CommitteeMember member) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: const CircleAvatar(
@@ -514,38 +456,19 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         backgroundColor: Color(0xFFF1F5F9),
         child: Icon(Icons.person, color: AppColors.primary),
       ),
-      title: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: (member['name'] as String).tr,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondary,
-                fontSize: 15,
-              ),
-            ),
-            TextSpan(
-              text: ' - ${(member['committee'] as String).tr}',
-              style: const TextStyle(
-                color: AppColors.mutedForeground,
-                fontSize: 13,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
+      title: Text(
+        member.name.tr,
+        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary, fontSize: 15),
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4.0),
         child: Text(
-          '${'Since:'.tr} ${_translateDate(member['since'] as String? ?? '')}  |  ${'Until:'.tr} ${_translateDate(member['until'] as String? ?? '')}',
+          '${LK.role.tr}: ${member.roleName.tr} (${member.roleTypeName.tr})',
           style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
         ),
       ),
-      trailing:
-          const Icon(Icons.keyboard_arrow_right, color: AppColors.mutedForeground),
-      onTap: () => _showMemberDetails(member, role),
+      trailing: const Icon(Icons.keyboard_arrow_right, color: AppColors.mutedForeground),
+      onTap: () => _showMemberDetails(member),
     );
   }
 }

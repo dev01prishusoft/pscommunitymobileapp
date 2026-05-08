@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MarriagePage extends StatefulWidget {
   const MarriagePage({super.key});
@@ -46,10 +48,10 @@ class _MarriagePageState extends State<MarriagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marriage'.tr),
+        title: Text(LK.marriageLabel.tr),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
       ),
       body: Stack(
@@ -74,7 +76,7 @@ class _MarriagePageState extends State<MarriagePage> {
                       children: [
                         Expanded(
                           child: _buildSummaryCard(
-                            label: 'Unmarried Male'.tr,
+                            label: LK.unmarriedMale.tr,
                             count: maleCount.toString(),
                             icon: Icons.group,
                             iconColor: Colors.blue,
@@ -84,7 +86,7 @@ class _MarriagePageState extends State<MarriagePage> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildSummaryCard(
-                            label: 'Unmarried Female'.tr,
+                            label: LK.unmarriedFemale.tr,
                             count: femaleCount.toString(),
                             icon: Icons.person,
                             iconColor: Colors.pink,
@@ -105,11 +107,11 @@ class _MarriagePageState extends State<MarriagePage> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Show :'.tr, style: const TextStyle(fontSize: 12)),
+                            Text(LK.showLabel.tr, style: const TextStyle(fontSize: 12)),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                'Looking for Marriage'.tr,
+                                LK.lookingForMarriage.tr,
                                 style: const TextStyle(fontSize: 12),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -133,7 +135,7 @@ class _MarriagePageState extends State<MarriagePage> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Gender:'.tr, style: const TextStyle(fontSize: 11)),
+                          Text(LK.gender.tr, style: const TextStyle(fontSize: 11)),
                           const SizedBox(width: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -178,7 +180,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             _controller.applyFilters();
                           },
                           decoration: InputDecoration(
-                            hintText: 'Search by name or member ID...'.tr,
+                            hintText: LK.searchMemberHint.tr,
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.close),
@@ -223,7 +225,7 @@ class _MarriagePageState extends State<MarriagePage> {
                 // Member List
                 Obx(() => AppStateView(
                   state: _controller.state.value,
-                  emptyMessage: 'No matches found'.tr,
+                  emptyMessage: LK.noMatchesFound.tr,
                   child: ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -285,7 +287,7 @@ class _MarriagePageState extends State<MarriagePage> {
                         const Icon(Icons.tune, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Text(
-                          'Advanced Filters'.tr,
+                          LK.advancedFilters.tr,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.secondary),
@@ -309,7 +311,7 @@ class _MarriagePageState extends State<MarriagePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildFilterRow(
-                            label: 'Age Range:'.tr,
+                            label: LK.ageRangeLabel.tr,
                             fromValue: _controller.selectedAgeFrom.value,
                             toValue: _controller.selectedAgeTo.value,
                             items: _ages,
@@ -320,7 +322,7 @@ class _MarriagePageState extends State<MarriagePage> {
                           ),
                           const SizedBox(height: 12),
                           _buildFilterRow(
-                            label: 'Height Range:'.tr,
+                            label: LK.heightRangeLabel.tr,
                             fromValue: _controller.selectedHeightFrom.value,
                             toValue: _controller.selectedHeightTo.value,
                             items: _heights,
@@ -334,7 +336,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             children: [
                               SizedBox(
                                 width: 80,
-                                child: Text('Gotra:'.tr,
+                                child: Text(LK.gotraLabel.tr,
                                     style: const TextStyle(fontSize: 13)),
                               ),
                               Expanded(
@@ -354,7 +356,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                     _controller.excludeSameGotra.value = val!,
                               ),
                               Flexible(
-                                child: Text('Exclude same gotra'.tr,
+                                child: Text(LK.excludeSameGotra.tr,
                                     style: const TextStyle(fontSize: 11)),
                               ),
                             ],
@@ -364,7 +366,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             children: [
                               SizedBox(
                                 width: 80,
-                                child: Text('Marital Status:'.tr,
+                                child: Text(LK.maritalStatusLabel.tr,
                                     style: const TextStyle(fontSize: 13)),
                               ),
                               Expanded(
@@ -384,7 +386,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                 width: 80,
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text('Residence:'.tr,
+                                  child: Text(LK.residenceLabel.tr,
                                       style: const TextStyle(fontSize: 13)),
                                 ),
                               ),
@@ -393,7 +395,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text('State:'.tr,
+                                        Text(LK.stateLabel.tr,
                                             style: const TextStyle(fontSize: 11)),
                                         const SizedBox(width: 4),
                                         Expanded(
@@ -404,7 +406,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text('District:'.tr,
+                                        Text(LK.districtLabel.tr,
                                             style: const TextStyle(fontSize: 11)),
                                         const SizedBox(width: 4),
                                         Expanded(
@@ -419,7 +421,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                     const SizedBox(height: 8),
                                     Row(
                                       children: [
-                                        Text('Taluka:'.tr,
+                                        Text(LK.talukaLabel.tr,
                                             style: const TextStyle(fontSize: 11)),
                                         const SizedBox(width: 4),
                                         Expanded(
@@ -431,7 +433,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                         ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            'Area:'.tr,
+                                            LK.areaLabel.tr,
                                             style: const TextStyle(
                                               fontSize: 11,
                                             ),
@@ -462,7 +464,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             children: [
                               SizedBox(
                                 width: 80,
-                                child: Text('Education:'.tr,
+                                child: Text(LK.educationLabel.tr,
                                     style: const TextStyle(fontSize: 13)),
                               ),
                               Expanded(
@@ -480,7 +482,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             children: [
                               SizedBox(
                                 width: 80,
-                                child: Text('Occupation:'.tr,
+                                child: Text(LK.occupationLabel.tr,
                                     style: const TextStyle(fontSize: 13)),
                               ),
                               Expanded(
@@ -495,7 +497,7 @@ class _MarriagePageState extends State<MarriagePage> {
                           ),
                           const SizedBox(height: 12),
                           _buildFilterRow(
-                            label: 'Income Range:'.tr,
+                            label: LK.incomeRangeLabel.tr,
                             fromValue: _controller.selectedIncomeFrom.value,
                             toValue: _controller.selectedIncomeTo.value,
                             items: _incomeRanges,
@@ -513,14 +515,14 @@ class _MarriagePageState extends State<MarriagePage> {
                                     _controller.applyFilters();
                                     _controller.isAdvancedFiltersOpen.value = false;
                                   },
-                                  child: Text('Apply Filters'.tr),
+                                  child: Text(LK.applyFilters.tr),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () => _controller.clearFilters(),
-                                  child: Text('Clear All'.tr),
+                                  child: Text(LK.clearAll.tr),
                                 ),
                               ),
                             ],
@@ -581,11 +583,29 @@ class _MarriagePageState extends State<MarriagePage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: avatarColors.background,
-              child: Icon(Icons.person, color: avatarColors.icon, size: 30),
-            ),
+            member.profilePhotoFullUrl != null && member.profilePhotoFullUrl!.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: member.profilePhotoFullUrl!,
+                    imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
+                      radius: 30,
+                      backgroundImage: imageProvider,
+                    ),
+                    placeholder: (context, url) => CircleAvatar(
+                      radius: 30,
+                      backgroundColor: avatarColors.background,
+                      child: const CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (context, url, error) => CircleAvatar(
+                      radius: 30,
+                      backgroundColor: avatarColors.background,
+                      child: Icon(Icons.person, color: avatarColors.icon, size: 30),
+                    ),
+                  )
+                : CircleAvatar(
+                    radius: 30,
+                    backgroundColor: avatarColors.background,
+                    child: Icon(Icons.person, color: avatarColors.icon, size: 30),
+                  ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -600,7 +620,7 @@ class _MarriagePageState extends State<MarriagePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${member.age} yrs | ${member.occupation.tr} | ${member.gotra.tr}',
+                    '${member.age} ${LK.ageYears.tr} | ${member.occupation.tr} | ${member.gotra.tr}',
                     style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                   ),
                   const SizedBox(height: 4),
@@ -611,7 +631,7 @@ class _MarriagePageState extends State<MarriagePage> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            member.area.tr,
+                            member.area,
                             style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                           ),
                         ),
@@ -620,11 +640,11 @@ class _MarriagePageState extends State<MarriagePage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Text('Looking for Marriage:'.tr,
+                      Text(LK.lookingForMarriage.tr,
                           style: const TextStyle(fontSize: 13)),
                       const SizedBox(width: 4),
                       Text(
-                        (member.isLookingforMarriage ?? false) ? 'Yes'.tr : 'No'.tr,
+                        (member.isLookingforMarriage ?? false) ? LK.yes.tr : LK.no.tr,
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -642,7 +662,7 @@ class _MarriagePageState extends State<MarriagePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           side: const BorderSide(color: AppColors.primary),
                         ),
-                        child: Text('View'.tr, style: const TextStyle(fontSize: 12)),
+                        child: Text(LK.view.tr, style: const TextStyle(fontSize: 12)),
                       ),
                     ],
                   ),
@@ -667,8 +687,8 @@ class _MarriagePageState extends State<MarriagePage> {
     required String fromValue,
     required String toValue,
     required List<String> items,
-    required Function(String?) onFromChanged,
-    required Function(String?) onToChanged,
+    required void Function(String?) onFromChanged,
+    required void Function(String?) onToChanged,
   }) {
     return Row(
       children: [
@@ -684,7 +704,7 @@ class _MarriagePageState extends State<MarriagePage> {
           ),
         ),
         const SizedBox(width: 8),
-        Text('to'.tr),
+        Text(LK.to.tr),
         const SizedBox(width: 8),
         Expanded(
           child: _buildDropdownField(

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pscommunitymobileapp/core/constants/app_strings_preboot.dart';
 
+//  ─────────────────────────────────────────────────────────────────
+//  PRE-BOOTSTRAP SCREEN: GetX DI has not yet completed when this 
+//  screen is shown. The localization system (.tr) is unavailable. 
+//  All strings here are intentionally hardcoded in English. 
+//  Do NOT add .tr calls — they will throw a LateInitializationError. 
+//  ─────────────────────────────────────────────────────────────────
 class FatalErrorScreen extends StatelessWidget {
   final Object error;
   final StackTrace? stackTrace;
@@ -31,7 +38,7 @@ class FatalErrorScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'System Initialization Error',
+                  PrebootStrings.initError,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -42,7 +49,7 @@ class FatalErrorScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'The community hub could not be started safely. This might be due to a network issue or corrupted local state.',
+                  PrebootStrings.initBody,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF94A3B8),
@@ -62,7 +69,7 @@ class FatalErrorScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'ERROR LOG',
+                        PrebootStrings.errorLog,
                         style: TextStyle(
                           color: Color(0xFF3B82F6),
                           fontSize: 11,
@@ -98,7 +105,7 @@ class FatalErrorScreen extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: const Text(
-                    'CLOSE APP & RESTART',
+                    PrebootStrings.closeApp,
                     style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
                   ),
                 ),

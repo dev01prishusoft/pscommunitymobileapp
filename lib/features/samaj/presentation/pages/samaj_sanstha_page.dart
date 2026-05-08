@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class SamajSansthaPage extends StatelessWidget {
   const SamajSansthaPage({super.key});
@@ -35,7 +36,7 @@ class SamajSansthaPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Samaj Sanstha'.tr,
+          LK.samajSanstha.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -100,7 +101,7 @@ class SamajSansthaPage extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Status:'.tr,
+                            LK.status.tr,
                             style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.mutedForeground,

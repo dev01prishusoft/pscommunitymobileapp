@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class PaymentHistoryPage extends StatelessWidget {
   const PaymentHistoryPage({super.key});
@@ -23,7 +24,7 @@ class PaymentHistoryPage extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Payment History'.tr,
+          LK.paymentHistory.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -41,17 +42,17 @@ class PaymentHistoryPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _buildFilterDropdown('Payment Type:'.tr, 'All Types'.tr)),
+                    Expanded(child: _buildFilterDropdown(LK.paymentTypeLabel.tr, LK.allTypes.tr)),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildFilterDropdown('Category:'.tr, 'All Categories'.tr)),
+                    Expanded(child: _buildFilterDropdown(LK.categoryLabel.tr, LK.allCategories.tr)),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Expanded(child: _buildFilterDropdown('Year:'.tr, '2025'.tr)),
+                    Expanded(child: _buildFilterDropdown(LK.yearLabel.tr, '2025')),
                     const SizedBox(width: 12),
-                    Expanded(child: _buildFilterDropdown('Status:'.tr, 'All'.tr)),
+                    Expanded(child: _buildFilterDropdown(LK.statusLabel.tr, LK.all.tr)),
                   ],
                 ),
               ],
@@ -102,7 +103,7 @@ class PaymentHistoryPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  value.tr,
+                  value,
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 const Icon(Icons.keyboard_arrow_down, size: 16),
@@ -172,7 +173,7 @@ class _PaymentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  payment.title.tr,
+                  payment.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
@@ -198,7 +199,7 @@ class _PaymentCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      payment.status.tr,
+                      payment.status,
                       style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -223,7 +224,7 @@ class _PaymentCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Receipt'.tr,
+                  LK.receiptLabel.tr,
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,

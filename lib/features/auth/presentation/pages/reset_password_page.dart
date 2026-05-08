@@ -16,6 +16,8 @@ class ResetPasswordPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ResetPasswordController>();
     final formKey = GlobalKey<FormState>();
+    final mobileController = TextEditingController();
+    final oldPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
 
@@ -27,10 +29,27 @@ class ResetPasswordPage extends StatelessWidget {
 
       if (!formKey.currentState!.validate()) return;
 
-      final success = await controller.resetPassword(newPasswordController.text);
+      final success = await controller.resetPassword(
+        mobileController.text,
+        oldPasswordController.text,
+        newPasswordController.text,
+      );
 
       if (success) {
+        Get.snackbar(
+          LK.success.tr,
+          LK.successUpdate.tr,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.offNamed(AppRouter.postLoginSplash);
+      } else if (controller.error.value != null) {
+        Get.snackbar(
+          LK.errorServer.tr,
+          controller.error.value!,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
     }
 
@@ -82,6 +101,34 @@ class ResetPasswordPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 32),
+                          AppTextField(
+                            label: LK.mobileNumber.tr,
+                            controller: mobileController,
+                            hint: LK.mobileHint.tr,
+                            icon: Icons.phone_android_rounded,
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return LK.pleaseEnterMobile.tr;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          AppTextField(
+                            label: LK.oldPassword.tr,
+                            controller: oldPasswordController,
+                            hint: LK.passwordHint.tr,
+                            icon: Icons.lock_open_rounded,
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return LK.pleaseEnterPassword.tr;
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
                           AppTextField(
                             label: LK.newPassword.tr,
                             controller: newPasswordController,

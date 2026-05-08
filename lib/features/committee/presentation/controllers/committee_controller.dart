@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 
 class CommitteeController extends GetxController {
   final CommitteeRepository _repository;
@@ -10,7 +11,9 @@ class CommitteeController extends GetxController {
   CommitteeController(this._repository);
 
   final Rx<AppState> state = AppState.loading.obs;
+  final Rx<AppState> detailState = AppState.loading.obs;
   final RxList<CommitteeNode> committees = <CommitteeNode>[].obs;
+  final Rx<CommitteeDetail?> committeeDetail = Rx<CommitteeDetail?>(null);
   final RxString searchQuery = ''.obs;
 
   @override
@@ -23,19 +26,23 @@ class CommitteeController extends GetxController {
     state.value = AppState.loading;
     try {
       final results = await _repository.getCommittees();
-      
-      if (searchQuery.value.isNotEmpty) {
-        // Simple client side filter if API doesn't support deep search yet
-        // but the repository is now calling the production endpoint
-        committees.assignAll(results.where((c) => c.name.toLowerCase().contains(searchQuery.value.toLowerCase())).toList());
-      } else {
-        committees.assignAll(results);
-      }
-      
+      committees.assignAll(results);
       state.value = committees.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load committees', e, stack);
       state.value = AppState.error;
+    }
+  }
+
+  Future<void> loadCommitteeDetail(int id) async {
+    detailState.value = AppState.loading;
+    try {
+      final result = await _repository.getCommitteeDetail(id);
+      committeeDetail.value = result;
+      detailState.value = result == null ? AppState.empty : AppState.data;
+    } catch (e, stack) {
+      AppLogger.e('Failed to load committee detail', e, stack);
+      detailState.value = AppState.error;
     }
   }
 

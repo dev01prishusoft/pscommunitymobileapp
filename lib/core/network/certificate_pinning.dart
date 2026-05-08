@@ -24,11 +24,11 @@ class CertificatePinning {
       // Reject all certificates that are not trusted by the OS trust store
       // AND later subject them to the pinning check.
       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
-        // Log the failure in debug mode for easier troubleshooting
         if (kDebugMode) {
-          print('Certificate validation failed for $host');
+          print('Certificate validation failed for $host. Allowing for debug.');
+          return true; // Allow in debug
         }
-        return false; // Reject
+        return false; // Reject in release
       };
       
       return client;

@@ -63,7 +63,7 @@ class DI {
     final authRepository = AuthRepositoryImpl(apiClient);
     final loginUseCase = LoginUseCase(authRepository);
     Get.put(LoginController(loginUseCase, tokenManager), permanent: true);
-    Get.put(ResetPasswordController(), permanent: true);
+    Get.put(ResetPasswordController(authRepository), permanent: true);
 
     // 7. Member Feature
     final memberRepository = MemberRepositoryImpl(apiClient);

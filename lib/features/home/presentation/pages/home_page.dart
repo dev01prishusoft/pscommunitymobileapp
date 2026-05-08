@@ -245,8 +245,18 @@ class HomePage extends StatelessWidget {
     }
 
     return Obx(() {
-      final currentLang = Get.locale?.languageCode ?? 'en';
+      final currentLang = (Get.locale?.languageCode ?? 'en').toUpperCase();
       
+      final List<String> codes = loc.languages.isEmpty 
+          ? ['EN', 'GU'] 
+          : loc.languages.map((l) => l.code.toUpperCase()).toSet().toList();
+
+      if (!codes.contains(currentLang) && codes.isNotEmpty) {
+        // If current locale is not in the list, we don't change it but we must ensure the dropdown has a valid value
+        // or add the current one to the list temporarily.
+        codes.add(currentLang);
+      }
+
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
         decoration: BoxDecoration(
@@ -262,7 +272,7 @@ class HomePage extends StatelessWidget {
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
-            value: currentLang.toUpperCase(),
+            value: codes.contains(currentLang) ? currentLang : codes.first,
             icon: const Icon(
               Icons.language,
               color: AppColors.navyBlue,
@@ -273,24 +283,17 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 12,
             ),
-            items: loc.languages.isEmpty
-                ? [
-                    const DropdownMenuItem(value: 'EN', child: Text(' EN')),
-                    const DropdownMenuItem(value: 'GU', child: Text(' GU')),
-                  ]
-                : loc.languages
-                      .map(
-                        (lang) => DropdownMenuItem(
-                          value: lang.code.toUpperCase(),
-                          child: Text(' ${lang.code.toUpperCase()}'),
-                        ),
-                      )
-                      .toList(),
+            items: codes.map((code) => DropdownMenuItem(
+              value: code,
+              child: Text(' $code'),
+            )).toList(),
             onChanged: (String? newValue) {
               if (newValue == 'EN') {
                 loc.changeLocale('en', 'US');
               } else if (newValue == 'GU') {
                 loc.changeLocale('gu', 'IN');
+              } else if (newValue != null) {
+                loc.changeLocale(newValue.toLowerCase(), '');
               }
             },
           ),

@@ -9,8 +9,10 @@ abstract class FamilyRepository {
     int? stateId,
     int? districtId,
     int? talukaId,
+    int pageNo = 1,
+    int pageSize = 20,
   });
-  Future<List<Family>> getFamiliesByArea(int areaId);
+  Future<List<Family>> getFamiliesByArea(int areaId, {int pageNo = 1, int pageSize = 20});
   Future<Member> getMemberDetails(int memberId);
   Future<List<MemberAddress>> getMemberAddresses(int memberId);
   

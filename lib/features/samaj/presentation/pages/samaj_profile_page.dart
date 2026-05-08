@@ -19,7 +19,7 @@ class SamajProfilePage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Samaj Profile'.tr,
+          LK.samajInfo.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -62,7 +62,7 @@ class SamajProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'A community for Patel families'.tr,
+                    LK.samajSubtitle.tr,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.mutedForeground,
@@ -75,7 +75,7 @@ class SamajProfilePage extends StatelessWidget {
             // Timeline/Hierarchical view
             _buildTimelineItem(
               context,
-              title: 'Samaj Sanstha'.tr,
+              title: LK.samajSanstha.tr,
               icon: Icons.account_balance,
               iconColor: AppColors.deepBlue,
               onTap: () => Navigator.pushNamed(context, AppRouter.samajSanstha),
@@ -83,7 +83,7 @@ class SamajProfilePage extends StatelessWidget {
             ),
             _buildTimelineItem(
               context,
-              title: 'Bank Details'.tr,
+              title: LK.bankAccounts.tr,
               icon: Icons.account_balance,
               iconColor: AppColors.deepGreen,
               onTap: () => Navigator.pushNamed(context, AppRouter.bankDetails),
@@ -155,7 +155,7 @@ class SamajProfilePage extends StatelessWidget {
                 ),
                 if (!isGreen)
                   Text(
-                    'View'.tr,
+                    LK.view.tr,
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,

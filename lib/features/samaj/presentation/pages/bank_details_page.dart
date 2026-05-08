@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
 
@@ -22,7 +23,7 @@ class BankDetailsPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Bank Accounts'.tr,
+          LK.bankAccounts.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -40,7 +41,7 @@ class BankDetailsPage extends StatelessWidget {
         if (accounts.isEmpty) {
           return Center(
             child: Text(
-              'No bank accounts found'.tr,
+              LK.noBankAccountsFound.tr,
               style: const TextStyle(color: AppColors.mutedForeground),
             ),
           );
@@ -94,7 +95,7 @@ class BankDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      bank.bankName.tr,
+                      bank.bankName,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -113,7 +114,7 @@ class BankDetailsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'Primary'.tr,
+                    LK.primary.tr,
                     style: const TextStyle(
                       color: AppColors.deepGreen,
                       fontSize: 12,
@@ -124,9 +125,9 @@ class BankDetailsPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _buildDetailRow('Branch:'.tr, bank.branchName.tr),
-          _buildDetailRow('A/C:'.tr, bank.accountNumber),
-          _buildDetailRow('IFSC:'.tr, bank.ifscCode),
+          _buildDetailRow(LK.branchLabel.tr, bank.branchName),
+          _buildDetailRow(LK.acLabel.tr, bank.accountNumber),
+          _buildDetailRow(LK.ifscLabel.tr, bank.ifscCode),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12.0),
             child: Divider(),
@@ -142,7 +143,7 @@ class BankDetailsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'View Details'.tr,
+                  LK.viewDetails.tr,
                   style: const TextStyle(
                     color: AppColors.deepBlue,
                     fontWeight: FontWeight.bold,

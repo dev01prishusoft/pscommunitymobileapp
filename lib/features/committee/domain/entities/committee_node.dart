@@ -1,26 +1,67 @@
 class CommitteeNode {
+  final int id;
   final String name;
   final int memberCount;
+  final int? parentId;
   final List<CommitteeNode> children;
   bool isExpanded;
 
   CommitteeNode({
+    required this.id,
     required this.name,
     this.memberCount = 0,
+    this.parentId,
     this.children = const [],
-    this.isExpanded = false,
+    this.isExpanded = true, // Default to true
   });
 
   factory CommitteeNode.fromJson(Map<String, dynamic> json) {
+    int parseId(dynamic val) {
+      if (val == null) return 0;
+      if (val is int) return val;
+      if (val is double) return val.toInt();
+      return int.tryParse(val.toString()) ?? 0;
+    }
+
+    int? parseParentId(Map<String, dynamic> json) {
+      final val = json['parentCommitteeId'] ?? 
+                  json['parentId'] ?? 
+                  json['ParentCommitteeId'] ?? 
+                  json['parent_id'];
+      
+      if (val == null || val == 0 || val == '0') return null;
+      if (val is int) return val;
+      return int.tryParse(val.toString());
+    }
+
+    final id = parseId(json['id'] ?? json['Id'] ?? json['committeeId'] ?? json['CommitteeId']);
+    final parentId = parseParentId(json);
+
     return CommitteeNode(
-      name: (json['committeeName'] ?? json['name']) as String? ?? '',
-      memberCount: (json['totalMembers'] ?? json['memberCount']) as int? ?? 0,
-      isExpanded: json['isExpanded'] as bool? ?? false,
-      children: json['children'] != null
-          ? (json['children'] as List<dynamic>)
-              .map((i) => CommitteeNode.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : const [],
+      id: id,
+      name: (json['committeeName'] ?? json['name'] ?? json['CommitteeName']) as String? ?? '',
+      memberCount: (json['totalMembers'] ?? json['memberCount'] ?? json['MemberCount']) as int? ?? 0,
+      parentId: parentId,
+      isExpanded: true, // Always expanded
+      children: [], 
+    );
+  }
+
+  CommitteeNode copyWith({
+    int? id,
+    String? name,
+    int? memberCount,
+    int? parentId,
+    List<CommitteeNode>? children,
+    bool? isExpanded,
+  }) {
+    return CommitteeNode(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      memberCount: memberCount ?? this.memberCount,
+      parentId: parentId ?? this.parentId,
+      children: children ?? this.children,
+      isExpanded: isExpanded ?? this.isExpanded,
     );
   }
 

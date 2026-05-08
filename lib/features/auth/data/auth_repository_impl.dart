@@ -19,7 +19,6 @@ class AuthRepositoryImpl implements AuthRepository {
       data: {
         'mobile': mobile,
         'password': password,
-        'ipAddress': '192.168.1.1',
       },
     );
 
@@ -36,7 +35,6 @@ class AuthRepositoryImpl implements AuthRepository {
       data: {
         'mobileNo': mobile,
         'password': password,
-        'ipAddress': '192.168.1.1',
       },
     );
 

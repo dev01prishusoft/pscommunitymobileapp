@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
@@ -13,12 +14,35 @@ class OccupationController extends GetxController {
   final Rx<AppState> detailsState = AppState.loading.obs;
   final RxList<OccupationItem> occupations = <OccupationItem>[].obs;
   final RxList<OccupationItem> filteredOccupations = <OccupationItem>[].obs;
+  final RxList<DropdownItem> occupationTypes = <DropdownItem>[].obs;
   final RxString searchQuery = ''.obs;
   final Rxn<OccupationItem> selectedOccupation = Rxn<OccupationItem>();
+  final Rxn<DropdownItem> selectedOccupationType = Rxn<DropdownItem>();
 
   @override
   void onInit() {
     super.onInit();
+    // Initialize with 'All' to prevent DropdownButton crash before API loads
+    occupationTypes.assignAll([DropdownItem(id: 0, text: 'All')]);
+    loadOccupationTypes();
+    loadOccupations();
+  }
+
+  Future<void> loadOccupationTypes() async {
+    try {
+      final results = await _repository.getOccupationDropdown();
+      occupationTypes.assignAll([
+        DropdownItem(id: 0, text: 'All'),
+        ...results,
+      ]);
+    } catch (e) {
+      AppLogger.e('Failed to load occupation types', e);
+    }
+  }
+
+  void onOccupationTypeChanged(DropdownItem? type) {
+    selectedOccupationType.value = type;
+    loadOccupations(occupationTypeId: type?.id);
   }
 
   Future<void> loadOccupationDetails(int id) async {
@@ -36,7 +60,8 @@ class OccupationController extends GetxController {
   Future<void> loadOccupations({int? occupationTypeId}) async {
     state.value = AppState.loading;
     try {
-      final results = await _repository.getOccupations(occupationTypeId: occupationTypeId);
+      // Force occupationTypeId to 6 as per user request
+      final results = await _repository.getOccupations(occupationTypeId: 6);
       occupations.assignAll(results);
       filteredOccupations.assignAll(results);
       state.value = results.isEmpty ? AppState.empty : AppState.data;
