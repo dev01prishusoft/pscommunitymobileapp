@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
 import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 
@@ -28,7 +29,7 @@ class _BusinessPageState extends State<BusinessPage> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
-          'Business Information'.tr,
+          LK.businessInfo.tr,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 20,

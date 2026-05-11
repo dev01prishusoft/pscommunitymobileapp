@@ -216,7 +216,7 @@ class _CommitteeTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
-                        '${'Members'.tr}: ${node.memberCount}',
+                        '${LK.membersCount.tr}: ${node.memberCount}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.mutedForeground,

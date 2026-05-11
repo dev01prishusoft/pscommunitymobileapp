@@ -153,7 +153,7 @@ class _FilterSection extends StatelessWidget {
                         const Divider(),
                         const SizedBox(height: 16),
                         _CustomDropdown(
-                          hint: 'Select State'.tr,
+                          hint: LK.selectState.tr,
                           value: controller.selectedState.value,
                             options: controller.states,
                             onChanged: controller.onStateChanged,
@@ -161,7 +161,7 @@ class _FilterSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         _CustomDropdown(
-                          hint: 'Select District'.tr,
+                          hint: LK.selectDistrict.tr,
                           value: controller.selectedDistrict.value,
                             options: controller.districts,
                             onChanged: controller.onDistrictChanged,
@@ -170,7 +170,7 @@ class _FilterSection extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         _CustomDropdown(
-                          hint: 'Select Taluka'.tr,
+                          hint: LK.selectTaluka.tr,
                           value: controller.selectedTaluka.value,
                             options: controller.talukas,
                             onChanged: controller.onTalukaChanged,
@@ -355,7 +355,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Areas Found'.tr,
+            LK.noAreasFound.tr,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -364,7 +364,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Try selecting different filters'.tr,
+            LK.trySelectingDifferentFilters.tr,
             style: const TextStyle(
               fontSize: 14,
               color: AppColors.mutedForeground,
@@ -473,7 +473,7 @@ class _CustomDropdownState extends State<_CustomDropdown> {
                               vertical: 12.0,
                             ),
                             child: Text(
-                              'No items found'.tr,
+                              LK.noItemsFound.tr,
                               style: const TextStyle(
                                 color: AppColors.mutedForeground,
                                 fontSize: 14,

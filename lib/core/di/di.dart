@@ -24,6 +24,7 @@ import 'package:pscommunitymobileapp/features/family/data/family_repository_impl
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/business/data/business_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class DI {
@@ -94,7 +95,8 @@ class DI {
     Get.put(BusinessController(businessRepository), permanent: true);
 
     // 14. Global Samaj Detail
-    final samajController = Get.put(SamajController(apiClient), permanent: true);
+    final samajRepository = SamajRepositoryImpl(apiClient);
+    final samajController = Get.put(SamajController(samajRepository), permanent: true);
     
     // Auto-fetch if already logged in
     if (authState.isAuthenticated.value) {

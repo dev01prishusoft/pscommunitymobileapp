@@ -12,11 +12,15 @@ class OccupationRepositoryImpl implements OccupationRepository {
   OccupationRepositoryImpl(this._apiClient);
 
   @override
-  Future<List<OccupationItem>> getOccupations({int? occupationTypeId}) async {
+  Future<List<OccupationItem>> getOccupations({
+    int? occupationTypeId,
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
     final queryParameters = <String, dynamic>{
       if (occupationTypeId != null) 'occupationTypeId': occupationTypeId,
-      'pageNumber': 1,
-      'pageSize': 100,
+      'pageNumber': pageNumber,
+      'pageSize': pageSize,
     };
 
     final response = await _apiClient.get(

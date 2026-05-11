@@ -18,15 +18,24 @@ class OccupationDirectoryPage extends StatefulWidget {
 class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   final OccupationController _controller = Get.find<OccupationController>();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      _controller.loadOccupations(refresh: false);
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -115,18 +124,30 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               onRetry: _controller.loadOccupations,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: _controller.filteredOccupations.length,
-                  itemBuilder: (context, index) {
-                    final occ = _controller.filteredOccupations[index];
-                    return _buildOccupationCard(occ);
-                  },
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: GridView.builder(
+                        controller: _scrollController,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemCount: _controller.filteredOccupations.length,
+                        itemBuilder: (context, index) {
+                          final occ = _controller.filteredOccupations[index];
+                          return _buildOccupationCard(occ);
+                        },
+                      ),
+                    ),
+                    if (_controller.isNextPageLoading.value)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                  ],
                 ),
               ),
             )),

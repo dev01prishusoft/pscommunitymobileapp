@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
   const FamilyMembersListPage({super.key});
@@ -80,7 +81,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
             ),
             const SizedBox(height: 2),
             Text(
-              '$_membersCount ${'Members'.tr}  |  $_familiesCount ${'Families'.tr}',
+              '$_membersCount ${LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
             ),
           ],
@@ -99,7 +100,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Search by name or mobile...'.tr,
+                  hintText: LK.searchByMobileHint.tr,
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -140,7 +141,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                           Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
                           const SizedBox(height: 16),
                           Text(
-                            'No results found'.tr,
+                            LK.noResultsFound.tr,
                             style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
                           ),
                         ],
@@ -261,7 +262,7 @@ class _MemberTile extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'Family Head'.tr,
+                                LK.familyHead.tr,
                                 style: const TextStyle(
                                   color: Color(0xFF16A34A),
                                   fontSize: 10,

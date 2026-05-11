@@ -21,7 +21,7 @@ class ShareAppPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Share App'.tr,
+          LK.share.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -75,7 +75,7 @@ class ShareAppPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Join our community today!'.tr,
+                    LK.joinCommunity.tr,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.mutedForeground,
@@ -99,7 +99,7 @@ class ShareAppPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'App Link:'.tr,
+                    LK.appLinkLabel.tr,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.secondary,
@@ -125,12 +125,12 @@ class ShareAppPage extends StatelessWidget {
                         onPressed: () {
                           // Copy to clipboard logic
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Link copied to clipboard'.tr)),
+                            SnackBar(content: Text(LK.linkCopied.tr)),
                           );
                         },
                         icon: const Icon(Icons.copy, size: 16, color: AppColors.primary),
                         label: Text(
-                          'Copy Link'.tr,
+                          LK.copyLink.tr,
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -184,7 +184,7 @@ class ShareAppPage extends StatelessWidget {
                       SharePlus.instance.share(ShareParams(text: 'Join our community: $appLink'));
                     },
                     icon: const Icon(Icons.share, size: 18),
-                    label: Text('Share QR'.tr),
+                    label: Text(LK.shareQR.tr),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -201,7 +201,7 @@ class ShareAppPage extends StatelessWidget {
 
             _buildShareButton(
               icon: Icons.chat_bubble, // Using bubble for WhatsApp representation
-              label: 'Share App via WhatsApp'.tr,
+              label: LK.shareAppViaWhatsApp.tr,
               color: const Color(0xFF25D366),
               onTap: () {
                 SharePlus.instance.share(ShareParams(text: 'Join our community: $appLink'));
@@ -212,7 +212,7 @@ class ShareAppPage extends StatelessWidget {
             // Other Share
             _buildShareButton(
               icon: Icons.share,
-              label: 'Share App via Other'.tr,
+              label: LK.shareAppViaOther.tr,
               color: AppColors.primary,
               onTap: () {
                 SharePlus.instance.share(ShareParams(text: 'Join our community: $appLink'));

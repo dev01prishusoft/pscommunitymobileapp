@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class PrivacyPage extends StatelessWidget {
   const PrivacyPage({super.key});
@@ -7,10 +8,10 @@ class PrivacyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Privacy Policy'.tr)),
+      appBar: AppBar(title: Text(LK.privacyPolicy.tr)),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Text('privacy_content'.tr),
+        child: Text(LK.privacyContent.tr),
       ),
     );
   }

@@ -19,6 +19,12 @@ class OccupationController extends GetxController {
   final Rxn<OccupationItem> selectedOccupation = Rxn<OccupationItem>();
   final Rxn<DropdownItem> selectedOccupationType = Rxn<DropdownItem>();
 
+  // Pagination
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  final RxBool hasMore = true.obs;
+  final RxBool isNextPageLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -26,6 +32,9 @@ class OccupationController extends GetxController {
     occupationTypes.assignAll([DropdownItem(id: 0, text: 'All')]);
     loadOccupationTypes();
     loadOccupations();
+
+    // Debounce search
+    debounce(searchQuery, (_) => loadOccupations(), time: const Duration(milliseconds: 300));
   }
 
   Future<void> loadOccupationTypes() async {
@@ -57,33 +66,56 @@ class OccupationController extends GetxController {
     }
   }
 
-  Future<void> loadOccupations({int? occupationTypeId}) async {
-    state.value = AppState.loading;
+  Future<void> loadOccupations({int? occupationTypeId, bool refresh = true}) async {
+    if (refresh) {
+      _currentPage = 1;
+      hasMore.value = true;
+      state.value = AppState.loading;
+      occupations.clear();
+      filteredOccupations.clear();
+    } else {
+      if (!hasMore.value || isNextPageLoading.value) return;
+      isNextPageLoading.value = true;
+    }
+
     try {
-      // Force occupationTypeId to 6 as per user request
-      final results = await _repository.getOccupations(occupationTypeId: 6);
-      occupations.assignAll(results);
-      filteredOccupations.assignAll(results);
-      state.value = results.isEmpty ? AppState.empty : AppState.data;
+      final results = await _repository.getOccupations(
+        occupationTypeId: occupationTypeId ?? selectedOccupationType.value?.id,
+        pageNumber: _currentPage,
+        pageSize: _pageSize,
+      );
+
+      if (results.isEmpty) {
+        hasMore.value = false;
+      } else {
+        occupations.addAll(results);
+        
+        // Apply search filter locally if any
+        if (searchQuery.value.isNotEmpty) {
+           final query = searchQuery.value.toLowerCase();
+           final filtered = results.where((o) => o.name.toLowerCase().contains(query)).toList();
+           filteredOccupations.addAll(filtered);
+        } else {
+           filteredOccupations.addAll(results);
+        }
+
+        _currentPage++;
+        if (results.length < _pageSize) {
+          hasMore.value = false;
+        }
+      }
+      state.value = filteredOccupations.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load occupations', e, stack);
-      state.value = AppState.error;
+      if (refresh) state.value = AppState.error;
+    } finally {
+      isNextPageLoading.value = false;
     }
   }
 
   void search(String query) {
     searchQuery.value = query;
-    if (query.isEmpty) {
-      filteredOccupations.assignAll(occupations);
-      state.value = occupations.isEmpty ? AppState.empty : AppState.data;
-    } else {
-      final results = occupations.where((o) {
-        return o.name.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-      
-      filteredOccupations.assignAll(results);
-      state.value = results.isEmpty ? AppState.empty : AppState.data;
-    }
+    // loadOccupations is called via debounce
   }
 
   void clearSearch() {

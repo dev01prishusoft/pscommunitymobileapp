@@ -300,7 +300,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
               border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
             ),
             child: Text(
-              '${'Member Count'.tr}: $count',
+              '${LK.memberCount.tr}: $count',
               style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
@@ -375,12 +375,12 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                       style: const TextStyle(
                           color: AppColors.mutedForeground, fontSize: 12),
                       children: [
-                        TextSpan(text: '${'Since:'.tr} '),
+                        TextSpan(text: '${LK.sinceColon.tr} '),
                         TextSpan(
                             text: since,
                             style: const TextStyle(fontWeight: FontWeight.w600)),
                         const TextSpan(text: '   |   '),
-                        TextSpan(text: '${'Reports to:'.tr} '),
+                        TextSpan(text: '${LK.reportsToColon.tr} '),
                         TextSpan(
                             text: reportsTo,
                             style: const TextStyle(fontWeight: FontWeight.w600)),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -84,7 +85,7 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                boxShadow: [
+                boxShadow: [ 
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 15,
@@ -96,14 +97,16 @@ class HomePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: logoUrl != null && logoUrl.isNotEmpty
-                      ? Image.network(
-                          logoUrl,
+                      ? CachedNetworkImage(
+                          imageUrl: logoUrl,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                                'assets/images/prishusoft_logo.png',
-                                fit: BoxFit.contain,
-                              ),
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/images/prishusoft_logo.png',
+                            fit: BoxFit.contain,
+                          ),
                         )
                       : Image.asset(
                           'assets/images/prishusoft_logo.png',

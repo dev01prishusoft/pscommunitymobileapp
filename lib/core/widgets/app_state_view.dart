@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 enum AppState { loading, error, empty, data }
 
@@ -41,7 +42,7 @@ class AppStateView extends StatelessWidget {
                 const Icon(Icons.error_outline, size: 60, color: AppColors.destructive),
                 const SizedBox(height: 16),
                 Text(
-                  errorMessage ?? 'Something went wrong'.tr,
+                  errorMessage ?? LK.somethingWrong.tr,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16, color: AppColors.foreground),
                 ),
@@ -49,7 +50,7 @@ class AppStateView extends StatelessWidget {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: onRetry,
-                    child: Text('Retry'.tr),
+                    child: Text(LK.retry.tr),
                   ),
                 ],
               ],
@@ -67,7 +68,7 @@ class AppStateView extends StatelessWidget {
                     size: 60, color: AppColors.mutedForeground),
                 const SizedBox(height: 16),
                 Text(
-                  emptyMessage ?? 'No results found'.tr,
+                  emptyMessage ?? LK.noResultsFound.tr,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 16,

@@ -43,6 +43,31 @@ class MarriageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Debounce search and filter changes to avoid excessive API calls
+    final List<RxInterface> filterObservables = [
+      searchQuery,
+      selectedGender,
+      lookingForMarriage,
+      selectedAgeFrom,
+      selectedAgeTo,
+      selectedHeightFrom,
+      selectedHeightTo,
+      selectedGotra,
+      selectedMaritalStatus,
+      selectedState,
+      selectedDistrict,
+      selectedTaluka,
+      selectedArea,
+      selectedEducation,
+      selectedOccupation,
+      selectedIncomeFrom,
+      selectedIncomeTo,
+      excludeSameGotra,
+    ];
+
+    for (var obs in filterObservables) {
+      debounce(obs, (_) => applyFilters(), time: const Duration(milliseconds: 300));
+    }
   }
 
   Future<void> loadProfiles({bool showLoading = true}) async {

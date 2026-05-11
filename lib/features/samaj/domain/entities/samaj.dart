@@ -1,4 +1,5 @@
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
+import 'package:pscommunitymobileapp/features/samaj/domain/entities/sanstha.dart';
 
 class Samaj {
   final int samajId;
@@ -8,6 +9,7 @@ class Samaj {
   final String descriptionEnglish;
   final String logoUrl;
   final List<BankAccount> bankAccounts;
+  final List<Sanstha> sansthas;
 
   const Samaj({
     required this.samajId,
@@ -17,6 +19,7 @@ class Samaj {
     required this.descriptionEnglish,
     required this.logoUrl,
     this.bankAccounts = const [],
+    this.sansthas = const [],
   });
 
   factory Samaj.fromJson(Map<String, dynamic> json) {
@@ -29,6 +32,10 @@ class Samaj {
       logoUrl: json['logoUrl'] as String? ?? '',
       bankAccounts: (json['bankAccounts'] as List<dynamic>?)
               ?.map((e) => BankAccount.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      sansthas: (json['sansthas'] as List<dynamic>?)
+              ?.map((e) => Sanstha.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
     );

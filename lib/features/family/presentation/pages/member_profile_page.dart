@@ -214,7 +214,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   _buildGridItem(Icons.height, LK.heightColon.tr, '${member.height ?? 0} cm'),
                   _buildGridItem(
                     Icons.access_time,
-                    'Birth Time'.tr, // I'll add this to LK if needed
+                    LK.birthTime.tr,
                     member.dateOfBirthTime ?? LK.na,
                   ),
                   _buildGridItem(
@@ -224,7 +224,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   ),
                   _buildGridItem(
                     Icons.person_outline,
-                    "Mother/Father's Name".tr,
+                    LK.motherFatherName.tr,
                     (member.motherFatherName ?? LK.na).tr,
                   ),
                   _buildGridItem(
@@ -234,7 +234,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   ),
                   _buildGridItem(
                     Icons.location_on_outlined,
-                    "Occupation Area".tr,
+                    LK.occupationArea.tr,
                     (member.occupationAreaName ?? LK.na).tr,
                   ),
                   _buildGridItem(
@@ -321,9 +321,9 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
             icon: Icons.work_outline,
             child: Column(
               children: [
-                _buildAssetRow(LK.incomeColon.tr, '₹${member.monthlyIncome ?? 0}', 'Own House'.tr, member.isOwnHouse ?? false),
-                _buildAssetRow('Own Land'.tr, member.isOwnLand ?? false, 'Two Wheeler'.tr, member.hasTwoWheeler ?? false),
-                _buildAssetRow('', '', 'Four Wheeler'.tr, member.hasFourWheeler ?? false),
+                _buildAssetRow(LK.incomeColon.tr, '₹${member.monthlyIncome ?? 0}', LK.ownHouse.tr, member.isOwnHouse ?? false),
+                _buildAssetRow(LK.ownLand.tr, member.isOwnLand ?? false, LK.twoWheeler.tr, member.hasTwoWheeler ?? false),
+                _buildAssetRow('', '', LK.fourWheeler.tr, member.hasFourWheeler ?? false),
               ],
             ),
           ),
@@ -368,7 +368,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   ),
                   _buildSocialItem(
                     Icons.alternate_email,
-                    'Twitter / X'.tr,
+                    LK.twitterX.tr,
                     member.twitterUrl ?? LK.na,
                     Colors.black,
                     onTap: member.twitterUrl != null ? () => _launchUrl(member.twitterUrl!) : null,

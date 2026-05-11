@@ -99,6 +99,11 @@ class LK {
   static const String unmarried = 'Unmarried';
   static const String familiesCount = 'Families';
   static const String success = 'Success';
+  static const String selectState = 'Select State';
+  static const String selectDistrict = 'Select District';
+  static const String selectTaluka = 'Select Taluka';
+  static const String noAreasFound = 'No Areas Found';
+  static const String trySelectingDifferentFilters = 'Try selecting different filters';
   static const String lookingForMarriageLabel = 'Looking for Marriage';
   
   // New keys from Audit
@@ -131,6 +136,8 @@ class LK {
   static const String nameLabel = 'Name:';
   static const String committeeLabel = 'Committee:';
   static const String searchCommittees = 'Search committees...';
+  static const String searchByMobileHint = 'Search by name or mobile...';
+  static const String familyHead = 'Family Head';
   static const String at = 'at';
   
   // Parameterized Keys
@@ -164,6 +171,9 @@ class LK {
   static const String branchLabel = 'Branch:';
   static const String acLabel = 'A/C:';
   static const String ifscLabel = 'IFSC:';
+  static const String memberCount = 'Member Count';
+  static const String sinceColon = 'Since:';
+  static const String reportsToColon = 'Reports to:';
   static const String newVersionAvailable = 'A new version is available!';
   static const String wouldYouLikeToUpdate = 'Would you like to update now?';
   static const String releaseNotes = 'Release Notes';
@@ -218,7 +228,7 @@ class LK {
   static const String excludeSameGotra = 'Exclude same gotra';
   static const String maritalStatusLabel = 'Marital Status:';
   static const String residenceLabel = 'Residence:';
-  static const String educationLabel = 'Education:';
+  static const String educationLabel = 'Education';
   static const String incomeRangeLabel = 'Income Range:';
   static const String applyFilters = 'Apply Filters';
   static const String clearAll = 'Clear All';
@@ -247,6 +257,22 @@ class LK {
   static const String startDateLabel = 'Start Date';
   static const String endDateLabel = 'End Date';
   static const String viewProfile = 'View Profile';
+  static const String shreePatelSevaSamaj = 'Shree Patel Seva Samaj';
+  static const String socialWelfareOrganization = 'Social welfare organization';
+  static const String active = 'Active';
+  static const String shreePatelYuvaMandal = 'Shree Patel Yuva Mandal';
+  static const String youthActivitiesAndEvents = 'Youth activities and events';
+  static const String shreePatelEducationTrust = 'Shree Patel Education Trust';
+  static const String educationalScholarships = 'Educational scholarships';
+  static const String birthTime = 'Birth Time';
+  static const String motherFatherName = "Mother/Father's Name";
+  static const String occupationArea = 'Occupation Area';
+  static const String ownHouse = 'Own House';
+  static const String ownLand = 'Own Land';
+  static const String twoWheeler = 'Two Wheeler';
+  static const String fourWheeler = 'Four Wheeler';
+  static const String twitterX = 'Twitter / X';
+  static const String businessInfo = 'Business Information';
   
   // Marriage specific
   static const String ageColon = 'Age:';
@@ -265,13 +291,13 @@ class LK {
     resetPassword, newPassword, confirmNewPassword, updatePassword, passwordsDoNotMatch,
     errorServer, errorNoInternet, errorUnauthorized, errorTimeout, errorCertificatePinning,
     errorValidation, invalidCredentials, pleaseEnterMobile, pleaseEnterValidMobile, pleaseEnterPassword,
-    family, findMember, committee, payment, occupationDirectory, contactUs, matrimonial,
-    support, share, samajInfo, marriage, lookingForMarriage, unmarriedMale, unmarriedFemale,
-    address, assetAndLife, socialMedia, facebook, instagram, whatsapp, makePayment, paymentHistory, paymentReceipt, amount,
+    family, findMember, committee, payment, contactUs, matrimonial,
+    support, share, samajInfo, unmarriedMale, unmarriedFemale,
+    address, assetAndLife, socialMedia, facebook, instagram, whatsapp, paymentHistory, paymentReceipt, amount,
     updateAvailable, updateNow, updateLater, reset, home, samajName, privacyPolicy,
     privacyContent, needHelp, supportEmail, supportPhone, supportHours, searchHint,
     showing, membersCount, courtesy, social, devotion, annualMembership,
-    male, female, self, wife, married, unmarried, familiesCount, success, lookingForMarriageLabel,
+    male, female, self, wife, married, unmarried, familiesCount, success, lookingForMarriage,
     logout, cancel, logoutConfirm, retry, somethingWrong, noResultsFound, noMembersFound,
     noMatchesFound, noBankAccountsFound, noItemsFound, areaLabel, joinCommunity,
     appLinkLabel, copyLink, shareQR, close, gender, birthDate, na, occupationLabel,
@@ -289,11 +315,11 @@ class LK {
     dateLabel, memberDetailsLabel, memberNoLabel, paymentDetailsLabel,
     typeLabel, categoryLabel, amountLabel, modeLabel, statusLabel,
     transactionIdLabel, downloadPdf, comingSoon, paymentTypeLabel,
-    allTypes, allCategories, yearLabel, all, receiptLabel, makePaymentLabel,
+    allTypes, allCategories, yearLabel, all, receiptLabel, makePayment,
     paymentTypeHeader, selectPaymentType, categoryHeader, selectCategory,
-    amountHeader, payNow, occupationDirectoryLabel, searchOccupation,
+    amountHeader, payNow, occupationDirectory, searchOccupation,
     occupationColon, any, yes, no, minAmountLabel, maxAmountLabel,
-    marriageLabel, showLabel, advancedFilters, ageRangeLabel, heightRangeLabel,
+    marriage, showLabel, advancedFilters, ageRangeLabel, heightRangeLabel,
     gotraLabel, excludeSameGotra, maritalStatusLabel, residenceLabel,
     educationLabel, incomeRangeLabel, applyFilters, clearAll, to,
     linkCopied, shareAppViaWhatsApp, shareAppViaOther, committeeMemberDetails,
@@ -301,6 +327,12 @@ class LK {
     districtLabel, talukaLabel, view, membershipFee, primary, viewDetails,
     samajSanstha, status, committees, samajSubtitle,
     committeeMembers, role, memberDetails, startDateLabel, endDateLabel, viewProfile,
-    ageColon, heightColon, weightColon, bloodGroupColon, birthDateColon, educationColon, incomeColon, ageYears
+    ageColon, heightColon, weightColon, bloodGroupColon, birthDateColon, incomeColon, ageYears,
+    selectState, selectDistrict, selectTaluka, noAreasFound, trySelectingDifferentFilters,
+    shreePatelSevaSamaj, socialWelfareOrganization, active, shreePatelYuvaMandal,
+    youthActivitiesAndEvents, shreePatelEducationTrust, educationalScholarships,
+    searchByMobileHint, familyHead, memberCount, sinceColon, reportsToColon,
+    birthTime, motherFatherName, occupationArea, ownHouse, ownLand, twoWheeler, fourWheeler, twitterX,
+    businessInfo
   ];
 }

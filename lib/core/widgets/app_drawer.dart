@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -36,10 +37,13 @@ class AppDrawer extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: logoUrl != null && logoUrl.isNotEmpty
-                      ? Image.network(
-                          logoUrl,
+                      ? CachedNetworkImage(
+                          imageUrl: logoUrl,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
                             'assets/images/prishusoft_logo.png',
                             fit: BoxFit.contain,
                           ),
@@ -76,7 +80,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.favorite_outline, color: AppColors.primary),
-            title: Text('Marriage'.tr),
+            title: Text(LK.marriage.tr),
             onTap: () => Get.toNamed<void>(AppRouter.marriage),
           ),
           
@@ -87,7 +91,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout_rounded, color: Colors.redAccent),
             title: Text(
-              'Logout'.tr,
+              LK.logout.tr,
               style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
             ),
             onTap: () {
@@ -105,13 +109,13 @@ class AppDrawer extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text('Logout'.tr),
-        content: Text('Are you sure you want to logout?'.tr),
+        title: Text(LK.logout.tr),
+        content: Text(LK.logoutConfirm.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back<void>(),
             child: Text(
-              'Cancel'.tr,
+              LK.cancel.tr,
               style: const TextStyle(color: AppColors.mutedForeground),
             ),
           ),
@@ -119,7 +123,7 @@ class AppDrawer extends StatelessWidget {
           SizedBox(
             width: 120,
             child: AppPrimaryButton(
-              text: 'Logout'.tr,
+              text: LK.logout.tr,
               height: 45,
               onPressed: () {
                 authState.logout();

@@ -123,7 +123,6 @@ class _MarriagePageState extends State<MarriagePage> {
                                 value: _controller.lookingForMarriage.value,
                                 onChanged: (val) {
                                   _controller.lookingForMarriage.value = val;
-                                  _controller.applyFilters();
                                 },
                                 activeThumbColor: AppColors.primary,
                               ),
@@ -156,7 +155,6 @@ class _MarriagePageState extends State<MarriagePage> {
                                     .toList(),
                                 onChanged: (val) {
                                   _controller.selectedGender.value = val!;
-                                  _controller.applyFilters();
                                 },
                               )),
                             ),
@@ -177,7 +175,6 @@ class _MarriagePageState extends State<MarriagePage> {
                           controller: _searchController,
                           onChanged: (val) {
                             _controller.searchQuery.value = val;
-                            _controller.applyFilters();
                           },
                           decoration: InputDecoration(
                             hintText: LK.searchMemberHint.tr,
@@ -187,7 +184,6 @@ class _MarriagePageState extends State<MarriagePage> {
                               onPressed: () {
                                 _searchController.clear();
                                 _controller.searchQuery.value = '';
-                                _controller.applyFilters();
                               },
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),

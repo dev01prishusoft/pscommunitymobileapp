@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
@@ -42,7 +43,7 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
     // Navigate after delay
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
-        Get.offNamed(AppRouter.home);
+        Get.offNamed<void>(AppRouter.home);
       }
     });
   }
@@ -112,10 +113,15 @@ class _PostLoginSplashPageState extends State<PostLoginSplashPage>
                   child: Obx(() {
                     final logoUrl = samajController.samaj.value?.logoUrl;
                     if (logoUrl != null && logoUrl.isNotEmpty) {
-                      return Image.network(
-                        logoUrl,
+                      return CachedNetworkImage(
+                        imageUrl: logoUrl,
                         width: 300,
-                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                        placeholder: (context, url) => const SizedBox(
+                          width: 300,
+                          height: 100,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
                           "assets/images/prishusoft_logo.png",
                           width: 300,
                         ),

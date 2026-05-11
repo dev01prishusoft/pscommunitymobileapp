@@ -4,14 +4,15 @@ import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class CertificatePinning {
   static void configure(Dio dio) {
     // Real production pins for the server (Primary + Backup)
     // To get pins: openssl s_client -connect your-api.com:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
     const allowedPins = [
-      'sha256/7nK9/K...base64_hash_here...', // Example production pin
-      'sha256/backup_hash_here...',          // Backup pin
+      'sha256/oBTD/ZWLoIUhpfzgjHtjfO/M0nohlVWgkYM7D/0A470=', // Primary: communityapi.prishusoft.com (Leaf Fingerprint)
+      'sha256/lrzsBiZJdvN0YHearCjFp8/oo8Cq4RqP/O4FwL3fCMY=', // Backup: ISRG Root X1 (Root Fingerprint)
     ];
 
     final adapter = dio.httpClientAdapter as IOHttpClientAdapter;
@@ -46,21 +47,15 @@ class CertificatePinning {
       final isValid = allowedPins.contains(currentPin);
       
       if (!isValid) {
+        AppLogger.e('PINNING FAILURE for $host: $currentPin');
         if (kDebugMode) {
-          print('PINNING FAILURE: $currentPin');
-        } else {
-          // In production, this is a fatal security error
-          return false; 
+          AppLogger.d('Allowing pinning failure in debug mode. In production, this will fail.');
+          return true; 
         }
+        return false; 
       }
 
-      // If we are in debug mode AND using placeholders, we allow it for development.
-      // In RELEASE mode, this shortcut is GONE.
-      if (kDebugMode && allowedPins.any((p) => p.contains('...'))) {
-        return true;
-      }
-
-      return isValid;
+      return true;
     };
   }
 }

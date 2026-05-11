@@ -23,6 +23,7 @@ class ApiEndpoints {
   static const String memberDetail = '/api/v1/member';
   static const String memberAddress = '/api/v1/member-address/member';
   static const String samajDetail = '/api/v1/member/samaj-detail';
+  static const String sansthas = '/api/v1/SamajSanstha/list';
   
   // Dropdowns
   static const String stateDropdown = '/api/v1/state/dropdown';
