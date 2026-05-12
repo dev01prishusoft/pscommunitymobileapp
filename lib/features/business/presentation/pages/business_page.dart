@@ -116,7 +116,7 @@ class _CategoryCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                category.title.tr,
+                category.title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.foreground,

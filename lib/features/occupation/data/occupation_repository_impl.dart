@@ -6,10 +6,10 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 
 class OccupationRepositoryImpl implements OccupationRepository {
-  // ignore: unused_field
-  final ApiClient _apiClient;
 
   OccupationRepositoryImpl(this._apiClient);
+  
+  final ApiClient _apiClient;
 
   @override
   Future<List<OccupationItem>> getOccupations({
@@ -64,7 +64,10 @@ class OccupationRepositoryImpl implements OccupationRepository {
       if (dataObj is List) {
         list = dataObj;
       } else if (dataObj is Map<String, dynamic>) {
-        list = (dataObj['data'] ?? dataObj['occupations'] ?? []) as List? ?? [];
+        list =
+            (dataObj['data'] ?? dataObj['occupations'] ?? <dynamic>[])
+                as List? ??
+            [];
       }
 
       return list

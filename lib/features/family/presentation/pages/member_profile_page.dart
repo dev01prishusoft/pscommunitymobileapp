@@ -134,7 +134,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        member.fullName.tr,
+                        member.fullName,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

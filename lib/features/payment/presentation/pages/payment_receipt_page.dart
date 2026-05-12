@@ -2,25 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-
+import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
-class PaymentReceiptPage extends StatelessWidget {
+class PaymentReceiptPage extends StatefulWidget {
   const PaymentReceiptPage({super.key});
 
   @override
+  State<PaymentReceiptPage> createState() => _PaymentReceiptPageState();
+}
+
+class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
+  final controller = Get.find<PaymentController>();
+  late Future<Map<String, dynamic>> _receiptFuture;
+  int? _receiptId;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = Get.arguments as Map<String, dynamic>?;
+    _receiptId = args?['receiptId'] as int?;
+    if (_receiptId != null) {
+      _receiptFuture = controller.getReceipt(_receiptId!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final payment = Get.arguments as Map<String, dynamic>?;
-    final receiptNo = (payment?['receiptNo'] ?? 'N/A').toString();
-    final date = (payment?['date'] ?? 'N/A').toString();
-    final name = (payment?['name'] ?? 'N/A').toString();
-    final memberNo = (payment?['memberNo'] ?? 'N/A').toString();
-    final type = (payment?['type'] ?? 'N/A').toString();
-    final category = (payment?['category'] ?? 'N/A').toString();
-    final amount = (payment?['amount'] ?? 'N/A').toString();
-    final mode = (payment?['mode'] ?? 'N/A').toString();
-    final status = (payment?['status'] ?? 'N/A').toString();
-    final txnId = (payment?['transactionId'] ?? 'N/A').toString();
+    if (_receiptId == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(LK.paymentReceipt.tr)),
+        body: const Center(child: Text('Invalid Receipt ID')),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -29,7 +46,7 @@ class PaymentReceiptPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.paymentReceipt.tr,
@@ -40,112 +57,124 @@ class PaymentReceiptPage extends StatelessWidget {
         ),
         centerTitle: false,
         actions: [
-          TextButton.icon(
-            onPressed: () {
-              SharePlus.instance.share(ShareParams(text: 'Check out my payment receipt for ${LK.samajName.tr}'));
-            },
-            icon: const Icon(Icons.share, size: 18),
-            label: Text(LK.share.tr),
-            style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+          IconButton(
+            onPressed: () => _shareReceipt(),
+            icon: const Icon(Icons.share, color: AppColors.primary),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            // Header Info
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-              decoration: BoxDecoration(
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _receiptFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: Text('No data found'));
+          }
+
+          final data = snapshot.data!;
+          return _buildContent(data);
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(Map<String, dynamic> data) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          // Header Info
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.account_balance, size: 60, color: Color(0xFF002B5B)),
+                const SizedBox(height: 16),
+                Text(
+                  LK.samajName.tr,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  LK.officialPaymentReceipt.tr,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.mutedForeground,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Details Sections
+          _buildReceiptSection(
+            LK.receiptDetailsLabel.tr,
+            [
+              _buildInfoRow(LK.receiptNoLabel.tr, data['receiptNo']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.dateLabel.tr, data['date']?.toString() ?? 'N/A'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildReceiptSection(
+            LK.memberDetailsLabel.tr,
+            [
+              _buildInfoRow(LK.nameLabel.tr, data['name']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.memberNoLabel.tr, data['memberNo']?.toString() ?? 'N/A'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildReceiptSection(
+            LK.paymentDetailsLabel.tr,
+            [
+              _buildInfoRow(LK.typeLabel.tr, data['type']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.categoryLabel.tr, data['category']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.amountLabel.tr, data['amount']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.modeLabel.tr, data['mode']?.toString() ?? 'N/A'),
+              _buildStatusRow(LK.statusLabel.tr, data['status']?.toString() ?? 'N/A'),
+              _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']?.toString() ?? 'N/A'),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Download PDF Button
+          ElevatedButton.icon(
+            onPressed: () => _generateAndPrintPdf(data),
+            icon: const Icon(Icons.file_download, color: Colors.white),
+            label: Text(
+              LK.downloadPdf.tr,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Column(
-                children: [
-                  const Icon(Icons.account_balance, size: 60, color: Color(0xFF002B5B)),
-                  const SizedBox(height: 16),
-                  Text(
-                    LK.samajName.tr,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    LK.officialPaymentReceipt.tr,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.mutedForeground,
-                    ),
-                  ),
-                ],
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Details Sections
-            _buildReceiptSection(
-              LK.receiptDetailsLabel.tr,
-              [
-                _buildInfoRow(LK.receiptNoLabel.tr, receiptNo),
-                _buildInfoRow(LK.dateLabel.tr, date),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildReceiptSection(
-              LK.memberDetailsLabel.tr,
-              [
-                _buildInfoRow(LK.nameLabel.tr, name),
-                _buildInfoRow(LK.memberNoLabel.tr, memberNo),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildReceiptSection(
-              LK.paymentDetailsLabel.tr,
-              [
-                _buildInfoRow(LK.typeLabel.tr, type),
-                _buildInfoRow(LK.categoryLabel.tr, category),
-                _buildInfoRow(LK.amountLabel.tr, amount),
-                _buildInfoRow(LK.modeLabel.tr, mode),
-                _buildStatusRow(LK.statusLabel.tr, status),
-                _buildInfoRow(LK.transactionIdLabel.tr, txnId),
-              ],
-            ),
-            const SizedBox(height: 32),
-
-            // Download PDF Button
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(LK.comingSoon.tr)),
-                );
-              },
-              icon: const Icon(Icons.file_download, color: Colors.white),
-              label: Text(
-                LK.downloadPdf.tr,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 56),
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
+              elevation: 0,
             ),
-            const SizedBox(height: 40),
-          ],
-        ),
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -232,8 +261,8 @@ class PaymentReceiptPage extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: Colors.green,
+              style: TextStyle(
+                color: value.toLowerCase() == 'success' ? Colors.green : Colors.orange,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -242,5 +271,47 @@ class PaymentReceiptPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _shareReceipt() {
+     Share.share('Official Receipt from ${LK.samajName.tr}');
+  }
+
+  Future<void> _generateAndPrintPdf(Map<String, dynamic> data) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Header(
+                level: 0,
+                child: pw.Text(LK.samajName.tr, style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Text('${LK.receiptNoLabel.tr} ${data['receiptNo']}'),
+              pw.Text('${LK.dateLabel.tr} ${data['date']}'),
+              pw.Divider(),
+              pw.Text('${LK.nameLabel.tr} ${data['name']}'),
+              pw.Text('${LK.memberNoLabel.tr} ${data['memberNo']}'),
+              pw.Divider(),
+              pw.Text('${LK.typeLabel.tr} ${data['type']}'),
+              pw.Text('${LK.categoryLabel.tr} ${data['category']}'),
+              pw.Text('${LK.amountLabel.tr} ${data['amount']}'),
+              pw.Text('${LK.modeLabel.tr} ${data['mode']}'),
+              pw.Text('${LK.statusLabel.tr} ${data['status']}'),
+              pw.Text('${LK.transactionIdLabel.tr} ${data['transactionId']}'),
+              pw.SizedBox(height: 40),
+              pw.Text('Thank you for your payment!', style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
   }
 }

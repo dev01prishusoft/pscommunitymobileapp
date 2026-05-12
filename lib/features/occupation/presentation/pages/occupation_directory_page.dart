@@ -205,7 +205,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
-                occ.name.tr,
+                occ.name,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12,

@@ -21,6 +21,7 @@ class LK {
   static const String passwordsDoNotMatch = 'Passwords do not match';
   
   // Errors
+  static const String error = 'Error';
   static const String errorServer = 'Server Error';
   static const String errorNoInternet = 'No Internet Connection';
   static const String errorUnauthorized = 'Unauthorized';
@@ -203,6 +204,7 @@ class LK {
   static const String allCategories = 'All Categories';
   static const String yearLabel = 'Year:';
   static const String all = 'All';
+  static const String receipt = 'Receipt';
   static const String receiptLabel = 'Receipt';
   static const String makePaymentLabel = 'Make Payment';
   static const String paymentTypeHeader = 'PAYMENT TYPE';
@@ -274,6 +276,18 @@ class LK {
   static const String twitterX = 'Twitter / X';
   static const String businessInfo = 'Business Information';
   
+  // Payment Hub
+  static const String payments = 'Payments';
+  static const String dueSummary = 'DUE SUMMARY';
+  static const String totalDue = 'Total Due:';
+  static const String payAll = 'Pay All';
+  static const String requestedPayments = 'REQUESTED PAYMENTS';
+  static const String requestedPaymentsPaid = 'REQUESTED PAYMENTS PAID';
+  static const String adminSent = 'Admin Sent';
+  static const String payNowButton = 'Pay Now';
+  static const String dueLabel = 'Due:';
+  static const String paidLabel = 'Paid:';
+  
   // Marriage specific
   static const String ageColon = 'Age:';
   static const String heightColon = 'Height:';
@@ -289,7 +303,7 @@ class LK {
     appTitle, welcome, welcomesYou, signIn, welcomeBack, loginSubtitle,
     mobileNumber, mobileHint, password, passwordHint, forgotPassword, adminWarning,
     resetPassword, newPassword, confirmNewPassword, updatePassword, passwordsDoNotMatch,
-    errorServer, errorNoInternet, errorUnauthorized, errorTimeout, errorCertificatePinning,
+    error, errorServer, errorNoInternet, errorUnauthorized, errorTimeout, errorCertificatePinning,
     errorValidation, invalidCredentials, pleaseEnterMobile, pleaseEnterValidMobile, pleaseEnterPassword,
     family, findMember, committee, payment, contactUs, matrimonial,
     support, share, samajInfo, unmarriedMale, unmarriedFemale,
@@ -315,7 +329,7 @@ class LK {
     dateLabel, memberDetailsLabel, memberNoLabel, paymentDetailsLabel,
     typeLabel, categoryLabel, amountLabel, modeLabel, statusLabel,
     transactionIdLabel, downloadPdf, comingSoon, paymentTypeLabel,
-    allTypes, allCategories, yearLabel, all, receiptLabel, makePayment,
+    allTypes, allCategories, yearLabel, all, receipt, receiptLabel, makePayment,
     paymentTypeHeader, selectPaymentType, categoryHeader, selectCategory,
     amountHeader, payNow, occupationDirectory, searchOccupation,
     occupationColon, any, yes, no, minAmountLabel, maxAmountLabel,
@@ -333,6 +347,7 @@ class LK {
     youthActivitiesAndEvents, shreePatelEducationTrust, educationalScholarships,
     searchByMobileHint, familyHead, memberCount, sinceColon, reportsToColon,
     birthTime, motherFatherName, occupationArea, ownHouse, ownLand, twoWheeler, fourWheeler, twitterX,
-    businessInfo
+    businessInfo, payments, dueSummary, totalDue, payAll, requestedPayments, requestedPaymentsPaid,
+    adminSent, payNowButton, dueLabel, paidLabel
   ];
 }

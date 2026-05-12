@@ -608,7 +608,7 @@ class _MarriagePageState extends State<MarriagePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    member.name.tr,
+                    member.name,
                     style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

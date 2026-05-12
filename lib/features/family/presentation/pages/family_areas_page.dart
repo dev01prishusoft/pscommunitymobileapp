@@ -265,7 +265,7 @@ class _AreasList extends StatelessWidget {
                 AppRouter.familyMembers,
                 arguments: {
                   'areaId': area.id,
-                  'areaName': '${area.location.tr} (${area.title.tr})',
+                  'areaName': '${area.location} (${area.title})',
                   'membersCount': area.members,
                   'familiesCount': area.families,
                 },
@@ -280,7 +280,7 @@ class _AreasList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${area.title.tr} (${area.location.tr})',
+                          '${area.title} (${area.location})',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,

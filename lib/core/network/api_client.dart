@@ -73,7 +73,9 @@ class ApiClient {
   Future<void> _checkConnectivity() async {
     final hasConnection = await _connectivity.hasConnection();
     if (kDebugMode && !hasConnection) {
-      print('CONNECTIVITY CHECK: No internet detected by connectivity_plus');
+      if (kDebugMode) {
+        print('CONNECTIVITY CHECK: No internet detected by connectivity_plus');
+      }
     }
     if (!hasConnection) {
       throw const NetworkFailure();

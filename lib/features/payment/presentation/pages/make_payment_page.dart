@@ -2,12 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 
-class MakePaymentPage extends StatelessWidget {
+class MakePaymentPage extends GetView<PaymentController> {
   const MakePaymentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController amountController = TextEditingController();
+    
+    // Listen to enteredAmount changes to update the text field
+    ever(controller.enteredAmount, (double val) {
+      if (val > 0) {
+        amountController.text = val.toStringAsFixed(0);
+      } else {
+        amountController.clear();
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -15,7 +29,7 @@ class MakePaymentPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.makePaymentLabel.tr,
@@ -32,12 +46,25 @@ class MakePaymentPage extends StatelessWidget {
           children: [
             // Payment Type Section
             _buildSectionHeader(LK.paymentTypeHeader.tr),
-            _buildDropdownField(LK.selectPaymentType.tr),
+            Obx(() => _buildDropdownField<PaymentType>(
+              hint: LK.selectPaymentType.tr,
+              value: controller.selectedType.value,
+              items: controller.paymentTypes,
+              onChanged: (type) => controller.onTypeChanged(type),
+              itemLabel: (type) => type.name,
+            )),
             const SizedBox(height: 24),
 
             // Category Section
             _buildSectionHeader(LK.categoryHeader.tr),
-            _buildDropdownField(LK.selectCategory.tr),
+            Obx(() => _buildDropdownField<PaymentCategory>(
+              hint: LK.selectCategory.tr,
+              value: controller.selectedCategory.value,
+              items: controller.categories,
+              onChanged: (cat) => controller.onCategoryChanged(cat),
+              itemLabel: (cat) => cat.name,
+              isEnabled: controller.selectedType.value != null,
+            )),
             const SizedBox(height: 24),
 
             // Amount Section
@@ -71,15 +98,17 @@ class MakePaymentPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: TextField(
+                          controller: amountController,
                           keyboardType: TextInputType.number,
-                          style: TextStyle(
+                          onChanged: (val) => controller.enteredAmount.value = double.tryParse(val) ?? 0,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: AppColors.secondary,
                           ),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: '0',
                           ),
@@ -115,8 +144,10 @@ class MakePaymentPage extends StatelessWidget {
             const SizedBox(height: 40),
 
             // Pay Now Button
-            ElevatedButton(
-              onPressed: () {},
+            Obx(() => ElevatedButton(
+              onPressed: controller.isProcessingPayment.value 
+                  ? null 
+                  : () => controller.initiatePayment(),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
                 backgroundColor: AppColors.primary,
@@ -125,16 +156,18 @@ class MakePaymentPage extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: Text(
-                LK.payNow.tr,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
+              child: controller.isProcessingPayment.value
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      LK.payNow.tr,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1,
+                      ),
+                    ),
+            )),
           ],
         ),
       ),
@@ -162,26 +195,35 @@ class MakePaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownField(String hint) {
+  Widget _buildDropdownField<T>({
+    required String hint,
+    required T? value,
+    required List<T> items,
+    required Function(T?) onChanged,
+    required String Function(T) itemLabel,
+    bool isEnabled = true,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isEnabled ? Colors.white : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            hint,
-            style: const TextStyle(
-              color: AppColors.mutedForeground,
-              fontSize: 14,
-            ),
-          ),
-          const Icon(Icons.keyboard_arrow_down, color: AppColors.secondary),
-        ],
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: value,
+          hint: Text(hint, style: const TextStyle(color: AppColors.mutedForeground, fontSize: 14)),
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.secondary),
+          items: items.map((T item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Text(itemLabel(item), style: const TextStyle(fontSize: 14)),
+            );
+          }).toList(),
+          onChanged: isEnabled ? onChanged : null,
+        ),
       ),
     );
   }

@@ -1,5 +1,33 @@
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 
 abstract class PaymentRepository {
-  Future<List<PaymentItem>> getPaymentHistory();
+  Future<PaymentDashboard> getDashboard();
+  Future<List<PaymentType>> getPaymentTypes();
+  Future<List<PaymentCategory>> getCategories(int paymentTypeId);
+  Future<RazorpayOrder> createOrder({
+    required double amount,
+    required int paymentTypeId,
+    required int paymentCategoryId,
+    int? adminPaymentRequestId,
+  });
+  Future<Map<String, dynamic>> verifyPayment({
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+    required double amount,
+    required int paymentTypeId,
+    required int paymentCategoryId,
+    int? adminPaymentRequestId,
+  });
+  Future<List<PaymentItem>> getHistory({
+    int? paymentTypeId,
+    int? categoryId,
+    int? year,
+    String? status,
+  });
+  Future<Map<String, dynamic>> getReceipt(int receiptId);
 }

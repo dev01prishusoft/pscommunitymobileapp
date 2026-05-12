@@ -198,7 +198,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                 ),
               ),
         title: Text(
-          member.name.tr,
+          member.name,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: AppColors.secondary,

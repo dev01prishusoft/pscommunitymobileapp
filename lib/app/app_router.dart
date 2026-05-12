@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/member/presentation/pages/find_mem
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/make_payment_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payment_history_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payment_receipt_page.dart';
+import 'package:pscommunitymobileapp/features/payment/presentation/pages/payments_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/samaj_profile_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/samaj_sanstha_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_details_page.dart';
@@ -36,6 +37,7 @@ class AppRouter {
   static const String makePayment = '/make-payment';
   static const String paymentHistory = '/payment-history';
   static const String paymentReceipt = '/payment-receipt';
+  static const String payments = '/payments';
   static const String samajProfile = '/samaj-profile';
   static const String samajSanstha = '/samaj-sanstha';
   static const String bankDetails = '/bank-details';
@@ -67,6 +69,7 @@ class AppRouter {
     GetPage<void>(name: makePayment, page: () => const MakePaymentPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: paymentHistory, page: () => const PaymentHistoryPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: paymentReceipt, page: () => const PaymentReceiptPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: payments, page: () => const PaymentsPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: samajProfile, page: () => const SamajProfilePage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: samajSanstha, page: () => const SamajSansthaPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: bankDetails, page: () => const BankDetailsPage(), middlewares: [AuthGuard()]),

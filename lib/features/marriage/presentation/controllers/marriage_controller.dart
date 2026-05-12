@@ -81,11 +81,64 @@ class MarriageController extends GetxController {
         _memberRepository.searchMembers(
           query: searchQuery.value,
           genderId: genderId,
+          lookingForMarriage: lookingForMarriage.value,
         ),
         _repository.getUnmarriedCounts(),
       ]);
       
-      filteredMembers.assignAll(results[0] as List<Member>);
+      List<Member> members = results[0] as List<Member>;
+
+      // Apply Local Advanced Filters
+      if (selectedAgeFrom.value != '18' || selectedAgeTo.value != '60') {
+        final minAge = int.tryParse(selectedAgeFrom.value) ?? 18;
+        final maxAge = int.tryParse(selectedAgeTo.value) ?? 60;
+        members = members
+            .where((m) => m.age >= minAge && m.age <= maxAge)
+            .toList();
+      }
+      if (selectedGotra.value != 'Any') {
+        members = members.where((m) => m.gotra == selectedGotra.value).toList();
+      }
+      if (selectedMaritalStatus.value != 'All') {
+        members = members
+            .where(
+              (m) => (m.maritalStatusName ?? '') == selectedMaritalStatus.value,
+            )
+            .toList();
+      }
+      if (selectedState.value != 'All') {
+        members = members
+            .where((m) => (m.occupationStateName ?? '') == selectedState.value)
+            .toList();
+      }
+      if (selectedDistrict.value != 'All') {
+        members = members
+            .where(
+              (m) => (m.occupationDistrictName ?? '') == selectedDistrict.value,
+            )
+            .toList();
+      }
+      if (selectedTaluka.value != 'All') {
+        members = members
+            .where(
+              (m) => (m.occupationTalukaName ?? '') == selectedTaluka.value,
+            )
+            .toList();
+      }
+      if (selectedArea.value != 'All') {
+        members = members.where((m) => m.area == selectedArea.value).toList();
+      }
+      if (selectedOccupation.value != 'Any') {
+        members = members
+            .where(
+              (m) =>
+                  (m.occupationName ?? '') == selectedOccupation.value ||
+                  (m.occupationTypeName ?? '') == selectedOccupation.value,
+            )
+            .toList();
+      }
+
+      filteredMembers.assignAll(members);
       unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
       
       state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;

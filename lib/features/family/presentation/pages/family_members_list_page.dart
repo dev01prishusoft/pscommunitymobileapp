@@ -244,7 +244,7 @@ class _MemberTile extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              member.name.tr,
+                              member.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,

@@ -25,6 +25,15 @@ class ApiEndpoints {
   static const String samajDetail = '/api/v1/member/samaj-detail';
   static const String sansthas = '/api/v1/SamajSanstha/list';
   
+  // Payments
+  static const String paymentDashboard = '/api/v1/payment/dashboard';
+  static const String paymentTypes = '/api/v1/PaymentType/dropdown';
+  static const String paymentCategories = '/api/v1/PaymentCategory/dropdown';
+  static const String createOrder = '/api/v1/payment/create-order';
+  static const String verifyPayment = '/api/v1/payment/verify';
+  static const String paymentHistory = '/api/v1/payment/history';
+  static const String paymentReceipt = '/api/v1/payment/receipt';
+
   // Dropdowns
   static const String stateDropdown = '/api/v1/state/dropdown';
   static const String districtDropdown = '/api/v1/district/dropdown';

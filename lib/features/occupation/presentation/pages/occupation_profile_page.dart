@@ -121,7 +121,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${occ.name.tr} ${LK.at.tr} ${(occ.companyName ?? LK.na.tr).tr}',
+                  '${occ.name} ${LK.at.tr} ${occ.companyName ?? LK.na.tr}',
                   style: const TextStyle(
                     fontSize: 16,
                     color: AppColors.mutedForeground,
@@ -168,9 +168,9 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 _buildDetailRow(Icons.person_outline, LK.occupationTypeLabel.tr,
                     (occ.occupationType ?? LK.na.tr).tr),
                 _buildDetailRow(Icons.business_center_outlined,
-                    LK.occupationLabel.tr, occ.name.tr),
+                    LK.occupationLabel.tr, occ.name),
                 _buildDetailRow(Icons.apartment, LK.companyNameLabel.tr,
-                    (occ.companyName ?? LK.na.tr).tr),
+                    (occ.companyName ?? LK.na.tr)),
 
                 // Expandable Address Row
                 Padding(

@@ -154,7 +154,7 @@ class HomePage extends StatelessWidget {
             context,
             icon: Icons.account_balance_wallet,
             title: LK.payment.tr,
-            onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
+            onTap: () => Get.toNamed<void>(AppRouter.payments),
           ),
           _buildMenuItem(
             context,

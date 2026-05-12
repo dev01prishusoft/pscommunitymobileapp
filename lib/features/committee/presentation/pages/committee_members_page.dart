@@ -320,7 +320,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            member.name.tr,
+                            member.name,
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -457,7 +457,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         child: Icon(Icons.person, color: AppColors.primary),
       ),
       title: Text(
-        member.name.tr,
+        member.name,
         style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary, fontSize: 15),
       ),
       subtitle: Padding(
