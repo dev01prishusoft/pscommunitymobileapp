@@ -36,7 +36,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
       ),
       body: Column(
@@ -173,7 +173,7 @@ class _CommitteeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.toNamed(
+        Get.toNamed<void>(
           AppRouter.committeeDetails,
           arguments: node,
         );
@@ -205,7 +205,7 @@ class _CommitteeTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    node.name.tr,
+                    node.name,
                     style: TextStyle(
                       fontWeight: isRoot ? FontWeight.bold : FontWeight.w600,
                       fontSize: isRoot ? 16 : 14,

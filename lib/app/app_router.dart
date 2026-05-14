@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:pscommunitymobileapp/features/auth/presentation/pages/login_page.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/pages/business_page.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/pages/home_page.dart';
@@ -57,7 +57,7 @@ class AppRouter {
   static const String occupationProfile = '/occupation-profile';
   static const String memberProfile = '/member-profile';
 
-  static final List<GetPage> pages = [
+  static final List<GetPage<dynamic>> pages = [
     // Public Routes
     GetPage<void>(name: login, page: () => const LoginPage()),
     GetPage<void>(name: resetPassword, page: () => const ResetPasswordPage()),

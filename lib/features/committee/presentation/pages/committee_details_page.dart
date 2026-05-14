@@ -322,7 +322,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
       String tag, String imageUrl) {
     return InkWell(
       onTap: () {
-        Get.toNamed(AppRouter.memberProfile, arguments: {'memberId': memberId});
+        Get.toNamed<void>(AppRouter.memberProfile, arguments: {'memberId': memberId});
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),

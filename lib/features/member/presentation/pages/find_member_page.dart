@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 
 class FindMemberPage extends StatefulWidget {
   const FindMemberPage({super.key});
@@ -209,12 +210,17 @@ class _FindMemberPageState extends State<FindMemberPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(
-              '${member.gender.tr} • ${member.age} ${LK.ageYears.tr} • ${member.occupation.tr}',
-              style: const TextStyle(
-                color: AppColors.mutedForeground,
-                fontSize: 13,
-              ),
+            Builder(
+              builder: (context) {
+                final genderKey = GenderMapper.getLabelKey(member.gender);
+                return Text(
+                  '${genderKey != null ? genderKey.tr : member.gender} • ${member.age} ${LK.ageYears.tr} • ${member.occupation}',
+                  style: const TextStyle(
+                    color: AppColors.mutedForeground,
+                    fontSize: 13,
+                  ),
+                );
+              }
             ),
             const SizedBox(height: 8),
             if (member.area.isNotEmpty)

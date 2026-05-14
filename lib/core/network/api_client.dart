@@ -50,7 +50,7 @@ class ApiClient {
     ]);
   }
 
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response<dynamic>> get(String path, {Map<String, dynamic>? queryParameters}) async {
     await _checkConnectivity();
     try {
       return await _dio.get(path, queryParameters: queryParameters);
@@ -60,7 +60,7 @@ class ApiClient {
     }
   }
 
-  Future<Response> post(String path, {dynamic data}) async {
+  Future<Response<dynamic>> post(String path, {dynamic data}) async {
     await _checkConnectivity();
     try {
       return await _dio.post(path, data: data);

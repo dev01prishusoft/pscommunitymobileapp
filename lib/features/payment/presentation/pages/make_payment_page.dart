@@ -32,7 +32,7 @@ class MakePaymentPage extends GetView<PaymentController> {
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
-          LK.makePaymentLabel.tr,
+          LK.makePayment.tr,
           style: const TextStyle(
             color: AppColors.secondary,
             fontWeight: FontWeight.bold,
@@ -199,7 +199,7 @@ class MakePaymentPage extends GetView<PaymentController> {
     required String hint,
     required T? value,
     required List<T> items,
-    required Function(T?) onChanged,
+    required void Function(T?) onChanged,
     required String Function(T) itemLabel,
     bool isEnabled = true,
   }) {

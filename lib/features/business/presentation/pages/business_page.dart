@@ -42,7 +42,7 @@ class _BusinessPageState extends State<BusinessPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -84,7 +84,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRouter.occupationDirectory),
+      onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.card,

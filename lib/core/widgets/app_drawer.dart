@@ -95,7 +95,7 @@ class AppDrawer extends StatelessWidget {
               style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
             ),
             onTap: () {
-              Get.back(); // Close drawer
+              Get.back<void>(); // Close drawer
               _showLogoutDialog(context, authState);
             },
           ),
@@ -106,7 +106,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context, AuthState authState) {
-    Get.dialog(
+    Get.dialog<void>(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(LK.logout.tr),

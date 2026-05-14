@@ -98,6 +98,9 @@ class LK {
   static const String wife = 'Wife';
   static const String married = 'Married';
   static const String unmarried = 'Unmarried';
+  static const String widow = 'Widow';
+  static const String divorced = 'Divorced';
+  static const String inactive = 'Inactive';
   static const String familiesCount = 'Families';
   static const String success = 'Success';
   static const String selectState = 'Select State';
@@ -105,7 +108,6 @@ class LK {
   static const String selectTaluka = 'Select Taluka';
   static const String noAreasFound = 'No Areas Found';
   static const String trySelectingDifferentFilters = 'Try selecting different filters';
-  static const String lookingForMarriageLabel = 'Looking for Marriage';
   
   // New keys from Audit
   static const String logout = 'Logout';
@@ -205,15 +207,12 @@ class LK {
   static const String yearLabel = 'Year:';
   static const String all = 'All';
   static const String receipt = 'Receipt';
-  static const String receiptLabel = 'Receipt';
-  static const String makePaymentLabel = 'Make Payment';
   static const String paymentTypeHeader = 'PAYMENT TYPE';
   static const String selectPaymentType = 'Select Payment Type';
   static const String categoryHeader = 'CATEGORY';
   static const String selectCategory = 'Select Category';
   static const String amountHeader = 'AMOUNT';
   static const String payNow = 'PAY NOW';
-  static const String occupationDirectoryLabel = 'Occupation Directory';
   static const String searchOccupation = 'Search occupation...';
   static const String occupationColon = 'Occupation:';
   static const String any = 'Any';
@@ -221,7 +220,6 @@ class LK {
   static const String no = 'No';
   static const String minAmountLabel = 'Min: ₹100';
   static const String maxAmountLabel = 'Max: ₹50,000';
-  static const String marriageLabel = 'Marriage';
   static const String showLabel = 'Show :';
   static const String advancedFilters = 'Advanced Filters';
   static const String ageRangeLabel = 'Age Range:';
@@ -288,6 +286,25 @@ class LK {
   static const String dueLabel = 'Due:';
   static const String paidLabel = 'Paid:';
   
+  static const String selectValidPayment = 'Please select valid type, category and amount (min ₹100)';
+  static const String paymentSuccessful = 'Payment successful';
+  static const String verificationFailed = 'Payment verification failed';
+  static const String externalWalletSelected = 'External wallet selected';
+  static const String paymentForCommunity = 'Payment for Community';
+  static const String info = 'Info';
+  static const String paymentGatewayMissing = 'Payment gateway configuration missing.';
+  static const String paymentFailed = 'Payment failed';
+  static const String pending = 'Pending';
+  static const String failed = 'Failed';
+  
+  // Roles
+  static const String rolePresident = 'President';
+  static const String roleVicePresident = 'Vice President';
+  static const String roleSecretary = 'Secretary';
+  static const String roleJointSecretary = 'Joint Secretary';
+  static const String roleTreasurer = 'Treasurer';
+  static const String roleCommitteeMember = 'Committee Member';
+  
   // Marriage specific
   static const String ageColon = 'Age:';
   static const String heightColon = 'Height:';
@@ -329,7 +346,7 @@ class LK {
     dateLabel, memberDetailsLabel, memberNoLabel, paymentDetailsLabel,
     typeLabel, categoryLabel, amountLabel, modeLabel, statusLabel,
     transactionIdLabel, downloadPdf, comingSoon, paymentTypeLabel,
-    allTypes, allCategories, yearLabel, all, receipt, receiptLabel, makePayment,
+    allTypes, allCategories, yearLabel, all, receipt, makePayment,
     paymentTypeHeader, selectPaymentType, categoryHeader, selectCategory,
     amountHeader, payNow, occupationDirectory, searchOccupation,
     occupationColon, any, yes, no, minAmountLabel, maxAmountLabel,
@@ -343,11 +360,15 @@ class LK {
     committeeMembers, role, memberDetails, startDateLabel, endDateLabel, viewProfile,
     ageColon, heightColon, weightColon, bloodGroupColon, birthDateColon, incomeColon, ageYears,
     selectState, selectDistrict, selectTaluka, noAreasFound, trySelectingDifferentFilters,
+    widow, divorced, inactive, pending, failed,
     shreePatelSevaSamaj, socialWelfareOrganization, active, shreePatelYuvaMandal,
     youthActivitiesAndEvents, shreePatelEducationTrust, educationalScholarships,
     searchByMobileHint, familyHead, memberCount, sinceColon, reportsToColon,
     birthTime, motherFatherName, occupationArea, ownHouse, ownLand, twoWheeler, fourWheeler, twitterX,
     businessInfo, payments, dueSummary, totalDue, payAll, requestedPayments, requestedPaymentsPaid,
-    adminSent, payNowButton, dueLabel, paidLabel
+    adminSent, payNowButton, dueLabel, paidLabel, selectValidPayment, paymentSuccessful,
+    verificationFailed, externalWalletSelected, paymentForCommunity, info,
+    paymentGatewayMissing, paymentFailed, rolePresident, roleVicePresident,
+    roleSecretary, roleJointSecretary, roleTreasurer, roleCommitteeMember
   ];
 }

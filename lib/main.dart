@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pscommunitymobileapp/app/app.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/di/di.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_validator.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/widgets/fatal_error_screen.dart';
 
@@ -13,11 +15,19 @@ void main() async {
     // Orientation Lock
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-    // Load Environment Variables
-    await dotenv.load(fileName: ".env");
+    // Load Environment Variables gracefully
+    try {
+      await dotenv.load(fileName: ".env");
+    } catch (e) {
+      AppLogger.w('No .env file found. Proceeding without local secrets.');
+    }
 
     // Bootstrap DI (hydrates tokens, locale, config)
     await DI.bootstrap();
+
+    if (kDebugMode) {
+      await LocalizationValidator.validate();
+    }
 
     runApp(const PsCommunityApp());
   } catch (e, stack) {

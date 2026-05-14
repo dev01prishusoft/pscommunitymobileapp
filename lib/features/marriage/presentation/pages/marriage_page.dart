@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
+import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 
 class MarriagePage extends StatefulWidget {
   const MarriagePage({super.key});
@@ -48,7 +50,7 @@ class _MarriagePageState extends State<MarriagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(LK.marriageLabel.tr),
+        title: Text(LK.marriage.tr),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
@@ -149,8 +151,13 @@ class _MarriagePageState extends State<MarriagePage> {
                                 items: ['All', 'Male', 'Female']
                                     .map((e) => DropdownMenuItem(
                                           value: e,
-                                          child: Text(e.tr,
-                                              style: const TextStyle(fontSize: 11)),
+                                          child: Builder(
+                                            builder: (context) {
+                                              if (e == 'All') return Text(LK.all.tr, style: const TextStyle(fontSize: 11));
+                                              final key = GenderMapper.getLabelKey(e);
+                                              return Text(key != null ? key.tr : e, style: const TextStyle(fontSize: 11));
+                                            }
+                                          ),
                                         ))
                                     .toList(),
                                 onChanged: (val) {
@@ -369,6 +376,11 @@ class _MarriagePageState extends State<MarriagePage> {
                                 child: _buildDropdownField(
                                   value: _controller.selectedMaritalStatus.value,
                                   items: _maritalStatuses,
+                                  mapper: (val) {
+                                    if (val == 'All') return LK.all.tr;
+                                    final key = MaritalStatusMapper.getLabelKey(val);
+                                    return key != null ? key.tr : val;
+                                  },
                                   onChanged: (val) => _controller.selectedMaritalStatus.value = val!,
                                 ),
                               ),
@@ -616,7 +628,7 @@ class _MarriagePageState extends State<MarriagePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${member.age} ${LK.ageYears.tr} | ${member.occupation.tr} | ${member.gotra.tr}',
+                    '${member.age} ${LK.ageYears.tr} | ${member.occupation} | ${member.gotra}',
                     style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
                   ),
                   const SizedBox(height: 4),
@@ -716,7 +728,8 @@ class _MarriagePageState extends State<MarriagePage> {
   Widget _buildDropdownField({
     required String value,
     required List<String> items,
-    required Function(String?) onChanged,
+    required void Function(String?) onChanged,
+    String Function(String)? mapper,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -733,10 +746,12 @@ class _MarriagePageState extends State<MarriagePage> {
           style: const TextStyle(fontSize: 12, color: AppColors.foreground),
           icon: const Icon(Icons.arrow_drop_down, size: 20),
           items: items
-              .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e.tr),
-                  ))
+              .map((e) {
+                return DropdownMenuItem(
+                  value: e,
+                  child: Text(mapper != null ? mapper(e) : e),
+                );
+              })
               .toList(),
           onChanged: onChanged,
         ),

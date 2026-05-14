@@ -37,7 +37,7 @@ class RetryInterceptor extends Interceptor {
     final random = Random();
     final jitter = Duration(milliseconds: random.nextInt(1000));
     
-    await Future.delayed(delay + jitter);
+    await Future<void>.delayed(delay + jitter);
 
     try {
       final response = await dio.fetch<dynamic>(options);

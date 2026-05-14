@@ -45,7 +45,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          LK.occupationDirectoryLabel.tr,
+          LK.occupationDirectory.tr,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
@@ -100,7 +100,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                           Text(LK.occupationColon.tr,
                               style: const TextStyle(color: AppColors.mutedForeground)),
                           const SizedBox(width: 4),
-                          Text(type.text.tr,
+                          Text(type.text,
                               style: const TextStyle(fontWeight: FontWeight.bold)),
                         ],
                       ),

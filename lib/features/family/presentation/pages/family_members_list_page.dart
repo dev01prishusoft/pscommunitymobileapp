@@ -6,6 +6,9 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
+import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
+import 'package:pscommunitymobileapp/core/mappers/relation_mapper.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
   const FamilyMembersListPage({super.key});
@@ -165,7 +168,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Text(
-                                  family.familyName.tr,
+                                  family.familyName,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -211,7 +214,7 @@ class _MemberTile extends StatelessWidget {
         if (showDivider)
           const Divider(indent: 70, endIndent: 16),
         InkWell(
-          onTap: () => Get.toNamed(
+          onTap: () => Get.toNamed<void>(
             AppRouter.memberProfile,
             arguments: {'memberId': int.tryParse(member.id) ?? 0},
           ),
@@ -274,9 +277,17 @@ class _MemberTile extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '${member.gender.tr}  •  ${member.relation.tr}  •  ${member.maritalStatus.tr}  •  ${member.occupation.tr}',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      Builder(
+                        builder: (context) {
+                          final genderKey = GenderMapper.getLabelKey(member.gender);
+                          final relKey = RelationMapper.getLabelKey(member.relation);
+                          final statusKey = MaritalStatusMapper.getLabelKey(member.maritalStatus);
+                          
+                          return Text(
+                            '${genderKey != null ? genderKey.tr : member.gender}  •  ${relKey != null ? relKey.tr : member.relation}  •  ${statusKey != null ? statusKey.tr : member.maritalStatus}  •  ${member.occupation}',
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                          );
+                        }
                       ),
                     ],
                   ),

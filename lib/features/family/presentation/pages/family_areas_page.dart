@@ -50,7 +50,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
         centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.secondary),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.family.tr,
@@ -261,7 +261,7 @@ class _AreasList extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: () {
-              Get.toNamed(
+              Get.toNamed<void>(
                 AppRouter.familyMembers,
                 arguments: {
                   'areaId': area.id,
@@ -380,7 +380,7 @@ class _CustomDropdown extends StatefulWidget {
   final String hint;
   final DropdownItem? value;
   final List<DropdownItem> options;
-  final Function(DropdownItem?) onChanged;
+  final void Function(DropdownItem?) onChanged;
   final bool isEnabled;
   final bool isLoading;
 

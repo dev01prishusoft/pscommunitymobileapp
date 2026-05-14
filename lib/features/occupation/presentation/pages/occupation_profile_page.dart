@@ -112,7 +112,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  (occ.memberName ?? LK.na.tr).tr,
+                  occ.memberName ?? LK.na.tr,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -166,7 +166,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   child: Divider(),
                 ),
                 _buildDetailRow(Icons.person_outline, LK.occupationTypeLabel.tr,
-                    (occ.occupationType ?? LK.na.tr).tr),
+                    occ.occupationType ?? LK.na.tr),
                 _buildDetailRow(Icons.business_center_outlined,
                     LK.occupationLabel.tr, occ.name),
                 _buildDetailRow(Icons.apartment, LK.companyNameLabel.tr,
@@ -281,7 +281,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
   }
 
   void _showAddressPopup(String address) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

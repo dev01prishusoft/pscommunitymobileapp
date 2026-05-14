@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (tokens != null) {
       if (tokens.isDefaultPassword) {
-        Get.offNamed(AppRouter.resetPassword);
+        Get.offNamed<void>(AppRouter.resetPassword);
       } else {
         Get.offNamed<void>(AppRouter.postLoginSplash);
       }

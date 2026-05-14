@@ -7,7 +7,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class MemberProfilePage extends StatefulWidget {
   const MemberProfilePage({super.key});
@@ -163,7 +162,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                             const Icon(Icons.workspace_premium, size: 14, color: AppColors.primary),
                             const SizedBox(width: 4),
                             Text(
-                              (member.jobPositionName ?? 'Member').tr,
+                              member.jobPositionName ?? 'Member',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.primary,
@@ -225,17 +224,17 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   _buildGridItem(
                     Icons.person_outline,
                     LK.motherFatherName.tr,
-                    (member.motherFatherName ?? LK.na).tr,
+                    member.motherFatherName ?? LK.na,
                   ),
                   _buildGridItem(
                     Icons.work_outline,
                     LK.occupationLabel.tr,
-                    (member.occupationName ?? member.occupationTypeName ?? LK.na).tr,
+                    member.occupationName ?? member.occupationTypeName ?? LK.na,
                   ),
                   _buildGridItem(
                     Icons.location_on_outlined,
                     LK.occupationArea.tr,
-                    (member.occupationAreaName ?? LK.na).tr,
+                    member.occupationAreaName ?? LK.na,
                   ),
                   _buildGridItem(
                     Icons.favorite_border,
@@ -254,7 +253,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     member.emergencyContactNo ?? LK.na,
                     onTap: member.emergencyContactNo != null ? () => _launchUrl('tel:${member.emergencyContactNo}') : null,
                   ),
-                  _buildGridItem(Icons.opacity, LK.gotraLabel.tr, (member.gotraName ?? LK.na).tr),
+                  _buildGridItem(Icons.opacity, LK.gotraLabel.tr, member.gotraName ?? LK.na),
                   _buildGridItem(Icons.mail_outline, LK.email.tr, member.emailAddress ?? LK.na),
                 ];
                 return items[index];
@@ -284,7 +283,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                addr.addressTypeName.tr,
+                                addr.addressTypeName,
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,

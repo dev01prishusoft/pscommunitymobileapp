@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
@@ -18,7 +19,9 @@ import 'package:pscommunitymobileapp/features/committee/data/committee_repositor
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/occupation/data/occupation_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/features/payment/data/payment_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/payment/data/mocks/mock_payment_repository.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/family/data/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
@@ -83,7 +86,10 @@ class DI {
     Get.put(OccupationController(occupationRepository), permanent: true);
 
     // 11. Payment Feature
-    final paymentRepository = PaymentRepositoryImpl(apiClient);
+    final PaymentRepository paymentRepository = 
+        kDebugMode && AppEnvironment.I.flavor == Flavor.dev
+            ? MockPaymentRepository()
+            : PaymentRepositoryImpl(apiClient);
     Get.put(PaymentController(paymentRepository), permanent: true);
 
     // 12. Family Feature

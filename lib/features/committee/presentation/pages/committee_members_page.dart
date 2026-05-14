@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/committee/presentation/controllers
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -175,11 +176,16 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label.replaceAll(':', ''), style: const TextStyle(color: AppColors.mutedForeground, fontSize: 11)),
-                  Text(
-                    val.tr,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Builder(
+                    builder: (context) {
+                      final valKey = RoleMapper.getLabelKey(val);
+                      return Text(
+                        valKey != null ? valKey.tr : val,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    }
                   ),
                 ],
               ),
@@ -221,7 +227,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   const Icon(Icons.group, color: AppColors.primary, size: 20),
                   const SizedBox(width: 12),
                   Text(
-                    '${role.toUpperCase().tr} (${members.length})',
+                    '${role.toUpperCase()} (${members.length})',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -329,7 +335,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${member.roleName.tr} (${member.roleTypeName.tr})',
+                            '${member.roleName} (${member.roleTypeName})',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -377,8 +383,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             padding: EdgeInsets.symmetric(vertical: 12.0),
                             child: Divider(),
                           ),
-                          _buildDetailRow(LK.nameLabel.tr, (controller.committeeDetail.value?.name ?? '--').tr),
-                          _buildDetailRow(LK.role.tr, member.roleName.tr),
+                          _buildDetailRow(LK.nameLabel.tr, controller.committeeDetail.value?.name ?? '--'),
+                          _buildDetailRow(LK.role.tr, member.roleName),
                           _buildDetailRow(LK.startDateLabel.tr, member.startDate?.split('T').first ?? '--'),
                           if (member.endDate != null)
                             _buildDetailRow(LK.endDateLabel.tr, member.endDate!.split('T').first),
@@ -393,8 +399,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               padding: const EdgeInsets.all(20.0),
               child: ElevatedButton(
                 onPressed: () {
-                  Get.back();
-                  Get.toNamed(
+                  Get.back<void>();
+                  Get.toNamed<void>(
                     AppRouter.memberProfile,
                     arguments: {'memberId': member.memberId},
                   );
@@ -462,9 +468,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       ),
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 4.0),
-        child: Text(
-          '${LK.role.tr}: ${member.roleName.tr} (${member.roleTypeName.tr})',
-          style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
+        child: Builder(
+          builder: (context) {
+            final nameKey = RoleMapper.getLabelKey(member.roleName);
+            final typeKey = RoleMapper.getLabelKey(member.roleTypeName);
+            return Text(
+              '${LK.role.tr}: ${nameKey != null ? nameKey.tr : member.roleName} (${typeKey != null ? typeKey.tr : member.roleTypeName})',
+              style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground),
+            );
+          }
         ),
       ),
       trailing: const Icon(Icons.keyboard_arrow_right, color: AppColors.mutedForeground),

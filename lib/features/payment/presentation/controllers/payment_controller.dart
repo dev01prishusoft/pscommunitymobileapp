@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -8,7 +9,7 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_ty
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:flutter/material.dart';
 
@@ -116,7 +117,7 @@ class PaymentController extends GetxController {
     }
 
     if (typeId == null || categoryId == null || amount < 100) {
-      Get.snackbar(LK.error.tr, 'Please select valid type, category and amount (min ₹100)');
+      Get.snackbar(LK.error.tr, LK.selectValidPayment.tr);
       return;
     }
 
@@ -131,12 +132,20 @@ class PaymentController extends GetxController {
         adminPaymentRequestId: adminPaymentRequestId,
       );
 
+      const envKey = String.fromEnvironment('RAZORPAY_KEY');
+      final key = envKey.isNotEmpty ? envKey : order.keyId;
+      if (key.isEmpty) {
+        Get.snackbar(LK.error.tr, LK.paymentGatewayMissing.tr);
+        isProcessingPayment.value = false;
+        return;
+      }
+
       final options = {
-        'key': dotenv.env['RAZORPAY_KEY'] ?? order.keyId,
+        'key': key,
         'amount': order.amountInPaise,
         'name': LK.samajName.tr,
         'order_id': order.orderId,
-        'description': 'Payment for Community',
+        'description': LK.paymentForCommunity.tr,
         'timeout': 300, // in seconds
         'prefill': {
           'contact': '', // Add user contact if available
@@ -148,7 +157,8 @@ class PaymentController extends GetxController {
       _razorpay.open(options);
     } catch (e) {
       AppLogger.e('Failed to initiate payment', e);
-      Get.snackbar(LK.error.tr, e.toString());
+      final errorMessage = e.toString();
+      Get.snackbar(LK.error.tr, errorMessage.isNotEmpty ? errorMessage : LK.paymentFailed.tr);
     } finally {
       isProcessingPayment.value = false;
     }
@@ -158,10 +168,10 @@ class PaymentController extends GetxController {
     AppLogger.i('Payment Success: ${response.paymentId}');
     
     try {
-      Get.dialog<void>(
+      unawaited(Get.dialog<void>(
         const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
-      );
+      ));
       
       final result = await _repository.verifyPayment(
         razorpayOrderId: response.orderId!,
@@ -177,28 +187,28 @@ class PaymentController extends GetxController {
       
       final receiptId = result['receiptId'] as int?;
       
-      loadDashboard(); // Refresh
+      await loadDashboard(); // Refresh
       
       if (receiptId != null) {
-        Get.toNamed(AppRouter.paymentReceipt, arguments: {'receiptId': receiptId});
+        unawaited(Get.toNamed<void>(AppRouter.paymentReceipt, arguments: {'receiptId': receiptId}));
       } else {
         Get.back<void>(); // Back from make payment
-        Get.snackbar(LK.success.tr, 'Payment successful');
+        Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back<void>(); // Close loading
-      Get.snackbar(LK.error.tr, 'Verification failed: $e');
+      Get.snackbar(LK.error.tr, LK.verificationFailed.tr);
     }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     AppLogger.e('Payment Error: ${response.code} - ${response.message}');
-    Get.snackbar(LK.error.tr, response.message ?? 'Payment failed');
+    Get.snackbar(LK.error.tr, response.message ?? LK.paymentFailed.tr);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     AppLogger.i('External Wallet: ${response.walletName}');
-    Get.snackbar('Info', 'External wallet ${response.walletName} selected');
+    Get.snackbar(LK.info.tr, LK.externalWalletSelected.tr);
   }
 
   Future<void> loadHistory({

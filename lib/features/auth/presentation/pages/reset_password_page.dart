@@ -23,7 +23,7 @@ class ResetPasswordPage extends StatelessWidget {
 
     Future<void> submit() async {
       if (kUiReviewMode) {
-        Get.offNamed(AppRouter.postLoginSplash);
+        Get.offNamed<void>(AppRouter.postLoginSplash);
         return;
       }
 
@@ -42,7 +42,7 @@ class ResetPasswordPage extends StatelessWidget {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        Get.offNamed(AppRouter.postLoginSplash);
+        Get.offNamed<void>(AppRouter.postLoginSplash);
       } else if (controller.error.value != null) {
         Get.snackbar(
           LK.errorServer.tr,
@@ -60,7 +60,7 @@ class ResetPasswordPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.secondary),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back<void>(),
         ),
       ),
       body: AppGradientBackground(

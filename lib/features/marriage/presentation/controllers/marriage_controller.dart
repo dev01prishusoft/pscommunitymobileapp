@@ -44,7 +44,7 @@ class MarriageController extends GetxController {
   void onInit() {
     super.onInit();
     // Debounce search and filter changes to avoid excessive API calls
-    final List<RxInterface> filterObservables = [
+    final List<RxInterface<dynamic>> filterObservables = [
       searchQuery,
       selectedGender,
       lookingForMarriage,

@@ -109,5 +109,35 @@ void main() {
         );
       }
     });
+
+    const paymentStatusValues = ['All', 'Success', 'Pending', 'Failed'];
+
+    test('all payment statuses exist in en_US.json', () {
+      final file = File('assets/locales/en_US.json');
+      final content = file.readAsStringSync();
+      final Map<String, dynamic> translations = json.decode(content) as Map<String, dynamic>;
+
+      for (final val in paymentStatusValues) {
+        expect(
+          translations.containsKey(val), 
+          isTrue, 
+          reason: 'Payment status "$val" is missing from en_US.json'
+        );
+      }
+    });
+
+    test('all payment statuses exist in gu_IN.json', () {
+      final file = File('assets/locales/gu_IN.json');
+      final content = file.readAsStringSync();
+      final Map<String, dynamic> translations = json.decode(content) as Map<String, dynamic>;
+
+      for (final val in paymentStatusValues) {
+        expect(
+          translations.containsKey(val), 
+          isTrue, 
+          reason: 'Payment status "$val" is missing from gu_IN.json'
+        );
+      }
+    });
   });
 }

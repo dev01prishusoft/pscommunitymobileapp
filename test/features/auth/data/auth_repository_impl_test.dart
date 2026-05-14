@@ -5,10 +5,10 @@ import 'package:dio/dio.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class MockApiClient implements ApiClient {
-  Response? mockResponse;
+  Response<dynamic>? mockResponse;
   
   @override
-  Future<Response> post(String path, {data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response<dynamic>> post(String path, {data, Map<String, dynamic>? queryParameters, Options? options}) async {
     return mockResponse!;
   }
   
@@ -26,7 +26,7 @@ void main() {
   });
 
   test('login success path returns AuthTokens', () async {
-    mockApiClient.mockResponse = Response(
+    mockApiClient.mockResponse = Response<dynamic>(
       requestOptions: RequestOptions(path: ''),
       data: {
         'succeeded': true,
@@ -45,7 +45,7 @@ void main() {
   });
 
   test('login throws ServerFailure when succeeded: false', () async {
-    mockApiClient.mockResponse = Response(
+    mockApiClient.mockResponse = Response<dynamic>(
       requestOptions: RequestOptions(path: ''),
       data: {
         'succeeded': false,
@@ -60,7 +60,7 @@ void main() {
   });
 
   test('login throws ServerFailure when tokens are missing', () async {
-    mockApiClient.mockResponse = Response(
+    mockApiClient.mockResponse = Response<dynamic>(
       requestOptions: RequestOptions(path: ''),
       data: {
         'succeeded': true,
