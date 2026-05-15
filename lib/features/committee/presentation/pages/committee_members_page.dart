@@ -22,6 +22,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   String _selectedRole = 'All';
   String _searchQuery = '';
   final Map<String, bool> _expandedGroups = {};
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -31,6 +33,16 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         controller.committeeDetail.value?.name != node.name) {
       controller.loadCommitteeDetail(node.id);
     }
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   List<String> _getRoles(List<CommitteeMember> members) {
@@ -91,7 +103,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           child: Column(
             children: [
               TextField(
-                onChanged: (val) => setState(() => _searchQuery = val),
+                controller: _searchController,
+                focusNode: _focusNode,
+                onTapOutside: (event) => _focusNode.unfocus(),
                 decoration: InputDecoration(
                   hintText: LK.searchCommittees.tr,
                   prefixIcon: const Icon(Icons.search),
@@ -271,20 +285,18 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              // Modal Header with Stack for better alignment
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Text(
                       LK.memberDetails.tr,
-                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -292,11 +304,19 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  Positioned(
+                    right: 8,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.mutedForeground,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            const Divider(height: 1),
+              const Divider(height: 1),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -318,28 +338,53 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                         ],
                       ),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                            child: const Icon(Icons.person, size: 50, color: AppColors.primary),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.primary.withValues(alpha: 0.2),
+                                  width: 2),
+                            ),
+                            child: CircleAvatar(
+                              radius: 45,
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                              child: const Icon(Icons.person,
+                                  size: 50, color: AppColors.primary),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             member.name,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: AppColors.secondary,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${member.roleName} (${member.roleTypeName})',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary,
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${member.roleName} (${member.roleTypeName})',
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
                         ],
@@ -425,6 +470,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

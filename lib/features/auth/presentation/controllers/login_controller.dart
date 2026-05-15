@@ -36,7 +36,11 @@ class LoginController extends GetxController {
       
       return newTokens;
     } on Failure catch (f) {
-      error.value = f.message;
+      if (f.message.contains('Invalid Email/ Password')) {
+        error.value = LK.invalidMobileOrPassword.tr;
+      } else {
+        error.value = f.message;
+      }
       return null;
     } catch (e) {
       error.value = LK.errorServer.tr;

@@ -24,7 +24,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
   @override
   void initState() {
     super.initState();
-    _controller.loadMembers();
+    _controller.clearSearch();
     _scrollController.addListener(_onScroll);
   }
 

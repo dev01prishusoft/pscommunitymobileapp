@@ -31,7 +31,7 @@ class OccupationItem {
 
   factory OccupationItem.fromJson(Map<String, dynamic> json) {
     return OccupationItem(
-      id: json['occupationId'] as int? ?? 0,
+      id: json['occupationId'] as int? ?? json['id'] as int? ?? 0,
       memberId: json['memberId'] as int?,
       name: json['name'] as String? ?? '',
       logoUrl: json['logoUrl'] as String?,

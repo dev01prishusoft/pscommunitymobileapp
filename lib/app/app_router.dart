@@ -25,6 +25,8 @@ import 'package:pscommunitymobileapp/features/committee/presentation/pages/commi
 import 'package:pscommunitymobileapp/features/committee/presentation/pages/committees_page.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_profile_page.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/member_profile_page.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/pages/edit_profile_page.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/pages/add_family_member_page.dart';
 
 import 'package:pscommunitymobileapp/app/auth_guard.dart';
 import 'package:get/get.dart';
@@ -56,6 +58,8 @@ class AppRouter {
   static const String committees = '/committees';
   static const String occupationProfile = '/occupation-profile';
   static const String memberProfile = '/member-profile';
+  static const String editProfile = '/edit-profile';
+  static const String addFamilyMember = '/add-family-member';
 
   static final List<GetPage<dynamic>> pages = [
     // Public Routes
@@ -91,5 +95,7 @@ class AppRouter {
     GetPage<void>(name: committees, page: () => const CommitteesPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: occupationProfile, page: () => const OccupationProfilePage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: memberProfile, page: () => const MemberProfilePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: editProfile, page: () => const EditProfilePage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: addFamilyMember, page: () => const AddFamilyMemberPage(), middlewares: [AuthGuard()]),
   ];
 }

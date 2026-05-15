@@ -273,8 +273,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
-  void _shareReceipt() {
-     Share.share('Official Receipt from ${LK.samajName.tr}');
+  Future<void> _shareReceipt() async {
+     await SharePlus.instance.share(ShareParams(text: 'Official Receipt from ${LK.samajName.tr}'));
   }
 
   Future<void> _generateAndPrintPdf(Map<String, dynamic> data) async {

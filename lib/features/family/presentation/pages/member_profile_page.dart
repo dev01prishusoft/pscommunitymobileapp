@@ -57,22 +57,57 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.secondary),
         ),
         centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Get.back<void>(),
-          ),
-        ],
       ),
-      body: Obx(() => AppStateView(
-            state: _controller.memberDetailState.value,
-            onRetry: () => _controller.loadMemberDetails(_memberId),
-            child: _buildProfileContent(),
-          )),
+      body: SafeArea(
+        child: Obx(() => AppStateView(
+              state: _controller.memberDetailState.value,
+              onRetry: () => _controller.loadMemberDetails(_memberId),
+              child: _buildProfileContent(),
+            )),
+      ),
+      bottomNavigationBar: Obx(() => _controller.memberDetailState.value == AppState.data 
+          ? SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: AppColors.border.withValues(alpha: 0.5))),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () => Get.back<void>(),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 54),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    LK.close.tr,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : const SizedBox.shrink()),
     );
   }
 
@@ -81,6 +116,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
     if (member == null) return const SizedBox.shrink();
 
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
           // Profile Header
@@ -88,9 +124,16 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+              border: Border.all(color: AppColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -207,7 +250,14 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     Icons.calendar_today_outlined,
                     LK.birthDate.tr,
                     member.dateOfBirth != null
-                        ? member.dateOfBirth!.split('T')[0]
+                        ? (() {
+                            try {
+                              final dob = DateTime.parse(member.dateOfBirth!);
+                              return '${dob.month.toString().padLeft(2, '0')}-${dob.day.toString().padLeft(2, '0')}-${dob.year}';
+                            } catch (_) {
+                              return member.dateOfBirth!.split('T')[0];
+                            }
+                          })()
                         : LK.na,
                   ),
                   _buildGridItem(Icons.height, LK.heightColon.tr, '${member.height ?? 0} cm'),
@@ -377,25 +427,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
               },
             ),
           ),
-
-          // Close Button
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ElevatedButton(
-              onPressed: () => Get.back<void>(),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                LK.close.tr,
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-          ),
+          const SizedBox(height: 100), // Extra space for the sticky button
         ],
       ),
     );

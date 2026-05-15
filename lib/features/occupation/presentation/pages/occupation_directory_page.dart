@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
@@ -23,6 +25,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   @override
   void initState() {
     super.initState();
+    _controller.clearSearch();
+    _controller.loadOccupations();
     _scrollController.addListener(_onScroll);
   }
 
@@ -59,21 +63,21 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         children: [
           // Search Bar
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: AppTextField(
               controller: _searchController,
+              hint: LK.searchOccupation.tr,
+              icon: Icons.search,
               onChanged: _controller.search,
-              decoration: InputDecoration(
-                hintText: LK.searchOccupation.tr,
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    _searchController.clear();
-                    _controller.clearSearch();
-                  },
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  _searchController.clear();
+                  _controller.clearSearch();
+                },
               ),
             ),
           ),
@@ -81,29 +85,30 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
           // Occupation Dropdown
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Obx(
+              () => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.border),
-                borderRadius: BorderRadius.circular(8),
+                  color: AppColors.muted.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.border.withValues(alpha: 0.5),
+                  ),
               ),
-              child: Obx(() => DropdownButtonHideUnderline(
+                child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
                   value: _controller.selectedOccupationType.value?.id ?? 0,
                   isExpanded: true,
                   icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
+                    style: const TextStyle(
+                      color: AppColors.foreground,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
                   items: _controller.occupationTypes.map((type) {
                     return DropdownMenuItem<int>(
                       value: type.id,
-                      child: Row(
-                        children: [
-                          Text(LK.occupationColon.tr,
-                              style: const TextStyle(color: AppColors.mutedForeground)),
-                          const SizedBox(width: 4),
-                          Text(type.text,
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
-                        ],
-                      ),
+                        child: Text(type.text),
                     );
                   }).toList(),
                   onChanged: (id) {
@@ -111,7 +116,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                     _controller.onOccupationTypeChanged(id == 0 ? null : type);
                   },
                 ),
-              )),
+                ),
+              ),
             ),
           ),
 
@@ -127,20 +133,33 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: GridView.builder(
-                        controller: _scrollController,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemCount: _controller.filteredOccupations.length,
-                        itemBuilder: (context, index) {
-                          final occ = _controller.filteredOccupations[index];
-                          return _buildOccupationCard(occ);
-                        },
-                      ),
+                        child: _controller.filteredOccupations.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: AppEmptyState(
+                                  icon: Icons.work_off_outlined,
+                                  secondaryIcon: Icons.search,
+                                  title: LK.noResultsFound.tr,
+                                  subtitle: LK.trySelectingDifferentFilters.tr,
+                                ),
+                              )
+                            : GridView.builder(
+                                controller: _scrollController,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                      childAspectRatio: 0.8,
+                                    ),
+                                itemCount:
+                                    _controller.filteredOccupations.length,
+                                itemBuilder: (context, index) {
+                                  final occ =
+                                      _controller.filteredOccupations[index];
+                                  return _buildOccupationCard(occ);
+                                },
+                              ),
                     ),
                     if (_controller.isNextPageLoading.value)
                       const Padding(

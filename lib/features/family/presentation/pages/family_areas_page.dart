@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/family/presentation/controllers/fa
 import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 
 class FamilyAreasPage extends StatefulWidget {
   const FamilyAreasPage({super.key});
@@ -22,8 +23,8 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
    @override
    void initState() {
      super.initState();
+     controller.resetFilters();
      controller.loadStates();
-     controller.loadAreas();
      _scrollController.addListener(_onScroll);
    }
 
@@ -333,50 +334,16 @@ class _AreasList extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40.0),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.5),
-      ),
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(Icons.map_outlined, size: 80, color: AppColors.primary.withValues(alpha: 0.15)),
-              const Positioned(
-                top: 10,
-                child: Icon(Icons.location_on, size: 40, color: AppColors.primary),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            LK.noAreasFound.tr,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            LK.trySelectingDifferentFilters.tr,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.mutedForeground,
-            ),
-          ),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.map_outlined,
+      secondaryIcon: Icons.location_on,
+      title: LK.noAreasFound.tr,
+      subtitle: LK.trySelectingDifferentFilters.tr,
     );
   }
 }
 
-class _CustomDropdown extends StatefulWidget {
+class _CustomDropdown extends StatelessWidget {
   final String hint;
   final DropdownItem? value;
   final List<DropdownItem> options;
@@ -394,143 +361,82 @@ class _CustomDropdown extends StatefulWidget {
   });
 
   @override
-  State<_CustomDropdown> createState() => _CustomDropdownState();
-}
-
-class _CustomDropdownState extends State<_CustomDropdown> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final opacity = widget.isEnabled ? 1.0 : 0.5;
+    final opacity = isEnabled ? 1.0 : 0.6;
 
     return Opacity(
       opacity: opacity,
       child: Container(
+        height: 52,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color: isEnabled ? AppColors.border : AppColors.border.withValues(alpha: 0.5),
+          ),
+          boxShadow: [
+            if (isEnabled)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
-        child: Column(
-          children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: widget.isEnabled
-                  ? () => setState(() => _isExpanded = !_isExpanded)
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.value != null ? widget.value!.text : widget.hint,
-                        style: TextStyle(
-                          color: widget.value != null
-                              ? AppColors.secondary
-                              : AppColors.mutedForeground,
-                          fontSize: 14,
-                          fontWeight: widget.value != null
-                              ? FontWeight.w500
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                    widget.isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.primary,
-                              ),
-                            ),
-                          )
-                        : Icon(
-                            _isExpanded
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
-                            color: AppColors.mutedForeground,
-                          ),
-                  ],
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<DropdownItem>(
+            value: (value != null && options.any((o) => o.id == value!.id)) 
+                ? options.firstWhere((o) => o.id == value!.id) 
+                : null,
+            hint: Text(
+              hint,
+              style: TextStyle(
+                color: AppColors.mutedForeground.withValues(alpha: 0.8),
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
               ),
             ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: _isExpanded && widget.isEnabled
-                  ? widget.options.isEmpty
-                        ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                              vertical: 12.0,
-                            ),
-                            child: Text(
-                              LK.noItemsFound.tr,
-                              style: const TextStyle(
-                                color: AppColors.mutedForeground,
-                                fontSize: 14,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          )
-                        : Column(
-                            children: widget.options.map((option) {
-                              final isSelected = option == widget.value;
-                              return InkWell(
-                                onTap: () {
-                                  widget.onChanged(option);
-                                  setState(() => _isExpanded = false);
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                    vertical: 12.0,
-                                  ),
-                                  color: isSelected
-                                      ? const Color(0xFFF0F7FF)
-                                      : Colors.transparent,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          option.text,
-                                          style: TextStyle(
-                                            color: isSelected
-                                                ? AppColors.primary
-                                                : AppColors.secondary,
-                                            fontWeight: isSelected
-                                                ? FontWeight.w600
-                                                : FontWeight.normal,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                      if (isSelected)
-                                        const Icon(
-                                          Icons.check,
-                                          color: AppColors.primary,
-                                          size: 18,
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          )
-                  : const SizedBox.shrink(),
-            ),
-          ],
+            isExpanded: true,
+            icon: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
+                  )
+                : const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: AppColors.mutedForeground,
+                  ),
+            items: options.isEmpty 
+              ? null 
+              : options.map((option) {
+                  return DropdownMenuItem<DropdownItem>(
+                    value: option,
+                    child: Text(
+                      option.text,
+                      style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
+                }).toList(),
+            onChanged: isEnabled ? onChanged : null,
+            borderRadius: BorderRadius.circular(12),
+            dropdownColor: Colors.white,
+            elevation: 8,
+            menuMaxHeight: 350,
+          ),
         ),
       ),
     );
   }
 }
+

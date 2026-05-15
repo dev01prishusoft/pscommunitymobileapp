@@ -1,10 +1,14 @@
+import 'package:get/get.dart';
+
 class CommitteeNode {
   final int id;
   final String name;
   final int memberCount;
   final int? parentId;
   final List<CommitteeNode> children;
-  bool isExpanded;
+  final RxBool _isExpanded;
+  bool get isExpanded => _isExpanded.value;
+  set isExpanded(bool value) => _isExpanded.value = value;
 
   CommitteeNode({
     required this.id,
@@ -12,8 +16,8 @@ class CommitteeNode {
     this.memberCount = 0,
     this.parentId,
     this.children = const [],
-    this.isExpanded = true, // Default to true
-  });
+    bool isExpanded = true,
+  }) : _isExpanded = isExpanded.obs;
 
   factory CommitteeNode.fromJson(Map<String, dynamic> json) {
     int parseId(dynamic val) {

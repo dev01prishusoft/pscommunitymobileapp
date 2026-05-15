@@ -29,6 +29,7 @@ import 'package:pscommunitymobileapp/features/business/data/business_repository_
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
 class DI {
   static Future<void> bootstrap() async {
@@ -73,28 +74,28 @@ class DI {
     final memberRepository = MemberRepositoryImpl(apiClient);
     Get.put(FindMemberController(memberRepository), permanent: true);
 
-    // 8. Marriage Feature
-    final marriageRepository = MarriageRepositoryImpl(apiClient);
-    Get.put(MarriageController(marriageRepository, memberRepository), permanent: true);
+    // 8. Family Feature
+    final familyRepository = FamilyRepositoryImpl(apiClient);
+    Get.put(FamilyController(familyRepository), permanent: true);
 
-    // 9. Committee Feature
+    // 9. Marriage Feature
+    final marriageRepository = MarriageRepositoryImpl(apiClient);
+    Get.put(MarriageController(marriageRepository, memberRepository, familyRepository), permanent: true);
+
+    // 10. Committee Feature
     final committeeRepository = CommitteeRepositoryImpl(apiClient);
     Get.put(CommitteeController(committeeRepository), permanent: true);
 
-    // 10. Occupation Feature
+    // 11. Occupation Feature
     final occupationRepository = OccupationRepositoryImpl(apiClient);
     Get.put(OccupationController(occupationRepository), permanent: true);
 
-    // 11. Payment Feature
+    // 12. Payment Feature
     final PaymentRepository paymentRepository = 
         kDebugMode && AppEnvironment.I.flavor == Flavor.dev
             ? MockPaymentRepository()
             : PaymentRepositoryImpl(apiClient);
     Get.put(PaymentController(paymentRepository), permanent: true);
-
-    // 12. Family Feature
-    final familyRepository = FamilyRepositoryImpl(apiClient);
-    Get.put(FamilyController(familyRepository), permanent: true);
 
     // 13. Business Feature
     final businessRepository = BusinessRepositoryImpl(apiClient);
@@ -103,6 +104,9 @@ class DI {
     // 14. Global Samaj Detail
     final samajRepository = SamajRepositoryImpl(apiClient);
     final samajController = Get.put(SamajController(samajRepository), permanent: true);
+    
+    // 15. Profile Feature
+    Get.put(ProfileFormController(), permanent: true);
     
     // Auto-fetch if already logged in
     if (authState.isAuthenticated.value) {

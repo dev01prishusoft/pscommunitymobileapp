@@ -16,11 +16,21 @@ class CommitteesPage extends StatefulWidget {
 
 class _CommitteesPageState extends State<CommitteesPage> {
   final controller = Get.find<CommitteeController>();
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    controller.loadCommittees();
+    _searchController.text = controller.searchQuery.value;
+    controller.clearSearch();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,7 +54,10 @@ class _CommitteesPageState extends State<CommitteesPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
+              controller: _searchController,
+              focusNode: _focusNode,
               onChanged: controller.onSearchChanged,
+              onTapOutside: (event) => _focusNode.unfocus(),
               decoration: InputDecoration(
                 hintText: LK.searchCommittees.tr,
                 prefixIcon: const Icon(Icons.search),
@@ -52,6 +65,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
                     ? IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
+                          _searchController.clear();
                           controller.onSearchChanged('');
                         },
                       )
@@ -109,16 +123,16 @@ class _CommitteeCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: Obx(() => Column(
         children: [
           _CommitteeTile(node: node, isRoot: true),
-          if (node.children.isNotEmpty)
+          if (node.isExpanded && node.children.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _ChildrenList(children: node.children, depth: 1),
             ),
         ],
-      ),
+      )),
     );
   }
 }
@@ -144,13 +158,13 @@ class _ChildrenList extends StatelessWidget {
         ),
         Column(
           children: children.map((child) {
-            return Column(
+            return Obx(() => Column(
               children: [
                 _CommitteeTile(node: child, depth: depth),
-                if (child.children.isNotEmpty)
+                if (child.isExpanded && child.children.isNotEmpty)
                   _ChildrenList(children: child.children, depth: depth + 1),
               ],
-            );
+            ));
           }).toList(),
         ),
       ],
@@ -188,10 +202,17 @@ class _CommitteeTile extends StatelessWidget {
         child: Row(
           children: [
             if (node.children.isNotEmpty)
-              const Icon(
-                Icons.keyboard_arrow_down,
-                color: AppColors.primary,
-                size: 24,
+              IconButton(
+                onPressed: () => Get.find<CommitteeController>().toggleNode(node),
+                icon: Icon(
+                  node.isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               )
             else
               const Icon(

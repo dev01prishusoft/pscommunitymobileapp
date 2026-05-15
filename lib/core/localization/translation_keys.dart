@@ -29,9 +29,13 @@ class LK {
   static const String errorCertificatePinning = 'Security Error';
   static const String errorValidation = 'Validation Error';
   static const String invalidCredentials = 'Invalid credentials';
+  static const String invalidMobileOrPassword = 'Invalid Mobile number or password';
   static const String pleaseEnterMobile = 'Please enter mobile number';
   static const String pleaseEnterValidMobile = 'Please enter a valid 10-digit mobile number';
   static const String pleaseEnterPassword = 'Please enter password';
+  static const String pleaseEnterOldPassword = 'Please enter Old Password';
+  static const String pleaseEnterNewPassword = 'Please enter New Password';
+  static const String pleaseEnterConfirmPassword = 'Please enter Confirm Password';
   
   // Navigation / Tabs
   static const String family = 'Family';
@@ -316,6 +320,79 @@ class LK {
   
   static const String ageYears = 'yrs';
   
+  // Profile Management
+  static const String editProfile = 'Edit Profile';
+  static const String addFamilyMember = 'Add Family Member';
+  static const String personal = 'Personal';
+  static const String contactVerify = 'Contact & Verify';
+  static const String familyParents = 'Family & Parents';
+  static const String assetsLife = 'Assets & Life';
+  static const String addressesTab = 'Addresses';
+  static const String educationTab = 'Education';
+  static const String workHistory = 'Work History';
+  
+  // Contact & Verify
+  static const String mobileVerified = 'Mobile Verified';
+  static const String notVerified = 'Not verified';
+  static const String secondaryMobileLabel = 'Secondary Mobile';
+  static const String entryPersonMobile = 'Entry Person Mobile';
+  static const String emergencyContactNameLabel = 'Emergency Contact Name';
+  
+  // Family & Parents
+  static const String memberIsFamilyHead = 'This member is the family head';
+  static const String mothersGotra = "Mother's Gotra";
+  static const String openToMarriageProposals = 'Open to marriage proposals';
+  
+  // Assets & Life
+  static const String monthlyIncomeLabel = 'Monthly Income';
+  
+  // Addresses
+  static const String addAddress = 'Add Address';
+  static const String addressType = 'Address Type';
+  static const String pincode = 'Pincode';
+  static const String landmarkLabel = 'Landmark';
+  static const String addressLine1 = 'Address Line 1';
+  static const String addressLine2 = 'Address Line 2';
+  static const String primaryAddress = 'Primary';
+  
+  // Education
+  static const String addEducation = 'Add Education';
+  static const String qualificationLabel = 'Qualification';
+  static const String instituteNameLabel = 'Institute Name';
+  static const String passingYearLabel = 'Passing Year';
+  static const String percentageLabel = 'Percentage';
+  static const String gradeLabel = 'Grade';
+  static const String markAsHighest = 'Mark as highest';
+  
+  // Work History
+  static const String jobPositionLabel = 'Job Position';
+  static const String otherJobPositionLabel = 'Other Job Position';
+  static const String otherOccupationLabel = 'Other Occupation';
+  static const String occupationAddressLine1Label = 'Occupation Address Line 1';
+  static const String occupationAddressLine2Label = 'Occupation Address Line 2';
+  static const String businessName = 'Business Name';
+  static const String mobileNo = 'Mobile No';
+  
+  static const String memberNo = 'Member No';
+  static const String firstName = 'First Name';
+  static const String middleName = 'Middle Name';
+  static const String lastName = 'Last Name';
+  static const String firstNameEnglish = 'First Name (English)';
+  static const String lastNameEnglish = 'Last Name (English)';
+  static const String timeOfBirth = 'Time of Birth';
+  static const String bloodGroup = 'Blood Group';
+  static const String sign = 'Sign';
+  static const String weightKg = 'Weight (Kg)';
+  static const String heightCm = 'Height (Cm)';
+  static const String memberIsActive = 'Member is active';
+  static const String profilePhoto = 'Profile Photo';
+  static const String chooseFile = 'Choose File';
+  static const String noFileChosen = 'No file chosen';
+  static const String removePhoto = 'Remove photo';
+  static const String saveChanges = 'Save Changes';
+  static const String addMember = 'Add Member';
+  static const String memberNoHint = 'PSC-2026-0512160358';
+  
   static const List<String> allValues = [
     appTitle, welcome, welcomesYou, signIn, welcomeBack, loginSubtitle,
     mobileNumber, mobileHint, password, passwordHint, forgotPassword, adminWarning,
@@ -369,6 +446,21 @@ class LK {
     adminSent, payNowButton, dueLabel, paidLabel, selectValidPayment, paymentSuccessful,
     verificationFailed, externalWalletSelected, paymentForCommunity, info,
     paymentGatewayMissing, paymentFailed, rolePresident, roleVicePresident,
-    roleSecretary, roleJointSecretary, roleTreasurer, roleCommitteeMember
+    roleSecretary, roleJointSecretary, roleTreasurer, roleCommitteeMember,
+    editProfile, addFamilyMember, personal, contactVerify, familyParents,
+    assetsLife, workHistory, memberNo, firstName, middleName, lastName,
+    firstNameEnglish, lastNameEnglish, timeOfBirth, bloodGroup, sign,
+    weightKg, heightCm, memberIsActive, profilePhoto, chooseFile,
+    noFileChosen, removePhoto, saveChanges, addMember, memberNoHint,
+    addressesTab, educationTab, mobileVerified, notVerified,
+    secondaryMobileLabel, entryPersonMobile, emergencyContactNameLabel,
+    memberIsFamilyHead, mothersGotra, openToMarriageProposals,
+    monthlyIncomeLabel, addAddress, addressType, pincode, landmarkLabel,
+    addressLine1, addressLine2, primaryAddress, addEducation,
+    qualificationLabel, instituteNameLabel, passingYearLabel,
+    percentageLabel, gradeLabel, markAsHighest, jobPositionLabel,
+    otherJobPositionLabel, otherOccupationLabel,
+    occupationAddressLine1Label, occupationAddressLine2Label, businessName, mobileNo,
+    invalidMobileOrPassword, pleaseEnterOldPassword, pleaseEnterNewPassword, pleaseEnterConfirmPassword
   ];
 }

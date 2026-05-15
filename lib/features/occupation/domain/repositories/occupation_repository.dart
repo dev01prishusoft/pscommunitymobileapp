@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupat
 abstract class OccupationRepository {
   Future<List<OccupationItem>> getOccupations({
     int? occupationTypeId,
+    String? search,
     int pageNumber = 1,
     int pageSize = 20,
   });

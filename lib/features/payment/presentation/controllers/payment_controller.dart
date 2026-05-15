@@ -14,9 +14,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:flutter/material.dart';
 
 class PaymentController extends GetxController {
-  final PaymentRepository _repository;
 
   PaymentController(this._repository);
+  final PaymentRepository _repository;
 
   // --- Dashboard state ---
   final Rx<AppState> dashboardState = AppState.loading.obs;

@@ -1,10 +1,10 @@
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 abstract class Failure implements Exception {
-  final String message;
-  final String translationKey;
 
   const Failure(this.message, {required this.translationKey});
+  final String message;
+  final String translationKey;
 
   @override
   String toString() => message;

@@ -123,7 +123,7 @@ class ResetPasswordPage extends StatelessWidget {
                             obscureText: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterPassword.tr;
+                                return LK.pleaseEnterOldPassword.tr;
                               }
                               return null;
                             },
@@ -146,7 +146,7 @@ class ResetPasswordPage extends StatelessWidget {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterPassword.tr;
+                                return LK.pleaseEnterNewPassword.tr;
                               }
                               return null;
                             },
@@ -169,7 +169,7 @@ class ResetPasswordPage extends StatelessWidget {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterPassword.tr;
+                                return LK.pleaseEnterConfirmPassword.tr;
                               }
                               if (value != newPasswordController.text) {
                                 return LK.passwordsDoNotMatch.tr;

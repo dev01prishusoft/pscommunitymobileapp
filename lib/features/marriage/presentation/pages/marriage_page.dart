@@ -24,20 +24,15 @@ class _MarriagePageState extends State<MarriagePage> {
   @override
   void initState() {
     super.initState();
-    _controller.loadProfiles();
+    _controller.clearFilters();
   }
 
   // Constants for Dropdowns (kept here for UI list)
   final List<String> _ages = List.generate(43, (i) => (18 + i).toString());
-  final List<String> _heights = List.generate(31, (i) => '${(4.0 + i * 0.1).toStringAsFixed(1)} ft');
-  final List<String> _gotras = ['Any', 'Kashyap Gotra', 'Bharadwaj Gotra', 'Vashishtha Gotra'];
+  final List<String> _heights = List.generate(121, (i) => '${(120 + i)} cm');
   final List<String> _maritalStatuses = ['All', 'Unmarried', 'Married', 'Widow', 'Widower', 'Divorced'];
-  final List<String> _states = ['All', 'Gujarat', 'Maharashtra', 'Rajasthan'];
-  final List<String> _districts = ['All', 'Ahmedabad', 'Gandhinagar', 'Vadodara', 'Surat'];
-  final List<String> _talukas = ['All', 'Daskroi', 'City', 'Sector 21'];
   final List<String> _areas = ['All', 'Satellite', 'Bopal', 'Prahladnagar'];
   final List<String> _educations = ['Any', 'Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD'];
-  final List<String> _occupations = ['Any', 'Business', 'Engineer', 'Doctor', 'Teacher', 'Student', 'Homemaker'];
   final List<String> _incomeRanges = ['Any', '1-2 Lakh', '2-5 Lakh', '5-10 Lakh', '10+ Lakh'];
 
   @override
@@ -106,67 +101,77 @@ class _MarriagePageState extends State<MarriagePage> {
                   child: Row(
                     children: [
                       Expanded(
+                        flex: 3,
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(LK.showLabel.tr, style: const TextStyle(fontSize: 12)),
+                            Text(LK.showLabel.tr, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 LK.lookingForMarriage.tr,
-                                style: const TextStyle(fontSize: 12),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                                overflow: TextOverflow.visible,
                               ),
                             ),
-                            Obx(() => Transform.scale(
-                              scale: 0.7,
-                              child: Switch(
-                                value: _controller.lookingForMarriage.value,
-                                onChanged: (val) {
-                                  _controller.lookingForMarriage.value = val;
-                                },
-                                activeThumbColor: AppColors.primary,
+                            Obx(() => SizedBox(
+                              height: 30,
+                              child: Transform.scale(
+                                scale: 0.65,
+                                child: Switch(
+                                  value: _controller.lookingForMarriage.value,
+                                  onChanged: (val) {
+                                    _controller.lookingForMarriage.value = val;
+                                  },
+                                  activeThumbColor: AppColors.primary,
+                                ),
                               ),
                             )),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(LK.gender.tr, style: const TextStyle(fontSize: 11)),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.border),
-                              borderRadius: BorderRadius.circular(6),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(LK.gender.tr, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.border),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.white,
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: Obx(() => DropdownButton<String>(
+                                    value: _controller.selectedGender.value,
+                                    isDense: true,
+                                    isExpanded: true,
+                                    icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+                                    items: ['All', 'Male', 'Female']
+                                        .map((e) => DropdownMenuItem(
+                                              value: e,
+                                              child: Builder(
+                                                builder: (context) {
+                                                  if (e == 'All') return Text(LK.all.tr, style: const TextStyle(fontSize: 11));
+                                                  final key = GenderMapper.getLabelKey(e);
+                                                  return Text(key != null ? key.tr : e, style: const TextStyle(fontSize: 11));
+                                                }
+                                              ),
+                                            ))
+                                        .toList(),
+                                    onChanged: (val) {
+                                      _controller.selectedGender.value = val!;
+                                    },
+                                  )),
+                                ),
+                              ),
                             ),
-                            child: DropdownButtonHideUnderline(
-                              child: Obx(() => DropdownButton<String>(
-                                value: _controller.selectedGender.value,
-                                isDense: true,
-                                items: ['All', 'Male', 'Female']
-                                    .map((e) => DropdownMenuItem(
-                                          value: e,
-                                          child: Builder(
-                                            builder: (context) {
-                                              if (e == 'All') return Text(LK.all.tr, style: const TextStyle(fontSize: 11));
-                                              final key = GenderMapper.getLabelKey(e);
-                                              return Text(key != null ? key.tr : e, style: const TextStyle(fontSize: 11));
-                                            }
-                                          ),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) {
-                                  _controller.selectedGender.value = val!;
-                                },
-                              )),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -306,11 +311,10 @@ class _MarriagePageState extends State<MarriagePage> {
                       ],
                     ),
                   ),
-                  const Divider(height: 1),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: SingleChildScrollView(
-                      child: Column(
+                      child: Obx(() => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildFilterRow(
@@ -345,7 +349,7 @@ class _MarriagePageState extends State<MarriagePage> {
                               Expanded(
                                 child: _buildDropdownField(
                                   value: _controller.selectedGotra.value,
-                                  items: _gotras,
+                                  items: _controller.dynamicGotras,
                                   onChanged: (val) =>
                                       _controller.selectedGotra.value = val!,
                                 ),
@@ -409,8 +413,8 @@ class _MarriagePageState extends State<MarriagePage> {
                                         Expanded(
                                           child: _buildDropdownField(
                                             value: _controller.selectedState.value,
-                                            items: _states,
-                                            onChanged: (val) => _controller.selectedState.value = val!,
+                                            items: ['All', ..._controller.states.map((e) => e.text)],
+                                            onChanged: (val) => _controller.onStateChanged(val!),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -420,8 +424,8 @@ class _MarriagePageState extends State<MarriagePage> {
                                         Expanded(
                                           child: _buildDropdownField(
                                             value: _controller.selectedDistrict.value,
-                                            items: _districts,
-                                            onChanged: (val) => _controller.selectedDistrict.value = val!,
+                                            items: ['All', ..._controller.districts.map((e) => e.text)],
+                                            onChanged: (val) => _controller.onDistrictChanged(val!),
                                           ),
                                         ),
                                       ],
@@ -435,31 +439,21 @@ class _MarriagePageState extends State<MarriagePage> {
                                         Expanded(
                                           child: _buildDropdownField(
                                             value: _controller.selectedTaluka.value,
-                                            items: _talukas,
+                                            items: ['All', ..._controller.talukas.map((e) => e.text)],
                                             onChanged: (val) => _controller.selectedTaluka.value = val!,
                                           ),
                                         ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            LK.areaLabel.tr,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                            ),
+                                        const SizedBox(width: 8),
+                                        Text(LK.areaLabel.tr,
+                                            style: const TextStyle(fontSize: 11)),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: _buildDropdownField(
+                                            value: _controller.selectedArea.value,
+                                            items: _areas,
+                                            onChanged: (val) => _controller.selectedArea.value = val!,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: _buildDropdownField(
-                                              value: _controller
-                                                  .selectedArea
-                                                  .value,
-                                              items: _areas,
-                                              onChanged: (val) =>
-                                                  _controller
-                                                          .selectedArea
-                                                          .value =
-                                                      val!,
-                                            ),
-                                          ),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -496,7 +490,7 @@ class _MarriagePageState extends State<MarriagePage> {
                               Expanded(
                                 child: _buildDropdownField(
                                   value: _controller.selectedOccupation.value,
-                                  items: _occupations,
+                                  items: _controller.dynamicOccupations,
                                   onChanged: (val) =>
                                       _controller.selectedOccupation.value = val!,
                                 ),
@@ -536,7 +530,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             ],
                           ),
                         ],
-                      ),
+                      )),
                     ),
                   ),
                 ],
@@ -556,25 +550,56 @@ class _MarriagePageState extends State<MarriagePage> {
     required Color textColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor, size: 32),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: const TextStyle(fontSize: 12, color: AppColors.mutedForeground)),
-              Text(count,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12, 
+                    color: AppColors.mutedForeground,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  count,
                   style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: textColor)),
-            ],
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold, 
+                    color: textColor,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -652,11 +677,11 @@ class _MarriagePageState extends State<MarriagePage> {
                           style: const TextStyle(fontSize: 13)),
                       const SizedBox(width: 4),
                       Text(
-                        (member.isLookingforMarriage ?? false) ? LK.yes.tr : LK.no.tr,
+                        (member.isLookingforMarriage == true) ? LK.yes.tr : LK.no.tr,
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: (member.isLookingforMarriage ?? false)
+                            color: (member.isLookingforMarriage == true)
                                 ? Colors.green
                                 : Colors.red),
                       ),
@@ -735,7 +760,7 @@ class _MarriagePageState extends State<MarriagePage> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(

@@ -25,7 +25,7 @@ class CommitteeController extends GetxController {
   Future<void> loadCommittees() async {
     state.value = AppState.loading;
     try {
-      final results = await _repository.getCommittees();
+      final results = await _repository.getCommittees(searchQuery: searchQuery.value);
       committees.assignAll(results);
       state.value = committees.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
@@ -48,6 +48,11 @@ class CommitteeController extends GetxController {
 
   void onSearchChanged(String query) {
     searchQuery.value = query;
+  }
+
+  void clearSearch() {
+    searchQuery.value = '';
+    loadCommittees();
   }
 
   void toggleNode(CommitteeNode node) {

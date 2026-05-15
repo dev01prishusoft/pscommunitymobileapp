@@ -9,7 +9,7 @@ class MockCommitteeRepository implements CommitteeRepository {
   bool shouldThrow = false;
 
   @override
-  Future<List<CommitteeNode>> getCommittees() async {
+  Future<List<CommitteeNode>> getCommittees({String? searchQuery}) async {
     if (shouldThrow) throw Exception('API Error');
     return [
       CommitteeNode(id: 1, name: 'Root')

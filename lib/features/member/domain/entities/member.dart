@@ -154,7 +154,7 @@ class Member {
       genderName: getString('genderName', 'gender'),
       maritalStatusName: getString('maritalStatusName', 'maritalStatus', 'marritalStatus'),
       bloodGroupName: getString('bloodGroupName'),
-      isLookingforMarriage: json['isLookingforMarriage'] as bool?,
+      isLookingforMarriage: (json['isLookingforMarriage'] ?? json['LookingforMarriage'] ?? json['isLookingForMarriage']) as bool?,
       jobPositionName: getString('jobPositionName'),
       otherJobPosition: getString('otherJobPosition'),
       monthlyIncome: (json['monthlyIncome'] as num?)?.toInt(),

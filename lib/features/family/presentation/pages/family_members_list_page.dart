@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/relation_mapper.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
   const FamilyMembersListPage({super.key});
@@ -55,7 +56,9 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
     return _controller.families.map((family) {
       final filteredMembers = family.members.where((member) {
         final name = member.name.toLowerCase();
-        return name.contains(query);
+        final mobile = member.mobileNo?.toLowerCase() ?? '';
+        final id = member.id.toLowerCase();
+        return name.contains(query) || mobile.contains(query) || id.contains(query);
       }).toList();
       if (filteredMembers.isEmpty) return null;
       return Family(familyName: family.familyName, members: filteredMembers);
@@ -137,17 +140,13 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               state: _controller.familyListState.value,
               onRetry: () => _controller.loadFamilies(_areaId),
               child: _filteredFamilies.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
-                          const SizedBox(height: 16),
-                          Text(
-                            LK.noResultsFound.tr,
-                            style: TextStyle(fontSize: 16, color: Colors.grey.shade500),
-                          ),
-                        ],
+                  ? Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: AppEmptyState(
+                        icon: Icons.search_off,
+                        secondaryIcon: Icons.search,
+                        title: LK.noResultsFound.tr,
+                        subtitle: LK.trySelectingDifferentFilters.tr,
                       ),
                     )
                   : ListView.separated(
@@ -225,16 +224,12 @@ class _MemberTile extends StatelessWidget {
                 CircleAvatar(
                   radius: 22,
                   backgroundColor: avatarColors.background,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: FittedBox(
-                      child: Text(
-                        member.id,
-                        style: TextStyle(
-                          color: avatarColors.text,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  child: Text(
+                    member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
+                    style: TextStyle(
+                      color: avatarColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
                     ),
                   ),
                 ),

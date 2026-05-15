@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 
 enum AppState { loading, error, empty, data }
 
@@ -61,21 +62,11 @@ class AppStateView extends StatelessWidget {
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(emptyIcon ?? Icons.search_off_rounded,
-                    size: 60, color: AppColors.mutedForeground),
-                const SizedBox(height: 16),
-                Text(
-                  emptyMessage ?? LK.noResultsFound.tr,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.mutedForeground,
-                      fontWeight: FontWeight.w500),
-                ),
-              ],
+            child: AppEmptyState(
+              icon: emptyIcon ?? Icons.search_off_rounded,
+              secondaryIcon: emptyIcon != null ? null : Icons.search,
+              title: emptyMessage ?? LK.noResultsFound.tr,
+              subtitle: LK.trySelectingDifferentFilters.tr,
             ),
           ),
         );

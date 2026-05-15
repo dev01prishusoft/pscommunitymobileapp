@@ -10,6 +10,9 @@ class AppTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final String? label;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final ValueChanged<String>? onChanged;
 
   const AppTextField({
     super.key,
@@ -21,6 +24,9 @@ class AppTextField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.label,
+    this.readOnly = false,
+    this.onTap,
+    this.onChanged,
   });
 
   @override
@@ -43,6 +49,9 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          readOnly: readOnly,
+          onTap: onTap,
+          onChanged: onChanged,
           style: const TextStyle(
             color: AppColors.foreground,
             fontWeight: FontWeight.w500,

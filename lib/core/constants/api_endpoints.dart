@@ -37,6 +37,6 @@ class ApiEndpoints {
   // Dropdowns
   static const String stateDropdown = '/api/v1/state/dropdown';
   static const String districtDropdown = '/api/v1/district/dropdown';
-  static const String talukaDropdown = '/api/v1/Taluka/dropdown';
+  static const String talukaDropdown = '/api/v1/taluka/dropdown';
   static const String occupationDropdown = '/api/v1/Occupation/dropdown';
 }

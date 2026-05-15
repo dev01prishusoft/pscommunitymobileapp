@@ -28,13 +28,22 @@ class OccupationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize with 'All' to prevent DropdownButton crash before API loads
-    occupationTypes.assignAll([DropdownItem(id: 0, text: 'All')]);
-    loadOccupationTypes();
-    loadOccupations();
+    
+    // Initialize with 'All' item and select it by default
+    final allItem = DropdownItem(id: 0, text: 'All');
+    occupationTypes.assignAll([allItem]);
+    selectedOccupationType.value = allItem;
+
+    // Load types then occupations sequentially to avoid race conditions
+    _initData();
 
     // Debounce search
     debounce(searchQuery, (_) => loadOccupations(), time: const Duration(milliseconds: 300));
+  }
+
+  Future<void> _initData() async {
+    await loadOccupationTypes();
+    await loadOccupations();
   }
 
   Future<void> loadOccupationTypes() async {
@@ -81,6 +90,7 @@ class OccupationController extends GetxController {
     try {
       final results = await _repository.getOccupations(
         occupationTypeId: occupationTypeId ?? selectedOccupationType.value?.id,
+        search: searchQuery.value,
         pageNumber: _currentPage,
         pageSize: _pageSize,
       );
@@ -89,15 +99,7 @@ class OccupationController extends GetxController {
         hasMore.value = false;
       } else {
         occupations.addAll(results);
-        
-        // Apply search filter locally if any
-        if (searchQuery.value.isNotEmpty) {
-           final query = searchQuery.value.toLowerCase();
-           final filtered = results.where((o) => o.name.toLowerCase().contains(query)).toList();
-           filteredOccupations.addAll(filtered);
-        } else {
-           filteredOccupations.addAll(results);
-        }
+        filteredOccupations.addAll(results);
 
         _currentPage++;
         if (results.length < _pageSize) {

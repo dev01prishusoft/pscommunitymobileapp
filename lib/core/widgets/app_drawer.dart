@@ -83,6 +83,16 @@ class AppDrawer extends StatelessWidget {
             title: Text(LK.marriage.tr),
             onTap: () => Get.toNamed<void>(AppRouter.marriage),
           ),
+          ListTile(
+            leading: const Icon(Icons.edit_outlined, color: AppColors.primary),
+            title: Text(LK.editProfile.tr),
+            onTap: () => Get.toNamed<void>(AppRouter.editProfile),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_add_alt_1_outlined, color: AppColors.primary),
+            title: Text(LK.addFamilyMember.tr),
+            onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
+          ),
           
           const Spacer(),
           const Divider(),

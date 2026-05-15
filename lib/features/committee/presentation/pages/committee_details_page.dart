@@ -62,7 +62,6 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             child: Column(
               children: [
                 _buildInfoRow(LK.nameLabel.tr, detail.name),
-                _buildInfoRow(LK.familiesCount.tr, node.memberCount.toString()),
                 const Divider(height: 12, thickness: 0.5),
                 _buildInfoRow(LK.descriptionLabel.tr, detail.description),
               ],
@@ -205,13 +204,6 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                  ),
-                ),
               ],
             ),
           ),
@@ -290,22 +282,6 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                   ),
                 ),
               ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-            ),
-            child: Text(
-              '${LK.memberCount.tr}: $count',
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
             ),
           ),
         ],

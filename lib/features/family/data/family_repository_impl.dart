@@ -44,42 +44,40 @@ class FamilyRepositoryImpl implements FamilyRepository {
   @override
   Future<List<DropdownItem>> getStates() async {
     final response = await _apiClient.get(ApiEndpoints.stateDropdown);
-    final json = response.data as Map<String, dynamic>;
-    AppLogger.d('States Response: $json');
-    if (json['succeeded'] != true) return [];
-    final data = json['data'] as List? ?? [];
-    return data
-        .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return _parseDropdownList(response.data);
   }
 
   @override
   Future<List<DropdownItem>> getDistricts(int stateId) async {
-    AppLogger.d('Districts Request for stateId: $stateId');
     final response = await _apiClient.get(
       ApiEndpoints.districtDropdown,
-      queryParameters: {'StateId': stateId},
+      queryParameters: {'stateId': stateId},
     );
-    final json = response.data as Map<String, dynamic>;
-    AppLogger.d('Districts Response: $json');
-    if (json['succeeded'] != true) return [];
-    final data = json['data'] as List? ?? [];
-    return data
-        .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return _parseDropdownList(response.data);
   }
 
   @override
   Future<List<DropdownItem>> getTalukas(int districtId) async {
-    AppLogger.d('Talukas Request for districtId: $districtId');
     final response = await _apiClient.get(
       ApiEndpoints.talukaDropdown,
-      queryParameters: {'DistrictId': districtId},
+      queryParameters: {'districtId': districtId},
     );
-    final json = response.data as Map<String, dynamic>;
-    AppLogger.d('Talukas Response: $json');
+    return _parseDropdownList(response.data);
+  }
+
+  List<DropdownItem> _parseDropdownList(dynamic responseData) {
+    if (responseData == null) return [];
+    final json = responseData as Map<String, dynamic>;
     if (json['succeeded'] != true) return [];
-    final data = json['data'] as List? ?? [];
+    
+    var data = json['data'];
+    // Handle double wrapping: { data: { data: [...] } } or { data: [...] }
+    if (data is Map<String, dynamic>) {
+      data = data['data'] ?? data['items'] ?? [];
+    }
+    
+    if (data is! List) return [];
+    
     return data
         .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -94,11 +92,11 @@ class FamilyRepositoryImpl implements FamilyRepository {
     int pageSize = 20,
   }) async {
     final queryParameters = <String, dynamic>{
-      if (stateId != null && stateId > 0) 'StateId': stateId,
-      if (districtId != null && districtId > 0) 'DistrictId': districtId,
-      if (talukaId != null && talukaId > 0) 'TalukaId': talukaId,
-      'PageNumber': pageNo,
-      'PageSize': pageSize,
+      if (stateId != null && stateId > 0) 'stateId': stateId,
+      if (districtId != null && districtId > 0) 'districtId': districtId,
+      if (talukaId != null && talukaId > 0) 'talukaId': talukaId,
+      'pageNumber': pageNo,
+      'pageSize': pageSize,
     };
 
     AppLogger.d('Family Areas Request: $queryParameters');
