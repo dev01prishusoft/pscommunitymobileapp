@@ -12,6 +12,8 @@ class FindMemberController extends GetxController {
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<Member> members = <Member>[].obs;
   final RxString searchQuery = ''.obs;
+  final RxBool isSearching = false.obs;
+  String _lastQuery = '';
   
   // Pagination
   int _currentPage = 1;
@@ -23,11 +25,22 @@ class FindMemberController extends GetxController {
   void onInit() {
     super.onInit();
     // Debounce search to avoid too many API calls
-    debounce(searchQuery, (_) => loadMembers(), time: const Duration(milliseconds: 500));
+    debounce(searchQuery, (_) => loadMembers(showLoading: false), time: const Duration(milliseconds: 500));
   }
 
   Future<void> loadMembers({bool showLoading = true}) async {
-    if (showLoading) state.value = AppState.loading;
+    // If it's a debounced call and query has not changed, return early
+    if (!showLoading && searchQuery.value == _lastQuery) {
+      return;
+    }
+    _lastQuery = searchQuery.value;
+
+    if (showLoading) {
+      state.value = AppState.loading;
+    } else {
+      isSearching.value = true;
+    }
+    
     _currentPage = 1;
     hasMore.value = true;
     
@@ -43,7 +56,11 @@ class FindMemberController extends GetxController {
       state.value = members.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load members', e, stack);
-      state.value = AppState.error;
+      if (showLoading) {
+        state.value = AppState.error;
+      }
+    } finally {
+      isSearching.value = false;
     }
   }
 
@@ -80,6 +97,6 @@ class FindMemberController extends GetxController {
 
   void clearSearch() {
     searchQuery.value = '';
-    loadMembers();
+    loadMembers(showLoading: true);
   }
 }

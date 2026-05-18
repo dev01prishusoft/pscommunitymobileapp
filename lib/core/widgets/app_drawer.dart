@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -92,6 +93,28 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.person_add_alt_1_outlined, color: AppColors.primary),
             title: Text(LK.addFamilyMember.tr),
             onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
+          ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined, color: AppColors.primary),
+            title: Text(LK.privacyPolicy.tr),
+            onTap: () {
+              Get.back<void>(); // Close drawer
+              Get.to<void>(() => AppWebViewPage(
+                title: LK.privacyPolicy.tr,
+                url: 'https://www.prishusoft.com/privacy-policy.html',
+              ));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.gavel_outlined, color: AppColors.primary),
+            title: Text(LK.termsAndConditions.tr),
+            onTap: () {
+              Get.back<void>(); // Close drawer
+              Get.to<void>(() => AppWebViewPage(
+                title: LK.termsAndConditions.tr,
+                url: 'https://www.prishusoft.com/terms-and-conditions.html',
+              ));
+            },
           ),
           
           const Spacer(),

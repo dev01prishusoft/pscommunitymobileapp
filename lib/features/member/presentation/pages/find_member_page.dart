@@ -72,13 +72,30 @@ class _FindMemberPageState extends State<FindMemberPage> {
               decoration: InputDecoration(
                 hintText: LK.searchHint.tr,
                 prefixIcon: const Icon(Icons.search, color: AppColors.mutedForeground),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.mutedForeground),
-                  onPressed: () {
-                    _searchController.clear();
-                    _controller.clearSearch();
-                  },
-                ),
+                suffixIcon: Obx(() {
+                  if (_controller.isSearching.value) {
+                    return const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        ),
+                      ),
+                    );
+                  }
+                  return _controller.searchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close, color: AppColors.mutedForeground),
+                          onPressed: () {
+                            _searchController.clear();
+                            _controller.clearSearch();
+                          },
+                        )
+                      : const SizedBox.shrink();
+                }),
                 filled: true,
                 fillColor: const Color(0xFFF1F5F9),
                 border: OutlineInputBorder(

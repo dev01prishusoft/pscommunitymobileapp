@@ -60,12 +60,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 _buildTimePicker(LK.timeOfBirth.tr, controller.tob),
               ),
               _buildFieldPair(
-                _buildDropdown(LK.gender.tr, controller.gender, ['Male', 'Female', 'Other']),
-                _buildDropdown(LK.maritalStatusLabel.tr, controller.maritalStatus, ['Married', 'Unmarried', 'Widow', 'Divorced']),
+                _buildDropdown(LK.gender.tr, controller.gender, ['Male', 'Female', 'Other'], translateItems: true),
+                _buildDropdown(LK.maritalStatusLabel.tr, controller.maritalStatus, ['Married', 'Unmarried', 'Widow', 'Divorced'], translateItems: true),
               ),
               _buildFieldPair(
-                _buildDropdown(LK.bloodGroup.tr, controller.bloodGroup, ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
-                _buildDropdown(LK.sign.tr, controller.sign, ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces']),
+                _buildDropdown(LK.bloodGroup.tr, controller.bloodGroup, ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], translateItems: true),
+                _buildDropdown(LK.sign.tr, controller.sign, ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'], translateItems: true),
               ),
               _buildFieldPair(
                 _buildTextField(LK.weightKg.tr, controller.weight, Icons.monitor_weight_outlined, keyboardType: TextInputType.number),
@@ -92,7 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _buildSection(LK.familyParents.tr, Icons.family_restroom_outlined, [
               _buildCheckboxField(LK.familyHead.tr, controller.isFamilyHead, LK.memberIsFamilyHead.tr),
               const SizedBox(height: 12),
-              _buildDropdown(LK.role.tr, controller.relation, ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother']),
+              _buildDropdown(LK.role.tr, controller.relation, ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother'], translateItems: true),
               const SizedBox(height: 12),
               _buildTextField(LK.motherFatherName.tr, controller.motherFatherName, Icons.people_outline),
               _buildFieldPair(
@@ -176,7 +176,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
                   ),
@@ -222,7 +222,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       child: Column(
         children: [
-          Text(LK.profilePhoto.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(LK.profilePhoto.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 16),
           Center(
             child: Stack(
@@ -315,7 +315,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildDropdownSimple(LK.addressType.tr, addr.type, ['Home', 'Office', 'Other'], (v) => addr.type = v!),
+          _buildDropdownSimple(LK.addressType.tr, addr.type, ['Home', 'Office', 'Other'], (v) => addr.type = v!, translateItems: true),
           const SizedBox(height: 12),
           _buildFieldPair(
             _buildDropdownSimple(LK.stateLabel.tr, addr.state, ['Gujarat', 'Maharashtra', 'Rajasthan'], (v) => addr.state = v!),
@@ -388,7 +388,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildDropdownSimple(LK.qualificationLabel.tr, edu.qualification, ['Graduate', 'HSC', 'SSC', 'Post Graduate'], (v) => edu.qualification = v!),
+          _buildDropdownSimple(LK.qualificationLabel.tr, edu.qualification, ['Graduate', 'HSC', 'SSC', 'Post Graduate'], (v) => edu.qualification = v!, translateItems: true),
           const SizedBox(height: 12),
           _buildFieldPair(
             _buildTextFieldSimple(LK.instituteNameLabel.tr, edu.institute, (v) => edu.institute = v),
@@ -408,7 +408,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildWorkHistorySection() {
     return _buildSection(LK.workHistory.tr, Icons.work_outline, [
-      _buildDropdown(LK.occupationTypeLabel.tr, controller.occupationType, ['Agriculture', 'Business', 'Job', 'Profession']),
+      _buildDropdown(LK.occupationTypeLabel.tr, controller.occupationType, ['Agriculture', 'Business', 'Job', 'Profession'], translateItems: true),
       const SizedBox(height: 12),
       _buildFieldPair(
         _buildDropdown(LK.occupationLabel.tr, controller.occupation, ['Dairy Farming', 'Software', 'Real Estate']),
@@ -456,7 +456,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.mutedForeground)),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.mutedForeground)),
         const SizedBox(height: 4),
         TextField(
           controller: textController,
@@ -501,11 +501,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildDropdown(String label, RxString value, List<String> items) {
+  Widget _buildDropdown(String label, RxString value, List<String> items, {bool translateItems = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.secondary)),
+        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.secondary)),
         const SizedBox(height: 8),
         Obx(() => Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -514,7 +514,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             child: DropdownButton<String>(
               value: items.contains(value.value) ? value.value : items.first,
               isExpanded: true,
-              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14)))).toList(),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(translateItems ? e.tr : e, style: const TextStyle(fontSize: 14)))).toList(),
               onChanged: (v) => value.value = v!,
             ),
           ),
@@ -523,11 +523,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildDropdownSimple(String label, String value, List<String> items, void Function(String?) onChanged) {
+  Widget _buildDropdownSimple(String label, String value, List<String> items, void Function(String?) onChanged, {bool translateItems = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.mutedForeground)),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.mutedForeground)),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -537,7 +537,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               value: items.contains(value) ? value : items.first,
               isExpanded: true,
               isDense: true,
-              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 13)))).toList(),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(translateItems ? e.tr : e, style: const TextStyle(fontSize: 13)))).toList(),
               onChanged: onChanged,
             ),
           ),
@@ -569,7 +569,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.secondary)),
+        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.secondary)),
         const SizedBox(height: 8),
         Obx(() => Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),

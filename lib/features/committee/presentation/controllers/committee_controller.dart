@@ -15,22 +15,39 @@ class CommitteeController extends GetxController {
   final RxList<CommitteeNode> committees = <CommitteeNode>[].obs;
   final Rx<CommitteeDetail?> committeeDetail = Rx<CommitteeDetail?>(null);
   final RxString searchQuery = ''.obs;
+  final RxBool isSearching = false.obs;
+  String _lastQuery = '';
 
   @override
   void onInit() {
     super.onInit();
-    debounce(searchQuery, (_) => loadCommittees(), time: const Duration(milliseconds: 500));
+    debounce(searchQuery, (_) => loadCommittees(showLoading: false), time: const Duration(milliseconds: 500));
   }
 
-  Future<void> loadCommittees() async {
-    state.value = AppState.loading;
+  Future<void> loadCommittees({bool showLoading = true}) async {
+    // If it's a debounced call and query has not changed, return early
+    if (!showLoading && searchQuery.value == _lastQuery) {
+      return;
+    }
+    _lastQuery = searchQuery.value;
+
+    if (showLoading) {
+      state.value = AppState.loading;
+    } else {
+      isSearching.value = true;
+    }
+
     try {
       final results = await _repository.getCommittees(searchQuery: searchQuery.value);
       committees.assignAll(results);
       state.value = committees.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load committees', e, stack);
-      state.value = AppState.error;
+      if (showLoading) {
+        state.value = AppState.error;
+      }
+    } finally {
+      isSearching.value = false;
     }
   }
 
@@ -52,7 +69,7 @@ class CommitteeController extends GetxController {
 
   void clearSearch() {
     searchQuery.value = '';
-    loadCommittees();
+    loadCommittees(showLoading: true);
   }
 
   void toggleNode(CommitteeNode node) {

@@ -38,6 +38,9 @@ dart run tool/check_invalid_tr_usage.dart
 
 # Check for duplicate localization keys
 dart run tool/check_duplicate_lk_values.dart
+
+# Ensure no test files reside under lib/
+dart run tool/check_no_test_files_in_lib.dart
 ```
 
 ## Localization

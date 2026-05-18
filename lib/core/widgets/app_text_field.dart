@@ -35,12 +35,37 @@ class AppTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(
-            label!,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.secondary,
+          Text.rich(
+            TextSpan(
+              children: [
+                if (label!.contains('*')) ...[
+                  TextSpan(
+                    text: label!.replaceAll('*', '').trimRight() + ' ',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: '*',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ] else ...[
+                  TextSpan(
+                    text: label!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           const SizedBox(height: 8),
@@ -52,39 +77,43 @@ class AppTextField extends StatelessWidget {
           readOnly: readOnly,
           onTap: onTap,
           onChanged: onChanged,
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppColors.foreground,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w400,
+            fontSize: 14.0,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.mutedForeground),
+            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppColors.mutedForeground,
+              fontSize: 14.0,
+            ),
             prefixIcon: Icon(icon, color: AppColors.mutedForeground),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: AppColors.muted.withValues(alpha: 0.5),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 18,
+              horizontal: 16,
+              vertical: 12,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.5)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: AppColors.destructive, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
                 color: AppColors.destructive,
                 width: 1.5,

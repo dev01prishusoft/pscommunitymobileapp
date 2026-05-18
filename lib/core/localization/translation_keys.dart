@@ -80,6 +80,7 @@ class LK {
   // Extra keys used in UI but missing from LK
   static const String samajName = 'Andhariya Ganata Samaj';
   static const String privacyPolicy = 'Privacy Policy';
+  static const String termsAndConditions = 'Terms & Conditions';
   static const String privacyContent = 'privacy_content';
   static const String needHelp = 'Need help?';
   static const String supportEmail = 'support_email';
@@ -402,7 +403,7 @@ class LK {
     family, findMember, committee, payment, contactUs, matrimonial,
     support, share, samajInfo, unmarriedMale, unmarriedFemale,
     address, assetAndLife, socialMedia, facebook, instagram, whatsapp, paymentHistory, paymentReceipt, amount,
-    updateAvailable, updateNow, updateLater, reset, home, samajName, privacyPolicy,
+    updateAvailable, updateNow, updateLater, reset, home, samajName, privacyPolicy, termsAndConditions,
     privacyContent, needHelp, supportEmail, supportPhone, supportHours, searchHint,
     showing, membersCount, courtesy, social, devotion, annualMembership,
     male, female, self, wife, married, unmarried, familiesCount, success, lookingForMarriage,
@@ -452,15 +453,15 @@ class LK {
     firstNameEnglish, lastNameEnglish, timeOfBirth, bloodGroup, sign,
     weightKg, heightCm, memberIsActive, profilePhoto, chooseFile,
     noFileChosen, removePhoto, saveChanges, addMember, memberNoHint,
-    addressesTab, educationTab, mobileVerified, notVerified,
+    addressesTab, mobileVerified, notVerified,
     secondaryMobileLabel, entryPersonMobile, emergencyContactNameLabel,
     memberIsFamilyHead, mothersGotra, openToMarriageProposals,
     monthlyIncomeLabel, addAddress, addressType, pincode, landmarkLabel,
-    addressLine1, addressLine2, primaryAddress, addEducation,
+    addressLine1, addressLine2, addEducation,
     qualificationLabel, instituteNameLabel, passingYearLabel,
     percentageLabel, gradeLabel, markAsHighest, jobPositionLabel,
     otherJobPositionLabel, otherOccupationLabel,
-    occupationAddressLine1Label, occupationAddressLine2Label, businessName, mobileNo,
+    occupationAddressLine1Label, occupationAddressLine2Label, businessName,
     invalidMobileOrPassword, pleaseEnterOldPassword, pleaseEnterNewPassword, pleaseEnterConfirmPassword
   ];
 }

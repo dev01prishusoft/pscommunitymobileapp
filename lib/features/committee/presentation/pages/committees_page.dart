@@ -22,8 +22,8 @@ class _CommitteesPageState extends State<CommitteesPage> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = controller.searchQuery.value;
     controller.clearSearch();
+    _searchController.text = '';
   }
 
   @override
@@ -61,15 +61,30 @@ class _CommitteesPageState extends State<CommitteesPage> {
               decoration: InputDecoration(
                 hintText: LK.searchCommittees.tr,
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _searchController.clear();
-                          controller.onSearchChanged('');
-                        },
-                      )
-                    : const SizedBox.shrink()),
+                suffixIcon: Obx(() {
+                  if (controller.isSearching.value) {
+                    return const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        ),
+                      ),
+                    );
+                  }
+                  return controller.searchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchController.clear();
+                            controller.clearSearch();
+                          },
+                        )
+                      : const SizedBox.shrink();
+                }),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
