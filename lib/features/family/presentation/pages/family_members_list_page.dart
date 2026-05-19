@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/relation_mapper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
   const FamilyMembersListPage({super.key});
@@ -56,9 +57,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
     return _controller.families.map((family) {
       final filteredMembers = family.members.where((member) {
         final name = member.name.toLowerCase();
-        final mobile = member.mobileNo?.toLowerCase() ?? '';
-        final id = member.id.toLowerCase();
-        return name.contains(query) || mobile.contains(query) || id.contains(query);
+        return name.contains(query);
       }).toList();
       if (filteredMembers.isEmpty) return null;
       return Family(familyName: family.familyName, members: filteredMembers);
@@ -106,7 +105,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: LK.searchByMobileHint.tr,
+                  hintText: LK.searchByNameHint.tr,
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -221,18 +220,50 @@ class _MemberTile extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: avatarColors.background,
-                  child: Text(
-                    member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
-                    style: TextStyle(
-                      color: avatarColors.text,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
+                member.profileImageUrl != null && member.profileImageUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: member.profileImageUrl!,
+                        imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
+                          radius: 22,
+                          backgroundImage: imageProvider,
+                        ),
+                        placeholder: (context, url) => CircleAvatar(
+                          radius: 22,
+                          backgroundColor: avatarColors.background,
+                          child: const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => CircleAvatar(
+                          radius: 22,
+                          backgroundColor: avatarColors.background,
+                          child: Text(
+                            member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
+                            style: TextStyle(
+                              color: avatarColors.text,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 22,
+                        backgroundColor: avatarColors.background,
+                        child: Text(
+                          member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
+                          style: TextStyle(
+                            color: avatarColors.text,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

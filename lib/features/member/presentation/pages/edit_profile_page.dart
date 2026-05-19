@@ -60,12 +60,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 _buildTimePicker(LK.timeOfBirth.tr, controller.tob),
               ),
               _buildFieldPair(
-                _buildDropdown(LK.gender.tr, controller.gender, ['Male', 'Female', 'Other'], translateItems: true),
-                _buildDropdown(LK.maritalStatusLabel.tr, controller.maritalStatus, ['Married', 'Unmarried', 'Widow', 'Divorced'], translateItems: true),
+                Obx(() => _buildDropdown(LK.gender.tr, controller.gender, controller.genderList.isEmpty ? controller.defaultGenders : controller.genderList, translateItems: true)),
+                Obx(() => _buildDropdown(LK.maritalStatusLabel.tr, controller.maritalStatus, controller.maritalStatusList.isEmpty ? controller.defaultMaritalStatuses : controller.maritalStatusList, translateItems: true)),
               ),
               _buildFieldPair(
-                _buildDropdown(LK.bloodGroup.tr, controller.bloodGroup, ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], translateItems: true),
-                _buildDropdown(LK.sign.tr, controller.sign, ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'], translateItems: true),
+                Obx(() => _buildDropdown(LK.bloodGroup.tr, controller.bloodGroup, controller.bloodGroupList.isEmpty ? controller.defaultBloodGroups : controller.bloodGroupList, translateItems: true)),
+                Obx(() => _buildDropdown(LK.sign.tr, controller.sign, controller.signList.isEmpty ? controller.defaultSigns : controller.signList, translateItems: true)),
               ),
               _buildFieldPair(
                 _buildTextField(LK.weightKg.tr, controller.weight, Icons.monitor_weight_outlined, keyboardType: TextInputType.number),
@@ -92,7 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _buildSection(LK.familyParents.tr, Icons.family_restroom_outlined, [
               _buildCheckboxField(LK.familyHead.tr, controller.isFamilyHead, LK.memberIsFamilyHead.tr),
               const SizedBox(height: 12),
-              _buildDropdown(LK.role.tr, controller.relation, ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother'], translateItems: true),
+              Obx(() => _buildDropdown(LK.role.tr, controller.relation, controller.relationList.isEmpty ? controller.defaultRelations : controller.relationList, translateItems: true)),
               const SizedBox(height: 12),
               _buildTextField(LK.motherFatherName.tr, controller.motherFatherName, Icons.people_outline),
               _buildFieldPair(
@@ -315,7 +315,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildDropdownSimple(LK.addressType.tr, addr.type, ['Home', 'Office', 'Other'], (v) => addr.type = v!, translateItems: true),
+          Obx(() => _buildDropdownSimple(LK.addressType.tr, addr.type, controller.addressTypeList.isEmpty ? controller.defaultAddressTypes : controller.addressTypeList, (v) => addr.type = v!, translateItems: true)),
           const SizedBox(height: 12),
           _buildFieldPair(
             _buildDropdownSimple(LK.stateLabel.tr, addr.state, ['Gujarat', 'Maharashtra', 'Rajasthan'], (v) => addr.state = v!),
@@ -388,7 +388,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildDropdownSimple(LK.qualificationLabel.tr, edu.qualification, ['Graduate', 'HSC', 'SSC', 'Post Graduate'], (v) => edu.qualification = v!, translateItems: true),
+          Obx(() => _buildDropdownSimple(LK.qualificationLabel.tr, edu.qualification, controller.qualificationList.isEmpty ? controller.defaultQualifications : controller.qualificationList, (v) => edu.qualification = v!, translateItems: true)),
           const SizedBox(height: 12),
           _buildFieldPair(
             _buildTextFieldSimple(LK.instituteNameLabel.tr, edu.institute, (v) => edu.institute = v),
@@ -408,7 +408,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildWorkHistorySection() {
     return _buildSection(LK.workHistory.tr, Icons.work_outline, [
-      _buildDropdown(LK.occupationTypeLabel.tr, controller.occupationType, ['Agriculture', 'Business', 'Job', 'Profession'], translateItems: true),
+      Obx(() => _buildDropdown(LK.occupationTypeLabel.tr, controller.occupationType, controller.occupationTypeList.isEmpty ? controller.defaultOccupationTypes : controller.occupationTypeList, translateItems: true)),
       const SizedBox(height: 12),
       _buildFieldPair(
         _buildDropdown(LK.occupationLabel.tr, controller.occupation, ['Dairy Farming', 'Software', 'Real Estate']),
@@ -460,6 +460,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const SizedBox(height: 4),
         TextField(
           controller: textController,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppColors.foreground,
+            fontWeight: FontWeight.w400,
+            fontSize: 14.0,
+          ),
           decoration: InputDecoration(
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),

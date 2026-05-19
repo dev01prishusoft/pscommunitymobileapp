@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+
 class Member {
   final int memberId;
   final String? memberNo;
@@ -136,6 +138,13 @@ class Member {
     final String fallbackLast = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     final int fallbackAge = (json['age'] as num?)?.toInt() ?? 0;
 
+    final String? profilePhoto = getString('profilePhotoFullUrl', 'memberProfileUrl', 'profileUrl');
+    String? fullProfileUrl = profilePhoto;
+    if (fullProfileUrl != null && fullProfileUrl.isNotEmpty && !fullProfileUrl.startsWith('http')) {
+      final baseUrl = AppEnvironment.I.apiBaseUrl;
+      fullProfileUrl = fullProfileUrl.startsWith('/') ? '$baseUrl$fullProfileUrl' : '$baseUrl/$fullProfileUrl';
+    }
+
     return Member(
       memberId: (json['memberId'] ?? json['id']) as int? ?? 0,
       memberNo: getString('memberNo'),
@@ -168,8 +177,8 @@ class Member {
       whatsappUrl: getString('whatsappUrl'),
       instagramUrl: getString('instagramUrl'),
       twitterUrl: getString('twitterUrl'),
-      profilePhotoFullUrl: getString('profilePhotoFullUrl'),
-      gotraName: getString('gotraName', 'gotra'),
+      profilePhotoFullUrl: fullProfileUrl,
+      gotraName: getString('gotraName', 'gotra', 'gotra_name', 'Gotra'),
       motherFatherName: getString('motherFatherName'),
       occupationTypeName: getString('occupationTypeName'),
       occupationName: getString('occupationName', 'occupation'),

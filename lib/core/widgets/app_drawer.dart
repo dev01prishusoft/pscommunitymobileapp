@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 
@@ -101,7 +102,7 @@ class AppDrawer extends StatelessWidget {
               Get.back<void>(); // Close drawer
               Get.to<void>(() => AppWebViewPage(
                 title: LK.privacyPolicy.tr,
-                url: 'https://www.prishusoft.com/privacy-policy.html',
+                url: '${AppEnvironment.I.uiBaseUrl}/privacy-policy',
               ));
             },
           ),
@@ -112,7 +113,7 @@ class AppDrawer extends StatelessWidget {
               Get.back<void>(); // Close drawer
               Get.to<void>(() => AppWebViewPage(
                 title: LK.termsAndConditions.tr,
-                url: 'https://www.prishusoft.com/terms-and-conditions.html',
+                url: '${AppEnvironment.I.uiBaseUrl}/terms-and-conditions',
               ));
             },
           ),

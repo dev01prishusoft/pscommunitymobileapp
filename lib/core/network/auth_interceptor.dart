@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
@@ -51,7 +52,11 @@ class AuthInterceptor extends Interceptor {
         final response = await _mainDio.fetch<Map<String, dynamic>>(options);
         return handler.resolve(response);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      if (kDebugMode) {
+        print('REFRESH TOKEN ERROR: $e');
+        print('STACKTRACE: $stack');
+      }
       _onAuthFailure();
     }
 

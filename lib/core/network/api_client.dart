@@ -29,6 +29,7 @@ class ApiClient {
     final refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl));
 
     CertificatePinning.configure(_dio);
+    CertificatePinning.configure(refreshDio);
 
     _dio.interceptors.addAll([
       LanguageInterceptor(),

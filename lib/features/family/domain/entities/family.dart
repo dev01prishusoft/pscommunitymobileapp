@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+
 class FamilyMember {
   final String id;
   final String name;
@@ -7,6 +9,7 @@ class FamilyMember {
   final String maritalStatus;
   final String occupation;
   final String? mobileNo;
+  final String? profileUrl;
 
   const FamilyMember({
     required this.id,
@@ -17,7 +20,15 @@ class FamilyMember {
     required this.maritalStatus,
     required this.occupation,
     this.mobileNo,
+    this.profileUrl,
   });
+
+  String? get profileImageUrl {
+    if (profileUrl == null || profileUrl!.isEmpty) return null;
+    if (profileUrl!.startsWith('http')) return profileUrl;
+    final baseUrl = AppEnvironment.I.apiBaseUrl;
+    return profileUrl!.startsWith('/') ? '$baseUrl$profileUrl' : '$baseUrl/$profileUrl';
+  }
 
   factory FamilyMember.fromJson(Map<String, dynamic> json) {
     final dynamic rawId = json['memberId'] ?? json['MemberId'] ?? json['id'] ?? json['Id'];
@@ -30,6 +41,7 @@ class FamilyMember {
       maritalStatus: json['maritalStatus'] as String? ?? '',
       occupation: json['occupation'] as String? ?? '',
       mobileNo: (json['mobileNo'] ?? json['MobileNo'] ?? json['mobile_no'])?.toString(),
+      profileUrl: json['profileUrl'] as String? ?? json['profilePhotoFullUrl'] as String? ?? json['memberProfileUrl'] as String?,
     );
   }
 }

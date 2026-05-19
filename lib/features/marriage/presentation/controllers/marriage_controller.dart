@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/features/member/domain/repositories/member_
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class MarriageController extends GetxController {
   MarriageController(this._repository, this._memberRepository, this._familyRepository);
@@ -45,6 +46,8 @@ class MarriageController extends GetxController {
   // Dynamic Lists
   final RxList<String> dynamicGotras = <String>['Any'].obs;
   final RxList<String> dynamicOccupations = <String>['Any'].obs;
+  final RxList<String> dynamicEducations = <String>['Any'].obs;
+  final RxList<String> dynamicAreas = <String>['All'].obs;
   
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
@@ -82,6 +85,7 @@ class MarriageController extends GetxController {
     }
     
     loadLocations();
+    loadAllDropdowns();
   }
 
   Future<void> loadLocations() async {
@@ -149,28 +153,29 @@ class MarriageController extends GetxController {
       if (searchQuery.isNotEmpty) {
         final query = searchQuery.value.toLowerCase();
         members = members.where((m) {
-          final fullName = '${m.firstName} ${m.middleName ?? ''} ${m.lastName}'.toLowerCase();
-          final occupation = m.occupation.toLowerCase();
-          final age = m.age.toString();
-          final memberId = m.memberId.toString();
-          final memberNo = m.memberNo?.toLowerCase() ?? '';
-          final mobile = m.mobileNo?.toLowerCase() ?? '';
-          
-          return fullName.contains(query) || 
-                 occupation.contains(query) || 
-                 age.contains(query) || 
-                 memberId.contains(query) ||
-                 memberNo.contains(query) ||
-                 mobile.contains(query);
+          final firstName = m.firstName.toLowerCase();
+          return firstName.contains(query);
         }).toList();
       }
 
-      // Populate Dynamic Filter Options BEFORE applying advanced filters (Issue 9, 11, 12)
-      final gotras = members.map((m) => m.gotra).where((g) => g.isNotEmpty).toSet().toList()..sort();
+      // Gotras are extracted from active members to show relevant Gotras
+      final gotras = members
+          .map((m) => m.gotra.trim())
+          .where((g) => g.isNotEmpty)
+          .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
+          .toSet()
+          .toList()
+        ..sort();
       dynamicGotras.assignAll(['Any', ...gotras]);
 
-      final occupations = members.map((m) => m.occupation).where((o) => o.isNotEmpty).toSet().toList()..sort();
-      dynamicOccupations.assignAll(['Any', ...occupations]);
+      // Areas are extracted dynamically from active members
+      final areas = members
+          .map((m) => m.area.trim())
+          .where((a) => a.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+      dynamicAreas.assignAll(['All', ...areas]);
 
       // Populate locations from members (Issue 11)
       final memStates = members.map((m) => m.occupationStateName).whereType<String>().toSet().toList()..sort();
@@ -197,7 +202,12 @@ class MarriageController extends GetxController {
       }
 
       if (selectedGotra.value != 'Any') {
-        members = members.where((m) => m.gotra == selectedGotra.value).toList();
+        members = members.where((m) {
+          final mGotra = m.gotra.trim();
+          if (mGotra.isEmpty) return false;
+          final normalized = mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
+          return normalized == selectedGotra.value;
+        }).toList();
       }
       
       if (excludeSameGotra.value) {
@@ -287,13 +297,73 @@ class MarriageController extends GetxController {
   }
 
   void _updateDynamicLists(List<Member> members) {
-    // Collect all unique gotras and occupations
-    final gotras = members.map((m) => m.gotra).where((g) => g.isNotEmpty).toSet().toList();
+    // Collect all unique gotras
+    final gotras = members
+        .map((m) => m.gotra.trim())
+        .where((g) => g.isNotEmpty)
+        .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
+        .toSet()
+        .toList();
     gotras.sort();
     dynamicGotras.assignAll(['Any', ...gotras]);
 
-    final occupations = members.map((m) => m.occupation).where((o) => o.isNotEmpty).toSet().toList();
-    occupations.sort();
-    dynamicOccupations.assignAll(['Any', ...occupations]);
+    // Collect all unique areas
+    final areas = members
+        .map((m) => m.area.trim())
+        .where((a) => a.isNotEmpty)
+        .toSet()
+        .toList();
+    areas.sort();
+    dynamicAreas.assignAll(['All', ...areas]);
+  }
+
+  Future<void> loadAllDropdowns() async {
+    await Future.wait([
+      _fetchDropdown('/EducationalQualification/list/dropdown', dynamicEducations, ['Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD']),
+      _fetchDropdown('/Occupation/dropdown', dynamicOccupations, ['Private Employee', 'Government Employee', 'Business Owner', 'Farmer', 'Housewife', 'Student', 'Retired', 'Unemployed', 'Other']),
+    ]);
+  }
+
+  Future<void> _fetchDropdown(String path, RxList<String> targetList, List<String> fallbacks) async {
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get('/api/v1$path');
+      if (response.data != null) {
+        final json = response.data as Map<String, dynamic>;
+        if (json['succeeded'] == true) {
+          final rawData = json['data'];
+          List<dynamic> list = [];
+          if (rawData is List) {
+            list = rawData;
+          } else if (rawData is Map<String, dynamic>) {
+            list = (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ?? [];
+          }
+          final items = list.map((e) {
+            final map = e as Map<String, dynamic>;
+            final textKeys = ['text', 'Text', 'name', 'Name', 'value', 'Value'];
+            for (final key in textKeys) {
+              if (map.containsKey(key) && map[key] != null) {
+                return map[key].toString().trim();
+              }
+            }
+            for (final entry in map.entries) {
+              if (!entry.key.toLowerCase().contains('id')) {
+                return entry.value.toString().trim();
+              }
+            }
+            return '';
+          }).where((s) => s.isNotEmpty).toList();
+          
+          if (items.isNotEmpty) {
+            targetList.assignAll(['Any', ...items]);
+            return;
+          }
+        }
+      }
+      targetList.assignAll(['Any', ...fallbacks]);
+    } catch (e) {
+      AppLogger.e('Failed to fetch dropdown $path', e);
+      targetList.assignAll(['Any', ...fallbacks]);
+    }
   }
 }

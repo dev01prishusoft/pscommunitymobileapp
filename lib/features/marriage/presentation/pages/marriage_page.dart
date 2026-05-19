@@ -25,6 +25,8 @@ class _MarriagePageState extends State<MarriagePage> {
   void initState() {
     super.initState();
     _controller.clearFilters();
+    _controller.loadLocations();
+    _controller.loadAllDropdowns();
   }
 
   // Constants for Dropdowns (kept here for UI list)
@@ -69,28 +71,31 @@ class _MarriagePageState extends State<MarriagePage> {
                       
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildSummaryCard(
-                            label: LK.unmarriedMale.tr,
-                            count: maleCount.toString(),
-                            icon: Icons.group,
-                            iconColor: Colors.blue,
-                            textColor: Colors.blue,
+                    child: IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _buildSummaryCard(
+                              label: LK.unmarriedMale.tr,
+                              count: maleCount.toString(),
+                              icon: Icons.group,
+                              iconColor: Colors.blue,
+                              textColor: Colors.blue,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildSummaryCard(
-                            label: LK.unmarriedFemale.tr,
-                            count: femaleCount.toString(),
-                            icon: Icons.person,
-                            iconColor: Colors.pink,
-                            textColor: Colors.pink,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildSummaryCard(
+                              label: LK.unmarriedFemale.tr,
+                              count: femaleCount.toString(),
+                              icon: Icons.person,
+                              iconColor: Colors.pink,
+                              textColor: Colors.pink,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -189,7 +194,7 @@ class _MarriagePageState extends State<MarriagePage> {
                             _controller.searchQuery.value = val;
                           },
                           decoration: InputDecoration(
-                            hintText: LK.searchMemberHint.tr,
+                            hintText: LK.searchByFirstNameHint.tr,
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.close),
@@ -269,7 +274,7 @@ class _MarriagePageState extends State<MarriagePage> {
             child: Container(
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
@@ -450,7 +455,7 @@ class _MarriagePageState extends State<MarriagePage> {
                                         Expanded(
                                           child: _buildDropdownField(
                                             value: _controller.selectedArea.value,
-                                            items: _areas,
+                                            items: _controller.dynamicAreas,
                                             onChanged: (val) => _controller.selectedArea.value = val!,
                                           ),
                                         ),
@@ -472,7 +477,7 @@ class _MarriagePageState extends State<MarriagePage> {
                               Expanded(
                                 child: _buildDropdownField(
                                   value: _controller.selectedEducation.value,
-                                  items: _educations,
+                                  items: _controller.dynamicEducations,
                                   onChanged: (val) =>
                                       _controller.selectedEducation.value = val!,
                                 ),
@@ -586,7 +591,7 @@ class _MarriagePageState extends State<MarriagePage> {
                     color: AppColors.mutedForeground,
                     fontWeight: FontWeight.w500,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(

@@ -1,6 +1,27 @@
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class ProfileFormController extends GetxController {
+  // Fallback defaults
+  final defaultGenders = ['Male', 'Female', 'Other'];
+  final defaultMaritalStatuses = ['Married', 'Unmarried', 'Widow', 'Divorced'];
+  final defaultBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  final defaultRelations = ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother'];
+  final defaultAddressTypes = ['Home', 'Office', 'Other'];
+  final defaultQualifications = ['Graduate', 'HSC', 'SSC', 'Post Graduate'];
+  final defaultOccupationTypes = ['Agriculture', 'Business', 'Job', 'Profession'];
+  final defaultSigns = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+
+  // Reactive dropdown lists
+  final genderList = <String>[].obs;
+  final maritalStatusList = <String>[].obs;
+  final bloodGroupList = <String>[].obs;
+  final relationList = <String>[].obs;
+  final addressTypeList = <String>[].obs;
+  final qualificationList = <String>[].obs;
+  final occupationTypeList = <String>[].obs;
+  final signList = <String>[].obs;
+
   // Personal Tab
   final memberNo = 'PSC-2026-0512160358'.obs;
   final firstName = 'Ajay'.obs;
@@ -103,8 +124,85 @@ class ProfileFormController extends GetxController {
   final workAddressLine1 = ''.obs;
   final workAddressLine2 = ''.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    loadAllDropdowns();
+  }
+
+  Future<void> loadAllDropdowns() async {
+    await Future.wait([
+      _fetchDropdown('/gender/dropdown', genderList, defaultGenders),
+      _fetchDropdown('/MaritalStatus/dropdown', maritalStatusList, defaultMaritalStatuses),
+      _fetchDropdown('/BloodGroup/dropdown', bloodGroupList, defaultBloodGroups),
+      _fetchDropdown('/RelationType/dropdown', relationList, defaultRelations),
+      _fetchDropdown('/AddressType/dropdown', addressTypeList, defaultAddressTypes),
+      _fetchDropdown('/EducationalQualification/list/dropdown', qualificationList, defaultQualifications),
+      _fetchDropdown('/Occupation/dropdown', occupationTypeList, defaultOccupationTypes),
+      _fetchDropdown('/Sign/dropdown', signList, defaultSigns),
+    ]);
+    
+    // Ensure currently selected values are present in the list, if not, add them or select first
+    _ensureSelectionValue(gender, genderList);
+    _ensureSelectionValue(maritalStatus, maritalStatusList);
+    _ensureSelectionValue(bloodGroup, bloodGroupList);
+    _ensureSelectionValue(relation, relationList);
+    _ensureSelectionValue(occupationType, occupationTypeList);
+    _ensureSelectionValue(sign, signList);
+  }
+
+  void _ensureSelectionValue(RxString selected, List<String> list) {
+    if (list.isNotEmpty && !list.contains(selected.value)) {
+      selected.value = list.first;
+    }
+  }
+
+  Future<void> _fetchDropdown(String path, RxList<String> targetList, List<String> fallbacks) async {
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get('/api/v1$path');
+      if (response.data != null) {
+        final json = response.data as Map<String, dynamic>;
+        if (json['succeeded'] == true) {
+          final rawData = json['data'];
+          List<dynamic> list = [];
+          if (rawData is List) {
+            list = rawData;
+          } else if (rawData is Map<String, dynamic>) {
+            list = (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ?? [];
+          }
+          final items = list.map((e) {
+            final map = e as Map<String, dynamic>;
+            // Extract text/name safely
+            final textKeys = ['text', 'Text', 'name', 'Name', 'value', 'Value'];
+            for (final key in textKeys) {
+              if (map.containsKey(key) && map[key] != null) {
+                return map[key].toString().trim();
+              }
+            }
+            // Fallback to first non-id value
+            for (final entry in map.entries) {
+              if (!entry.key.toLowerCase().contains('id')) {
+                return entry.value.toString().trim();
+              }
+            }
+            return '';
+          }).where((s) => s.isNotEmpty).toList();
+          
+          if (items.isNotEmpty) {
+            targetList.assignAll(items);
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      // Fail silently and use fallback
+    }
+    targetList.assignAll(fallbacks);
+  }
+
   void addAddress() {
-    addresses.add(AddressModel(type: 'Home', isPrimary: false));
+    addresses.add(AddressModel(type: addressTypeList.isNotEmpty ? addressTypeList.first : 'Home', isPrimary: false));
   }
 
   void removeAddress(int index) {
@@ -112,7 +210,7 @@ class ProfileFormController extends GetxController {
   }
 
   void addEducation() {
-    educationList.add(EducationModel(qualification: 'Graduate', isHighest: false));
+    educationList.add(EducationModel(qualification: qualificationList.isNotEmpty ? qualificationList.first : 'Graduate', isHighest: false));
   }
 
   void removeEducation(int index) {

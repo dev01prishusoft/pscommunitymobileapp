@@ -8,6 +8,7 @@ class AppEnvironment {
 
   final Flavor flavor;
   final String apiBaseUrl;
+  final String uiBaseUrl;
   final Duration connectTimeout;
   final Duration receiveTimeout;
   final bool enableLogging;
@@ -15,6 +16,7 @@ class AppEnvironment {
   AppEnvironment._({
     required this.flavor,
     required this.apiBaseUrl,
+    required this.uiBaseUrl,
     this.connectTimeout = const Duration(seconds: 15),
     this.receiveTimeout = const Duration(seconds: 15),
     this.enableLogging = true,
@@ -29,6 +31,9 @@ class AppEnvironment {
       apiBaseUrl: flavor == Flavor.prod 
           ? ApiConstants.baseUrl 
           : ApiConstants.devUrl,
+      uiBaseUrl: flavor == Flavor.prod
+          ? ApiConstants.uiBaseUrl
+          : ApiConstants.devUiBaseUrl,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       enableLogging: flavor == Flavor.dev,

@@ -144,7 +144,7 @@ class LK {
   static const String nameLabel = 'Name:';
   static const String committeeLabel = 'Committee:';
   static const String searchCommittees = 'Search committees...';
-  static const String searchByMobileHint = 'Search by name or mobile...';
+  static const String searchByNameHint = 'Search by name...';
   static const String familyHead = 'Family Head';
   static const String at = 'at';
   
@@ -244,7 +244,7 @@ class LK {
   static const String committeeMemberDetails = 'Committee Member Details';
   static const String committeeDetailsHeader = 'COMMITTEE DETAILS';
   static const String noMembersCommittee = 'No members found for this committee';
-  static const String searchMemberHint = 'Search by name or member ID...';
+  static const String searchByFirstNameHint = 'Search by first name...';
   static const String stateLabel = 'State:';
   static const String districtLabel = 'District:';
   static const String talukaLabel = 'Taluka:';
@@ -432,7 +432,7 @@ class LK {
     gotraLabel, excludeSameGotra, maritalStatusLabel, residenceLabel,
     educationLabel, incomeRangeLabel, applyFilters, clearAll, to,
     linkCopied, shareAppViaWhatsApp, shareAppViaOther, committeeMemberDetails,
-    committeeDetailsHeader, noMembersCommittee, searchMemberHint, stateLabel,
+    committeeDetailsHeader, noMembersCommittee, searchByFirstNameHint, stateLabel,
     districtLabel, talukaLabel, view, membershipFee, primary, viewDetails,
     samajSanstha, status, committees, samajSubtitle,
     committeeMembers, role, memberDetails, startDateLabel, endDateLabel, viewProfile,
@@ -441,7 +441,7 @@ class LK {
     widow, divorced, inactive, pending, failed,
     shreePatelSevaSamaj, socialWelfareOrganization, active, shreePatelYuvaMandal,
     youthActivitiesAndEvents, shreePatelEducationTrust, educationalScholarships,
-    searchByMobileHint, familyHead, memberCount, sinceColon, reportsToColon,
+    searchByNameHint, familyHead, memberCount, sinceColon, reportsToColon,
     birthTime, motherFatherName, occupationArea, ownHouse, ownLand, twoWheeler, fourWheeler, twitterX,
     businessInfo, payments, dueSummary, totalDue, payAll, requestedPayments, requestedPaymentsPaid,
     adminSent, payNowButton, dueLabel, paidLabel, selectValidPayment, paymentSuccessful,
