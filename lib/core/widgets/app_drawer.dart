@@ -121,6 +121,19 @@ class AppDrawer extends StatelessWidget {
           const Spacer(),
           const Divider(),
           
+          // Delete Account Item
+          ListTile(
+            leading: const Icon(Icons.person_remove_alt_1_outlined, color: Colors.redAccent),
+            title: Text(
+              LK.deleteAccount.tr,
+              style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+            ),
+            onTap: () {
+              Get.back<void>(); // Close drawer
+              _showDeleteAccountDialog(context, authState);
+            },
+          ),
+          
           // Logout Item
           ListTile(
             leading: const Icon(Icons.logout_rounded, color: Colors.redAccent),
@@ -163,6 +176,55 @@ class AppDrawer extends StatelessWidget {
                 authState.logout();
                 Get.offAllNamed<void>(AppRouter.login);
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context, AuthState authState) {
+    Get.dialog<void>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(LK.deleteAccount.tr, style: const TextStyle(color: Colors.redAccent)),
+        content: Text(LK.deleteAccountConfirm.tr),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back<void>(),
+            child: Text(
+              LK.cancel.tr,
+              style: const TextStyle(color: AppColors.mutedForeground),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: () {
+              // TODO: Implement API call to delete account
+              Get.back<void>(); // Close the dialog
+              authState.logout();
+              Get.offAllNamed<void>(AppRouter.login);
+              Get.snackbar(
+                'Account Deleted', 
+                'Your account has been deleted successfully.',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              minimumSize: const Size(120, 45),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Text(
+              LK.deleteAccount.tr,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
           ),
         ],

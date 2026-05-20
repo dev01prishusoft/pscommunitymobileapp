@@ -118,6 +118,8 @@ class LK {
   static const String logout = 'Logout';
   static const String cancel = 'Cancel';
   static const String logoutConfirm = 'Are you sure you want to logout?';
+  static const String deleteAccount = 'Delete Account';
+  static const String deleteAccountConfirm = 'Are you sure you want to delete your account? This action cannot be undone.';
   static const String retry = 'Retry';
   static const String somethingWrong = 'Something went wrong';
   static const String noResultsFound = 'No results found';
@@ -462,6 +464,7 @@ class LK {
     percentageLabel, gradeLabel, markAsHighest, jobPositionLabel,
     otherJobPositionLabel, otherOccupationLabel,
     occupationAddressLine1Label, occupationAddressLine2Label, businessName,
-    invalidMobileOrPassword, pleaseEnterOldPassword, pleaseEnterNewPassword, pleaseEnterConfirmPassword
+    invalidMobileOrPassword, pleaseEnterOldPassword, pleaseEnterNewPassword, pleaseEnterConfirmPassword,
+    deleteAccount, deleteAccountConfirm
   ];
 }
