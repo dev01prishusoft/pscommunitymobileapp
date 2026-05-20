@@ -18,16 +18,25 @@ class _CommitteesPageState extends State<CommitteesPage> {
   final controller = Get.find<CommitteeController>();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     controller.clearSearch();
     _searchController.text = '';
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      controller.loadCommittees(isRefresh: false, isLoadMore: true);
+    }
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _searchController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -102,11 +111,27 @@ class _CommitteesPageState extends State<CommitteesPage> {
           Expanded(
             child: Obx(() => AppStateView(
               state: controller.state.value,
-              onRetry: controller.loadCommittees,
+              onRetry: () => controller.loadCommittees(isRefresh: true),
               child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(16),
-                itemCount: controller.committees.length,
+                itemCount: controller.committees.length + (controller.isLoadingMore.value ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == controller.committees.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                   return _CommitteeCard(node: controller.committees[index]);
                 },
               ),

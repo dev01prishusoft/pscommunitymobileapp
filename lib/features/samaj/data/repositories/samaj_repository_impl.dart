@@ -12,27 +12,34 @@ class SamajRepositoryImpl implements SamajRepository {
   @override
   Future<Samaj?> getSamajDetail() async {
     final response = await _apiClient.get(ApiEndpoints.samajDetail);
-    final json = response.data as Map<String, dynamic>;
-    if (json['succeeded'] == true) {
-      return Samaj.fromJson(json['data'] as Map<String, dynamic>);
-    }
-    return null;
+    final json = response.data as Map<String, dynamic>?;
+    if (json == null || json['succeeded'] != true) return null;
+    final data = json['data'];
+    if (data is! Map<String, dynamic>) return null;
+    return Samaj.fromJson(data);
   }
 
   @override
   Future<List<Sanstha>> getSansthas() async {
     final response = await _apiClient.get(ApiEndpoints.sansthas);
-    final json = response.data as Map<String, dynamic>;
-    if (json['succeeded'] == true) {
-      final data = json['data'];
-      List<dynamic> list = [];
-      if (data is List) {
-        list = data;
-      } else if (data is Map && data['data'] is List) {
-        list = data['data'] as List;
-      }
-      return list.map((e) => Sanstha.fromJson(e as Map<String, dynamic>)).toList();
+
+    final json = response.data as Map<String, dynamic>?;
+    if (json == null || json['succeeded'] != true) return [];
+
+    final data = json['data'];
+    final List<dynamic> list;
+
+    if (data is List) {
+      list = data;
+    } else if (data is Map<String, dynamic> && data['data'] is List) {
+      list = data['data'] as List<dynamic>;
+    } else {
+      return [];
     }
-    return [];
+
+    return list
+        .whereType<Map<String, dynamic>>() // Skip any non-map entries safely
+        .map(Sanstha.fromJson)
+        .toList();
   }
 }

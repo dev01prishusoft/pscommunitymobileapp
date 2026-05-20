@@ -18,36 +18,66 @@ class CommitteeController extends GetxController {
   final RxBool isSearching = false.obs;
   String _lastQuery = '';
 
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  bool get hasMore => _hasMore;
+  bool _hasMore = true;
+  final RxBool isLoadingMore = false.obs;
+
   @override
   void onInit() {
     super.onInit();
-    debounce(searchQuery, (_) => loadCommittees(showLoading: false), time: const Duration(milliseconds: 500));
+    debounce(searchQuery, (_) => loadCommittees(isRefresh: false), time: const Duration(milliseconds: 500));
   }
 
-  Future<void> loadCommittees({bool showLoading = true}) async {
-    // If it's a debounced call and query has not changed, return early
-    if (!showLoading && searchQuery.value == _lastQuery) {
-      return;
-    }
-    _lastQuery = searchQuery.value;
-
-    if (showLoading) {
-      state.value = AppState.loading;
+  Future<void> loadCommittees({bool isRefresh = true, bool isLoadMore = false}) async {
+    if (isLoadMore) {
+      if (!_hasMore || isLoadingMore.value) return;
+      isLoadingMore.value = true;
+      _currentPage++;
     } else {
-      isSearching.value = true;
+      if (!isRefresh && searchQuery.value == _lastQuery) return;
+      _lastQuery = searchQuery.value;
+      _currentPage = 1;
+      _hasMore = true;
+
+      if (isRefresh) {
+        state.value = AppState.loading;
+      } else {
+        isSearching.value = true;
+      }
     }
 
     try {
-      final results = await _repository.getCommittees(searchQuery: searchQuery.value);
-      committees.assignAll(results);
-      state.value = committees.isEmpty ? AppState.empty : AppState.data;
+      final results = await _repository.getCommittees(
+        searchQuery: searchQuery.value,
+        pageNumber: _currentPage,
+        pageSize: _pageSize,
+      );
+      
+      if (results.length < _pageSize) {
+        _hasMore = false;
+      }
+
+      if (isLoadMore) {
+        committees.addAll(results);
+      } else {
+        committees.assignAll(results);
+      }
+      
+      if (!isLoadMore) {
+        state.value = committees.isEmpty ? AppState.empty : AppState.data;
+      }
     } catch (e, stack) {
       AppLogger.e('Failed to load committees', e, stack);
-      if (showLoading) {
+      if (!isLoadMore) {
         state.value = AppState.error;
+      } else {
+        _currentPage--; // Revert page count on failure
       }
     } finally {
       isSearching.value = false;
+      isLoadingMore.value = false;
     }
   }
 
@@ -69,7 +99,7 @@ class CommitteeController extends GetxController {
 
   void clearSearch() {
     searchQuery.value = '';
-    loadCommittees(showLoading: true);
+    loadCommittees(isRefresh: true);
   }
 
   void toggleNode(CommitteeNode node) {

@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 
 class BankDetailsPage extends StatelessWidget {
   const BankDetailsPage({super.key});
@@ -32,18 +33,30 @@ class BankDetailsPage extends StatelessWidget {
         centerTitle: false,
       ),
       body: Obx(() {
-        if (samajController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+        if (samajController.isSamajLoading.value) {
+          return AppStateView(
+            state: AppState.loading,
+            child: const SizedBox.shrink(),
+          );
+        }
+
+        if (samajController.samajError.value != null) {
+          return AppStateView(
+            state: AppState.error,
+            errorMessage: samajController.samajError.value,
+            onRetry: samajController.fetchSamajDetail,
+            child: const SizedBox.shrink(),
+          );
         }
 
         final accounts = samajController.samaj.value?.bankAccounts ?? [];
 
         if (accounts.isEmpty) {
-          return Center(
-            child: Text(
-              LK.noBankAccountsFound.tr,
-              style: const TextStyle(color: AppColors.mutedForeground),
-            ),
+          return AppStateView(
+            state: AppState.empty,
+            emptyMessage: LK.noBankAccountsFound.tr,
+            onRetry: samajController.fetchSamajDetail,
+            child: const SizedBox.shrink(),
           );
         }
 

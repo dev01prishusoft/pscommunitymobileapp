@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
@@ -41,7 +43,14 @@ class MarriageController extends GetxController {
   final RxString selectedIncomeFrom = 'Any'.obs;
   final RxString selectedIncomeTo = 'Any'.obs;
   
+  final TextEditingController searchTextController = TextEditingController();
   final RxString searchQuery = ''.obs;
+  
+  // Filter Options (Static)
+  final List<String> ages = List.generate(43, (i) => (18 + i).toString());
+  final List<String> heights = List.generate(121, (i) => '${(120 + i)} cm');
+  final List<String> maritalStatuses = ['All', 'Unmarried', 'Married', 'Widow', 'Widower', 'Divorced'];
+  final List<String> incomeRanges = ['Any', '1-2 Lakh', '2-5 Lakh', '5-10 Lakh', '10+ Lakh'];
   
   // Dynamic Lists
   final RxList<String> dynamicGotras = <String>['Any'].obs;
@@ -80,9 +89,14 @@ class MarriageController extends GetxController {
       excludeSameGotra,
     ];
 
-    for (var obs in filterObservables) {
-      debounce(obs, (_) => applyFilters(), time: const Duration(milliseconds: 300));
-    }
+    Timer? debounceTimer;
+    everAll(filterObservables, (_) {
+      debounceTimer?.cancel();
+      debounceTimer = Timer(const Duration(milliseconds: 300), () => applyFilters());
+    });
+    
+    // Initial fetch
+    loadProfiles();
     
     loadLocations();
     loadAllDropdowns();
@@ -135,8 +149,11 @@ class MarriageController extends GetxController {
     if (showLoading) state.value = AppState.loading;
     try {
       int? genderId;
-      if (selectedGender.value == 'Male') genderId = 1;
-      else if (selectedGender.value == 'Female') genderId = 6;
+      if (selectedGender.value == 'Male') {
+        genderId = 1;
+      } else if (selectedGender.value == 'Female') {
+        genderId = 6;
+      }
 
       final results = await Future.wait([
         _memberRepository.searchMembers(
@@ -148,6 +165,7 @@ class MarriageController extends GetxController {
       ]);
       
       List<Member> members = results[0] as List<Member>;
+      _updateDynamicLists(members);
 
       // Local Search Filter (Issue 13)
       if (searchQuery.isNotEmpty) {
@@ -302,7 +320,7 @@ class MarriageController extends GetxController {
     selectedIncomeFrom.value = 'Any';
     selectedIncomeTo.value = 'Any';
     excludeSameGotra.value = false;
-    applyFilters();
+    // applyFilters() will be triggered by everAll debouncer automatically
   }
 
   void _updateDynamicLists(List<Member> members) {
@@ -374,5 +392,11 @@ class MarriageController extends GetxController {
       AppLogger.e('Failed to fetch dropdown $path', e);
       targetList.assignAll(['Any', ...fallbacks]);
     }
+  }
+
+  @override
+  void onClose() {
+    searchTextController.dispose();
+    super.onClose();
   }
 }

@@ -223,18 +223,8 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           ),
 
           _buildSection(
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 52,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: 14,
-              itemBuilder: (context, index) {
+            child: Builder(
+              builder: (context) {
                 final items = [
                   _buildGridItem(
                     Icons.person_outline,
@@ -253,9 +243,9 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                         ? (() {
                             try {
                               final dob = DateTime.parse(member.dateOfBirth!);
-                              return '${dob.month.toString().padLeft(2, '0')}-${dob.day.toString().padLeft(2, '0')}-${dob.year}';
+                              return '${dob.year}/${dob.month.toString().padLeft(2, '0')}/${dob.day.toString().padLeft(2, '0')}';
                             } catch (_) {
-                              return member.dateOfBirth!.split('T')[0];
+                              return member.dateOfBirth!.split('T')[0].replaceAll('-', '/');
                             }
                           })()
                         : LK.na,
@@ -306,7 +296,23 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                   _buildGridItem(Icons.opacity, LK.gotraLabel.tr, member.gotraName ?? LK.na),
                   _buildGridItem(Icons.mail_outline, LK.email.tr, member.emailAddress ?? LK.na),
                 ];
-                return items[index];
+                
+                return Column(
+                  children: [
+                    for (int i = 0; i < items.length; i += 2)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: i + 2 < items.length ? 16.0 : 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: items[i]),
+                            const SizedBox(width: 12),
+                            Expanded(child: i + 1 < items.length ? items[i + 1] : const SizedBox.shrink()),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
               },
             ),
           ),
@@ -381,18 +387,8 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           _buildSection(
             title: LK.socialMedia.tr,
             icon: Icons.share_outlined,
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 48,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: 4,
-              itemBuilder: (context, index) {
+            child: Builder(
+              builder: (context) {
                 final items = [
                   _buildSocialItem(
                     Icons.facebook,
@@ -423,7 +419,22 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     onTap: member.twitterUrl != null ? () => _launchUrl(member.twitterUrl!) : null,
                   ),
                 ];
-                return items[index];
+                return Column(
+                  children: [
+                    for (int i = 0; i < items.length; i += 2)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: i + 2 < items.length ? 16.0 : 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: items[i]),
+                            const SizedBox(width: 12),
+                            Expanded(child: i + 1 < items.length ? items[i + 1] : const SizedBox.shrink()),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
               },
             ),
           ),
@@ -474,13 +485,16 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.primary),
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Icon(icon, size: 20, color: AppColors.primary),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(label, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
                 const SizedBox(height: 2),
@@ -492,8 +506,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     color: AppColors.secondary,
                     decoration: onTap != null ? TextDecoration.underline : null,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -545,21 +557,22 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 22, color: color),
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Icon(icon, size: 22, color: color),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(label, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
                 const SizedBox(height: 2),
                 Text(
                   handle,
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.secondary),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

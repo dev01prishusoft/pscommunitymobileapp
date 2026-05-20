@@ -278,45 +278,43 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
         child: SafeArea(
           bottom: false,
           child: Column(
-            children: [
-              // Modal Header with Stack for better alignment
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                      LK.memberDetails.tr,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
+              children: [
+                // Modal Header
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 48,
+                    ), // Spacer to balance the close button
+                    Expanded(
+                      child: Text(
+                        LK.memberDetails.tr,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: 8,
-                    child: IconButton(
+                    IconButton(
                       icon: const Icon(
                         Icons.close,
                         color: AppColors.mutedForeground,
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                ],
-              ),
-              const Divider(height: 1),
+                  ],
+                ),
+                const Divider(height: 1),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
@@ -470,7 +468,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             ),
           ],
         ),
-      ),
+        ),
       ),
     );
   }

@@ -13,7 +13,7 @@ import 'package:pscommunitymobileapp/features/samaj/presentation/pages/samaj_san
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_details_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_account_details_page.dart';
 import 'package:pscommunitymobileapp/features/privacy/presentation/pages/privacy_page.dart';
-import 'package:pscommunitymobileapp/features/splash/presentation/pages/post_login_splash_page.dart';
+import 'package:pscommunitymobileapp/features/splash/presentation/pages/community_welcome_splash_page.dart';
 import 'package:pscommunitymobileapp/features/support/presentation/pages/support_page.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/family_areas_page.dart';
@@ -81,7 +81,7 @@ class AppRouter {
     GetPage<void>(name: privacy, page: () => const PrivacyPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: support, page: () => const SupportPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: business, page: () => const BusinessPage(), middlewares: [AuthGuard()]),
-    GetPage<void>(name: postLoginSplash, page: () => const PostLoginSplashPage(), middlewares: [AuthGuard()]),
+    GetPage<void>(name: postLoginSplash, page: () => const CommunityWelcomeSplashPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: familyAreas, page: () => const FamilyAreasPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: familyMembers, page: () => const FamilyMembersListPage(), middlewares: [AuthGuard()]),
     GetPage<void>(name: marriage, page: () => const MarriagePage(), middlewares: [AuthGuard()]),

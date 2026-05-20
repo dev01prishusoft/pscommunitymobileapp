@@ -29,8 +29,20 @@ class SamajSansthaPage extends GetView<SamajController> {
         centerTitle: false,
       ),
       body: Obx(() {
-        if (controller.isLoading.value && controller.sansthas.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+        if (controller.isSansthasLoading.value && controller.sansthas.isEmpty) {
+          return AppStateView(
+            state: AppState.loading,
+            child: const SizedBox.shrink(),
+          );
+        }
+
+        if (controller.sansthaError.value != null && controller.sansthas.isEmpty) {
+          return AppStateView(
+            state: AppState.error,
+            errorMessage: controller.sansthaError.value,
+            onRetry: controller.fetchSansthas,
+            child: const SizedBox.shrink(),
+          );
         }
 
         final sansthas = controller.sansthas;
@@ -39,7 +51,7 @@ class SamajSansthaPage extends GetView<SamajController> {
           return AppStateView(
             state: AppState.empty,
             emptyMessage: LK.noItemsFound.tr,
-            onRetry: controller.fetchSamajDetail,
+            onRetry: controller.fetchSansthas,
             child: const SizedBox.shrink(),
           );
         }

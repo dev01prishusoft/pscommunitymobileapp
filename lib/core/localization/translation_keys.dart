@@ -243,6 +243,8 @@ class LK {
   static const String linkCopied = 'Link copied to clipboard';
   static const String shareAppViaWhatsApp = 'Share App via WhatsApp';
   static const String shareAppViaOther = 'Share App via Other';
+  static const String shareMessageTemplate = 'Join @samaj community! Download our app: @link';
+  static const String scanToDownload = 'Scan to download the app';
   static const String committeeMemberDetails = 'Committee Member Details';
   static const String committeeDetailsHeader = 'COMMITTEE DETAILS';
   static const String noMembersCommittee = 'No members found for this committee';
@@ -433,7 +435,8 @@ class LK {
     marriage, showLabel, advancedFilters, ageRangeLabel, heightRangeLabel,
     gotraLabel, excludeSameGotra, maritalStatusLabel, residenceLabel,
     educationLabel, incomeRangeLabel, applyFilters, clearAll, to,
-    linkCopied, shareAppViaWhatsApp, shareAppViaOther, committeeMemberDetails,
+    linkCopied, shareAppViaWhatsApp, shareAppViaOther,
+    shareMessageTemplate, scanToDownload, committeeMemberDetails,
     committeeDetailsHeader, noMembersCommittee, searchByFirstNameHint, stateLabel,
     districtLabel, talukaLabel, view, membershipFee, primary, viewDetails,
     samajSanstha, status, committees, samajSubtitle,

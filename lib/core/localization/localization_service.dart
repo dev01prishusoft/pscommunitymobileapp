@@ -15,6 +15,7 @@ class LocalizationService {
   final Rx<Locale> currentLocale = const Locale('en', 'US').obs;
   
   final RxList<Language> languages = <Language>[].obs;
+  bool _isFetchingLanguages = false;
 
   late Map<String, Map<String, String>> keys;
 
@@ -43,16 +44,25 @@ class LocalizationService {
   }
 
   Future<void> fetchLanguages() async {
+    if (_isFetchingLanguages || languages.isNotEmpty) return;
+    _isFetchingLanguages = true;
     try {
       final apiClient = Get.find<ApiClient>();
       final response = await apiClient.get(ApiEndpoints.languageDropdown);
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] == true) {
+      final json = response.data as Map<String, dynamic>?;
+      if (json != null && json['succeeded'] == true) {
         final data = json['data'] as List? ?? [];
-        languages.assignAll(data.map((e) => Language.fromJson(e as Map<String, dynamic>)).toList());
+        languages.assignAll(
+          data
+              .whereType<Map<String, dynamic>>()
+              .map(Language.fromJson)
+              .toList(),
+        );
       }
-    } catch (e) {
-      // Fallback or log
+    } catch (_) {
+      // Non-fatal — fallback language codes are shown in the dropdown
+    } finally {
+      _isFetchingLanguages = false;
     }
   }
 

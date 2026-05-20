@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
-import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
-import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
-import 'package:pscommunitymobileapp/core/mappers/relation_mapper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/features/family/presentation/widgets/member_tile.dart';
 
 class FamilyMembersListPage extends StatefulWidget {
   const FamilyMembersListPage({super.key});
@@ -22,46 +17,29 @@ class FamilyMembersListPage extends StatefulWidget {
 class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   final FamilyController _controller = Get.find<FamilyController>();
   final TextEditingController _searchController = TextEditingController();
-  int _areaId = 0;
-  String _areaName = 'Daskroi (Satellite)';
-  int _membersCount = 31;
-  int _familiesCount = 15;
-  String _searchQuery = '';
   
+  late int _areaId;
+  late String _areaName;
+  late int _membersCount;
+  late int _familiesCount;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = Get.arguments as Map<String, dynamic>?;
-      if (args != null) {
-        setState(() {
-          _areaId = (args['areaId'] as int?) ?? 0;
-          _areaName = (args['areaName'] as String?) ?? _areaName;
-          _membersCount = (args['membersCount'] as int?) ?? _membersCount;
-          _familiesCount = (args['familiesCount'] as int?) ?? _familiesCount;
-        });
-      }
-      _controller.loadFamilies(_areaId);
-    });
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    _areaId = args['areaId'] as int? ?? 0;
+    _areaName = args['areaName'] as String? ?? '';
+    _membersCount = args['membersCount'] as int? ?? 0;
+    _familiesCount = args['familiesCount'] as int? ?? 0;
+
+    _controller.memberSearchQuery.value = '';
+    _controller.loadFamilies(_areaId);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  List<Family> get _filteredFamilies {
-    if (_searchQuery.isEmpty) return _controller.families;
-    final query = _searchQuery.toLowerCase();
-    return _controller.families.map((family) {
-      final filteredMembers = family.members.where((member) {
-        final name = member.name.toLowerCase();
-        return name.contains(query);
-      }).toList();
-      if (filteredMembers.isEmpty) return null;
-      return Family(familyName: family.familyName, members: filteredMembers);
-    }).whereType<Family>().toList();
   }
 
   @override
@@ -100,23 +78,21 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: AppColors.border),
               ),
-              child: TextField(
+              child: Obx(() => TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: LK.searchByNameHint.tr,
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
-                  suffixIcon: _searchController.text.isNotEmpty
+                  hintStyle: const TextStyle(color: AppColors.mutedForeground, fontSize: 14),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.mutedForeground),
+                  suffixIcon: _controller.memberSearchQuery.value.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.close, color: Color(0xFF94A3B8), size: 20),
+                          icon: const Icon(Icons.close, color: AppColors.mutedForeground, size: 20),
                           padding: EdgeInsets.zero,
                           onPressed: () {
                             _searchController.clear();
-                            setState(() {
-                              _searchQuery = '';
-                            });
+                            _controller.memberSearchQuery.value = '';
                           },
                         )
                       : null,
@@ -126,11 +102,9 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                   contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
+                  _controller.memberSearchQuery.value = value;
                 },
-              ),
+              )),
             ),
           ),
 
@@ -138,27 +112,36 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
             child: Obx(() => AppStateView(
               state: _controller.familyListState.value,
               onRetry: () => _controller.loadFamilies(_areaId),
-              child: _filteredFamilies.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: AppEmptyState(
-                        icon: Icons.search_off,
-                        secondaryIcon: Icons.search,
-                        title: LK.noResultsFound.tr,
-                        subtitle: LK.trySelectingDifferentFilters.tr,
+              child: _controller.filteredFamilies.isEmpty
+                  ? LayoutBuilder(
+                      builder: (context, constraints) => SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: AppEmptyState(
+                                icon: Icons.search_off,
+                                secondaryIcon: Icons.search,
+                                title: LK.noResultsFound.tr,
+                                subtitle: LK.trySelectingDifferentFilters.tr,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      itemCount: _filteredFamilies.length,
+                      itemCount: _controller.filteredFamilies.length,
                       separatorBuilder: (context, index) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
-                        final family = _filteredFamilies[index];
+                        final family = _controller.filteredFamilies[index];
                         return Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,13 +153,13 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF1E293B),
+                                    color: AppColors.secondary,
                                   ),
                                 ),
                               ),
                               const Divider(height: 1),
                               ...family.members.asMap().entries.map((entry) {
-                                return _MemberTile(
+                                return MemberTile(
                                   member: entry.value,
                                   showDivider: entry.key > 0,
                                 );
@@ -194,143 +177,3 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   }
 }
 
-class _MemberTile extends StatelessWidget {
-  const _MemberTile({
-    required this.member,
-    required this.showDivider,
-  });
-
-  final FamilyMember member;
-  final bool showDivider;
-
-  @override
-  Widget build(BuildContext context) {
-    final avatarColors = _getAvatarColors(member.gender);
-    
-    return Column(
-      children: [
-        if (showDivider)
-          const Divider(indent: 70, endIndent: 16),
-        InkWell(
-          onTap: () => Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': int.tryParse(member.id) ?? 0},
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                member.profileImageUrl != null && member.profileImageUrl!.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: member.profileImageUrl!,
-                        imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
-                          radius: 22,
-                          backgroundImage: imageProvider,
-                        ),
-                        placeholder: (context, url) => CircleAvatar(
-                          radius: 22,
-                          backgroundColor: avatarColors.background,
-                          child: const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => CircleAvatar(
-                          radius: 22,
-                          backgroundColor: avatarColors.background,
-                          child: Text(
-                            member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
-                            style: TextStyle(
-                              color: avatarColors.text,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      )
-                    : CircleAvatar(
-                        radius: 22,
-                        backgroundColor: avatarColors.background,
-                        child: Text(
-                          member.name.isNotEmpty ? member.name[0].toUpperCase() : '',
-                          style: TextStyle(
-                            color: avatarColors.text,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              member.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Color(0xFF1E293B),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (member.isHead) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFDCFCE7),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                LK.familyHead.tr,
-                                style: const TextStyle(
-                                  color: Color(0xFF16A34A),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Builder(
-                        builder: (context) {
-                          final genderKey = GenderMapper.getLabelKey(member.gender);
-                          final relKey = RelationMapper.getLabelKey(member.relation);
-                          final statusKey = MaritalStatusMapper.getLabelKey(member.maritalStatus);
-                          
-                          return Text(
-                            '${genderKey != null ? genderKey.tr : member.gender}  •  ${relKey != null ? relKey.tr : member.relation}  •  ${statusKey != null ? statusKey.tr : member.maritalStatus}  •  ${member.occupation}',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                          );
-                        }
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1), size: 20),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  ({Color background, Color text}) _getAvatarColors(String gender) {
-    if (gender == 'Female') {
-      return (background: const Color(0xFFFDE7F3), text: const Color(0xFFD61A87));
-    }
-    return (background: const Color(0xFFE2F1FB), text: const Color(0xFF1AA3E8));
-  }
-}

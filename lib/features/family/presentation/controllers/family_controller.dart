@@ -128,6 +128,37 @@ class FamilyController extends GetxController {
   final RxBool hasMore = true.obs;
   final RxBool isNextPageLoading = false.obs;
 
+  final RxString memberSearchQuery = ''.obs;
+  final RxList<Family> filteredFamilies = <Family>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    debounce(memberSearchQuery, (_) => _filterFamilies(), time: const Duration(milliseconds: 300));
+  }
+
+  void _filterFamilies() {
+    if (memberSearchQuery.value.isEmpty) {
+      filteredFamilies.assignAll(families);
+      return;
+    }
+    
+    final query = memberSearchQuery.value.toLowerCase();
+    final results = families.map((family) {
+      final matchingMembers = family.members.where((member) {
+        final name = member.name.toLowerCase();
+        final mobile = member.mobileNo?.toLowerCase() ?? '';
+        final memberId = member.id.toLowerCase();
+        return name.contains(query) || mobile.contains(query) || memberId.contains(query);
+      }).toList();
+      
+      if (matchingMembers.isEmpty) return null;
+      return Family(familyName: family.familyName, members: matchingMembers);
+    }).whereType<Family>().toList();
+    
+    filteredFamilies.assignAll(results);
+  }
+
   Future<void> loadAreas({bool refresh = true}) async {
     if (refresh) {
       _currentPage = 1;
@@ -173,7 +204,8 @@ class FamilyController extends GetxController {
     try {
       final results = await _repository.getFamiliesByArea(areaId);
       families.assignAll(results);
-      familyListState.value = results.isEmpty ? AppState.empty : AppState.data;
+      _filterFamilies(); // Apply initial filter
+      familyListState.value = filteredFamilies.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load families for areaId: $areaId', e, stack);
       familyListState.value = AppState.error;

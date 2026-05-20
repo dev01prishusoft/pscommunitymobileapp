@@ -18,7 +18,6 @@ class ApiClient {
   ApiClient({
     required TokenManager tokenManager,
     required ConnectivityService connectivity,
-    required VoidCallback onAuthFailure,
   }) : _connectivity = connectivity {
     _dio = Dio(BaseOptions(
       baseUrl: AppEnvironment.I.apiBaseUrl,
@@ -37,7 +36,7 @@ class ApiClient {
         tokenManager: tokenManager,
         refreshDio: refreshDio,
         mainDio: _dio,
-        onAuthFailure: onAuthFailure,
+        onAuthFailure: () {},
       ),
       RetryInterceptor(dio: _dio),
       ErrorMappingInterceptor(),

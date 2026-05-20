@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_inline_error.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_gradient_background.dart';
-import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
@@ -18,45 +16,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // formKey is owned by widget State — never by a singleton controller.
+  // This prevents the "Multiple widgets used the same GlobalKey" crash
+  // when the LoginPage is pushed more than once onto the navigator stack.
   final _formKey = GlobalKey<FormState>();
-  final _mobileController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _mobileRegex = RegExp(r'^[0-9]{10}$');
+
+  late final LoginController _controller;
 
   @override
-  void dispose() {
-    _mobileController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    if (kUiReviewMode) {
-      Get.offNamed<void>(AppRouter.postLoginSplash);
-      return;
-    }
-
-    if (!_formKey.currentState!.validate()) return;
-
-    final controller = Get.find<LoginController>();
-    final tokens = await controller.login(
-      mobile: _mobileController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    if (tokens != null) {
-      if (tokens.isDefaultPassword) {
-        Get.offNamed<void>(AppRouter.resetPassword);
-      } else {
-        Get.offNamed<void>(AppRouter.postLoginSplash);
-      }
-    }
+  void initState() {
+    super.initState();
+    _controller = Get.find<LoginController>();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<LoginController>();
-
     return Scaffold(
       body: AppGradientBackground(
         child: SafeArea(
@@ -108,15 +82,18 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 32),
                           AppTextField(
                             label: LK.mobileNumber.tr,
-                            controller: _mobileController,
+                            controller: _controller.mobileController,
                             hint: LK.mobileHint.tr,
                             icon: Icons.phone_outlined,
                             keyboardType: TextInputType.phone,
+                            maxLength: 10,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return LK.pleaseEnterMobile.tr;
                               }
-                              if (!_mobileRegex.hasMatch(value.trim())) {
+                              if (!_controller.mobileRegex.hasMatch(
+                                value.trim(),
+                              )) {
                                 return LK.pleaseEnterValidMobile.tr;
                               }
                               return null;
@@ -125,14 +102,14 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 20),
                           Obx(() => AppTextField(
                             label: LK.password.tr,
-                            controller: _passwordController,
+                              controller: _controller.passwordController,
                             hint: LK.passwordHint.tr,
                             icon: Icons.lock_outline_rounded,
-                            obscureText: controller.obscurePassword.value,
+                              obscureText: _controller.obscurePassword.value,
                             suffixIcon: IconButton(
-                              onPressed: controller.togglePasswordVisibility,
+                                onPressed: _controller.togglePasswordVisibility,
                               icon: Icon(
-                                controller.obscurePassword.value
+                                  _controller.obscurePassword.value
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: AppColors.mutedForeground,
@@ -148,11 +125,11 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 32),
                           Obx(() => AppPrimaryButton(
                             text: LK.signIn.tr,
-                            onPressed: _submit,
-                            isLoading: controller.isLoading.value,
+                              onPressed: () => _controller.submit(_formKey),
+                              isLoading: _controller.isLoading.value,
                           )),
                           Obx(() {
-                            final error = controller.error.value;
+                            final error = _controller.error.value;
                             if (error == null) return const SizedBox.shrink();
                             return Column(
                               children: [
@@ -174,3 +151,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

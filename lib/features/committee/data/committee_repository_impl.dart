@@ -12,11 +12,15 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
   final ApiClient _apiClient;
 
   @override
-  Future<List<CommitteeNode>> getCommittees({String? searchQuery}) async {
+  Future<List<CommitteeNode>> getCommittees({
+    String? searchQuery,
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
     try {
       final Map<String, dynamic> params = {
-        'PageNumber': 1,
-        'PageSize': 100,
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
       };
 
       if (searchQuery != null && searchQuery.isNotEmpty) {

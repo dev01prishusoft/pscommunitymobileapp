@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
@@ -30,6 +31,8 @@ import 'package:pscommunitymobileapp/features/business/presentation/controllers/
 import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
 
 class DI {
   static Future<void> bootstrap() async {
@@ -60,10 +63,9 @@ class DI {
     final apiClient = ApiClient(
       tokenManager: tokenManager,
       connectivity: connectivity,
-      onAuthFailure: () => authState.logout(),
     );
     Get.put(apiClient, permanent: true);
-    
+
     // 6. Auth Feature
     final authRepository = AuthRepositoryImpl(apiClient);
     final loginUseCase = LoginUseCase(authRepository);
@@ -91,7 +93,7 @@ class DI {
     Get.put(OccupationController(occupationRepository), permanent: true);
 
     // 12. Payment Feature
-    final PaymentRepository paymentRepository = 
+    final PaymentRepository paymentRepository =
         kDebugMode && AppEnvironment.I.flavor == Flavor.dev
             ? MockPaymentRepository()
             : PaymentRepositoryImpl(apiClient);
@@ -101,16 +103,20 @@ class DI {
     final businessRepository = BusinessRepositoryImpl(apiClient);
     Get.put(BusinessController(businessRepository), permanent: true);
 
-    // 14. Global Samaj Detail
+    // 14. Global Samaj Data
     final samajRepository = SamajRepositoryImpl(apiClient);
     final samajController = Get.put(SamajController(samajRepository), permanent: true);
-    
+
     // 15. Profile Feature
     Get.put(ProfileFormController(), permanent: true);
-    
-    // Auto-fetch if already logged in
+
+    // 16. Home Feature
+    Get.put(HomeController(), permanent: true);
+    Get.put(ShareController(), permanent: true);
+
+    // Auto-fetch samaj data if already logged in (e.g. app reopen with valid tokens)
     if (authState.isAuthenticated.value) {
-      samajController.fetchSamajDetail();
+      unawaited(samajController.fetchAll());
     }
   }
 }

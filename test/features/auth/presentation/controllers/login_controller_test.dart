@@ -12,7 +12,7 @@ class MockLoginUseCase implements LoginUseCase {
 
   @override
   Future<AuthTokens> call({required String mobile, required String password}) async {
-    if (shouldThrow) throw ServerFailure('Invalid credentials');
+    if (shouldThrow) throw ServerFailure('Some generic error');
     return AuthTokens(accessToken: 'access', refreshToken: 'refresh', isDefaultPassword: false);
   }
 }
@@ -68,7 +68,7 @@ void main() {
     final result = await future;
     
     expect(controller.isLoading.value, false);
-    expect(result, isNotNull);
+    expect(result, LoginResult.success);
     expect(mockTokenManager.savedAccess, 'access');
     expect(mockSamajController.fetchCalled, true);
   });
@@ -79,7 +79,7 @@ void main() {
     final result = await controller.login(mobile: '123', password: 'wrong');
     
     expect(controller.isLoading.value, false);
-    expect(result, isNull);
-    expect(controller.error.value, 'Invalid credentials');
+    expect(result, LoginResult.failure);
+    expect(controller.error.value, 'Some generic error');
   });
 }

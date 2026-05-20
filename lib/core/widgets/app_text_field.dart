@@ -13,6 +13,7 @@ class AppTextField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final ValueChanged<String>? onChanged;
+  final int? maxLength;
 
   const AppTextField({
     super.key,
@@ -27,6 +28,7 @@ class AppTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.onChanged,
+    this.maxLength,
   });
 
   @override
@@ -77,6 +79,7 @@ class AppTextField extends StatelessWidget {
           readOnly: readOnly,
           onTap: onTap,
           onChanged: onChanged,
+          maxLength: maxLength,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppColors.foreground,
             fontWeight: FontWeight.w400,
@@ -119,6 +122,7 @@ class AppTextField extends StatelessWidget {
                 width: 1.5,
               ),
             ),
+            counterText: '',
           ),
           validator: validator,
         ),
