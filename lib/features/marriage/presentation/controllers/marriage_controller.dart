@@ -153,8 +153,17 @@ class MarriageController extends GetxController {
       if (searchQuery.isNotEmpty) {
         final query = searchQuery.value.toLowerCase();
         members = members.where((m) {
-          final firstName = m.firstName.toLowerCase();
-          return firstName.contains(query);
+          final fullName = m.fullName.toLowerCase();
+          final occupation = m.occupation.toLowerCase();
+          final age = m.age.toString();
+          final memberNo = (m.memberNo ?? '').toLowerCase();
+          final mobile = (m.mobileNo ?? '').toLowerCase();
+
+          return fullName.contains(query) ||
+              occupation.contains(query) ||
+              age.contains(query) ||
+              memberNo.contains(query) ||
+              mobile.contains(query);
         }).toList();
       }
 
