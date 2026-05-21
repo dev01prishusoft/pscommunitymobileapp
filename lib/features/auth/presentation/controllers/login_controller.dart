@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -22,20 +21,23 @@ class LoginController extends GetxController {
 
   final mobileController = TextEditingController();
   final passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
   final mobileRegex = RegExp(r'^[0-9]{10}$');
 
   @override
   void onClose() {
-    mobileController.dispose();
-    passwordController.dispose();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      mobileController.dispose();
+      passwordController.dispose();
+    });
     super.onClose();
   }
 
-  Future<void> submit(GlobalKey<FormState> formKey) async {
+  Future<void> submit() async {
     if (isLoading.value) return;
 
     if (kUiReviewMode) {
-      Get.offNamed<void>(AppRouter.postLoginSplash);
+      await Get.offNamed<void>(AppRouter.postLoginSplash);
       return;
     }
 
@@ -80,12 +82,7 @@ class LoginController extends GetxController {
           ? LoginResult.requirePasswordReset 
           : LoginResult.success;
     } on Failure catch (f) {
-      final msg = f.message.toLowerCase();
-      if (msg.contains('invalid') && (msg.contains('mobile') || msg.contains('password') || msg.contains('email') || msg.contains('credentials'))) {
-        error.value = LK.invalidMobileOrPassword.tr;
-      } else {
-        error.value = f.message;
-      }
+      error.value = f.message;
       return LoginResult.failure;
     } catch (e) {
       error.value = LK.errorServer.tr;

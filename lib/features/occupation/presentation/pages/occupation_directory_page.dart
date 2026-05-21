@@ -203,6 +203,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                     imageUrl: occ.logoUrl!,
                     height: 40,
                     width: 40,
+                    memCacheHeight: 120,
+                    memCacheWidth: 120,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => const SizedBox(
                       height: 40,

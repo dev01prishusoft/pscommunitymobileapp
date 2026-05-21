@@ -16,6 +16,7 @@ class ApiEndpoints {
   static const String committeeDetail = '/api/v1/committee';
   static const String payments = '/api/v1/PaymentMode/list';
   static const String occupations = '/api/v1/Occupation/list';
+  static const String occupationDetail = '/api/v1/Occupation';
   static const String business = '/api/v1/AddressType/list';
   static const String marriage = '/api/v1/marriage/list';
   static const String unmarriedCount = '/api/v1/metrimonial/UnMarriedCount';

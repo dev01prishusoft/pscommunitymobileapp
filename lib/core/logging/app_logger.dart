@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:logger/logger.dart';
 import 'package:flutter/foundation.dart';
 
@@ -37,6 +38,14 @@ class AppLogger {
 class ProductionFilter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) {
+    if (!kIsWeb) {
+      // Suppress logs during tests to avoid polluting test output
+      final isTest = const bool.fromEnvironment('dart.vm.product') == false &&
+          const bool.hasEnvironment('FLUTTER_TEST') || 
+          (kDebugMode && Platform.environment.containsKey('FLUTTER_TEST'));
+      if (isTest) return false;
+    }
+
     if (kReleaseMode) {
       return event.level.index >= Level.warning.index;
     }

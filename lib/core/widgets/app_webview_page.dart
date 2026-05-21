@@ -65,22 +65,33 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
     }
   }
 
+  bool _hasError = false;
+  String _errorMessage = '';
+
   @override
   void initState() {
     super.initState();
+    _setupWebView();
+  }
+
+  void _setupWebView() {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            setState(() {
-              _loadingPercentage = progress;
-            });
+            // Reduce excessive setState by only updating every 10% or at edges
+            if (progress == 0 || progress == 100 || (progress % 10 == 0 && progress != _loadingPercentage)) {
+              setState(() {
+                _loadingPercentage = progress;
+              });
+            }
           },
           onPageStarted: (String url) {
             setState(() {
               _loadingPercentage = 0;
+              _hasError = false;
             });
           },
           onPageFinished: (String url) {
@@ -88,7 +99,12 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
               _loadingPercentage = 100;
             });
           },
-          onWebResourceError: (WebResourceError error) {},
+          onWebResourceError: (WebResourceError error) {
+            setState(() {
+              _hasError = true;
+              _errorMessage = error.description;
+            });
+          },
           onNavigationRequest: (NavigationRequest request) async {
             final url = request.url;
             if (_isUrlAllowed(url)) {
@@ -127,8 +143,44 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
       ),
       body: Stack(
         children: [
-          WebViewWidget(controller: _controller),
-          if (_loadingPercentage < 100)
+          if (_hasError)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 60, color: AppColors.destructive),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Failed to load page',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _errorMessage,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: AppColors.mutedForeground),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _hasError = false;
+                          _loadingPercentage = 0;
+                        });
+                        _controller.reload();
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            WebViewWidget(controller: _controller),
+            
+          if (_loadingPercentage < 100 && !_hasError)
             LinearProgressIndicator(
               value: _loadingPercentage / 100.0,
               backgroundColor: Colors.grey[200],

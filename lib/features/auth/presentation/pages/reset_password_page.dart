@@ -9,17 +9,32 @@ import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
+
+  @override
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+}
+
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final formKey = GlobalKey<FormState>();
+  final mobileController = TextEditingController();
+  final oldPasswordController = TextEditingController();
+  final newPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    mobileController.dispose();
+    oldPasswordController.dispose();
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ResetPasswordController>();
-    final formKey = GlobalKey<FormState>();
-    final mobileController = TextEditingController();
-    final oldPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
 
     Future<void> submit() async {
       if (kUiReviewMode) {

@@ -16,15 +16,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<PaymentDashboard> getDashboard() async {
     try {
-      final response = await _apiClient.get(ApiEndpoints.paymentDashboard);
-      final json = response.data as Map<String, dynamic>;
-      
-      if (json['succeeded'] != true) {
-        throw Exception(json['message'] ?? 'Failed to load dashboard');
-      }
-      
-      final data = json['data'] as Map<String, dynamic>;
-      return PaymentDashboard.fromJson(data);
+      final response = await _apiClient.getParsed<PaymentDashboard>(
+        ApiEndpoints.paymentDashboard,
+        fromJsonT: (json) => PaymentDashboard.fromJson(json as Map<String, dynamic>),
+      );
+      return response.data!;
     } catch (e, stack) {
       AppLogger.e('GetDashboard Error', e, stack);
       rethrow;
@@ -34,13 +30,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<List<PaymentType>> getPaymentTypes() async {
     try {
-      final response = await _apiClient.get(ApiEndpoints.paymentTypes);
-      final json = response.data as Map<String, dynamic>;
-      
-      if (json['succeeded'] != true) return [];
-      
-      final data = json['data'] as List? ?? [];
-      return data.map((e) => PaymentType.fromJson(e as Map<String, dynamic>)).toList();
+      final response = await _apiClient.getParsed<List<PaymentType>>(
+        ApiEndpoints.paymentTypes,
+        fromJsonT: (json) => (json as List).map((e) => PaymentType.fromJson(e as Map<String, dynamic>)).toList(),
+      );
+      return response.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetPaymentTypes Error', e, stack);
       rethrow;
@@ -50,16 +44,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<List<PaymentCategory>> getCategories(int paymentTypeId) async {
     try {
-      final response = await _apiClient.get(
+      final response = await _apiClient.getParsed<List<PaymentCategory>>(
         ApiEndpoints.paymentCategories,
         queryParameters: {'paymentTypeId': paymentTypeId},
+        fromJsonT: (json) => (json as List).map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>)).toList(),
       );
-      final json = response.data as Map<String, dynamic>;
-      
-      if (json['succeeded'] != true) return [];
-      
-      final data = json['data'] as List? ?? [];
-      return data.map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>)).toList();
+      return response.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetCategories Error', e, stack);
       rethrow;
@@ -74,7 +64,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     int? adminPaymentRequestId,
   }) async {
     try {
-      final response = await _apiClient.post(
+      final response = await _apiClient.postParsed<RazorpayOrder>(
         ApiEndpoints.createOrder,
         data: {
           'amount': amount,
@@ -82,15 +72,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'paymentCategoryId': paymentCategoryId,
           if (adminPaymentRequestId != null) 'adminPaymentRequestId': adminPaymentRequestId,
         },
+        fromJsonT: (json) => RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
-      
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] != true) {
-        throw Exception(json['message'] ?? 'Failed to create order');
-      }
-      
-      final data = json['data'] as Map<String, dynamic>;
-      return RazorpayOrder.fromJson(data);
+      return response.data!;
     } catch (e, stack) {
       AppLogger.e('CreateOrder Error', e, stack);
       rethrow;
@@ -108,7 +92,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     int? adminPaymentRequestId,
   }) async {
     try {
-      final response = await _apiClient.post(
+      final response = await _apiClient.postParsed<Map<String, dynamic>>(
         ApiEndpoints.verifyPayment,
         data: {
           'razorpayOrderId': razorpayOrderId,
@@ -119,14 +103,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'paymentCategoryId': paymentCategoryId,
           if (adminPaymentRequestId != null) 'adminPaymentRequestId': adminPaymentRequestId,
         },
+        fromJsonT: (json) => json as Map<String, dynamic>,
       );
-      
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] != true) {
-        throw Exception(json['message'] ?? 'Payment verification failed');
-      }
-      
-      return json['data'] as Map<String, dynamic>? ?? {};
+      return response.data ?? {};
     } catch (e, stack) {
       AppLogger.e('VerifyPayment Error', e, stack);
       rethrow;
@@ -148,16 +127,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
         if (status != null && status != 'All') 'status': status,
       };
 
-      final response = await _apiClient.get(
+      final response = await _apiClient.getParsed<List<PaymentItem>>(
         ApiEndpoints.paymentHistory,
         queryParameters: queryParameters,
+        fromJsonT: (json) => (json as List).map((e) => PaymentItem.fromJson(e as Map<String, dynamic>)).toList(),
       );
-      
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] != true) return [];
-      
-      final data = json['data'] as List? ?? [];
-      return data.map((e) => PaymentItem.fromJson(e as Map<String, dynamic>)).toList();
+      return response.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetHistory Error', e, stack);
       rethrow;
@@ -167,14 +142,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<Map<String, dynamic>> getReceipt(int receiptId) async {
     try {
-      final response = await _apiClient.get('${ApiEndpoints.paymentReceipt}/$receiptId');
-      final json = response.data as Map<String, dynamic>;
-      
-      if (json['succeeded'] != true) {
-        throw Exception(json['message'] ?? 'Failed to load receipt');
-      }
-      
-      return json['data'] as Map<String, dynamic>? ?? {};
+      final response = await _apiClient.getParsed<Map<String, dynamic>>(
+        '${ApiEndpoints.paymentReceipt}/$receiptId',
+        fromJsonT: (json) => json as Map<String, dynamic>,
+      );
+      return response.data ?? {};
     } catch (e, stack) {
       AppLogger.e('GetReceipt Error', e, stack);
       rethrow;

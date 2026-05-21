@@ -16,71 +16,58 @@ class FamilyRepositoryImpl implements FamilyRepository {
   @override
   Future<Member> getMemberDetails(int memberId) async {
     AppLogger.d('Member Detail Request for ID: $memberId');
-    final response = await _apiClient.get('${ApiEndpoints.memberDetail}/$memberId');
-    final json = response.data as Map<String, dynamic>;
-    AppLogger.d('Member Detail Response: $json');
-    
-    if (json['succeeded'] != true) {
-      throw Exception(json['message'] ?? 'Failed to load member details');
-    }
-    
-    final data = json['data'] as Map<String, dynamic>;
-    return Member.fromJson(data);
+    final response = await _apiClient.getParsed<Member>(
+      '${ApiEndpoints.memberDetail}/$memberId',
+      fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
+    );
+    return response.data!;
   }
 
   @override
   Future<List<MemberAddress>> getMemberAddresses(int memberId) async {
     AppLogger.d('Member Address Request for ID: $memberId');
-    final response = await _apiClient.get('${ApiEndpoints.memberAddress}/$memberId');
-    final json = response.data as Map<String, dynamic>;
-    AppLogger.d('Member Address Response: $json');
-    
-    if (json['succeeded'] != true) return [];
-    
-    final data = json['data'] as List? ?? [];
-    return data.map((e) => MemberAddress.fromJson(e as Map<String, dynamic>)).toList();
+    final response = await _apiClient.getParsed<List<MemberAddress>>(
+      '${ApiEndpoints.memberAddress}/$memberId',
+      fromJsonT: (json) => (json as List).map((e) => MemberAddress.fromJson(e as Map<String, dynamic>)).toList(),
+    );
+    return response.data ?? [];
   }
 
   @override
   Future<List<DropdownItem>> getStates() async {
-    final response = await _apiClient.get(ApiEndpoints.stateDropdown);
-    return _parseDropdownList(response.data);
+    final response = await _apiClient.getParsed<List<DropdownItem>>(
+      ApiEndpoints.stateDropdown,
+      fromJsonT: (json) => _parseDropdownListData(json),
+    );
+    return response.data ?? [];
   }
 
   @override
   Future<List<DropdownItem>> getDistricts(int stateId) async {
-    final response = await _apiClient.get(
+    final response = await _apiClient.getParsed<List<DropdownItem>>(
       ApiEndpoints.districtDropdown,
       queryParameters: {'stateId': stateId},
+      fromJsonT: (json) => _parseDropdownListData(json),
     );
-    return _parseDropdownList(response.data);
+    return response.data ?? [];
   }
 
   @override
   Future<List<DropdownItem>> getTalukas(int districtId) async {
-    final response = await _apiClient.get(
+    final response = await _apiClient.getParsed<List<DropdownItem>>(
       ApiEndpoints.talukaDropdown,
       queryParameters: {'districtId': districtId},
+      fromJsonT: (json) => _parseDropdownListData(json),
     );
-    return _parseDropdownList(response.data);
+    return response.data ?? [];
   }
 
-  List<DropdownItem> _parseDropdownList(dynamic responseData) {
-    if (responseData == null) return [];
-    final json = responseData as Map<String, dynamic>;
-    if (json['succeeded'] != true) return [];
-    
-    var data = json['data'];
-    // Handle double wrapping: { data: { data: [...] } } or { data: [...] }
+  List<DropdownItem> _parseDropdownListData(dynamic data) {
     if (data is Map<String, dynamic>) {
       data = data['data'] ?? data['items'] ?? [];
     }
-    
     if (data is! List) return [];
-    
-    return data
-        .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return data.map((e) => DropdownItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
@@ -102,23 +89,14 @@ class FamilyRepositoryImpl implements FamilyRepository {
     AppLogger.d('Family Areas Request: $queryParameters');
     
     try {
-      final response = await _apiClient.get(
+      final response = await _apiClient.getPaginated<FamilyArea>(
         ApiEndpoints.familyAreas,
         queryParameters: queryParameters,
+        listKey: 'data',
+        fromJsonT: (json) => FamilyArea.fromJson(json as Map<String, dynamic>),
       );
-
-      final json = response.data as Map<String, dynamic>;
-      AppLogger.d('Family Areas Response: $json');
-
-      if (json['succeeded'] != true) return [];
-      
-      // The API response is double-wrapped: { data: { data: [...] } }
-      final outerData = json['data'] as Map<String, dynamic>? ?? {};
-      final innerData = outerData['data'] as List? ?? [];
-      
-      return innerData.map((e) => FamilyArea.fromJson(e as Map<String, dynamic>)).toList();
+      return response.data;
     } on Exception catch (e) {
-      // Log the full response if possible to see validation errors
       AppLogger.e('GetFamilyAreaForSamaj Error', e);
       rethrow;
     }
@@ -135,27 +113,13 @@ class FamilyRepositoryImpl implements FamilyRepository {
     AppLogger.d('Families By Area Request: $queryParameters');
     
     try {
-      final response = await _apiClient.get(
+      final response = await _apiClient.getPaginated<Family>(
         ApiEndpoints.getFamiliesByArea,
         queryParameters: queryParameters,
+        listKey: 'families',
+        fromJsonT: (json) => Family.fromJson(json as Map<String, dynamic>),
       );
-
-      final json = response.data as Map<String, dynamic>;
-      AppLogger.d('Families By Area Response: $json');
-
-      if (json['succeeded'] != true) return [];
-      
-      final dataObj = json['data'];
-      List<dynamic> items = [];
-      
-      if (dataObj is Map<String, dynamic>) {
-        // Try 'families' then 'data' as fallback
-        items = (dataObj['families'] ?? dataObj['data']) as List? ?? [];
-      } else if (dataObj is List) {
-        items = dataObj;
-      }
-      
-      return items.map((e) => Family.fromJson(e as Map<String, dynamic>)).toList();
+      return response.data;
     } on Exception catch (e) {
       AppLogger.e('GetFamiliesByArea Error', e);
       rethrow;

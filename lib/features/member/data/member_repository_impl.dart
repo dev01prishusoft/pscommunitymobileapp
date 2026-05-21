@@ -29,19 +29,13 @@ class MemberRepositoryImpl implements MemberRepository {
       if (lookingForMarriage != null) 'lookingForMarriage': lookingForMarriage,
     };
 
-    final response = await _apiClient.get(
+    final response = await _apiClient.getPaginated<Member>(
       '/api/v1/member/MemberSearch',
       queryParameters: queryParameters,
+      listKey: 'members',
+      fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
     );
 
-    final json = response.data as Map<String, dynamic>;
-    if (json['succeeded'] != true) return [];
-
-    final data = json['data'] as Map<String, dynamic>? ?? {};
-    final members = data['members'] as List? ?? [];
-
-    return members
-        .map((e) => Member.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return response.data;
   }
 }

@@ -54,12 +54,12 @@ void main() {
   });
 
   test('pagination and loadMore increments page correctly', () async {
-    await controller.loadAreas(refresh: true);
+    await controller.loadAreas();
     expect(controller.areas.length, 20);
     expect(controller.hasMore.value, true);
     expect(repository.lastPageNo, 1);
 
-    await controller.loadAreas(refresh: false);
+    await controller.loadNextPage();
     expect(controller.areas.length, 25);
     expect(controller.hasMore.value, false);
     expect(repository.lastPageNo, 2);
@@ -80,7 +80,7 @@ void main() {
 
   test('error gracefully sets AppState.error', () async {
     repository.shouldThrow = true;
-    await controller.loadAreas(refresh: true);
+    await controller.loadAreas();
     expect(controller.state.value, AppState.error);
     expect(controller.areas.isEmpty, true);
   });

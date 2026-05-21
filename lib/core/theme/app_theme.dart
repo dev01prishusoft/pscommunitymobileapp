@@ -121,18 +121,30 @@ class AppTheme {
     // 🧩 Input Fields
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.muted,
+      fillColor: AppColors.muted.withOpacity(0.5),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primary),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.destructive, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.destructive, width: 1.5),
       ),
     ),
 
@@ -152,7 +164,7 @@ class AppTheme {
     ),
 
     // 🎯 Focus / Ripple
-    splashColor: AppColors.primary.withValues(alpha: 0.1),
-    highlightColor: AppColors.primary.withValues(alpha: 0.05),
+    splashColor: AppColors.primary.withOpacity(0.1),
+    highlightColor: AppColors.primary.withOpacity(0.05),
   );
 }

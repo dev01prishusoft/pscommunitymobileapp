@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class FamilyController extends GetxController {
 
@@ -76,19 +77,20 @@ class FamilyController extends GetxController {
     districts.clear();
     talukas.clear();
 
-    // Refresh list with new filter
-    await loadAreas();
-
     if (state != null) {
       isDistrictsLoading.value = true;
       try {
-        final results = await _repository.getDistricts(state.id);
-        districts.assignAll(results);
+        await Future.wait([
+          loadAreas(),
+          _repository.getDistricts(state.id).then((results) => districts.assignAll(results))
+        ]);
       } catch (e) {
         AppLogger.e('Failed to load districts', e);
       } finally {
         isDistrictsLoading.value = false;
       }
+    } else {
+      await loadAreas();
     }
   }
 
@@ -97,19 +99,20 @@ class FamilyController extends GetxController {
     selectedTaluka.value = null;
     talukas.clear();
 
-    // Refresh list with new filter
-    await loadAreas();
-
     if (district != null) {
       isTalukasLoading.value = true;
       try {
-        final results = await _repository.getTalukas(district.id);
-        talukas.assignAll(results);
+        await Future.wait([
+          loadAreas(),
+          _repository.getTalukas(district.id).then((results) => talukas.assignAll(results))
+        ]);
       } catch (e) {
         AppLogger.e('Failed to load talukas', e);
       } finally {
         isTalukasLoading.value = false;
       }
+    } else {
+      await loadAreas();
     }
   }
 
@@ -127,6 +130,7 @@ class FamilyController extends GetxController {
   final int _pageSize = 20;
   final RxBool hasMore = true.obs;
   final RxBool isNextPageLoading = false.obs;
+  int _currentLoadRequestId = 0;
 
   final RxString memberSearchQuery = ''.obs;
   final RxList<Family> filteredFamilies = <Family>[].obs;
@@ -159,16 +163,22 @@ class FamilyController extends GetxController {
     filteredFamilies.assignAll(results);
   }
 
-  Future<void> loadAreas({bool refresh = true}) async {
-    if (refresh) {
-      _currentPage = 1;
-      hasMore.value = true;
-      state.value = AppState.loading;
-      areas.clear();
-    } else {
-      if (!hasMore.value || isNextPageLoading.value) return;
-      isNextPageLoading.value = true;
-    }
+  Future<void> loadAreas() async {
+    _currentPage = 1;
+    hasMore.value = true;
+    state.value = AppState.loading;
+    areas.clear();
+    await _fetchAreas(isRefresh: true);
+  }
+
+  Future<void> loadNextPage() async {
+    if (!hasMore.value || isNextPageLoading.value) return;
+    isNextPageLoading.value = true;
+    await _fetchAreas(isRefresh: false);
+  }
+
+  Future<void> _fetchAreas({required bool isRefresh}) async {
+    final requestId = ++_currentLoadRequestId;
 
     try {
       final results = await _repository.getFamilyAreas(
@@ -179,10 +189,17 @@ class FamilyController extends GetxController {
         pageSize: _pageSize,
       );
 
+      if (requestId != _currentLoadRequestId) return;
+
       if (results.isEmpty) {
         hasMore.value = false;
+        if (isRefresh) state.value = AppState.data;
       } else {
-        areas.addAll(results);
+        if (isRefresh) {
+          areas.assignAll(List.unmodifiable(results));
+        } else {
+          areas.assignAll(List.unmodifiable([...areas, ...results]));
+        }
         _currentPage++;
         if (results.length < _pageSize) {
           hasMore.value = false;
@@ -190,12 +207,15 @@ class FamilyController extends GetxController {
       }
       state.value = AppState.data;
     } catch (e, stack) {
+      if (requestId != _currentLoadRequestId) return;
       AppLogger.e('Failed to load family areas', e, stack);
-      if (refresh) {
+      if (isRefresh) {
         state.value = AppState.error;
       }
     } finally {
-      isNextPageLoading.value = false;
+      if (requestId == _currentLoadRequestId) {
+        isNextPageLoading.value = false;
+      }
     }
   }
 
@@ -212,14 +232,22 @@ class FamilyController extends GetxController {
     }
   }
 
-  List<FamilyArea> get filteredAreas => areas;
-
-  void resetFilters() {
+  Future<void> resetFilters() async {
     selectedState.value = null;
     selectedDistrict.value = null;
     selectedTaluka.value = null;
     districts.clear();
     talukas.clear();
-    loadAreas();
+    await loadAreas();
+  }
+
+  String getFormattedDateOfBirth(Member member) {
+    if (member.dateOfBirth == null) return LK.na;
+    try {
+      final dob = DateTime.parse(member.dateOfBirth!);
+      return '${dob.year}/${dob.month.toString().padLeft(2, '0')}/${dob.day.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return member.dateOfBirth!.split('T')[0].replaceAll('-', '/');
+    }
   }
 }

@@ -33,7 +33,8 @@ class SamajController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAll();
+    // Do not call fetchAll() here to prevent unauthorized API calls before login.
+    // fetchAll() is triggered from DI.bootstrap() if authenticated, or post-login.
   }
 
   // ─── Public API ───────────────────────────────────────────────────────────

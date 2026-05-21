@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 
 class FindMemberPage extends StatefulWidget {
   const FindMemberPage({super.key});
@@ -162,6 +163,40 @@ class _FindMemberPageState extends State<FindMemberPage> {
   }
 
   Widget _buildMemberCard(Member member) {
+    return _FindMemberCard(member: member);
+  }
+
+  Widget _buildLoader() {
+    return Obx(
+      () => _controller.isLoadingMore.value
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          : const SizedBox(height: 24),
+    );
+  }
+}
+
+class _FindMemberCard extends StatelessWidget {
+  final Member member;
+
+  const _FindMemberCard({required this.member});
+
+  @override
+  Widget build(BuildContext context) {
+    final infoParts = <String>[];
+    final genderKey = GenderMapper.getLabelKey(member.gender);
+    if (genderKey != null) {
+      infoParts.add(genderKey.tr);
+    } else if (member.gender.isNotEmpty) {
+      infoParts.add(member.gender);
+    }
+    
+    if (member.age > 0) infoParts.add('${member.age} ${LK.ageYears.tr}');
+    if (member.occupation.isNotEmpty) infoParts.add(member.occupation);
+    final infoString = infoParts.join(' • ');
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -178,43 +213,11 @@ class _FindMemberPageState extends State<FindMemberPage> {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: member.profilePhotoFullUrl != null && member.profilePhotoFullUrl!.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: member.profilePhotoFullUrl!,
-                imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
-                  radius: 30,
-                  backgroundImage: imageProvider,
-                ),
-                placeholder: (context, url) => const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Color(0xFFE2E8F0),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                errorWidget: (context, url, error) => CircleAvatar(
-                  radius: 30,
-                  backgroundColor: const Color(0xFFE2E8F0),
-                  child: Text(
-                    member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-              )
-            : CircleAvatar(
-                radius: 30,
-                backgroundColor: const Color(0xFFE2E8F0),
-                child: Text(
-                  member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
+        leading: MemberAvatar(
+          imageUrl: member.profilePhotoFullUrl,
+          gender: member.gender,
+          radius: 30,
+        ),
         title: Text(
           member.name,
           style: const TextStyle(
@@ -226,21 +229,18 @@ class _FindMemberPageState extends State<FindMemberPage> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
-            Builder(
-              builder: (context) {
-                final genderKey = GenderMapper.getLabelKey(member.gender);
-                return Text(
-                  '${genderKey != null ? genderKey.tr : member.gender} • ${member.age} ${LK.ageYears.tr} • ${member.occupation}',
-                  style: const TextStyle(
-                    color: AppColors.mutedForeground,
-                    fontSize: 13,
-                  ),
-                );
-              }
-            ),
-            const SizedBox(height: 8),
-            if (member.area.isNotEmpty)
+            if (infoString.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                infoString,
+                style: const TextStyle(
+                  color: AppColors.mutedForeground,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+            if (member.area.isNotEmpty) ...[
+              const SizedBox(height: 8),
               Row(
                 children: [
                   const Icon(
@@ -261,6 +261,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   ),
                 ],
               ),
+            ],
           ],
         ),
         trailing: const Icon(Icons.arrow_forward, color: AppColors.primary),
@@ -269,17 +270,6 @@ class _FindMemberPageState extends State<FindMemberPage> {
           arguments: {'memberId': member.memberId},
         ),
       ),
-    );
-  }
-
-  Widget _buildLoader() {
-    return Obx(
-      () => _controller.isLoadingMore.value
-          ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.0),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            )
-          : const SizedBox(height: 24),
     );
   }
 }

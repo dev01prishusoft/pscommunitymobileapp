@@ -19,13 +19,17 @@ class ErrorMappingInterceptor extends Interceptor {
         String? apiMessage;
         
         if (data is Map<String, dynamic>) {
-          apiMessage = data['message']?.toString() ?? data['Message']?.toString();
+          apiMessage = _extractMessage(data);
         }
 
-        if (status == 401) {
+        if (status == 400) {
+          failure = ValidationFailure(apiMessage ?? 'Validation failed');
+        } else if (status == 401) {
           failure = UnauthorizedFailure(apiMessage ?? 'Unauthorized access');
         } else if (status == 403) {
-          failure = UnauthorizedFailure(apiMessage ?? 'Access Forbidden');
+          failure = ForbiddenFailure(apiMessage ?? 'Access Forbidden');
+        } else if (status == 404) {
+          failure = NotFoundFailure(apiMessage ?? 'Resource not found');
         } else if (status != null && status >= 500) {
           failure = ServerFailure(apiMessage ?? 'Server error occurred');
         } else {
@@ -39,6 +43,8 @@ class ErrorMappingInterceptor extends Interceptor {
         if (err.error is SocketException) {
           final socketErr = err.error as SocketException;
           failure = NetworkFailure('Network Error: ${socketErr.message}');
+        } else if (err.error is HandshakeException) {
+          failure = const CertificatePinningFailure();
         } else {
           failure = ServerFailure(err.message ?? 'An unexpected error occurred');
         }
@@ -49,5 +55,16 @@ class ErrorMappingInterceptor extends Interceptor {
 
     // Pass the typed failure forward as the error
     handler.next(err.copyWith(error: failure));
+  }
+
+  String? _extractMessage(Map<String, dynamic> data) {
+    final msg = data['message'] ?? data['Message'] ?? data['error'] ?? data['Error'];
+    if (msg is String && msg.isNotEmpty) {
+      return msg;
+    }
+    if (msg is List && msg.isNotEmpty) {
+      return msg.first.toString();
+    }
+    return null;
   }
 }

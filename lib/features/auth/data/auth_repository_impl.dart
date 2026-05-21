@@ -14,15 +14,15 @@ class AuthRepositoryImpl implements AuthRepository {
     required String mobile,
     required String password,
   }) async {
-    final response = await _apiClient.post(
+    final response = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.login,
       data: {
         'mobile': mobile,
         'password': password,
       },
+      fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
-
-    return _mapAuthResponse(response.data as Map<String, dynamic>);
+    return response.data!;
   }
 
   @override
@@ -30,15 +30,15 @@ class AuthRepositoryImpl implements AuthRepository {
     required String mobile,
     required String password,
   }) async {
-    final response = await _apiClient.post(
+    final response = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,
       data: {
         'mobileNo': mobile,
         'password': password,
       },
+      fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
-
-    return _mapAuthResponse(response.data as Map<String, dynamic>);
+    return response.data!;
   }
 
   @override
@@ -47,33 +47,18 @@ class AuthRepositoryImpl implements AuthRepository {
     required String oldPassword,
     required String newPassword,
   }) async {
-    final response = await _apiClient.post(
+    await _apiClient.postParsed<void>(
       ApiEndpoints.memberUpdatePassword,
       data: {
         'mobileNo': mobileNo,
         'oldPassword': oldPassword,
         'newPassword': newPassword,
       },
+      // Since we just need it to succeed and the parser handles json['succeeded']
     );
-
-    final data = response.data as Map<String, dynamic>;
-    final succeeded = data['succeeded'] as bool? ?? false;
-    
-    if (!succeeded) {
-      final msg = data['message']?.toString() ?? 'Update password failed';
-      throw ServerFailure(msg);
-    }
   }
 
-  AuthTokens _mapAuthResponse(Map<String, dynamic> data) {
-    final succeeded = data['succeeded'] as bool? ?? false;
-    
-    if (!succeeded) {
-      final msg = data['message']?.toString() ?? 'Authentication failed';
-      throw ServerFailure(msg);
-    }
-
-    final authData = data['data'] as Map<String, dynamic>? ?? {};
+  AuthTokens _mapAuthResponseData(Map<String, dynamic> authData) {
     final accessToken = authData['accessToken']?.toString() ?? '';
     final refreshToken = authData['refreshToken']?.toString() ?? '';
     final isDefault = authData['isDefaultPassword'] as bool? ?? false;

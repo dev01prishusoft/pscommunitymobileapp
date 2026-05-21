@@ -218,7 +218,7 @@ class LK {
   static const String selectPaymentType = 'Select Payment Type';
   static const String categoryHeader = 'CATEGORY';
   static const String selectCategory = 'Select Category';
-  static const String amountHeader = 'AMOUNT';
+  static const String amountHeader = 'Amount Header';
   static const String payNow = 'PAY NOW';
   static const String searchOccupation = 'Search occupation...';
   static const String occupationColon = 'Occupation:';
@@ -397,6 +397,7 @@ class LK {
   static const String saveChanges = 'Save Changes';
   static const String addMember = 'Add Member';
   static const String memberNoHint = 'PSC-2026-0512160358';
+  static const String fieldRequired = 'This field is required';
   
   static const List<String> allValues = [
     appTitle, welcome, welcomesYou, signIn, welcomeBack, loginSubtitle,
@@ -468,6 +469,6 @@ class LK {
     otherJobPositionLabel, otherOccupationLabel,
     occupationAddressLine1Label, occupationAddressLine2Label, businessName,
     invalidMobileOrPassword, pleaseEnterOldPassword, pleaseEnterNewPassword, pleaseEnterConfirmPassword,
-    deleteAccount, deleteAccountConfirm
+    deleteAccount, deleteAccountConfirm, fieldRequired
   ];
 }

@@ -3,18 +3,18 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class AuthState {
-  final TokenManager _tokenManager;
-  final RxBool isAuthenticated = false.obs;
-
   AuthState(this._tokenManager) {
     _updateAuthStatus();
     // Listen to token changes
-    ever(_tokenManager.accessToken, (_) => _updateAuthStatus());
+    ever(_tokenManager.authState, (_) => _updateAuthStatus());
   }
 
+  final TokenManager _tokenManager;
+  final RxBool isAuthenticated = false.obs;
+
   void _updateAuthStatus() {
-    // hasValidToken checks both presence and JWT expiry
-    isAuthenticated.value = _tokenManager.hasValidToken;
+    // hasToken checks presence of either access or refresh token
+    isAuthenticated.value = _tokenManager.hasToken;
   }
 
   void logout() {

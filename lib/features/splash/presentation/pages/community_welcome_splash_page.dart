@@ -188,6 +188,7 @@ class _AnimatedLogo extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: logoUrl,
         width: 300,
+        memCacheWidth: 600,
         placeholder: (context, url) => const SizedBox(
           width: 300,
           height: 100,

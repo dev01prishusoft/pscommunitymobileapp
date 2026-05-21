@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 
 enum AppState { loading, error, empty, data }
 
@@ -39,37 +40,9 @@ class AppStateView extends StatelessWidget {
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 60,
-                          color: AppColors.destructive,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          errorMessage ?? LK.somethingWrong.tr,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: AppColors.foreground,
-                          ),
-                        ),
-                        if (onRetry != null) ...[
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: onRetry,
-                            child: Text(LK.retry.tr),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+                child: AppErrorState(
+                  errorMessage: errorMessage,
+                  onRetry: onRetry,
                 ),
               ),
             );

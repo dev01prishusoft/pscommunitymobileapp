@@ -8,6 +8,19 @@ import 'package:pscommunitymobileapp/core/constants/app_strings_preboot.dart';
 //  All strings here are intentionally hardcoded in English. 
 //  Do NOT add .tr calls — they will throw a LateInitializationError. 
 //  ─────────────────────────────────────────────────────────────────
+class PrebootColors {
+  static const background = Color(0xFF0F172A);
+  static const errorIcon = Color(0xFFEF4444);
+  static const textPrimary = Colors.white;
+  static const textSecondary = Color(0xFF94A3B8);
+  static const logBackground = Color(0xFF1E293B);
+  static const logBorder = Colors.white10;
+  static const logHeader = Color(0xFF3B82F6);
+  static const logText = Color(0xFFF1F5F9);
+  static const buttonBg = Color(0xFF3B82F6);
+  static const buttonText = Colors.white;
+}
+
 class FatalErrorScreen extends StatelessWidget {
   final Object error;
   final StackTrace? stackTrace;
@@ -23,7 +36,7 @@ class FatalErrorScreen extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: PrebootColors.background,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -33,7 +46,7 @@ class FatalErrorScreen extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.error_outline_rounded,
-                  color: Color(0xFFEF4444),
+                  color: PrebootColors.errorIcon,
                   size: 80,
                 ),
                 const SizedBox(height: 24),
@@ -41,7 +54,7 @@ class FatalErrorScreen extends StatelessWidget {
                   PrebootStrings.initError,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: PrebootColors.textPrimary,
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
@@ -52,7 +65,7 @@ class FatalErrorScreen extends StatelessWidget {
                   PrebootStrings.initBody,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Color(0xFF94A3B8),
+                    color: PrebootColors.textSecondary,
                     fontSize: 16,
                     height: 1.5,
                   ),
@@ -61,9 +74,9 @@ class FatalErrorScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: PrebootColors.logBackground,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: PrebootColors.logBorder),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +84,7 @@ class FatalErrorScreen extends StatelessWidget {
                       const Text(
                         PrebootStrings.errorLog,
                         style: TextStyle(
-                          color: Color(0xFF3B82F6),
+                          color: PrebootColors.logHeader,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
@@ -81,7 +94,7 @@ class FatalErrorScreen extends StatelessWidget {
                       Text(
                         '$error',
                         style: const TextStyle(
-                          color: Color(0xFFF1F5F9),
+                          color: PrebootColors.logText,
                           fontFamily: 'monospace',
                           fontSize: 13,
                         ),
@@ -92,12 +105,11 @@ class FatalErrorScreen extends StatelessWidget {
                 const SizedBox(height: 48),
                 ElevatedButton(
                   onPressed: () {
-                    // Close the app to allow a clean restart by the user
                     SystemNavigator.pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    foregroundColor: Colors.white,
+                    backgroundColor: PrebootColors.buttonBg,
+                    foregroundColor: PrebootColors.buttonText,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

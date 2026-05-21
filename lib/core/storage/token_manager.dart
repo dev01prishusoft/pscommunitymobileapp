@@ -4,11 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
+class TokenPair {
+  final String? accessToken;
+  final String? refreshToken;
+
+  const TokenPair({this.accessToken, this.refreshToken});
+}
+
 class TokenManager {
   final SecureStorageService _storage;
 
-  final RxnString accessToken = RxnString();
-  final RxnString refreshToken = RxnString();
+  final Rx<TokenPair> authState = const TokenPair().obs;
 
   TokenManager(this._storage);
 
@@ -17,49 +23,63 @@ class TokenManager {
 
   Future<void> bootstrap() async {
     try {
-      accessToken.value = await _storage.read(_accessKey);
-      refreshToken.value = await _storage.read(_refreshKey);
+      final results = await Future.wait([
+        _storage.read(_accessKey),
+        _storage.read(_refreshKey),
+      ]);
+      authState.value = TokenPair(accessToken: results[0], refreshToken: results[1]);
     } catch (e, stack) {
       if (kDebugMode) {
         debugPrint('TokenManager.bootstrap error: $e\n$stack');
       }
-      accessToken.value = null;
-      refreshToken.value = null;
+      authState.value = const TokenPair();
     }
   }
 
   Future<void> saveTokens(String access, String refresh) async {
     try {
-      accessToken.value = access;
-      refreshToken.value = refresh;
-      await _storage.write(_accessKey, access);
-      await _storage.write(_refreshKey, refresh);
+      await Future.wait([
+        _storage.write(_accessKey, access),
+        _storage.write(_refreshKey, refresh),
+      ]);
+      authState.value = TokenPair(accessToken: access, refreshToken: refresh);
     } catch (e, stack) {
       if (kDebugMode) {
         debugPrint('TokenManager.saveTokens error: $e\n$stack');
       }
+      rethrow;
     }
   }
 
   Future<void> clearTokens() async {
     try {
-      accessToken.value = null;
-      refreshToken.value = null;
-      await _storage.delete(_accessKey);
-      await _storage.delete(_refreshKey);
+      await Future.wait([
+        _storage.delete(_accessKey),
+        _storage.delete(_refreshKey),
+      ]);
+      authState.value = const TokenPair();
     } catch (e, stack) {
       if (kDebugMode) {
         debugPrint('TokenManager.clearTokens error: $e\n$stack');
       }
+      rethrow;
     }
   }
+
+  Stream<bool> get isLoggedInStream => authState.stream.map((pair) {
+    if (pair.accessToken == null || pair.accessToken!.isEmpty) return false;
+    return !_isJwtExpired(pair.accessToken!);
+  }).distinct();
+
+  String? get accessToken => authState.value.accessToken;
+  String? get refreshToken => authState.value.refreshToken;
 
   /// True when the current session can be used or recovered by refresh.
   bool get hasToken => hasValidAccessToken || hasRefreshToken;
 
   /// True only when an access token exists and is not expired.
   bool get hasValidAccessToken {
-    final token = accessToken.value;
+    final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return false;
     return !_isJwtExpired(token);
   }
@@ -70,16 +90,18 @@ class TokenManager {
   /// True when a refresh token exists in memory.
   /// The server remains the source of truth for refresh-token validity.
   bool get hasRefreshToken {
-    final token = refreshToken.value;
+    final token = authState.value.refreshToken;
     return token != null && token.isNotEmpty;
   }
 
   /// True when the access token is missing, invalid, or expired.
   bool get isAccessTokenExpired {
-    final token = accessToken.value;
+    final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return true;
     return _isJwtExpired(token);
   }
+
+  Stream<TokenPair> get authStateStream => authState.stream;
 
   static Map<String, dynamic>? _decodeJwtPayload(String token) {
     try {

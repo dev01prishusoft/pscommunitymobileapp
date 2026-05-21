@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -21,8 +21,6 @@ class MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatarColors = _getAvatarColors(member.gender);
-    
     return Column(
       children: [
         if (showDivider)
@@ -36,7 +34,7 @@ class MemberTile extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                _buildAvatar(avatarColors),
+                _buildAvatar(),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -113,52 +111,12 @@ class MemberTile extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar(({Color background, Color text}) colors) {
-    final initial = member.name.isNotEmpty ? member.name[0].toUpperCase() : '';
-    
-    Widget fallbackAvatar() => CircleAvatar(
+  Widget _buildAvatar() {
+    return MemberAvatar(
+      imageUrl: member.profileImageUrl,
+      gender: member.gender,
+      fallbackName: member.name,
       radius: 22,
-      backgroundColor: colors.background,
-      child: Text(
-        initial,
-        style: TextStyle(
-          color: colors.text,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
-      ),
     );
-
-    if (member.profileImageUrl == null || member.profileImageUrl!.isEmpty) {
-      return fallbackAvatar();
-    }
-
-    return CachedNetworkImage(
-      imageUrl: member.profileImageUrl!,
-      imageBuilder: (context, imageProvider) => CircleAvatar(
-        radius: 22,
-        backgroundImage: imageProvider,
-      ),
-      placeholder: (context, url) => CircleAvatar(
-        radius: 22,
-        backgroundColor: colors.background,
-        child: const SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-      ),
-      errorWidget: (context, url, error) => fallbackAvatar(),
-    );
-  }
-
-  ({Color background, Color text}) _getAvatarColors(String gender) {
-    if (gender == 'Female') {
-      return (background: const Color(0xFFFDE7F3), text: const Color(0xFFD61A87));
-    }
-    return (background: const Color(0xFFE2F1FB), text: const Color(0xFF1AA3E8));
   }
 }

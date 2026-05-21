@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
@@ -16,18 +17,35 @@ class SecureStorageService {
         );
 
   Future<void> write(String key, String? value) async {
-    await _storage.write(key: key, value: value);
+    try {
+      await _storage.write(key: 'ps_community_$key', value: value);
+    } catch (e) {
+      if (kDebugMode) print('SecureStorage write error: $e');
+    }
   }
 
   Future<String?> read(String key) async {
-    return await _storage.read(key: key);
+    try {
+      return await _storage.read(key: 'ps_community_$key');
+    } catch (e) {
+      if (kDebugMode) print('SecureStorage read error: $e');
+      return null;
+    }
   }
 
   Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+    try {
+      await _storage.delete(key: 'ps_community_$key');
+    } catch (e) {
+      if (kDebugMode) print('SecureStorage delete error: $e');
+    }
   }
 
   Future<void> deleteAll() async {
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      if (kDebugMode) print('SecureStorage deleteAll error: $e');
+    }
   }
 }

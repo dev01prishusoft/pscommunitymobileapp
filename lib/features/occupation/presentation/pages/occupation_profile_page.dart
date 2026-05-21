@@ -93,6 +93,8 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                       ? ClipOval(
                           child: CachedNetworkImage(
                             imageUrl: occ.logoUrl!,
+                            memCacheHeight: 300,
+                            memCacheWidth: 300,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),

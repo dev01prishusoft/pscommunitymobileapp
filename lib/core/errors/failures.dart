@@ -25,6 +25,11 @@ class UnauthorizedFailure extends Failure {
       : super(translationKey: LK.errorUnauthorized);
 }
 
+class ForbiddenFailure extends Failure {
+  const ForbiddenFailure([super.message = 'Access Forbidden'])
+      : super(translationKey: LK.errorUnauthorized);
+}
+
 class TimeoutFailure extends Failure {
   const TimeoutFailure([super.message = 'Request timed out'])
       : super(translationKey: LK.errorTimeout);
@@ -38,4 +43,9 @@ class CertificatePinningFailure extends Failure {
 class ValidationFailure extends Failure {
   const ValidationFailure(super.message)
       : super(translationKey: LK.errorValidation);
+}
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure([super.message = 'Resource not found'])
+      : super(translationKey: LK.noResultsFound);
 }

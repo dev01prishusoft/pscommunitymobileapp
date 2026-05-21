@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'dart:math';
 
@@ -43,10 +44,10 @@ class RetryInterceptor extends Interceptor {
       final response = await dio.fetch<dynamic>(options);
       return handler.resolve(response);
     } on DioException catch (retryErr) {
-      // Re-trigger the interceptor chain for the new error
-      return handler.next(retryErr);
+      // Reject to prevent interceptor chain recursion
+      return handler.reject(retryErr);
     } catch (e) {
-      return handler.next(err);
+      return handler.reject(err);
     }
   }
 
@@ -55,9 +56,14 @@ class RetryInterceptor extends Interceptor {
     if (err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.sendTimeout ||
-        err.type == DioExceptionType.receiveTimeout ||
-        err.type == DioExceptionType.unknown) {
+        err.type == DioExceptionType.receiveTimeout) {
       return true;
+    }
+    
+    if (err.type == DioExceptionType.unknown) {
+      if (err.error is SocketException || err.error is TimeoutException) {
+        return true;
+      }
     }
     
     final status = err.response?.statusCode;

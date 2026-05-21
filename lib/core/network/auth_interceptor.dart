@@ -24,7 +24,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final token = _tokenManager.accessToken.value;
+    final token = _tokenManager.accessToken;
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -37,7 +37,20 @@ class AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
 
-    final refreshToken = _tokenManager.refreshToken.value;
+    // Do not intercept 401s for login or refresh token endpoints, 
+    // let them pass through to the controller/usecase.
+    final path = err.requestOptions.path;
+    if (path.contains('/member-login') || path.contains('/refresh-token')) {
+      return handler.next(err);
+    }
+
+    final isRetry = err.requestOptions.extra['isAuthRetry'] as bool? ?? false;
+    if (isRetry) {
+      _onAuthFailure();
+      return handler.next(err);
+    }
+
+    final refreshToken = _tokenManager.refreshToken;
     if (refreshToken == null) {
       _onAuthFailure();
       return handler.next(err);
@@ -48,9 +61,12 @@ class AuthInterceptor extends Interceptor {
       if (newToken != null) {
         final options = err.requestOptions;
         options.headers['Authorization'] = 'Bearer $newToken';
+        options.extra['isAuthRetry'] = true;
         
         final response = await _mainDio.fetch<Map<String, dynamic>>(options);
         return handler.resolve(response);
+      } else {
+        _onAuthFailure();
       }
     } catch (e, stack) {
       if (kDebugMode) {
@@ -73,7 +89,10 @@ class AuthInterceptor extends Interceptor {
     try {
       final response = await _refreshDio.post<Map<String, dynamic>>(
         ApiEndpoints.refreshToken,
-        data: {'refreshToken': refreshToken},
+        data: {
+          'accessToken': _tokenManager.accessToken,
+          'refreshToken': refreshToken,
+        },
       );
       
       final data = response.data ?? {};
@@ -85,9 +104,15 @@ class AuthInterceptor extends Interceptor {
         await _tokenManager.saveTokens(access, refresh);
         c.complete(access);
       } else {
+        if (kDebugMode) {
+          print('REFRESH TOKEN ERROR: API returned success but tokens were null. Response: $data');
+        }
         c.complete(null);
       }
     } catch (e) {
+      if (kDebugMode) {
+        print('REFRESH TOKEN EXCEPTION: $e');
+      }
       c.completeError(e);
     } finally {
       _refreshCompleter = null;

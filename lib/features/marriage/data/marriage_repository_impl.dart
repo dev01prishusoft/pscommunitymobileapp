@@ -11,27 +11,21 @@ class MarriageRepositoryImpl implements MarriageRepository {
 
   @override
   Future<List<MarriageProfile>> getMatrimonialProfiles() async {
-    final response = await _apiClient.get(ApiEndpoints.marriage);
-    
-    final json = response.data as Map<String, dynamic>;
-    if (json['succeeded'] != true) return [];
-
-    final dataObj = json['data'] as Map<String, dynamic>? ?? {};
-    final list = dataObj['members'] as List? ?? [];
-
-    return list.map((e) => MarriageProfile.fromJson(e as Map<String, dynamic>)).toList();
+    final response = await _apiClient.getPaginated<MarriageProfile>(
+      ApiEndpoints.marriage,
+      listKey: 'members',
+      fromJsonT: (json) => MarriageProfile.fromJson(json as Map<String, dynamic>),
+    );
+    return response.data;
   }
 
   @override
   Future<List<UnmarriedCount>> getUnmarriedCounts() async {
-    final response = await _apiClient.get(ApiEndpoints.unmarriedCount);
-    
-    final json = response.data as Map<String, dynamic>;
-    if (json['succeeded'] != true) return [];
-
-    final dataObj = json['data'] as Map<String, dynamic>? ?? {};
-    final list = dataObj['unMarriedCount'] as List? ?? [];
-
-    return list.map((e) => UnmarriedCount.fromJson(e as Map<String, dynamic>)).toList();
+    final response = await _apiClient.getPaginated<UnmarriedCount>(
+      ApiEndpoints.unmarriedCount,
+      listKey: 'unMarriedCount',
+      fromJsonT: (json) => UnmarriedCount.fromJson(json as Map<String, dynamic>),
+    );
+    return response.data;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
@@ -10,7 +11,6 @@ import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/features/auth/data/auth_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
-import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
 import 'package:pscommunitymobileapp/features/member/data/member_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
@@ -36,8 +36,9 @@ import 'package:pscommunitymobileapp/features/home/presentation/controllers/shar
 
 class DI {
   static Future<void> bootstrap() async {
-    // 1. Config
-    AppEnvironment.init();
+    try {
+      // 1. Config
+      AppEnvironment.init();
 
     // 2. Storage
     final secureStorage = SecureStorageService();
@@ -48,7 +49,8 @@ class DI {
     await tokenManager.bootstrap();
     Get.put(tokenManager, permanent: true);
 
-    final connectivity = ConnectivityService();
+    final connectivityPlugin = Connectivity();
+    final connectivity = ConnectivityService(connectivity: connectivityPlugin);
     Get.put(connectivity, permanent: true);
 
     final authState = AuthState(tokenManager);
@@ -63,60 +65,69 @@ class DI {
     final apiClient = ApiClient(
       tokenManager: tokenManager,
       connectivity: connectivity,
+      onAuthFailure: authState.logoutAndRedirect,
     );
     Get.put(apiClient, permanent: true);
 
     // 6. Auth Feature
     final authRepository = AuthRepositoryImpl(apiClient);
     final loginUseCase = LoginUseCase(authRepository);
-    Get.put(LoginController(loginUseCase, tokenManager), permanent: true);
-    Get.put(ResetPasswordController(authRepository), permanent: true);
+    Get.put(loginUseCase, permanent: true);
+    // LoginController is instantiated in LoginPage to prevent Duplicate GlobalKey errors during transitions
+    Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
 
     // 7. Member Feature
     final memberRepository = MemberRepositoryImpl(apiClient);
-    Get.put(FindMemberController(memberRepository), permanent: true);
+    Get.lazyPut(() => FindMemberController(memberRepository), fenix: true);
 
     // 8. Family Feature
     final familyRepository = FamilyRepositoryImpl(apiClient);
-    Get.put(FamilyController(familyRepository), permanent: true);
+    Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
 
     // 9. Marriage Feature
     final marriageRepository = MarriageRepositoryImpl(apiClient);
-    Get.put(MarriageController(marriageRepository, memberRepository, familyRepository), permanent: true);
+    Get.lazyPut(() => MarriageController(marriageRepository, memberRepository, familyRepository), fenix: true);
 
     // 10. Committee Feature
     final committeeRepository = CommitteeRepositoryImpl(apiClient);
-    Get.put(CommitteeController(committeeRepository), permanent: true);
+    Get.lazyPut(() => CommitteeController(committeeRepository), fenix: true);
 
     // 11. Occupation Feature
     final occupationRepository = OccupationRepositoryImpl(apiClient);
-    Get.put(OccupationController(occupationRepository), permanent: true);
+    Get.lazyPut(() => OccupationController(occupationRepository), fenix: true);
 
     // 12. Payment Feature
     final PaymentRepository paymentRepository =
         kDebugMode && AppEnvironment.I.flavor == Flavor.dev
             ? MockPaymentRepository()
             : PaymentRepositoryImpl(apiClient);
-    Get.put(PaymentController(paymentRepository), permanent: true);
+    Get.lazyPut(() => PaymentController(paymentRepository), fenix: true);
 
     // 13. Business Feature
     final businessRepository = BusinessRepositoryImpl(apiClient);
-    Get.put(BusinessController(businessRepository), permanent: true);
+    Get.lazyPut(() => BusinessController(businessRepository), fenix: true);
 
     // 14. Global Samaj Data
     final samajRepository = SamajRepositoryImpl(apiClient);
     final samajController = Get.put(SamajController(samajRepository), permanent: true);
 
     // 15. Profile Feature
-    Get.put(ProfileFormController(), permanent: true);
+    // ProfileFormController is instantiated per page in the UI to prevent GlobalKey duplication
 
     // 16. Home Feature
-    Get.put(HomeController(), permanent: true);
-    Get.put(ShareController(), permanent: true);
+    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => ShareController(), fenix: true);
 
     // Auto-fetch samaj data if already logged in (e.g. app reopen with valid tokens)
     if (authState.isAuthenticated.value) {
       unawaited(samajController.fetchAll());
+    }
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('Bootstrap Failed: $e\n$stackTrace');
+      }
+      // Depending on the app's architecture, we might want to throw or show a fatal error UI
+      rethrow;
     }
   }
 }

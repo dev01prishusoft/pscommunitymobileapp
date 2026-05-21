@@ -1,7 +1,16 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class ProfileFormController extends GetxController {
+  final formKey = GlobalKey<FormState>();
   // Fallback defaults
   final defaultGenders = ['Male', 'Female', 'Other'];
   final defaultMaritalStatuses = ['Married', 'Unmarried', 'Widow', 'Divorced'];
@@ -23,111 +32,208 @@ class ProfileFormController extends GetxController {
   final signList = <String>[].obs;
 
   // Personal Tab
-  final memberNo = 'PSC-2026-0512160358'.obs;
-  final firstName = 'Ajay'.obs;
-  final middleName = 'Kumar'.obs;
-  final lastName = 'Parmar'.obs;
-  final firstNameEn = 'Ajay'.obs;
-  final lastNameEn = 'Parmar'.obs;
-  final dob = '15-06-1995'.obs;
-  final tob = '10:30'.obs;
-  final weight = '70'.obs;
-  final height = '175'.obs;
+  final memberNo = ''.obs;
+  final firstName = ''.obs;
+  final middleName = ''.obs;
+  final lastName = ''.obs;
+  final firstNameEn = ''.obs;
+  final lastNameEn = ''.obs;
+  final dob = ''.obs;
+  final tob = ''.obs;
+  final weight = ''.obs;
+  final height = ''.obs;
   final gender = 'Male'.obs;
   final maritalStatus = 'Married'.obs;
   final bloodGroup = 'A+'.obs;
-  final sign = 'Aquarius'.obs;
+  final sign = 'Aries'.obs;
   final isActive = true.obs;
 
   // Contact & Verify
-  final mobileNo = '9876543216'.obs;
+  final mobileNo = ''.obs;
   final mobileVerified = false.obs;
-  final secondaryMobile = '9876501234'.obs;
-  final email = 'ajay.parmar@yopmail.com'.obs;
-  final entryPersonMobile = '9876512345'.obs;
-  final emergencyContactName = 'Ajay Sharma'.obs;
-  final emergencyContactNo = '9876523456'.obs;
+  final secondaryMobile = ''.obs;
+  final email = ''.obs;
+  final entryPersonMobile = ''.obs;
+  final emergencyContactName = ''.obs;
+  final emergencyContactNo = ''.obs;
 
   // Family & Parents
-  final isFamilyHead = true.obs;
+  final isFamilyHead = false.obs;
   final relation = 'Self'.obs;
-  final motherFatherName = 'Rajiv Parmar'.obs;
-  final gotra = 'Parmar'.obs;
-  final mothersGotra = 'Parmar'.obs;
+  final motherFatherName = ''.obs;
+  final gotra = ''.obs;
+  final mothersGotra = ''.obs;
   final openToMarriage = false.obs;
 
   // Assets & Life
-  final ownLand = true.obs;
-  final ownHouse = true.obs;
-  final twoWheeler = true.obs;
+  final ownLand = false.obs;
+  final ownHouse = false.obs;
+  final twoWheeler = false.obs;
   final fourWheeler = false.obs;
-  final monthlyIncome = '50000'.obs;
+  final monthlyIncome = ''.obs;
 
   // Social Media
-  final facebook = 'https://facebook.com/dummy'.obs;
-  final whatsapp = 'https://wa.me/919876543210'.obs;
-  final instagram = 'https://instagram.com/dummy'.obs;
-  final twitter = 'https://twitter.com/dummy'.obs;
+  final facebook = ''.obs;
+  final whatsapp = ''.obs;
+  final instagram = ''.obs;
+  final twitter = ''.obs;
 
   // Addresses (List of addresses)
-  final addresses = <AddressModel>[
-    AddressModel(
-      type: 'Home',
-      state: 'Gujarat',
-      district: 'Ahmedabad',
-      taluka: 'Ahmedabad City',
-      area: 'Bapunagar',
-      pincode: '380001',
-      line1: '123, MG Road',
-      line2: 'Near City Mall',
-      landmark: 'Opp. Bus Stand',
-      isPrimary: true,
-    )
-  ].obs;
+  final addresses = <AddressModel>[].obs;
 
   // Education (List of education)
-  final educationList = <EducationModel>[
-    EducationModel(
-      qualification: 'Graduate',
-      institute: 'Gujarat University',
-      passingYear: '2017',
-      percentage: '78',
-      grade: 'A',
-      description: 'Bachelor of Computer Applications',
-      isHighest: true,
-    ),
-    EducationModel(
-      qualification: 'HSC',
-      institute: "St. Xavier's High School",
-      passingYear: '2013',
-      percentage: '82',
-      grade: 'A+',
-      description: 'Science Stream',
-      isHighest: false,
-    ),
-  ].obs;
+  final educationList = <EducationModel>[].obs;
 
   // Work History
   final occupationType = 'Agriculture'.obs;
-  final occupation = 'Dairy Farming'.obs;
-  final jobPosition = 'Senior Developer'.obs;
-  final otherJobPosition = 'Senior Engineer'.obs;
-  final otherOccupation = 'Software Developer'.obs;
-  final companyName = 'Prishusoft'.obs;
-  final businessName = 'Prishusoft'.obs;
-  final workMonthlyIncome = '50000'.obs;
-  final occupationDescription = 'Full-stack web developer'.obs;
-  final workState = 'Gujarat'.obs;
-  final workDistrict = 'Ahmedabad'.obs;
-  final workTaluka = 'Barwala'.obs;
+  final occupation = ''.obs;
+  final jobPosition = ''.obs;
+  final otherJobPosition = ''.obs;
+  final otherOccupation = ''.obs;
+  final companyName = ''.obs;
+  final businessName = ''.obs;
+  final workMonthlyIncome = ''.obs;
+  final occupationDescription = ''.obs;
+  final workState = ''.obs;
+  final workDistrict = ''.obs;
+  final workTaluka = ''.obs;
   final workArea = ''.obs;
   final workAddressLine1 = ''.obs;
   final workAddressLine2 = ''.obs;
 
+  // Image Handling
+  final Rx<File?> profileImage = Rx<File?>(null);
+  final RxDouble uploadProgress = 0.0.obs;
+
+  // TextEditingControllers
+  late final TextEditingController firstNameCtrl;
+  late final TextEditingController middleNameCtrl;
+  late final TextEditingController lastNameCtrl;
+  late final TextEditingController firstNameEnCtrl;
+  late final TextEditingController lastNameEnCtrl;
+  late final TextEditingController dobCtrl;
+  late final TextEditingController heightCtrl;
+  late final TextEditingController weightCtrl;
+  
+  late final TextEditingController mobileCtrl;
+  late final TextEditingController secondaryMobileCtrl;
+  late final TextEditingController emailCtrl;
+  late final TextEditingController emergencyNameCtrl;
+  late final TextEditingController emergencyNoCtrl;
+  
+  late final TextEditingController monthlyIncomeCtrl;
+  
+  late final TextEditingController facebookCtrl;
+  late final TextEditingController whatsappCtrl;
+  late final TextEditingController instagramCtrl;
+  late final TextEditingController twitterCtrl;
+
   @override
   void onInit() {
     super.onInit();
+    _initializeControllers();
     loadAllDropdowns();
+  }
+
+  void loadFromMember(Member m) {
+    memberNo.value = m.memberNo ?? '';
+    firstName.value = m.firstName;
+    middleName.value = m.middleName ?? '';
+    lastName.value = m.lastName;
+    dob.value = m.dateOfBirth ?? '';
+    tob.value = m.dateOfBirthTime ?? '';
+    weight.value = m.weight?.toString() ?? '';
+    height.value = m.height?.toString() ?? '';
+    gender.value = m.genderName ?? '';
+    maritalStatus.value = m.maritalStatusName ?? '';
+    bloodGroup.value = m.bloodGroupName ?? '';
+    
+    mobileNo.value = m.mobileNo ?? '';
+    secondaryMobile.value = m.secondaryMobile ?? '';
+    email.value = m.emailAddress ?? '';
+    emergencyContactName.value = m.emergencyContactName ?? '';
+    emergencyContactNo.value = m.emergencyContactNo ?? '';
+    
+    motherFatherName.value = m.motherFatherName ?? '';
+    gotra.value = m.gotraName ?? '';
+    openToMarriage.value = m.isLookingforMarriage ?? false;
+    
+    ownLand.value = m.isOwnLand ?? false;
+    ownHouse.value = m.isOwnHouse ?? false;
+    twoWheeler.value = m.hasTwoWheeler ?? false;
+    fourWheeler.value = m.hasFourWheeler ?? false;
+    monthlyIncome.value = m.monthlyIncome?.toString() ?? '';
+    
+    facebook.value = m.facebookUrl ?? '';
+    whatsapp.value = m.whatsappUrl ?? '';
+    instagram.value = m.instagramUrl ?? '';
+    twitter.value = m.twitterUrl ?? '';
+    
+    occupationType.value = m.occupationTypeName ?? '';
+    occupation.value = m.occupationName ?? '';
+    jobPosition.value = m.jobPositionName ?? '';
+    otherJobPosition.value = m.otherJobPosition ?? '';
+    otherOccupation.value = m.otherOccupation ?? '';
+    companyName.value = m.companyName ?? '';
+    businessName.value = m.businessName ?? '';
+    occupationDescription.value = m.occupationDescription ?? '';
+    workState.value = m.occupationStateName ?? '';
+    workDistrict.value = m.occupationDistrictName ?? '';
+    workTaluka.value = m.occupationTalukaName ?? '';
+    workArea.value = m.occupationAreaName ?? '';
+    workAddressLine1.value = m.occupationAddressLine1 ?? '';
+    workAddressLine2.value = m.occupationAddressLine2 ?? '';
+
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    firstNameCtrl = TextEditingController(text: firstName.value);
+    middleNameCtrl = TextEditingController(text: middleName.value);
+    lastNameCtrl = TextEditingController(text: lastName.value);
+    firstNameEnCtrl = TextEditingController(text: firstNameEn.value);
+    lastNameEnCtrl = TextEditingController(text: lastNameEn.value);
+    dobCtrl = TextEditingController(text: dob.value);
+    heightCtrl = TextEditingController(text: height.value);
+    weightCtrl = TextEditingController(text: weight.value);
+    
+    mobileCtrl = TextEditingController(text: mobileNo.value);
+    secondaryMobileCtrl = TextEditingController(text: secondaryMobile.value);
+    emailCtrl = TextEditingController(text: email.value);
+    emergencyNameCtrl = TextEditingController(text: emergencyContactName.value);
+    emergencyNoCtrl = TextEditingController(text: emergencyContactNo.value);
+    
+    monthlyIncomeCtrl = TextEditingController(text: monthlyIncome.value);
+    
+    facebookCtrl = TextEditingController(text: facebook.value);
+    whatsappCtrl = TextEditingController(text: whatsapp.value);
+    instagramCtrl = TextEditingController(text: instagram.value);
+    twitterCtrl = TextEditingController(text: twitter.value);
+  }
+
+  @override
+  void onClose() {
+    Future<void>.delayed(const Duration(milliseconds: 500), () {
+      firstNameCtrl.dispose();
+      middleNameCtrl.dispose();
+      lastNameCtrl.dispose();
+      firstNameEnCtrl.dispose();
+      lastNameEnCtrl.dispose();
+      dobCtrl.dispose();
+      heightCtrl.dispose();
+      weightCtrl.dispose();
+      mobileCtrl.dispose();
+      secondaryMobileCtrl.dispose();
+      emailCtrl.dispose();
+      emergencyNameCtrl.dispose();
+      emergencyNoCtrl.dispose();
+      monthlyIncomeCtrl.dispose();
+      facebookCtrl.dispose();
+      whatsappCtrl.dispose();
+      instagramCtrl.dispose();
+      twitterCtrl.dispose();
+    });
+    super.onClose();
   }
 
   Future<void> loadAllDropdowns() async {
@@ -216,50 +322,70 @@ class ProfileFormController extends GetxController {
   void removeEducation(int index) {
     educationList.removeAt(index);
   }
-}
 
-class AddressModel {
-  String type;
-  String state;
-  String district;
-  String taluka;
-  String area;
-  String pincode;
-  String line1;
-  String line2;
-  String landmark;
-  bool isPrimary;
+  Future<void> pickProfilePhoto() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      await _cropImage(pickedFile.path);
+    }
+  }
 
-  AddressModel({
-    this.type = '',
-    this.state = '',
-    this.district = '',
-    this.taluka = '',
-    this.area = '',
-    this.pincode = '',
-    this.line1 = '',
-    this.line2 = '',
-    this.landmark = '',
-    this.isPrimary = false,
-  });
-}
+  Future<void> _cropImage(String path) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Profile Photo',
+          toolbarColor: AppColors.primary,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+        ),
+        IOSUiSettings(
+          title: 'Crop Profile Photo',
+          aspectRatioLockEnabled: true,
+          aspectRatioPickerButtonHidden: true,
+        ),
+      ],
+    );
 
-class EducationModel {
-  String qualification;
-  String institute;
-  String passingYear;
-  String percentage;
-  String grade;
-  String description;
-  bool isHighest;
+    if (croppedFile != null) {
+      profileImage.value = File(croppedFile.path);
+    }
+  }
 
-  EducationModel({
-    this.qualification = '',
-    this.institute = '',
-    this.passingYear = '',
-    this.percentage = '',
-    this.grade = '',
-    this.description = '',
-    this.isHighest = false,
-  });
+  void removePhoto() {
+    profileImage.value = null;
+    uploadProgress.value = 0.0;
+  }
+
+  Future<void> submitForm() async {
+    if (formKey.currentState?.validate() ?? false) {
+      // Form is valid, gather values and submit
+      firstName.value = firstNameCtrl.text;
+      lastName.value = lastNameCtrl.text;
+      
+      // Simulate API call and upload progress
+      try {
+        uploadProgress.value = 0.1;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        uploadProgress.value = 0.5;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        uploadProgress.value = 1.0;
+        
+        Get.snackbar('Success', 'Profile updated successfully!',
+            backgroundColor: Colors.green, colorText: Colors.white);
+      } catch (e) {
+        Get.snackbar('Error', 'Failed to update profile',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      } finally {
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        uploadProgress.value = 0.0;
+      }
+    } else {
+      Get.snackbar('Validation Error', 'Please fill all required fields correctly.',
+          backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
 }

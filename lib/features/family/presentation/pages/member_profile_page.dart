@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class MemberProfilePage extends StatefulWidget {
   const MemberProfilePage({super.key});
@@ -32,21 +33,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
     }
   }
 
-  Future<void> _launchUrl(String urlString) async {
-    try {
-      final Uri url = Uri.parse(urlString);
-      if (urlString.startsWith('tel:')) {
-        final String number = urlString.replaceFirst('tel:', '');
-        final Uri telUri = Uri(scheme: 'tel', path: number);
-        await launchUrl(telUri);
-      } else {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      debugPrint('Could not launch URL');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +54,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
         child: Obx(() => AppStateView(
               state: _controller.memberDetailState.value,
               onRetry: () => _controller.loadMemberDetails(_memberId),
-              child: _buildProfileContent(),
+              child: const _ProfileContent(),
             )),
       ),
       bottomNavigationBar: Obx(() => _controller.memberDetailState.value == AppState.data 
@@ -110,109 +96,130 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           : const SizedBox.shrink()),
     );
   }
+}
 
-  Widget _buildProfileContent() {
-    final member = _controller.selectedMember.value;
+Future<void> launchSafeUrl(String urlString) async {
+  try {
+    final Uri url = Uri.parse(urlString);
+    if (urlString.startsWith('tel:')) {
+      final String number = urlString.replaceFirst('tel:', '');
+      final Uri telUri = Uri(scheme: 'tel', path: number);
+      if (await canLaunchUrl(telUri)) {
+        await launchUrl(telUri);
+      }
+    } else {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    }
+  } catch (e) {
+    debugPrint('Could not launch URL: $e');
+  }
+}
+
+class _ProfileContent extends StatelessWidget {
+  const _ProfileContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<FamilyController>();
+    final member = controller.selectedMember.value;
     if (member == null) return const SizedBox.shrink();
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
-          // Profile Header
+          _ProfileHeader(member: member),
+          _MemberDetailsSection(member: member, controller: controller),
+          if (controller.memberAddresses.isNotEmpty)
+            _AddressSection(controller: controller),
+          _AssetLifeSection(member: member),
+          _SocialMediaSection(member: member),
+          const SizedBox(height: 100),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final Member member;
+
+  const _ProfileHeader({required this.member});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
           Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(3),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.primary, width: 2),
             ),
-            child: Row(
+            child: MemberAvatar(
+              imageUrl: member.profilePhotoFullUrl,
+              gender: member.gender,
+              fallbackName: member.fullName,
+              radius: 40,
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 2),
+                Text(
+                  member.fullName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
                   ),
-                  child: member.profilePhotoFullUrl != null &&
-                          member.profilePhotoFullUrl!.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: member.profilePhotoFullUrl!,
-                          imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
-                            radius: 40,
-                            backgroundImage: imageProvider,
-                          ),
-                          placeholder: (context, url) => const CircleAvatar(
-                            radius: 40,
-                            backgroundColor: AppColors.muted,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          errorWidget: (context, url, error) => CircleAvatar(
-                            radius: 40,
-                            backgroundColor: AppColors.muted,
-                            child: Icon(Icons.person,
-                                size: 50, color: AppColors.primary.withValues(alpha: 0.5)),
-                          ),
-                        )
-                      : CircleAvatar(
-                          radius: 40,
-                          backgroundColor: AppColors.muted,
-                          child: Icon(Icons.person,
-                              size: 50, color: AppColors.primary.withValues(alpha: 0.5)),
-                        ),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 4),
+                Text(
+                  member.memberNo ?? '',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.mutedForeground,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      const Icon(Icons.workspace_premium, size: 14, color: AppColors.primary),
+                      const SizedBox(width: 4),
                       Text(
-                        member.fullName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        member.memberNo ?? '',
+                        member.jobPositionName ?? 'Member',
                         style: const TextStyle(
                           fontSize: 12,
-                          color: AppColors.mutedForeground,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.workspace_premium, size: 14, color: AppColors.primary),
-                            const SizedBox(width: 4),
-                            Text(
-                              member.jobPositionName ?? 'Member',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -221,260 +228,66 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
 
-          _buildSection(
-            child: Builder(
-              builder: (context) {
-                final items = [
-                  _buildGridItem(
-                    Icons.person_outline,
-                    LK.gender.tr,
-                    (member.genderName ?? LK.na).tr,
-                  ),
-                  _buildGridItem(
-                    Icons.water_drop_outlined,
-                    LK.bloodGroupColon.tr,
-                    member.bloodGroupName ?? LK.na,
-                  ),
-                  _buildGridItem(
-                    Icons.calendar_today_outlined,
-                    LK.birthDate.tr,
-                    member.dateOfBirth != null
-                        ? (() {
-                            try {
-                              final dob = DateTime.parse(member.dateOfBirth!);
-                              return '${dob.year}/${dob.month.toString().padLeft(2, '0')}/${dob.day.toString().padLeft(2, '0')}';
-                            } catch (_) {
-                              return member.dateOfBirth!.split('T')[0].replaceAll('-', '/');
-                            }
-                          })()
-                        : LK.na,
-                  ),
-                  _buildGridItem(Icons.height, LK.heightColon.tr, '${member.height ?? 0} cm'),
-                  _buildGridItem(
-                    Icons.access_time,
-                    LK.birthTime.tr,
-                    member.dateOfBirthTime ?? LK.na,
-                  ),
-                  _buildGridItem(
-                    Icons.monitor_weight_outlined,
-                    LK.weightColon.tr,
-                    '${member.weight ?? 0} kg',
-                  ),
-                  _buildGridItem(
-                    Icons.person_outline,
-                    LK.motherFatherName.tr,
-                    member.motherFatherName ?? LK.na,
-                  ),
-                  _buildGridItem(
-                    Icons.work_outline,
-                    LK.occupationLabel.tr,
-                    member.occupationName ?? member.occupationTypeName ?? LK.na,
-                  ),
-                  _buildGridItem(
-                    Icons.location_on_outlined,
-                    LK.occupationArea.tr,
-                    member.occupationAreaName ?? LK.na,
-                  ),
-                  _buildGridItem(
-                    Icons.favorite_border,
-                    LK.maritalStatusLabel.tr,
-                    (member.maritalStatusName ?? LK.na).tr,
-                  ),
-                  _buildGridItem(
-                    Icons.phone_outlined,
-                    LK.mobileNoLabel.tr,
-                    member.mobileNo ?? LK.na,
-                    onTap: member.mobileNo != null ? () => _launchUrl('tel:${member.mobileNo}') : null,
-                  ),
-                  _buildGridItem(
-                    Icons.contact_phone_outlined,
-                    LK.emergencyContact.tr,
-                    member.emergencyContactNo ?? LK.na,
-                    onTap: member.emergencyContactNo != null ? () => _launchUrl('tel:${member.emergencyContactNo}') : null,
-                  ),
-                  _buildGridItem(Icons.opacity, LK.gotraLabel.tr, member.gotraName ?? LK.na),
-                  _buildGridItem(Icons.mail_outline, LK.email.tr, member.emailAddress ?? LK.na),
-                ];
-                
-                return Column(
-                  children: [
-                    for (int i = 0; i < items.length; i += 2)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: i + 2 < items.length ? 16.0 : 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: items[i]),
-                            const SizedBox(width: 12),
-                            Expanded(child: i + 1 < items.length ? items[i + 1] : const SizedBox.shrink()),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
+class _MemberDetailsSection extends StatelessWidget {
+  final Member member;
+  final FamilyController controller;
+
+  const _MemberDetailsSection({required this.member, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionContainer(
+      child: Column(
+        children: [
+          _buildDetailRow(
+            _buildGridItem(Icons.person_outline, LK.gender.tr, (member.genderName ?? LK.na).tr),
+            _buildGridItem(Icons.water_drop_outlined, LK.bloodGroupColon.tr, member.bloodGroupName ?? LK.na),
           ),
-
-          // Address Section
-          if (_controller.memberAddresses.isNotEmpty)
-            _buildSection(
-            title: LK.memberAddresses.tr,
-            icon: Icons.location_on_outlined,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _controller.memberAddresses.map((addr) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                addr.addressTypeName,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                            if (addr.isPrimary) ...[
-                              const SizedBox(width: 8),
-                              const Icon(Icons.check_circle, size: 14, color: AppColors.success),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          addr.fullAddress,
-                          style: const TextStyle(fontSize: 14, color: AppColors.secondary, height: 1.5),
-                        ),
-                        if (_controller.memberAddresses.last != addr)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 8.0),
-                            child: Divider(height: 1),
-                          ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-          // Asset & Life Section
-          _buildSection(
-            title: LK.assetAndLife.tr,
-            icon: Icons.work_outline,
-            child: Column(
-              children: [
-                _buildAssetRow(LK.incomeColon.tr, '₹${member.monthlyIncome ?? 0}', LK.ownHouse.tr, member.isOwnHouse ?? false),
-                _buildAssetRow(LK.ownLand.tr, member.isOwnLand ?? false, LK.twoWheeler.tr, member.hasTwoWheeler ?? false),
-                _buildAssetRow('', '', LK.fourWheeler.tr, member.hasFourWheeler ?? false),
-              ],
-            ),
+          _buildDetailRow(
+            _buildGridItem(Icons.calendar_today_outlined, LK.birthDate.tr, controller.getFormattedDateOfBirth(member)),
+            _buildGridItem(Icons.height, LK.heightColon.tr, '${member.height ?? 0} cm'),
           ),
-
-          // Social Media Section
-          _buildSection(
-            title: LK.socialMedia.tr,
-            icon: Icons.share_outlined,
-            child: Builder(
-              builder: (context) {
-                final items = [
-                  _buildSocialItem(
-                    Icons.facebook,
-                    LK.facebook.tr,
-                    member.facebookUrl ?? LK.na,
-                    Colors.blue,
-                    onTap: member.facebookUrl != null ? () => _launchUrl(member.facebookUrl!) : null,
-                  ),
-                  _buildSocialItem(
-                    Icons.camera_alt_outlined,
-                    LK.instagram.tr,
-                    member.instagramUrl ?? LK.na,
-                    Colors.pink,
-                    onTap: member.instagramUrl != null ? () => _launchUrl(member.instagramUrl!) : null,
-                  ),
-                  _buildSocialItem(
-                    Icons.chat_bubble_outline,
-                    LK.whatsapp.tr,
-                    member.whatsappUrl ?? LK.na,
-                    Colors.green,
-                    onTap: member.whatsappUrl != null ? () => _launchUrl(member.whatsappUrl!) : null,
-                  ),
-                  _buildSocialItem(
-                    Icons.alternate_email,
-                    LK.twitterX.tr,
-                    member.twitterUrl ?? LK.na,
-                    Colors.black,
-                    onTap: member.twitterUrl != null ? () => _launchUrl(member.twitterUrl!) : null,
-                  ),
-                ];
-                return Column(
-                  children: [
-                    for (int i = 0; i < items.length; i += 2)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: i + 2 < items.length ? 16.0 : 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: items[i]),
-                            const SizedBox(width: 12),
-                            Expanded(child: i + 1 < items.length ? items[i + 1] : const SizedBox.shrink()),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
+          _buildDetailRow(
+            _buildGridItem(Icons.access_time, LK.birthTime.tr, member.dateOfBirthTime ?? LK.na),
+            _buildGridItem(Icons.monitor_weight_outlined, LK.weightColon.tr, '${member.weight ?? 0} kg'),
           ),
-          const SizedBox(height: 100), // Extra space for the sticky button
+          _buildDetailRow(
+            _buildGridItem(Icons.person_outline, LK.motherFatherName.tr, member.motherFatherName ?? LK.na),
+            _buildGridItem(Icons.work_outline, LK.occupationLabel.tr, member.occupationName ?? member.occupationTypeName ?? LK.na),
+          ),
+          _buildDetailRow(
+            _buildGridItem(Icons.location_on_outlined, LK.occupationArea.tr, member.occupationAreaName ?? LK.na),
+            _buildGridItem(Icons.favorite_border, LK.maritalStatusLabel.tr, (member.maritalStatusName ?? LK.na).tr),
+          ),
+          _buildDetailRow(
+            _buildGridItem(Icons.phone_outlined, LK.mobileNoLabel.tr, member.mobileNo ?? LK.na, onTap: member.mobileNo != null ? () => launchSafeUrl('tel:${member.mobileNo}') : null),
+            _buildGridItem(Icons.contact_phone_outlined, LK.emergencyContact.tr, member.emergencyContactNo ?? LK.na, onTap: member.emergencyContactNo != null ? () => launchSafeUrl('tel:${member.emergencyContactNo}') : null),
+          ),
+          _buildDetailRow(
+            _buildGridItem(Icons.opacity, LK.gotraLabel.tr, member.gotraName ?? LK.na),
+            _buildGridItem(Icons.mail_outline, LK.email.tr, member.emailAddress ?? LK.na),
+            isLast: true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSection({String? title, IconData? icon, required Widget child}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
+  Widget _buildDetailRow(Widget item1, Widget item2, {bool isLast = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null) ...[
-            Row(
-              children: [
-                Icon(icon, size: 18, color: AppColors.primary),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-          child,
+          Expanded(child: item1),
+          const SizedBox(width: 12),
+          Expanded(child: item2),
         ],
       ),
     );
@@ -510,6 +323,87 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddressSection extends StatelessWidget {
+  final FamilyController controller;
+
+  const _AddressSection({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionContainer(
+      title: LK.memberAddresses.tr,
+      icon: Icons.location_on_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: controller.memberAddresses.map((addr) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        addr.addressTypeName,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    if (addr.isPrimary) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check_circle, size: 14, color: AppColors.success),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  addr.fullAddress,
+                  style: const TextStyle(fontSize: 14, color: AppColors.secondary, height: 1.5),
+                ),
+                if (controller.memberAddresses.last != addr)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Divider(height: 1),
+                  ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class _AssetLifeSection extends StatelessWidget {
+  final Member member;
+
+  const _AssetLifeSection({required this.member});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionContainer(
+      title: LK.assetAndLife.tr,
+      icon: Icons.work_outline,
+      child: Column(
+        children: [
+          _buildAssetRow(LK.incomeColon.tr, '₹${member.monthlyIncome ?? 0}', LK.ownHouse.tr, member.isOwnHouse ?? false),
+          _buildAssetRow(LK.ownLand.tr, member.isOwnLand ?? false, LK.twoWheeler.tr, member.hasTwoWheeler ?? false),
+          _buildAssetRow('', '', LK.fourWheeler.tr, member.hasFourWheeler ?? false),
         ],
       ),
     );
@@ -551,6 +445,47 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
       ),
     );
   }
+}
+
+class _SocialMediaSection extends StatelessWidget {
+  final Member member;
+
+  const _SocialMediaSection({required this.member});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionContainer(
+      title: LK.socialMedia.tr,
+      icon: Icons.share_outlined,
+      child: Column(
+        children: [
+          _buildSocialRow(
+            _buildSocialItem(Icons.facebook, LK.facebook.tr, member.facebookUrl ?? LK.na, Colors.blue, onTap: member.facebookUrl != null ? () => launchSafeUrl(member.facebookUrl!) : null),
+            _buildSocialItem(Icons.camera_alt_outlined, LK.instagram.tr, member.instagramUrl ?? LK.na, Colors.pink, onTap: member.instagramUrl != null ? () => launchSafeUrl(member.instagramUrl!) : null),
+          ),
+          _buildSocialRow(
+            _buildSocialItem(Icons.chat_bubble_outline, LK.whatsapp.tr, member.whatsappUrl ?? LK.na, Colors.green, onTap: member.whatsappUrl != null ? () => launchSafeUrl(member.whatsappUrl!) : null),
+            _buildSocialItem(Icons.alternate_email, LK.twitterX.tr, member.twitterUrl ?? LK.na, Colors.black, onTap: member.twitterUrl != null ? () => launchSafeUrl(member.twitterUrl!) : null),
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialRow(Widget item1, Widget item2, {bool isLast = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: item1),
+          const SizedBox(width: 12),
+          Expanded(child: item2),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSocialItem(IconData icon, String label, String handle, Color color, {VoidCallback? onTap}) {
     return InkWell(
@@ -577,6 +512,51 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionContainer extends StatelessWidget {
+  final String? title;
+  final IconData? icon;
+  final Widget child;
+
+  const _SectionContainer({this.title, this.icon, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Row(
+              children: [
+                Icon(icon, size: 18, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title!,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+          child,
         ],
       ),
     );

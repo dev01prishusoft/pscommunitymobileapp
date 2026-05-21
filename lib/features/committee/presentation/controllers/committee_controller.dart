@@ -6,9 +6,15 @@ import 'package:pscommunitymobileapp/features/committee/domain/entities/committe
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 
 class CommitteeController extends GetxController {
+  // Configurable pagination
+  final int pageSize;
+
+  // Expansion state for nodes (to avoid mutating model directly)
+  final RxMap<int, bool> nodeExpansion = <int, bool>{}.obs;
+
   final CommitteeRepository _repository;
 
-  CommitteeController(this._repository);
+  CommitteeController(this._repository, {this.pageSize = 20});
 
   final Rx<AppState> state = AppState.loading.obs;
   final Rx<AppState> detailState = AppState.loading.obs;
@@ -19,8 +25,6 @@ class CommitteeController extends GetxController {
   String _lastQuery = '';
 
   int _currentPage = 1;
-  final int _pageSize = 20;
-  bool get hasMore => _hasMore;
   bool _hasMore = true;
   final RxBool isLoadingMore = false.obs;
 
@@ -28,7 +32,10 @@ class CommitteeController extends GetxController {
   void onInit() {
     super.onInit();
     debounce(searchQuery, (_) => loadCommittees(isRefresh: false), time: const Duration(milliseconds: 500));
+    loadCommittees();
   }
+
+  bool get hasMore => _hasMore;
 
   Future<void> loadCommittees({bool isRefresh = true, bool isLoadMore = false}) async {
     if (isLoadMore) {
@@ -52,10 +59,10 @@ class CommitteeController extends GetxController {
       final results = await _repository.getCommittees(
         searchQuery: searchQuery.value,
         pageNumber: _currentPage,
-        pageSize: _pageSize,
+        pageSize: pageSize,
       );
-      
-      if (results.length < _pageSize) {
+
+      if (results.length < pageSize) {
         _hasMore = false;
       }
 
@@ -64,7 +71,7 @@ class CommitteeController extends GetxController {
       } else {
         committees.assignAll(results);
       }
-      
+
       if (!isLoadMore) {
         state.value = committees.isEmpty ? AppState.empty : AppState.data;
       }
@@ -73,7 +80,7 @@ class CommitteeController extends GetxController {
       if (!isLoadMore) {
         state.value = AppState.error;
       } else {
-        _currentPage--; // Revert page count on failure
+        _currentPage--;
       }
     } finally {
       isSearching.value = false;
@@ -81,7 +88,11 @@ class CommitteeController extends GetxController {
     }
   }
 
+  int? _currentDetailId;
+
   Future<void> loadCommitteeDetail(int id) async {
+    if (detailState.value == AppState.loading && _currentDetailId == id) return;
+    _currentDetailId = id;
     detailState.value = AppState.loading;
     try {
       final result = await _repository.getCommitteeDetail(id);
@@ -98,12 +109,14 @@ class CommitteeController extends GetxController {
   }
 
   void clearSearch() {
+    if (searchQuery.value.isEmpty) return;
     searchQuery.value = '';
     loadCommittees(isRefresh: true);
   }
 
   void toggleNode(CommitteeNode node) {
-    node.isExpanded = !node.isExpanded;
+    final current = nodeExpansion[node.id] ?? true;
+    nodeExpansion[node.id] = !current;
     committees.refresh();
   }
 }

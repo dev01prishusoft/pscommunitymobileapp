@@ -22,19 +22,17 @@ class AppDrawer extends StatelessWidget {
       child: Column(
         children: [
           // Drawer Header
-          Obx(() {
-            final samaj = samajController.samaj.value;
-            final logoUrl = samaj?.logoUrl;
-            
-            return UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.navyBlue],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primary, AppColors.navyBlue],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              currentAccountPicture: CircleAvatar(
+            ),
+            currentAccountPicture: Obx(() {
+              final logoUrl = samajController.samaj.value?.logoUrl;
+              return CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -55,19 +53,19 @@ class AppDrawer extends StatelessWidget {
                           fit: BoxFit.contain,
                         ),
                 ),
-              ),
-              accountName: Text(
-                samaj?.name ?? LK.samajName.tr,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              accountEmail: Text(
-                samaj?.descriptionEnglish ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12),
-              ),
-            );
-          }),
+              );
+            }),
+            accountName: Obx(() => Text(
+              samajController.samaj.value?.name ?? LK.samajName.tr,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            )),
+            accountEmail: Obx(() => Text(
+              samajController.samaj.value?.descriptionEnglish ?? '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12),
+            )),
+          ),
 
           // Drawer Items
           ListTile(
@@ -102,7 +100,7 @@ class AppDrawer extends StatelessWidget {
               Get.back<void>(); // Close drawer
               Get.to<void>(() => AppWebViewPage(
                 title: LK.privacyPolicy.tr,
-                url: '${AppEnvironment.I.uiBaseUrl}/privacy-policy',
+                url: AppEnvironment.I.privacyPolicyUrl,
               ));
             },
           ),
@@ -113,7 +111,7 @@ class AppDrawer extends StatelessWidget {
               Get.back<void>(); // Close drawer
               Get.to<void>(() => AppWebViewPage(
                 title: LK.termsAndConditions.tr,
-                url: '${AppEnvironment.I.uiBaseUrl}/terms-and-conditions',
+                url: AppEnvironment.I.termsAndConditionsUrl,
               ));
             },
           ),

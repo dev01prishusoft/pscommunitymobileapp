@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class CertificatePinning {
   static void configure(Dio dio) {
@@ -44,10 +45,14 @@ class CertificatePinning {
       final base64Hash = base64.encode(hash);
       final currentPin = 'sha256/$base64Hash';
 
-      final isValid = allowedPins.contains(currentPin);
+      final isValidPin = allowedPins.contains(currentPin);
       
-      if (!isValid) {
-        AppLogger.e('PINNING FAILURE for $host: $currentPin');
+      // Basic host validation
+      final expectedHost = Uri.parse(AppEnvironment.I.apiBaseUrl).host;
+      final isValidHost = host == expectedHost;
+      
+      if (!isValidPin || !isValidHost) {
+        AppLogger.e('PINNING/HOST FAILURE for $host. Pin valid: $isValidPin, Host valid: $isValidHost');
         if (kDebugMode) {
           AppLogger.d('Allowing pinning failure in debug mode. In production, this will fail.');
           return true; 

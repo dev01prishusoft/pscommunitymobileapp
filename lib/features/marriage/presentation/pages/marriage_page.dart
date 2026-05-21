@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 
 class MarriagePage extends GetView<MarriageController> {
   const MarriagePage({super.key});
@@ -43,31 +43,29 @@ class MarriagePage extends GetView<MarriageController> {
                           
                       return Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  label: LK.unmarriedMale.tr,
-                                  count: maleCount.toString(),
-                                  icon: Icons.group,
-                                  iconColor: Colors.blue,
-                                  textColor: Colors.blue,
-                                ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _buildSummaryCard(
+                                label: LK.unmarriedMale.tr,
+                                count: maleCount.toString(),
+                                icon: Icons.group,
+                                iconColor: Colors.blue,
+                                textColor: Colors.blue,
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildSummaryCard(
-                                  label: LK.unmarriedFemale.tr,
-                                  count: femaleCount.toString(),
-                                  icon: Icons.person,
-                                  iconColor: Colors.pink,
-                                  textColor: Colors.pink,
-                                ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildSummaryCard(
+                                label: LK.unmarriedFemale.tr,
+                                count: femaleCount.toString(),
+                                icon: Icons.person,
+                                iconColor: Colors.pink,
+                                textColor: Colors.pink,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     }),
@@ -200,12 +198,14 @@ class MarriagePage extends GetView<MarriageController> {
                     ),
                   );
                 } else {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: AppStateView(
-                      state: controller.state.value,
-                      emptyMessage: LK.noMatchesFound.tr,
-                      child: const SizedBox.shrink(),
+                  return SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      child: AppStateView(
+                        state: controller.state.value,
+                        emptyMessage: LK.noMatchesFound.tr,
+                        child: const SizedBox.shrink(),
+                      ),
                     ),
                   );
                 }
@@ -585,8 +585,23 @@ class MarriagePage extends GetView<MarriageController> {
   }
 
   Widget _buildMemberCard(Member member) {
-    final avatarColors = _getAvatarColors(member.gender);
-    
+    return _MarriageMemberCard(member: member);
+  }
+}
+
+class _MarriageMemberCard extends StatelessWidget {
+  const _MarriageMemberCard({super.key, required this.member});
+
+  final Member member;
+
+  @override
+  Widget build(BuildContext context) {
+    final infoParts = <String>[];
+    if (member.age > 0) infoParts.add('${member.age} ${LK.ageYears.tr}');
+    if (member.occupation.isNotEmpty) infoParts.add(member.occupation);
+    if (member.gotra.isNotEmpty) infoParts.add(member.gotra);
+    final infoString = infoParts.join(' | ');
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -594,29 +609,11 @@ class MarriagePage extends GetView<MarriageController> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            member.profilePhotoFullUrl != null && member.profilePhotoFullUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: member.profilePhotoFullUrl!,
-                    imageBuilder: (context, ImageProvider imageProvider) => CircleAvatar(
-                      radius: 30,
-                      backgroundImage: imageProvider,
-                    ),
-                    placeholder: (context, url) => CircleAvatar(
-                      radius: 30,
-                      backgroundColor: avatarColors.background,
-                      child: const CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                    errorWidget: (context, url, error) => CircleAvatar(
-                      radius: 30,
-                      backgroundColor: avatarColors.background,
-                      child: Icon(Icons.person, color: avatarColors.icon, size: 30),
-                    ),
-                  )
-                : CircleAvatar(
-                    radius: 30,
-                    backgroundColor: avatarColors.background,
-                    child: Icon(Icons.person, color: avatarColors.icon, size: 30),
-                  ),
+            MemberAvatar(
+              imageUrl: member.profilePhotoFullUrl,
+              gender: member.gender,
+              radius: 30,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -629,13 +626,15 @@ class MarriagePage extends GetView<MarriageController> {
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${member.age} ${LK.ageYears.tr} | ${member.occupation} | ${member.gotra}',
-                    style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
-                  ),
-                  const SizedBox(height: 4),
-                  if (member.area.isNotEmpty)
+                  if (infoString.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      infoString,
+                      style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
+                    ),
+                  ],
+                  if (member.area.isNotEmpty) ...[
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         const Icon(Icons.location_on, size: 16, color: AppColors.primary),
@@ -648,6 +647,7 @@ class MarriagePage extends GetView<MarriageController> {
                         ),
                       ],
                     ),
+                  ],
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -685,14 +685,9 @@ class MarriagePage extends GetView<MarriageController> {
       ),
     );
   }
+}
 
-  ({Color background, Color icon}) _getAvatarColors(String gender) {
-    if (gender == 'Female') {
-      return (background: const Color(0xFFFCE4EC), icon: Colors.pink);
-    }
-    return (background: const Color(0xFFE3F2FD), icon: Colors.blue);
-  }
-
+extension MarriagePageFilters on MarriagePage {
   Widget _buildFilterRow({
     required String label,
     required RxString fromRx,

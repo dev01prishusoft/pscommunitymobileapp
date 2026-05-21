@@ -75,22 +75,20 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
               title:
                   '${LK.roles.tr} ${LK.at.tr.toUpperCase()} (${detail.roles.length})',
               icon: Icons.verified_user,
-              child: Column(
-                children: detail.roles.asMap().entries.map((entry) {
-                  final role = entry.value;
-                  final isLast = entry.key == detail.roles.length - 1;
-                  return Column(
-                    children: [
-                      _buildRoleTile(
-                        _getRoleIcon(role.roleTypeName),
-                        role.roleName,
-                        role.roleTypeName,
-                        role.memberCount,
-                      ),
-                      if (!isLast) const Divider(),
-                    ],
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: detail.roles.length,
+                separatorBuilder: (context, index) => const Divider(),
+                itemBuilder: (context, index) {
+                  final role = detail.roles[index];
+                  return _buildRoleTile(
+                    _getRoleIcon(role.roleTypeName),
+                    role.roleName,
+                    role.roleTypeName,
+                    role.memberCount,
                   );
-                }).toList(),
+                },
               ),
             ),
           const SizedBox(height: 16),
@@ -107,8 +105,13 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     child: Text(LK.noMembersFound.tr),
                   )
                 else
-                  Column(
-                    children: detail.members.take(3).map((member) {
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: detail.members.length > 3 ? 3 : detail.members.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final member = detail.members[index];
                       return _buildMemberTile(
                         context,
                         member.memberId,
@@ -118,7 +121,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         member.roleName,
                         '',
                       );
-                    }).toList(),
+                    },
                   ),
                 const SizedBox(height: 8),
                 TextButton(

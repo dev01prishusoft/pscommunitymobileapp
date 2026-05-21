@@ -161,6 +161,7 @@ class _SamajLogo extends StatelessWidget {
           child: logoUrl != null && logoUrl.isNotEmpty
               ? CachedNetworkImage(
                   imageUrl: logoUrl,
+                  memCacheWidth: 160,
                   fit: BoxFit.contain,
                   placeholder: (_, __) =>
                       const Center(child: CircularProgressIndicator(strokeWidth: 2)),

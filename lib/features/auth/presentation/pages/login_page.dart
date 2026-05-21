@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_inline_error.dart';
@@ -16,17 +17,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // formKey is owned by widget State — never by a singleton controller.
-  // This prevents the "Multiple widgets used the same GlobalKey" crash
-  // when the LoginPage is pushed more than once onto the navigator stack.
-  final _formKey = GlobalKey<FormState>();
 
   late final LoginController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = Get.find<LoginController>();
+    // Use Get.put with a unique tag so that if a new LoginPage is pushed while 
+    // the old one is still animating out, they don't share the same controller.
+    _controller = Get.put(
+      LoginController(Get.find(), Get.find()), 
+      tag: UniqueKey().toString(),
+    );
   }
 
   @override
@@ -56,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     child: Form(
-                      key: _formKey,
+                      key: _controller.formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -87,6 +89,10 @@ class _LoginPageState extends State<LoginPage> {
                             icon: Icons.phone_outlined,
                             keyboardType: TextInputType.phone,
                             maxLength: 10,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return LK.pleaseEnterMobile.tr;
@@ -125,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 32),
                           Obx(() => AppPrimaryButton(
                             text: LK.signIn.tr,
-                              onPressed: () => _controller.submit(_formKey),
+                              onPressed: () => _controller.submit(),
                               isLoading: _controller.isLoading.value,
                           )),
                           Obx(() {

@@ -6,6 +6,7 @@ class AppEmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData? secondaryIcon;
+  final Widget? actionButton;
 
   const AppEmptyState({
     super.key,
@@ -13,6 +14,7 @@ class AppEmptyState extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.secondaryIcon,
+    this.actionButton,
   });
 
   @override
@@ -21,7 +23,7 @@ class AppEmptyState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20.0),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border, width: 1.5),
       ),
@@ -34,7 +36,7 @@ class AppEmptyState extends StatelessWidget {
               Icon(
                 icon, 
                 size: 80, 
-                color: AppColors.primary.withValues(alpha: 0.15)
+                color: AppColors.primary.withOpacity(0.15)
               ),
               if (secondaryIcon != null)
                 Positioned(
@@ -62,6 +64,10 @@ class AppEmptyState extends StatelessWidget {
               color: AppColors.mutedForeground,
             ),
           ),
+          if (actionButton != null) ...[
+            const SizedBox(height: 24),
+            actionButton!,
+          ],
         ],
       ),
     );

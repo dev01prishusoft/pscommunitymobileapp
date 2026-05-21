@@ -27,26 +27,20 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
         params['Search'] = searchQuery;
       }
 
-      final response = await _apiClient.get(
+      final response = await _apiClient.getPaginated<CommitteeNode>(
         ApiEndpoints.committees,
         queryParameters: params,
+        listKey: 'committees',
+        fromJsonT: (json) => CommitteeNode.fromJson(json as Map<String, dynamic>),
       );
 
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] != true) return [];
-
-      final dataObj = json['data'] as Map<String, dynamic>? ?? {};
-      final list = dataObj['committees'] as List? ?? [];
+      final list = response.data;
 
       if (kDebugMode && list.isNotEmpty) {
         print('RAW COMMITTEE DATA SAMPLE: ${list.first}');
       }
 
-      final allNodes = list
-          .map((e) => CommitteeNode.fromJson(e as Map<String, dynamic>))
-          .toList();
-
-      final tree = _buildTree(allNodes);
+      final tree = _buildTree(list);
 
       if (kDebugMode) {
         for (var root in tree) {
@@ -64,15 +58,12 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
   @override
   Future<CommitteeDetail?> getCommitteeDetail(int id) async {
     try {
-      final response = await _apiClient.get(
+      final response = await _apiClient.getParsed<CommitteeDetail>(
         '${ApiEndpoints.committeeDetail}/$id',
+        fromJsonT: (json) => CommitteeDetail.fromJson(json as Map<String, dynamic>),
       );
 
-      final json = response.data as Map<String, dynamic>;
-      if (json['succeeded'] != true) return null;
-
-      final dataObj = json['data'] as Map<String, dynamic>? ?? {};
-      return CommitteeDetail.fromJson(dataObj);
+      return response.data;
     } on Exception catch (e) {
       AppLogger.e('GetCommitteeDetail Error', e);
       rethrow;

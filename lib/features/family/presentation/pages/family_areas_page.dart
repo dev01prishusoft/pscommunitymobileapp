@@ -36,7 +36,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      controller.loadAreas(refresh: false);
+      controller.loadNextPage();
     }
   }
 
@@ -76,7 +76,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
               Obx(() => AppStateView(
                 state: controller.state.value,
                 onRetry: controller.loadAreas,
-                child: controller.filteredAreas.isEmpty 
+                child: controller.areas.isEmpty 
                     ? _EmptyState() 
                     : Column(
                         children: [
@@ -216,11 +216,11 @@ class _ResultsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<FamilyController>();
     return Obx(() {
-      if (controller.filteredAreas.isEmpty) return const SizedBox.shrink();
+      if (controller.areas.isEmpty) return const SizedBox.shrink();
       return Text(
         LK.totalAreasLabel.trParams({
           'taluka': controller.selectedTaluka.value?.text ?? 'All',
-          'count': controller.filteredAreas.length.toString(),
+          'count': controller.areas.length.toString(),
         }),
         style: const TextStyle(
           fontSize: 15,

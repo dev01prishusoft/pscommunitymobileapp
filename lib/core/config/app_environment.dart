@@ -4,7 +4,12 @@ enum Flavor { dev, prod }
 
 class AppEnvironment {
   static AppEnvironment? _instance;
-  static AppEnvironment get I => _instance!;
+  static AppEnvironment get I {
+    if (_instance == null) {
+      throw StateError('AppEnvironment not initialized. Call init() first.');
+    }
+    return _instance!;
+  }
 
   final Flavor flavor;
   final String apiBaseUrl;
@@ -12,6 +17,12 @@ class AppEnvironment {
   final Duration connectTimeout;
   final Duration receiveTimeout;
   final bool enableLogging;
+
+  bool get isProd => flavor == Flavor.prod;
+  bool get isDev => flavor == Flavor.dev;
+
+  String get privacyPolicyUrl => '$uiBaseUrl/privacy-policy';
+  String get termsAndConditionsUrl => '$uiBaseUrl/terms-and-conditions';
 
   AppEnvironment._({
     required this.flavor,
@@ -23,6 +34,7 @@ class AppEnvironment {
   });
 
   static void init() {
+    if (_instance != null) return;
     const flavorString = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
     final flavor = flavorString == 'prod' ? Flavor.prod : Flavor.dev;
 
