@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 
@@ -35,39 +35,21 @@ class AppStateView extends StatelessWidget {
           ),
         );
       case AppState.error:
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: AppErrorState(
-                  errorMessage: errorMessage,
-                  onRetry: onRetry,
-                ),
-              ),
-            );
-          },
+        return Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: AppErrorState(errorMessage: errorMessage, onRetry: onRetry),
         );
       case AppState.empty:
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: AppEmptyState(
-                      icon: emptyIcon ?? Icons.search_off_rounded,
-                      secondaryIcon: emptyIcon != null ? null : Icons.search,
-                      title: emptyMessage ?? LK.noResultsFound.tr,
-                      subtitle: LK.trySelectingDifferentFilters.tr,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: AppEmptyState(
+              icon: emptyIcon ?? Icons.search_off_rounded,
+              secondaryIcon: emptyIcon != null ? null : Icons.search,
+              title: emptyMessage ?? LK.noResultsFound.tr,
+              subtitle: LK.trySelectingDifferentFilters.tr,
+            ),
+          ),
         );
       case AppState.data:
         return child;

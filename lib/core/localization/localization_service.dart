@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/models/language.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class LocalizationService {
   LocalizationService(this._storage);
@@ -28,7 +29,7 @@ class LocalizationService {
 
     keys = {
       'en_US': Map<String, String>.from(jsonDecode(results[0]) as Map),
-      'gu_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
+      'gj_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
     };
 
     // Restore saved locale

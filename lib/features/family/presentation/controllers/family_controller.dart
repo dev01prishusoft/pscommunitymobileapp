@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
-import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
+import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
+import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class FamilyController extends GetxController {
 
@@ -190,21 +190,34 @@ class FamilyController extends GetxController {
       );
 
       if (requestId != _currentLoadRequestId) return;
+      if (isRefresh) {
+        areas.clear();
+      }
 
       if (results.isEmpty) {
         hasMore.value = false;
-        if (isRefresh) state.value = AppState.data;
+
+        if (areas.isEmpty) {
+          state.value = AppState.empty;
       } else {
-        if (isRefresh) {
-          areas.assignAll(List.unmodifiable(results));
-        } else {
-          areas.assignAll(List.unmodifiable([...areas, ...results]));
+          state.value = AppState.data;
         }
-        _currentPage++;
-        if (results.length < _pageSize) {
-          hasMore.value = false;
-        }
+
+        return;
       }
+
+      if (isRefresh) {
+        areas.assignAll(List.unmodifiable(results));
+      } else {
+        areas.assignAll(List.unmodifiable([...areas, ...results]));
+      }
+
+      _currentPage++;
+
+      if (results.length < _pageSize) {
+        hasMore.value = false;
+      }
+
       state.value = AppState.data;
     } catch (e, stack) {
       if (requestId != _currentLoadRequestId) return;
