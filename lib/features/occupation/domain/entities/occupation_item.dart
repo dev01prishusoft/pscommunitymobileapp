@@ -1,20 +1,5 @@
 class OccupationItem {
-  final int id;
-  final int? memberId;
-  final String name;
-  final String? logoUrl;
-  final int? count;
-  final String? iconKey;
-  
-  // Profile details
-  final String? memberName;
-  final String? occupationType;
-  final String? companyName;
-  final String? businessAddress;
-  final String? mobile;
-  final String? description;
-
-  const OccupationItem({
+  OccupationItem({
     required this.id,
     this.memberId,
     required this.name,
@@ -45,4 +30,16 @@ class OccupationItem {
       description: json['description'] as String?,
     );
   }
+  final int id;
+  final int? memberId;
+  final String name;
+  final String? logoUrl;
+  final int? count;
+  final String? iconKey;
+  final String? memberName;
+  final String? occupationType;
+  final String? companyName;
+  final String? businessAddress;
+  final String? mobile;
+  final String? description;
 }

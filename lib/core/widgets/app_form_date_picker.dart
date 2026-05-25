@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -5,15 +7,6 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class AppFormDatePicker extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final String? hint;
-  final bool isRequired;
-  final String? Function(String?)? validator;
-  final DateTime? initialDate;
-  final DateTime? firstDate;
-  final DateTime? lastDate;
-
   const AppFormDatePicker({
     super.key,
     required this.controller,
@@ -25,6 +18,14 @@ class AppFormDatePicker extends StatelessWidget {
     this.firstDate,
     this.lastDate,
   });
+  final TextEditingController controller;
+  final String label;
+  final String? hint;
+  final bool isRequired;
+  final String? Function(String?)? validator;
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -35,9 +36,9 @@ class AppFormDatePicker extends StatelessWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppColors.primary,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.white,
               onSurface: AppColors.foreground,
             ),
           ),
@@ -58,48 +59,58 @@ class AppFormDatePicker extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            style: AppTextStyles.titleSmall.copyWith(
               color: AppColors.secondary,
             ),
             children: [
               if (isRequired)
-                const TextSpan(
+                TextSpan(
                   text: ' *',
-                  style: TextStyle(color: Colors.red),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.red,
+                  ),
                 ),
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           readOnly: true,
           onTap: () => _selectDate(context),
-          style: const TextStyle(fontSize: 14, color: AppColors.foreground),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.mutedForeground, fontSize: 14),
-            suffixIcon: const Icon(Icons.calendar_today, color: AppColors.mutedForeground, size: 20),
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.mutedForeground,
+            ),
+            suffixIcon: Icon(
+              Icons.calendar_today,
+              color: AppColors.mutedForeground,
+              size: 20,
+            ),
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: AppColors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: BorderSide(color: AppColors.red),
             ),
           ),
           validator: (value) {

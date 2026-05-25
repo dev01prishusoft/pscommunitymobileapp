@@ -2,17 +2,15 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectivityService {
+  ConnectivityService({required Connectivity connectivity})
+    : _connectivity = connectivity;
   final Connectivity _connectivity;
-
-  ConnectivityService({required Connectivity connectivity}) : _connectivity = connectivity;
 
   Future<bool> hasConnection() async {
     final result = await _connectivity.checkConnectivity();
     if (!result.any((r) => r != ConnectivityResult.none)) {
       return false;
     }
-    
-    // True internet checking
     try {
       final lookup = await InternetAddress.lookup('google.com');
       return lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty;
@@ -21,11 +19,8 @@ class ConnectivityService {
     }
   }
 
-  Stream<List<ConnectivityResult>> get onChange => 
+  Stream<List<ConnectivityResult>> get onChange =>
       _connectivity.onConnectivityChanged.distinct();
 
-  void dispose() {
-    // Connectivity plugin does not require manual stream disposal
-    // but having the method allows for consistent cleanup if needed
-  }
+  void dispose() {}
 }

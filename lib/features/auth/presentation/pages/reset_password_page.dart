@@ -1,3 +1,7 @@
+// ignore_for_file: unawaited_futures, inference_failure_on_function_invocation
+import 'dart:async';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -7,6 +11,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_gradient_background.dart';
 import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
+import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -44,26 +49,26 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       if (!formKey.currentState!.validate()) return;
 
-      final success = await controller.resetPassword(
+      await controller.resetPassword(
         mobileController.text,
         oldPasswordController.text,
         newPasswordController.text,
       );
 
-      if (success) {
+      if (controller.isFormSuccess) {
         Get.snackbar(
           LK.success.tr,
           LK.successUpdate.tr,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          backgroundColor: AppColors.green,
+          colorText: AppColors.white,
         );
         Get.offNamed<void>(AppRouter.postLoginSplash);
-      } else if (controller.error.value != null) {
+      } else if (controller.isFormError && controller.formError.value != null) {
         Get.snackbar(
           LK.errorServer.tr,
-          controller.error.value!,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          controller.formError.value!,
+          backgroundColor: AppColors.red,
+          colorText: AppColors.white,
         );
       }
     }
@@ -71,10 +76,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.secondary),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: AppColors.secondary,
+          ),
           onPressed: () => Get.back<void>(),
         ),
       ),
@@ -82,126 +90,119 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Obx(() => Container(
-                    constraints: const BoxConstraints(maxWidth: 500),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            LK.resetPassword.tr,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.secondary,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          AppTextField(
-                            label: LK.mobileNumber.tr,
-                            controller: mobileController,
-                            hint: LK.mobileHint.tr,
-                            icon: Icons.phone_android_rounded,
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterMobile.tr;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          AppTextField(
-                            label: LK.oldPassword.tr,
-                            controller: oldPasswordController,
-                            hint: LK.passwordHint.tr,
-                            icon: Icons.lock_open_rounded,
-                            obscureText: true,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterOldPassword.tr;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          AppTextField(
-                            label: LK.newPassword.tr,
-                            controller: newPasswordController,
-                            hint: LK.passwordHint.tr,
-                            icon: Icons.lock_outline_rounded,
-                            obscureText: controller.obscureNewPassword.value,
-                            suffixIcon: IconButton(
-                              onPressed: controller.toggleNewPasswordVisibility,
-                              icon: Icon(
-                                controller.obscureNewPassword.value
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.mutedForeground,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterNewPassword.tr;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          AppTextField(
-                            label: LK.confirmNewPassword.tr,
-                            controller: confirmPasswordController,
-                            hint: LK.passwordHint.tr,
-                            icon: Icons.lock_outline_rounded,
-                            obscureText: controller.obscureConfirmPassword.value,
-                            suffixIcon: IconButton(
-                              onPressed: controller.toggleConfirmPasswordVisibility,
-                              icon: Icon(
-                                controller.obscureConfirmPassword.value
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: AppColors.mutedForeground,
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return LK.pleaseEnterConfirmPassword.tr;
-                              }
-                              if (value != newPasswordController.text) {
-                                return LK.passwordsDoNotMatch.tr;
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 32),
-                          AppPrimaryButton(
-                            text: LK.updatePassword.tr,
-                            onPressed: submit,
-                            isLoading: controller.isLoading.value,
+                  Obx(
+                    () => Container(
+                      constraints: BoxConstraints(maxWidth: 500),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 40,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.black.withValues(alpha: 0.06),
+                            blurRadius: 24,
+                            offset: Offset(0, 8),
                           ),
                         ],
                       ),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              LK.resetPassword.tr,
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.displaySmall.copyWith(
+                                color: AppColors.secondary,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(height: 32.h),
+                            AppTextField(
+                              label: LK.mobileNumber.tr,
+                              controller: mobileController,
+                              hint: LK.mobileHint.tr,
+                              icon: Icons.phone_android_rounded,
+                              keyboardType: TextInputType.phone,
+                              validator: AppValidators.mobile,
+                            ),
+                            SizedBox(height: 20.h),
+                            AppTextField(
+                              label: LK.oldPassword.tr,
+                              controller: oldPasswordController,
+                              hint: LK.passwordHint.tr,
+                              icon: Icons.lock_open_rounded,
+                              obscureText: true,
+                              validator: AppValidators.required,
+                            ),
+                            SizedBox(height: 20.h),
+                            AppTextField(
+                              label: LK.newPassword.tr,
+                              controller: newPasswordController,
+                              hint: LK.passwordHint.tr,
+                              icon: Icons.lock_outline_rounded,
+                              obscureText: controller.obscureNewPassword.value,
+                              suffixIcon: IconButton(
+                                onPressed:
+                                    controller.toggleNewPasswordVisibility,
+                                icon: Icon(
+                                  controller.obscureNewPassword.value
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color: AppColors.mutedForeground,
+                                ),
+                              ),
+                              validator: AppValidators.password,
+                            ),
+                            SizedBox(height: 20.h),
+                            AppTextField(
+                              label: LK.confirmNewPassword.tr,
+                              controller: confirmPasswordController,
+                              hint: LK.passwordHint.tr,
+                              icon: Icons.lock_outline_rounded,
+                              obscureText:
+                                  controller.obscureConfirmPassword.value,
+                              suffixIcon: IconButton(
+                                onPressed:
+                                    controller.toggleConfirmPasswordVisibility,
+                                icon: Icon(
+                                  controller.obscureConfirmPassword.value
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color: AppColors.mutedForeground,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return LK.pleaseEnterConfirmPassword.tr;
+                                }
+                                if (value != newPasswordController.text) {
+                                  return LK.passwordsDoNotMatch.tr;
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 32.h),
+                            Obx(
+                              () => AppPrimaryButton(
+                                text: LK.updatePassword.tr,
+                                onPressed: submit,
+                                isLoading: controller.isFormLoading,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),

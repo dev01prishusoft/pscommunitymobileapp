@@ -22,15 +22,25 @@ class AppLogger {
       _logger.e(_redact(message), error: error, stackTrace: stackTrace);
 
   static String _redact(String message) {
-    if (kReleaseMode) {
-      // In release mode, we might want to redact even more or skip certain logs
-    }
-    
+    if (kReleaseMode) {}
+
     return message
-        .replaceAll(RegExp(r'Bearer\s+[a-zA-Z0-9\-\._~+/]+=*'), 'Bearer [REDACTED]')
-        .replaceAll(RegExp(r'password["\s:]+[^\s,}\]]+'), 'password: [REDACTED]')
-        .replaceAll(RegExp(r'accessToken["\s:]+[^\s,}\]]+'), 'accessToken: [REDACTED]')
-        .replaceAll(RegExp(r'refreshToken["\s:]+[^\s,}\]]+'), 'refreshToken: [REDACTED]')
+        .replaceAll(
+          RegExp(r'Bearer\s+[a-zA-Z0-9\-\._~+/]+=*'),
+          'Bearer [REDACTED]',
+        )
+        .replaceAll(
+          RegExp(r'password["\s:]+[^\s,}\]]+'),
+          'password: [REDACTED]',
+        )
+        .replaceAll(
+          RegExp(r'accessToken["\s:]+[^\s,}\]]+'),
+          'accessToken: [REDACTED]',
+        )
+        .replaceAll(
+          RegExp(r'refreshToken["\s:]+[^\s,}\]]+'),
+          'refreshToken: [REDACTED]',
+        )
         .replaceAll(RegExp(r'otp["\s:]+[^\s,}\]]+'), 'otp: [REDACTED]');
   }
 }
@@ -39,9 +49,9 @@ class ProductionFilter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) {
     if (!kIsWeb) {
-      // Suppress logs during tests to avoid polluting test output
-      final isTest = const bool.fromEnvironment('dart.vm.product') == false &&
-          const bool.hasEnvironment('FLUTTER_TEST') || 
+      final isTest =
+          const bool.fromEnvironment('dart.vm.product') == false &&
+              const bool.hasEnvironment('FLUTTER_TEST') ||
           (kDebugMode && Platform.environment.containsKey('FLUTTER_TEST'));
       if (isTest) return false;
     }

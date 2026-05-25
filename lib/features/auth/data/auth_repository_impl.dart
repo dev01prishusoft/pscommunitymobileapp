@@ -1,61 +1,82 @@
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/repositories/auth_repository.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+  AuthRepositoryImpl(this._apiClient, this._tokenManager);
   final ApiClient _apiClient;
-
-  AuthRepositoryImpl(this._apiClient);
+  final TokenManager _tokenManager;
 
   @override
-  Future<AuthTokens> login({
+  Future<Result<AuthTokens>> login({
     required String mobile,
     required String password,
   }) async {
-    final response = await _apiClient.postParsed<AuthTokens>(
+    final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.login,
-      data: {
-        'mobile': mobile,
-        'password': password,
-      },
+      data: {'mobile': mobile, 'password': password},
       fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
-    return response.data!;
+    
+    if (result is Success<ApiResponse<AuthTokens>>) {
+      final tokens = result.data.data;
+      if (tokens == null) {
+        return Error(ServerFailure('Missing tokens in response'));
+      }
+      await _tokenManager.saveTokens(tokens.accessToken, tokens.refreshToken);
+      return Success(tokens);
+    } else {
+      return Error((result as Error).failure);
+    }
   }
 
   @override
-  Future<AuthTokens> memberLogin({
+  Future<Result<AuthTokens>> memberLogin({
     required String mobile,
     required String password,
   }) async {
-    final response = await _apiClient.postParsed<AuthTokens>(
+    final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,
-      data: {
-        'mobileNo': mobile,
-        'password': password,
-      },
+      data: {'mobileNo': mobile, 'password': password},
       fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
-    return response.data!;
+    
+    if (result is Success<ApiResponse<AuthTokens>>) {
+      final tokens = result.data.data;
+      if (tokens == null) {
+        return Error(ServerFailure('Missing tokens in response'));
+      }
+      await _tokenManager.saveTokens(tokens.accessToken, tokens.refreshToken);
+      return Success(tokens);
+    } else {
+      return Error((result as Error).failure);
+    }
   }
 
   @override
-  Future<void> memberUpdatePassword({
+  Future<Result<void>> memberUpdatePassword({
     required String mobileNo,
     required String oldPassword,
     required String newPassword,
   }) async {
-    await _apiClient.postParsed<void>(
+    final result = await _apiClient.postParsed<void>(
       ApiEndpoints.memberUpdatePassword,
       data: {
         'mobileNo': mobileNo,
         'oldPassword': oldPassword,
         'newPassword': newPassword,
       },
-      // Since we just need it to succeed and the parser handles json['succeeded']
     );
+    
+    if (result is Success<ApiResponse<void>>) {
+      return const Success(null);
+    } else {
+      return Error((result as Error).failure);
+    }
   }
 
   AuthTokens _mapAuthResponseData(Map<String, dynamic> authData) {
@@ -64,7 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final isDefault = authData['isDefaultPassword'] as bool? ?? false;
 
     if (accessToken.isEmpty || refreshToken.isEmpty) {
-      throw const ServerFailure('Response is missing authentication tokens');
+      throw ServerFailure('Response is missing authentication tokens');
     }
 
     return AuthTokens(

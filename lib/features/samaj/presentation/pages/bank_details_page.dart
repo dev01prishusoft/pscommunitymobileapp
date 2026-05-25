@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -7,63 +9,58 @@ import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/sam
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/bank_account.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 
-class BankDetailsPage extends StatelessWidget {
+class BankDetailsPage extends GetView<SamajController> {
   const BankDetailsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final samajController = Get.find<SamajController>();
-
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.bankAccounts.tr,
-          style: const TextStyle(
-            color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
         ),
         centerTitle: false,
       ),
       body: Obx(() {
-        if (samajController.isSamajLoading.value) {
+        if (controller.isSamajLoading.value) {
           return AppStateView(
             state: AppState.loading,
-            child: const SizedBox.shrink(),
+            child: SizedBox.shrink(),
           );
         }
 
-        if (samajController.samajError.value != null) {
+        if (controller.samajError.value != null) {
           return AppStateView(
             state: AppState.error,
-            errorMessage: samajController.samajError.value,
-            onRetry: samajController.fetchSamajDetail,
-            child: const SizedBox.shrink(),
+            errorMessage: controller.samajError.value,
+            onRetry: controller.fetchSamajDetail,
+            child: SizedBox.shrink(),
           );
         }
 
-        final accounts = samajController.samaj.value?.bankAccounts ?? [];
+        final accounts = controller.samaj.value?.bankAccounts ?? [];
 
         if (accounts.isEmpty) {
           return AppStateView(
             state: AppState.empty,
             emptyMessage: LK.noBankAccountsFound.tr,
-            onRetry: samajController.fetchSamajDetail,
-            child: const SizedBox.shrink(),
+            onRetry: controller.fetchSamajDetail,
+            child: SizedBox.shrink(),
           );
         }
 
         return ListView.separated(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           itemCount: accounts.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          separatorBuilder: (context, index) => SizedBox(height: 16.h),
           itemBuilder: (context, index) {
             final bank = accounts[index];
             return _buildBankCard(context, bank);
@@ -75,16 +72,16 @@ class BankDetailsPage extends StatelessWidget {
 
   Widget _buildBankCard(BuildContext context, BankAccount bank) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.02),
             blurRadius: 8,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -94,24 +91,25 @@ class BankDetailsPage extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: AppColors.navyBlue,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.account_balance,
-                    color: Colors.white, size: 24),
+                child: Icon(
+                  Icons.account_balance,
+                  color: AppColors.white,
+                  size: 24,
+                ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       bank.bankName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.headlineSmall.copyWith(
                         color: AppColors.secondary,
                       ),
                     ),
@@ -120,52 +118,43 @@ class BankDetailsPage extends StatelessWidget {
               ),
               if (bank.isPrimary)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.lightGreen,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     LK.primary.tr,
-                    style: const TextStyle(
+                    style: AppTextStyles.labelMedium.copyWith(
                       color: AppColors.deepGreen,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           _buildDetailRow(LK.branchLabel.tr, bank.branchName),
           _buildDetailRow(LK.acLabel.tr, bank.accountNumber),
           _buildDetailRow(LK.ifscLabel.tr, bank.ifscCode),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 12.0),
             child: Divider(),
           ),
           InkWell(
             onTap: () {
-              Get.toNamed<void>(
-                AppRouter.bankAccountDetails,
-                arguments: bank,
-              );
+              Get.toNamed<void>(AppRouter.bankAccountDetails, arguments: bank);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
                   LK.viewDetails.tr,
-                  style: const TextStyle(
+                  style: AppTextStyles.labelLarge.copyWith(
                     color: AppColors.deepBlue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
                   ),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward,
-                    color: AppColors.deepBlue, size: 16),
+                SizedBox(width: 4.w),
+                Icon(Icons.arrow_forward, color: AppColors.deepBlue, size: 16),
               ],
             ),
           ),
@@ -176,26 +165,23 @@ class BankDetailsPage extends StatelessWidget {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
           SizedBox(
-            width: 100,
+            width: 100.w,
             child: Text(
               label,
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mutedForeground,
-                fontSize: 14,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: AppTextStyles.titleSmall.copyWith(
                 color: AppColors.secondary,
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
               ),
             ),
           ),

@@ -1,10 +1,4 @@
 class PaidPaymentRequest {
-  final int id;
-  final String title;
-  final String amountFormatted;
-  final String paidDate;
-  final int receiptId;
-
   PaidPaymentRequest({
     required this.id,
     required this.title,
@@ -22,4 +16,9 @@ class PaidPaymentRequest {
       receiptId: json['receiptId'] as int? ?? 0,
     );
   }
+  final int id;
+  final String title;
+  final String amountFormatted;
+  final String paidDate;
+  final int receiptId;
 }

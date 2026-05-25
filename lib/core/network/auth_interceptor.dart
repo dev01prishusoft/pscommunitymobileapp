@@ -5,25 +5,33 @@ import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 
 class AuthInterceptor extends Interceptor {
-  final TokenManager _tokenManager;
-  final Dio _refreshDio;
-  final Dio _mainDio;
-  final VoidCallback _onAuthFailure;
-
   AuthInterceptor({
     required TokenManager tokenManager,
     required Dio refreshDio,
     required Dio mainDio,
     required VoidCallback onAuthFailure,
-  })  : _tokenManager = tokenManager,
-        _refreshDio = refreshDio,
-        _mainDio = mainDio,
-        _onAuthFailure = onAuthFailure;
+  }) : _tokenManager = tokenManager,
+       _refreshDio = refreshDio,
+       _mainDio = mainDio,
+       _onAuthFailure = onAuthFailure;
+  final TokenManager _tokenManager;
+  final Dio _refreshDio;
+  final Dio _mainDio;
+  final VoidCallback _onAuthFailure;
 
   Completer<String?>? _refreshCompleter;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final path = options.path;
+    if (!path.contains('/login') && !path.contains('/member-login') && !path.contains('/refresh-token')) {
+      if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenExpired) {
+        try {
+          await _refreshSingleFlight(_tokenManager.refreshToken!);
+        } catch (_) {}
+      }
+    }
+
     final token = _tokenManager.accessToken;
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -32,15 +40,19 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     if (err.response?.statusCode != 401) {
       return handler.next(err);
     }
-
-    // Do not intercept 401s for login or refresh token endpoints, 
-    // let them pass through to the controller/usecase.
     final path = err.requestOptions.path;
-    if (path.contains('/member-login') || path.contains('/refresh-token')) {
+    if (path.contains('/login') || path.contains('/member-login')) {
+      return handler.next(err);
+    }
+    if (path.contains('/refresh-token')) {
+      _onAuthFailure();
       return handler.next(err);
     }
 
@@ -62,17 +74,14 @@ class AuthInterceptor extends Interceptor {
         final options = err.requestOptions;
         options.headers['Authorization'] = 'Bearer $newToken';
         options.extra['isAuthRetry'] = true;
-        
+
         final response = await _mainDio.fetch<Map<String, dynamic>>(options);
         return handler.resolve(response);
       } else {
         _onAuthFailure();
       }
-    } catch (e, stack) {
-      if (kDebugMode) {
-        print('REFRESH TOKEN ERROR: $e');
-        print('STACKTRACE: $stack');
-      }
+    } catch (e) {
+      if (kDebugMode) {}
       _onAuthFailure();
     }
 
@@ -94,25 +103,21 @@ class AuthInterceptor extends Interceptor {
           'refreshToken': refreshToken,
         },
       );
-      
+
       final data = response.data ?? {};
       final authData = data['data'] as Map<String, dynamic>? ?? {};
       final access = authData['accessToken'] as String?;
       final refresh = authData['refreshToken'] as String?;
-      
+
       if (access != null && refresh != null) {
         await _tokenManager.saveTokens(access, refresh);
         c.complete(access);
       } else {
-        if (kDebugMode) {
-          print('REFRESH TOKEN ERROR: API returned success but tokens were null. Response: $data');
-        }
+        if (kDebugMode) {}
         c.complete(null);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('REFRESH TOKEN EXCEPTION: $e');
-      }
+      if (kDebugMode) {}
       c.completeError(e);
     } finally {
       _refreshCompleter = null;

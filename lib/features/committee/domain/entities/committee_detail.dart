@@ -1,10 +1,4 @@
 class CommitteeDetail {
-  final String name;
-  final String? parentName;
-  final String description;
-  final List<CommitteeRole> roles;
-  final List<CommitteeMember> members;
-
   CommitteeDetail({
     required this.name,
     this.parentName,
@@ -26,13 +20,14 @@ class CommitteeDetail {
           .toList(),
     );
   }
+  final String name;
+  final String? parentName;
+  final String description;
+  final List<CommitteeRole> roles;
+  final List<CommitteeMember> members;
 }
 
 class CommitteeRole {
-  final String roleName;
-  final String roleTypeName;
-  final int memberCount;
-
   CommitteeRole({
     required this.roleName,
     required this.roleTypeName,
@@ -46,16 +41,12 @@ class CommitteeRole {
       memberCount: json['memberCount'] as int? ?? 0,
     );
   }
+  final String roleName;
+  final String roleTypeName;
+  final int memberCount;
 }
 
 class CommitteeMember {
-  final int memberId;
-  final String name;
-  final String roleName;
-  final String roleTypeName;
-  final String? startDate;
-  final String? endDate;
-
   CommitteeMember({
     required this.memberId,
     required this.name,
@@ -67,7 +58,11 @@ class CommitteeMember {
 
   factory CommitteeMember.fromJson(Map<String, dynamic> json) {
     return CommitteeMember(
-      memberId: int.tryParse((json['memberId'] ?? json['id'] ?? json['Id'] ?? 0).toString()) ?? 0,
+      memberId:
+          int.tryParse(
+            (json['memberId'] ?? json['id'] ?? json['Id'] ?? 0).toString(),
+          ) ??
+          0,
       name: json['name'] as String? ?? '',
       roleName: json['committeeRoleName'] as String? ?? '',
       roleTypeName: json['committeeRoleTypeName'] as String? ?? '',
@@ -75,4 +70,10 @@ class CommitteeMember {
       endDate: json['endDate'] as String?,
     );
   }
+  final int memberId;
+  final String name;
+  final String roleName;
+  final String roleTypeName;
+  final String? startDate;
+  final String? endDate;
 }

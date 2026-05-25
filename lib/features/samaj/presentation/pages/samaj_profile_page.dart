@@ -1,10 +1,13 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
-class SamajProfilePage extends StatelessWidget {
+class SamajProfilePage extends GetView<SamajController> {
   const SamajProfilePage({super.key});
 
   @override
@@ -12,81 +15,95 @@ class SamajProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.samajInfo.tr,
-          style: const TextStyle(
-            color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
         ),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // Header Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: AppColors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
-              child: Column(
-                children: [
-                  const Icon(Icons.account_balance,
-                      size: 60, color: AppColors.navyBlue),
-                  const SizedBox(height: 16),
-                  Text(
-                    LK.samajName.tr,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
+              child: Obx(() {
+                final samaj = controller.samaj.value;
+                return Column(
+                  children: [
+                    if (samaj?.logoUrl != null && samaj!.logoUrl.isNotEmpty)
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.black.withValues(alpha: 0.08),
+                              blurRadius: 15,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: CachedImg(
+                            url: samaj.logoUrl,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      )
+                    else
+                      Icon(
+                        Icons.account_balance,
+                        size: 60,
+                        color: AppColors.navyBlue,
+                      ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      samaj?.name ?? LK.samajName.tr,
+                      style: AppTextStyles.headlineLarge.copyWith(
+                        color: AppColors.secondary,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    LK.samajSubtitle.tr,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.mutedForeground,
+                    SizedBox(height: 4.h),
+                    Text(
+                      LK.samajSubtitle.tr,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.mutedForeground,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Timeline/Hierarchical view
-            _buildTimelineItem(
-              context,
-              title: LK.samajSanstha.tr,
-              icon: Icons.account_balance,
-              iconColor: AppColors.deepBlue,
-              onTap: () => Navigator.pushNamed(context, AppRouter.samajSanstha),
-              isLast: false,
+                  ],
+                );
+              }),
             ),
             _buildTimelineItem(
               context,
               title: LK.bankAccounts.tr,
               icon: Icons.account_balance,
               iconColor: AppColors.deepGreen,
-              onTap: () => Navigator.pushNamed(context, AppRouter.bankDetails),
+              onTap: () => Get.toNamed<void>(AppRouter.bankDetails),
               isLast: true,
               isGreen: true,
             ),
@@ -107,48 +124,43 @@ class SamajProfilePage extends StatelessWidget {
   }) {
     return Column(
       children: [
-        // Vertical connector line from top
-        Container(
-          width: 1,
-          height: 40,
-          color: Colors.grey.shade300,
-        ),
+        Container(width: 1.w, height: 40.h, color: AppColors.grey.shade300),
         InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: isGreen ? AppColors.lightGreen : Colors.white,
+              color: isGreen ? AppColors.lightGreen : AppColors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isGreen ? const Color(0xFFC8E6C9) : AppColors.primary.withValues(alpha: 0.2),
+                    color: isGreen
+                        ? AppColors.lightGreen
+                        : AppColors.primary.withValues(alpha: 0.2),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: AppColors.black.withValues(alpha: 0.02),
                   blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isGreen ? AppColors.deepGreen : AppColors.deepBlue,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: Colors.white, size: 24),
+                  child: Icon(icon, color: AppColors.white, size: 24),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    style: AppTextStyles.titleLarge.copyWith(
                       color: AppColors.secondary,
                     ),
                   ),
@@ -156,13 +168,11 @@ class SamajProfilePage extends StatelessWidget {
                 if (!isGreen)
                   Text(
                     LK.view.tr,
-                    style: const TextStyle(
+                    style: AppTextStyles.titleSmall.copyWith(
                       color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
                     ),
                   ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Icon(
                   Icons.chevron_right,
                   color: isGreen ? AppColors.deepGreen : AppColors.primary,

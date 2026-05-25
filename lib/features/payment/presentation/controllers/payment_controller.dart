@@ -14,33 +14,24 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:flutter/material.dart';
 
 class PaymentController extends GetxController {
-
   PaymentController(this._repository);
   final PaymentRepository _repository;
-
-  // --- Dashboard state ---
   final Rx<AppState> dashboardState = AppState.loading.obs;
   final Rxn<PaymentDashboard> dashboard = Rxn<PaymentDashboard>();
-  
-  // --- Make Payment form state ---
   final RxList<PaymentType> paymentTypes = <PaymentType>[].obs;
   final RxList<PaymentCategory> categories = <PaymentCategory>[].obs;
   final Rxn<PaymentType> selectedType = Rxn<PaymentType>();
   final Rxn<PaymentCategory> selectedCategory = Rxn<PaymentCategory>();
   final RxDouble enteredAmount = 0.0.obs;
   final RxBool isProcessingPayment = false.obs;
-  
-  // --- History state ---
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
   final RxString selectedYear = ''.obs;
   final RxString selectedStatus = 'All'.obs;
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
-  
-  // --- Razorpay ---
   late Razorpay _razorpay;
   int? _pendingAdminRequestId;
-  
+
   @override
   void onInit() {
     super.onInit();
@@ -51,7 +42,7 @@ class PaymentController extends GetxController {
     loadDashboard();
     loadPaymentTypes();
   }
-  
+
   @override
   void onClose() {
     _razorpay.clear();
@@ -101,14 +92,21 @@ class PaymentController extends GetxController {
     }
   }
 
-  Future<void> initiatePayment({int? adminPaymentRequestId, double? customAmount}) async {
+  Future<void> initiatePayment({
+    int? adminPaymentRequestId,
+    double? customAmount,
+  }) async {
+    if (isProcessingPayment.value) return;
+
     final amount = customAmount ?? enteredAmount.value;
-    
+
     int? typeId;
     int? categoryId;
 
     if (adminPaymentRequestId != null) {
-      final req = dashboard.value?.pendingPayments.firstWhere((p) => p.id == adminPaymentRequestId);
+      final req = dashboard.value?.pendingPayments.firstWhere(
+        (p) => p.id == adminPaymentRequestId,
+      );
       typeId = req?.paymentTypeId;
       categoryId = req?.paymentCategoryId;
     } else {
@@ -146,33 +144,35 @@ class PaymentController extends GetxController {
         'name': LK.samajName.tr,
         'order_id': order.orderId,
         'description': LK.paymentForCommunity.tr,
-        'timeout': 300, // in seconds
-        'prefill': {
-          'contact': '', // Add user contact if available
-          'email': '',   // Add user email if available
-        },
-        'theme': {'color': '#1E3A8A'} // App primary color
+        'timeout': 300,
+        'prefill': {'contact': '', 'email': ''},
+        'theme': {'color': '#1E3A8A'},
       };
 
       _razorpay.open(options);
     } catch (e) {
       AppLogger.e('Failed to initiate payment', e);
       final errorMessage = e.toString();
-      Get.snackbar(LK.error.tr, errorMessage.isNotEmpty ? errorMessage : LK.paymentFailed.tr);
-    } finally {
+      Get.snackbar(
+        LK.error.tr,
+        errorMessage.isNotEmpty ? errorMessage : LK.paymentFailed.tr,
+      );
       isProcessingPayment.value = false;
+      _pendingAdminRequestId = null;
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     AppLogger.i('Payment Success: ${response.paymentId}');
-    
+
     try {
-      unawaited(Get.dialog<void>(
-        const Center(child: CircularProgressIndicator()),
-        barrierDismissible: false,
-      ));
-      
+      unawaited(
+        Get.dialog<void>(
+          Center(child: CircularProgressIndicator()),
+          barrierDismissible: false,
+        ),
+      );
+
       final result = await _repository.verifyPayment(
         razorpayOrderId: response.orderId!,
         razorpayPaymentId: response.paymentId!,
@@ -182,28 +182,38 @@ class PaymentController extends GetxController {
         paymentCategoryId: selectedCategory.value?.id ?? 0,
         adminPaymentRequestId: _pendingAdminRequestId,
       );
-      
-      Get.back<void>(); // Close loading
-      
+
+      Get.back<void>();
+
       final receiptId = result['receiptId'] as int?;
-      
-      await loadDashboard(); // Refresh
-      
+
+      await loadDashboard();
+
       if (receiptId != null) {
-        unawaited(Get.toNamed<void>(AppRouter.paymentReceipt, arguments: {'receiptId': receiptId}));
+        unawaited(
+          Get.toNamed<void>(
+            AppRouter.paymentReceipt,
+            arguments: {'receiptId': receiptId},
+          ),
+        );
       } else {
-        Get.back<void>(); // Back from make payment
+        Get.back<void>();
         Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
       }
     } catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back<void>(); // Close loading
+      if (Get.isDialogOpen ?? false) Get.back<void>();
       Get.snackbar(LK.error.tr, LK.verificationFailed.tr);
+    } finally {
+      isProcessingPayment.value = false;
+      _pendingAdminRequestId = null;
     }
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     AppLogger.e('Payment Error: ${response.code} - ${response.message}');
     Get.snackbar(LK.error.tr, response.message ?? LK.paymentFailed.tr);
+    isProcessingPayment.value = false;
+    _pendingAdminRequestId = null;
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {

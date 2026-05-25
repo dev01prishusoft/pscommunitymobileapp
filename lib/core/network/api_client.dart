@@ -10,35 +10,40 @@ import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/certificate_pinning.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class ApiClient {
-  final Dio _dio;
-  final ConnectivityService _connectivity;
-
   ApiClient({
     required TokenManager tokenManager,
     required ConnectivityService connectivity,
     required VoidCallback onAuthFailure,
-  })  : _connectivity = connectivity,
-        _dio = Dio(BaseOptions(
-          baseUrl: AppEnvironment.I.apiBaseUrl,
-          connectTimeout: AppEnvironment.I.connectTimeout,
-          receiveTimeout: AppEnvironment.I.receiveTimeout,
-        )) {
-
+  }) : _connectivity = connectivity,
+       _dio = Dio(
+         BaseOptions(
+           baseUrl: AppEnvironment.I.apiBaseUrl,
+           connectTimeout: AppEnvironment.I.connectTimeout,
+           receiveTimeout: AppEnvironment.I.receiveTimeout,
+         ),
+       ) {
     final refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl));
 
     CertificatePinning.configure(_dio);
     CertificatePinning.configure(refreshDio);
 
     if (AppEnvironment.I.enableLogging) {
-      refreshDio.interceptors.add(PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        compact: true,
-      ));
+      refreshDio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: true,
+          compact: true,
+          logPrint: (Object object) {
+            AppLogger.d(object.toString());
+          },
+        ),
+      );
     }
 
     _dio.interceptors.addAll([
@@ -57,15 +62,21 @@ class ApiClient {
           requestBody: true,
           responseHeader: true,
           compact: true,
+          logPrint: (Object object) {
+            AppLogger.d(object.toString());
+          },
         ),
     ]);
   }
+  final Dio _dio;
+  final ConnectivityService _connectivity;
 
   Future<Response<dynamic>> request(
     String path, {
     String method = 'GET',
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
   }) async {
     await _checkConnectivity();
     try {
@@ -73,63 +84,90 @@ class ApiClient {
         path,
         data: data,
         queryParameters: queryParameters,
+        cancelToken: cancelToken,
         options: Options(method: method),
       );
-    } on DioException catch (e) {
-      if (e.error is Failure) throw e.error as Failure;
-      throw const ServerFailure();
+    } catch (e) {
+      throw NetworkExceptionMapper.map(e);
     }
   }
 
-  Future<Response<dynamic>> get(String path, {Map<String, dynamic>? queryParameters}) {
-    return request(path, method: 'GET', queryParameters: queryParameters);
-  }
-
-  Future<Response<dynamic>> post(String path, {dynamic data}) {
-    return request(path, method: 'POST', data: data);
-  }
-
-  Future<ApiResponse<T>> getParsed<T>(
+  Future<Response<dynamic>> get(
     String path, {
     Map<String, dynamic>? queryParameters,
-    T Function(Object? json)? fromJsonT,
-  }) async {
-    final response = await get(path, queryParameters: queryParameters);
-    return ApiResponse<T>.fromJson(response.data as Map<String, dynamic>, fromJsonT);
+    CancelToken? cancelToken,
+  }) {
+    return request(path, method: 'GET', queryParameters: queryParameters, cancelToken: cancelToken);
   }
 
-  Future<PaginatedResponse<T>> getPaginated<T>(
+  Future<Response<dynamic>> post(
+    String path, {
+    dynamic data,
+    CancelToken? cancelToken,
+  }) {
+    return request(path, method: 'POST', data: data, cancelToken: cancelToken);
+  }
+
+  Future<Result<ApiResponse<T>>> getParsed<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+    T Function(Object? json)? fromJsonT,
+  }) async {
+    try {
+      final response = await get(path, queryParameters: queryParameters, cancelToken: cancelToken);
+      return Success(ApiResponse<T>.fromJson(
+        response.data as Map<String, dynamic>,
+        fromJsonT,
+      ));
+    } catch (e) {
+      return Error(NetworkExceptionMapper.map(e));
+    }
+  }
+
+  Future<Result<PaginatedResponse<T>>> getPaginated<T>(
     String path, {
     required String listKey,
     Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
     required T Function(Object? json) fromJsonT,
   }) async {
-    final response = await get(path, queryParameters: queryParameters);
-    return PaginatedResponse<T>.fromJson(
-      response.data as Map<String, dynamic>,
-      listKey,
-      fromJsonT,
-    );
+    try {
+      final response = await get(path, queryParameters: queryParameters, cancelToken: cancelToken);
+      return Success(PaginatedResponse<T>.fromJson(
+        response.data as Map<String, dynamic>,
+        listKey,
+        fromJsonT,
+      ));
+    } catch (e) {
+      return Error(NetworkExceptionMapper.map(e));
+    }
   }
-  
-  Future<ApiResponse<T>> postParsed<T>(
+
+  Future<Result<ApiResponse<T>>> postParsed<T>(
     String path, {
     dynamic data,
+    CancelToken? cancelToken,
     T Function(Object? json)? fromJsonT,
   }) async {
-    final response = await post(path, data: data);
-    return ApiResponse<T>.fromJson(response.data as Map<String, dynamic>, fromJsonT);
+    try {
+      final response = await post(path, data: data, cancelToken: cancelToken);
+      return Success(ApiResponse<T>.fromJson(
+        response.data as Map<String, dynamic>,
+        fromJsonT,
+      ));
+    } catch (e) {
+      return Error(NetworkExceptionMapper.map(e));
+    }
   }
 
   Future<void> _checkConnectivity() async {
     final hasConnection = await _connectivity.hasConnection();
     if (kDebugMode && !hasConnection) {
-      if (kDebugMode) {
-        print('CONNECTIVITY CHECK: No internet detected by connectivity_plus');
-      }
+      if (kDebugMode) {}
     }
     if (!hasConnection) {
-      throw const NetworkFailure();
+      throw NetworkFailure();
     }
   }
 

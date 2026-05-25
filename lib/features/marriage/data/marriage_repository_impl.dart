@@ -5,18 +5,18 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/entities/marriage_profile.dart';
 
 class MarriageRepositoryImpl implements MarriageRepository {
-  final ApiClient _apiClient;
-
   MarriageRepositoryImpl(this._apiClient);
+  final ApiClient _apiClient;
 
   @override
   Future<List<MarriageProfile>> getMatrimonialProfiles() async {
     final response = await _apiClient.getPaginated<MarriageProfile>(
       ApiEndpoints.marriage,
       listKey: 'members',
-      fromJsonT: (json) => MarriageProfile.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) =>
+          MarriageProfile.fromJson(json as Map<String, dynamic>),
     );
-    return response.data;
+    return response.dataOrNull?.data ?? [];
   }
 
   @override
@@ -24,8 +24,9 @@ class MarriageRepositoryImpl implements MarriageRepository {
     final response = await _apiClient.getPaginated<UnmarriedCount>(
       ApiEndpoints.unmarriedCount,
       listKey: 'unMarriedCount',
-      fromJsonT: (json) => UnmarriedCount.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) =>
+          UnmarriedCount.fromJson(json as Map<String, dynamic>),
     );
-    return response.data;
+    return response.dataOrNull?.data ?? [];
   }
 }

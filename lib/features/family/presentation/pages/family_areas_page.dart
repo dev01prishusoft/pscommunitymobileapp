@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -19,14 +21,14 @@ class FamilyAreasPage extends StatefulWidget {
 class _FamilyAreasPageState extends State<FamilyAreasPage> {
   final controller = Get.find<FamilyController>();
   final ScrollController _scrollController = ScrollController();
- 
-   @override
-   void initState() {
-     super.initState();
-     controller.resetFilters();
-     controller.loadStates();
-     _scrollController.addListener(_onScroll);
-   }
+
+  @override
+  void initState() {
+    super.initState();
+    controller.resetFilters();
+    controller.loadStates();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
@@ -35,60 +37,62 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       controller.loadNextPage();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.secondary),
+          icon: Icon(Icons.arrow_back, color: AppColors.secondary),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.family.tr,
-          style: const TextStyle(
+          style: AppTextStyles.headlineSmall.copyWith(
             color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
           ),
         ),
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _FilterSection(),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               _ResultsHeader(),
-              const SizedBox(height: 5),
-              Obx(() => AppStateView(
-                state: controller.state.value,
-                onRetry: controller.loadAreas,
-                child: controller.areas.isEmpty 
-                    ? _EmptyState() 
-                    : Column(
-                        children: [
-                          _AreasList(areas: controller.areas),
-                          if (controller.isNextPageLoading.value)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 20),
-                              child: Center(child: CircularProgressIndicator()),
-                            ),
-                        ],
-                      ),
-              )),
+              SizedBox(height: 5.h),
+              Obx(
+                () => AppStateView(
+                  state: controller.state.value,
+                  onRetry: controller.loadAreas,
+                  child: controller.areas.isEmpty
+                      ? _EmptyState()
+                      : Column(
+                          children: [
+                            _AreasList(areas: controller.areas),
+                            if (controller.isNextPageLoading.value)
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                          ],
+                        ),
+                ),
+              ),
             ],
           ),
         ),
@@ -97,143 +101,146 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   }
 }
 
-class _FilterSection extends StatelessWidget {
+class _FilterSection extends GetView<FamilyController> {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<FamilyController>();
-    return Obx(() => AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Obx(
+      () => AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.2),
+            width: 1.5.w,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => controller.filtersExpanded.value = !controller.filtersExpanded.value,
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.filter_list, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    LK.locationFilters.tr,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                      fontSize: 14,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            InkWell(
+              onTap: () => controller.filtersExpanded.value =
+                  !controller.filtersExpanded.value,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.filter_list, color: AppColors.primary, size: 20),
+                    SizedBox(width: 8.w),
+                    Text(
+                      LK.locationFilters.tr,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.secondary,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    controller.filtersExpanded.value ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                    color: AppColors.mutedForeground,
-                  ),
-                ],
+                    Spacer(),
+                    Icon(
+                      controller.filtersExpanded.value
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: AppColors.mutedForeground,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: controller.filtersExpanded.value
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
-                    child: Column(
-                      children: [
-                        const Divider(),
-                        const SizedBox(height: 16),
-                        _CustomDropdown(
-                          hint: LK.selectState.tr,
-                          value: controller.selectedState.value,
+            AnimatedSize(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: controller.filtersExpanded.value
+                  ? Padding(
+                      padding: EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        bottom: 16.0,
+                      ),
+                      child: Column(
+                        children: [
+                          Divider(),
+                          SizedBox(height: 16.h),
+                          _CustomDropdown(
+                            hint: LK.selectState.tr,
+                            value: controller.selectedState.value,
                             options: controller.states,
                             onChanged: controller.onStateChanged,
                             isLoading: controller.isStatesLoading.value,
-                        ),
-                        const SizedBox(height: 12),
-                        _CustomDropdown(
-                          hint: LK.selectDistrict.tr,
-                          value: controller.selectedDistrict.value,
+                          ),
+                          SizedBox(height: 12.h),
+                          _CustomDropdown(
+                            hint: LK.selectDistrict.tr,
+                            value: controller.selectedDistrict.value,
                             options: controller.districts,
                             onChanged: controller.onDistrictChanged,
                             isEnabled: controller.selectedState.value != null,
                             isLoading: controller.isDistrictsLoading.value,
-                        ),
-                        const SizedBox(height: 12),
-                        _CustomDropdown(
-                          hint: LK.selectTaluka.tr,
-                          value: controller.selectedTaluka.value,
+                          ),
+                          SizedBox(height: 12.h),
+                          _CustomDropdown(
+                            hint: LK.selectTaluka.tr,
+                            value: controller.selectedTaluka.value,
                             options: controller.talukas,
                             onChanged: controller.onTalukaChanged,
                             isEnabled:
                                 controller.selectedDistrict.value != null,
                             isLoading: controller.isTalukasLoading.value,
-                        ),
-                        if (controller.selectedState.value != null ||
-                            controller.selectedDistrict.value != null ||
-                            controller.selectedTaluka.value != null) ...[
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: controller.resetFilters,
-                              icon: const Icon(Icons.refresh, size: 18),
-                              label: Text(LK.reset.tr),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.primary,
-                                side: const BorderSide(color: AppColors.primary),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                          ),
+                          if (controller.selectedState.value != null ||
+                              controller.selectedDistrict.value != null ||
+                              controller.selectedTaluka.value != null) ...[
+                            SizedBox(height: 16.h),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                onPressed: controller.resetFilters,
+                                icon: Icon(Icons.refresh, size: 18),
+                                label: Text(LK.reset.tr),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                  side: BorderSide(color: AppColors.primary),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 12),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
                               ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
-class _ResultsHeader extends StatelessWidget {
+class _ResultsHeader extends GetView<FamilyController> {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<FamilyController>();
     return Obx(() {
-      if (controller.areas.isEmpty) return const SizedBox.shrink();
+      if (controller.areas.isEmpty) return SizedBox.shrink();
       return Text(
         LK.totalAreasLabel.trParams({
           'taluka': controller.selectedTaluka.value?.text ?? 'All',
           'count': controller.areas.length.toString(),
         }),
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: AppColors.secondary,
-        ),
+        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondary),
       );
     });
   }
 }
 
 class _AreasList extends StatelessWidget {
-
   const _AreasList({required this.areas});
   final List<FamilyArea> areas;
 
@@ -241,21 +248,21 @@ class _AreasList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       itemCount: areas.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {
         final area = areas[index];
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: AppColors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
-                offset: const Offset(0, 2),
+                offset: Offset(0, 2),
               ),
             ],
           ),
@@ -273,7 +280,7 @@ class _AreasList extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0),
               child: Row(
                 children: [
                   Expanded(
@@ -282,32 +289,31 @@ class _AreasList extends StatelessWidget {
                       children: [
                         Text(
                           '${area.title} (${area.location})',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.secondary,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Row(
                           children: [
                             Text(
                               '${area.members} ${LK.membersCount.tr}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+                              style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.mutedForeground,
                               ),
                             ),
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('|', style: TextStyle(color: AppColors.border)),
+                              child: Text(
+                                '|',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.border,
+                                ),
+                              ),
                             ),
                             Text(
                               '${area.families} ${LK.familiesCount.tr}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+                              style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.mutedForeground,
                               ),
                             ),
@@ -316,11 +322,7 @@ class _AreasList extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(
-                    Icons.arrow_forward,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
+                  Icon(Icons.arrow_forward, color: AppColors.primary, size: 20),
                 ],
               ),
             ),
@@ -344,13 +346,6 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _CustomDropdown extends StatelessWidget {
-  final String hint;
-  final DropdownItem? value;
-  final List<DropdownItem> options;
-  final void Function(DropdownItem?) onChanged;
-  final bool isEnabled;
-  final bool isLoading;
-
   const _CustomDropdown({
     required this.hint,
     required this.value,
@@ -359,6 +354,12 @@ class _CustomDropdown extends StatelessWidget {
     this.isEnabled = true,
     this.isLoading = false,
   });
+  final String hint;
+  final DropdownItem? value;
+  final List<DropdownItem> options;
+  final void Function(DropdownItem?) onChanged;
+  final bool isEnabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -367,41 +368,41 @@ class _CustomDropdown extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: Container(
-        height: 52,
+        height: 52.h,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isEnabled ? AppColors.border : AppColors.border.withValues(alpha: 0.5),
+            color: isEnabled
+                ? AppColors.border
+                : AppColors.border.withValues(alpha: 0.5),
           ),
           boxShadow: [
             if (isEnabled)
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: AppColors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
-                offset: const Offset(0, 2),
+                offset: Offset(0, 2),
               ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<DropdownItem>(
-            value: (value != null && options.any((o) => o.id == value!.id)) 
-                ? options.firstWhere((o) => o.id == value!.id) 
+            value: (value != null && options.any((o) => o.id == value!.id))
+                ? options.firstWhere((o) => o.id == value!.id)
                 : null,
             hint: Text(
               hint,
-              style: TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mutedForeground.withValues(alpha: 0.8),
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
               ),
             ),
             isExpanded: true,
             icon: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.h,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -409,28 +410,26 @@ class _CustomDropdown extends StatelessWidget {
                       ),
                     ),
                   )
-                : const Icon(
+                : Icon(
                     Icons.keyboard_arrow_down_rounded,
                     color: AppColors.mutedForeground,
                   ),
-            items: options.isEmpty 
-              ? null 
-              : options.map((option) {
-                  return DropdownMenuItem<DropdownItem>(
-                    value: option,
-                    child: Text(
-                      option.text,
-                      style: const TextStyle(
-                        color: AppColors.secondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+            items: options.isEmpty
+                ? null
+                : options.map((option) {
+                    return DropdownMenuItem<DropdownItem>(
+                      value: option,
+                      child: Text(
+                        option.text,
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: AppColors.secondary,
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
             onChanged: isEnabled ? onChanged : null,
             borderRadius: BorderRadius.circular(12),
-            dropdownColor: Colors.white,
+            dropdownColor: AppColors.white,
             elevation: 8,
             menuMaxHeight: 350,
           ),
@@ -439,4 +438,3 @@ class _CustomDropdown extends StatelessWidget {
     );
   }
 }
-

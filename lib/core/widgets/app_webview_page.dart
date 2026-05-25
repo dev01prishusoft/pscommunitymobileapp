@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -5,14 +7,9 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class AppWebViewPage extends StatefulWidget {
+  const AppWebViewPage({super.key, required this.title, required this.url});
   final String title;
   final String url;
-
-  const AppWebViewPage({
-    super.key,
-    required this.title,
-    required this.url,
-  });
 
   @override
   State<AppWebViewPage> createState() => _AppWebViewPageState();
@@ -25,14 +22,12 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
   bool _isUrlAllowed(String urlString) {
     try {
       final uri = Uri.parse(urlString);
-      
-      // Only allow http or https scheme inside the webview
       if (uri.scheme != 'http' && uri.scheme != 'https') {
         return false;
       }
 
       final host = uri.host.toLowerCase();
-      
+
       final allowedUiUri = Uri.parse(AppEnvironment.I.uiBaseUrl);
       final allowedApiUri = Uri.parse(AppEnvironment.I.apiBaseUrl);
 
@@ -44,7 +39,8 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         return host == allowedHost || host.endsWith('.$allowedHost');
       }
 
-      return matchesAllowedHost(allowedUiHost) || matchesAllowedHost(allowedApiHost);
+      return matchesAllowedHost(allowedUiHost) ||
+          matchesAllowedHost(allowedApiHost);
     } catch (_) {
       return false;
     }
@@ -61,8 +57,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      debugPrint('Could not launch URL: $urlString');
-    }
+}
   }
 
   bool _hasError = false;
@@ -77,12 +72,13 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
   void _setupWebView() {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
+      ..setBackgroundColor(Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            // Reduce excessive setState by only updating every 10% or at edges
-            if (progress == 0 || progress == 100 || (progress % 10 == 0 && progress != _loadingPercentage)) {
+            if (progress == 0 ||
+                progress == 100 ||
+                (progress % 10 == 0 && progress != _loadingPercentage)) {
               setState(() {
                 _loadingPercentage = progress;
               });
@@ -131,14 +127,11 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(widget.title, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Stack(
@@ -146,23 +139,29 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
           if (_hasError)
             Center(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 60, color: AppColors.destructive),
-                    const SizedBox(height: 16),
+                    Icon(
+                      Icons.error_outline,
+                      size: 60,
+                      color: AppColors.destructive,
+                    ),
+                    SizedBox(height: 16.h),
                     Text(
                       'Failed to load page',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: AppTextStyles.headlineSmall,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       _errorMessage,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.mutedForeground),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.mutedForeground,
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
@@ -171,7 +170,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
                         });
                         _controller.reload();
                       },
-                      child: const Text('Retry'),
+                      child: Text('Retry'),
                     ),
                   ],
                 ),
@@ -179,12 +178,12 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
             )
           else
             WebViewWidget(controller: _controller),
-            
+
           if (_loadingPercentage < 100 && !_hasError)
             LinearProgressIndicator(
               value: _loadingPercentage / 100.0,
-              backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+              backgroundColor: AppColors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
         ],
       ),

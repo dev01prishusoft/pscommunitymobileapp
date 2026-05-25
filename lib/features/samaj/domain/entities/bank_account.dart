@@ -1,16 +1,5 @@
 class BankAccount {
-  final String bankName;
-  final String branchName;
-  final String accountHolderName;
-  final String accountNumber;
-  final String accountType;
-  final String ifscCode;
-  final String micrCode;
-  final String swiftCode;
-  final String upiId;
-  final bool isPrimary;
-
-  const BankAccount({
+  BankAccount({
     required this.bankName,
     required this.branchName,
     required this.accountHolderName,
@@ -37,4 +26,14 @@ class BankAccount {
       isPrimary: json['isPrimary'] as bool? ?? false,
     );
   }
+  final String bankName;
+  final String branchName;
+  final String accountHolderName;
+  final String accountNumber;
+  final String accountType;
+  final String ifscCode;
+  final String micrCode;
+  final String swiftCode;
+  final String upiId;
+  final bool isPrimary;
 }

@@ -2,10 +2,6 @@ import 'payment_request.dart';
 import 'paid_payment_request.dart';
 
 class PaymentDashboard {
-  final double totalDue;
-  final List<PaymentRequest> pendingPayments;
-  final List<PaidPaymentRequest> paidPayments;
-
   PaymentDashboard({
     required this.totalDue,
     required this.pendingPayments,
@@ -13,11 +9,13 @@ class PaymentDashboard {
   });
 
   factory PaymentDashboard.fromJson(Map<String, dynamic> json) {
-    final pending = (json['pendingPayments'] as List?)
+    final pending =
+        (json['pendingPayments'] as List?)
             ?.map((e) => PaymentRequest.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
-    final paid = (json['paidPayments'] as List?)
+    final paid =
+        (json['paidPayments'] as List?)
             ?.map((e) => PaidPaymentRequest.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
@@ -28,4 +26,7 @@ class PaymentDashboard {
       paidPayments: paid,
     );
   }
+  final double totalDue;
+  final List<PaymentRequest> pendingPayments;
+  final List<PaidPaymentRequest> paidPayments;
 }

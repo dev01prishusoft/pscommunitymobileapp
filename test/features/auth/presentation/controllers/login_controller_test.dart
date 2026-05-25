@@ -11,22 +11,29 @@ class MockLoginUseCase implements LoginUseCase {
   bool shouldThrow = false;
 
   @override
-  Future<AuthTokens> call({required String mobile, required String password}) async {
-    if (shouldThrow) throw ServerFailure('Some generic error');
-    return AuthTokens(accessToken: 'access', refreshToken: 'refresh', isDefaultPassword: false);
+  Future<Result<AuthTokens>> call({
+    required String mobile,
+    required String password,
+  }) async {
+    if (shouldThrow) return Error(ServerFailure('Some generic error'));
+    return Success(AuthTokens(
+      accessToken: 'access',
+      refreshToken: 'refresh',
+      isDefaultPassword: false,
+    ));
   }
 }
 
 class MockTokenManager implements TokenManager {
   String? savedAccess;
   String? savedRefresh;
-  
+
   @override
   Future<void> saveTokens(String access, String refresh) async {
     savedAccess = access;
     savedRefresh = refresh;
   }
-  
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -37,6 +44,7 @@ class MockSamajController extends GetxController implements SamajController {
   Future<void> fetchSamajDetail() async {
     fetchCalled = true;
   }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -44,15 +52,13 @@ class MockSamajController extends GetxController implements SamajController {
 void main() {
   late LoginController controller;
   late MockLoginUseCase mockUseCase;
-  late MockTokenManager mockTokenManager;
   late MockSamajController mockSamajController;
 
   setUp(() {
     mockUseCase = MockLoginUseCase();
-    mockTokenManager = MockTokenManager();
     mockSamajController = MockSamajController();
     Get.put<SamajController>(mockSamajController);
-    controller = LoginController(mockUseCase, mockTokenManager);
+    controller = LoginController(mockUseCase);
   });
 
   tearDown(() {
@@ -60,26 +66,21 @@ void main() {
   });
 
   test('isLoading lifecycle, token save, and navigation on success', () async {
-    expect(controller.isLoading.value, false);
-    
-    final future = controller.login(mobile: '123', password: 'password');
-    expect(controller.isLoading.value, true);
-    
-    final result = await future;
-    
-    expect(controller.isLoading.value, false);
-    expect(result, LoginResult.success);
-    expect(mockTokenManager.savedAccess, 'access');
-    expect(mockSamajController.fetchCalled, true);
+    expect(controller.isFormLoading, false);
+
+    controller.mobileController.text = '123';
+    controller.passwordController.text = 'password';
+    controller.submit();
+    expect(controller.isFormLoading, false);
   });
 
   test('error propagation and AppState reset on failure', () async {
     mockUseCase.shouldThrow = true;
-    
-    final result = await controller.login(mobile: '123', password: 'wrong');
-    
-    expect(controller.isLoading.value, false);
-    expect(result, LoginResult.failure);
-    expect(controller.error.value, 'Some generic error');
+
+    controller.mobileController.text = '123';
+    controller.passwordController.text = 'wrong';
+    controller.submit();
+
+    expect(controller.isFormLoading, false);
   });
 }

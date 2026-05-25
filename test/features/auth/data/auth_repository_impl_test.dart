@@ -2,16 +2,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pscommunitymobileapp/features/auth/data/auth_repository_impl.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:dio/dio.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class MockApiClient implements ApiClient {
   Response<dynamic>? mockResponse;
-  
+
   @override
-  Future<Response<dynamic>> post(String path, {data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response<dynamic>> post(
+    String path, {
+    dynamic data,
+    CancelToken? cancelToken,
+  }) async {
     return mockResponse!;
   }
-  
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class MockTokenManager implements TokenManager {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -22,7 +31,7 @@ void main() {
 
   setUp(() {
     mockApiClient = MockApiClient();
-    repository = AuthRepositoryImpl(mockApiClient);
+    repository = AuthRepositoryImpl(mockApiClient, MockTokenManager());
   });
 
   test('login success path returns AuthTokens', () async {
@@ -34,46 +43,40 @@ void main() {
           'accessToken': 'token123',
           'refreshToken': 'refresh123',
           'isDefaultPassword': false,
-        }
-      }
+        },
+      },
     );
 
     final result = await repository.login(mobile: '123', password: 'pw');
-    expect(result.accessToken, 'token123');
-    expect(result.refreshToken, 'refresh123');
-    expect(result.isDefaultPassword, false);
+    expect(result.isSuccess, true);
+    final data = result.dataOrNull!;
+    expect(data.accessToken, 'token123');
+    expect(data.refreshToken, 'refresh123');
+    expect(data.isDefaultPassword, false);
   });
 
-  test('login throws ServerFailure when succeeded: false', () async {
+  test('login returns ServerFailure when succeeded: false', () async {
     mockApiClient.mockResponse = Response<dynamic>(
       requestOptions: RequestOptions(path: ''),
-      data: {
-        'succeeded': false,
-        'message': 'Invalid credentials provided',
-      }
+      data: {'succeeded': false, 'message': 'Invalid credentials provided'},
     );
 
-    expect(
-      () => repository.login(mobile: '123', password: 'pw'),
-      throwsA(isA<ServerFailure>().having((f) => f.message, 'message', 'Invalid credentials provided'))
-    );
+    final result = await repository.login(mobile: '123', password: 'pw');
+    expect(result.isFailure, true);
+    expect(result.failureOrNull?.message, 'Invalid credentials provided');
   });
 
-  test('login throws ServerFailure when tokens are missing', () async {
+  test('login returns ServerFailure when tokens are missing', () async {
     mockApiClient.mockResponse = Response<dynamic>(
       requestOptions: RequestOptions(path: ''),
       data: {
         'succeeded': true,
-        'data': {
-          'accessToken': '',
-          'refreshToken': '',
-        }
-      }
+        'data': {'accessToken': '', 'refreshToken': ''},
+      },
     );
 
-    expect(
-      () => repository.login(mobile: '123', password: 'pw'),
-      throwsA(isA<ServerFailure>().having((f) => f.message, 'message', 'Response is missing authentication tokens'))
-    );
+    final result = await repository.login(mobile: '123', password: 'pw');
+    expect(result.isFailure, true);
+    expect(result.failureOrNull?.message, 'Response is missing authentication tokens');
   });
 }

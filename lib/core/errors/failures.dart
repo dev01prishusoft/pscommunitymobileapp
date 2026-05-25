@@ -1,51 +1,72 @@
+// ignore_for_file: use_super_parameters
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
-abstract class Failure implements Exception {
+sealed class Result<T> {
+  const Result();
 
-  const Failure(this.message, {required this.translationKey});
+  bool get isSuccess => this is Success<T>;
+  bool get isFailure => this is Error<T>;
+
+  T? get dataOrNull => isSuccess ? (this as Success<T>).data : null;
+  Failure? get failureOrNull => isFailure ? (this as Error<T>).failure : null;
+}
+
+class Success<T> extends Result<T> {
+  const Success(this.data);
+  final T data;
+}
+
+class Error<T> extends Result<T> {
+  const Error(this.failure);
+  final Failure failure;
+}
+
+abstract class Failure implements Exception {
+  Failure(this.message, {required this.translationKey, this.code});
   final String message;
   final String translationKey;
+  final String? code;
 
   @override
   String toString() => message;
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure([super.message = 'Server error occurred'])
-      : super(translationKey: LK.errorServer);
+  ServerFailure([String message = 'Server error occurred', String? code])
+    : super(message, translationKey: LK.errorServer, code: code);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([super.message = 'No internet connection'])
-      : super(translationKey: LK.errorNoInternet);
+  NetworkFailure([String message = 'No internet connection', String? code])
+    : super(message, translationKey: LK.errorNoInternet, code: code);
 }
 
 class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure([super.message = 'Unauthorized access'])
-      : super(translationKey: LK.errorUnauthorized);
+  UnauthorizedFailure([String message = 'Unauthorized access', String? code])
+    : super(message, translationKey: LK.errorUnauthorized, code: code);
 }
 
 class ForbiddenFailure extends Failure {
-  const ForbiddenFailure([super.message = 'Access Forbidden'])
-      : super(translationKey: LK.errorUnauthorized);
+  ForbiddenFailure([String message = 'Access Forbidden', String? code])
+    : super(message, translationKey: LK.errorUnauthorized, code: code);
 }
 
 class TimeoutFailure extends Failure {
-  const TimeoutFailure([super.message = 'Request timed out'])
-      : super(translationKey: LK.errorTimeout);
+  TimeoutFailure([String message = 'Request timed out', String? code])
+    : super(message, translationKey: LK.errorTimeout, code: code);
 }
 
 class CertificatePinningFailure extends Failure {
-  const CertificatePinningFailure([super.message = 'Certificate pinning mismatch'])
-      : super(translationKey: LK.errorCertificatePinning);
+  CertificatePinningFailure([String message = 'Certificate pinning mismatch', String? code])
+    : super(message, translationKey: LK.errorCertificatePinning, code: code);
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure(super.message)
-      : super(translationKey: LK.errorValidation);
+  ValidationFailure(String message, {String? code}) 
+    : super(message, translationKey: LK.errorValidation, code: code);
 }
 
 class NotFoundFailure extends Failure {
-  const NotFoundFailure([super.message = 'Resource not found'])
-      : super(translationKey: LK.noResultsFound);
+  NotFoundFailure([String message = 'Resource not found', String? code])
+    : super(message, translationKey: LK.noResultsFound, code: code);
 }

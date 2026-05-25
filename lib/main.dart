@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/app/app.dart';
@@ -6,23 +7,32 @@ import 'package:pscommunitymobileapp/core/di/di.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_validator.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/widgets/fatal_error_screen.dart';
+import 'package:pscommunitymobileapp/core/lifecycle/app_lifecycle_observer.dart';
 
-void main() async {
+void main() {
+  runZonedGuarded(_bootstrap, (error, stack) {
+    AppLogger.e('Uncaught async error', error, stack);
+  });
+}
+
+Future<void> _bootstrap() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Orientation Lock
+    FlutterError.onError = (FlutterErrorDetails details) {
+      AppLogger.e('Flutter framework error', details.exception, details.stack);
+    };
+
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-
-    // Bootstrap DI (hydrates tokens, locale, config)
     await DI.bootstrap();
+    
+    AppLifecycleObserver.instance.init();
 
     if (kDebugMode) {
       await LocalizationValidator.validate();
     }
 
-    runApp(const PsCommunityApp());
+    runApp(PsCommunityApp());
   } catch (e, stack) {
     AppLogger.e('Fatal crash during bootstrap', e, stack);
     runApp(FatalErrorScreen(error: e, stackTrace: stack));

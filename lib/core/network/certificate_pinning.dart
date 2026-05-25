@@ -1,66 +1,73 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class CertificatePinning {
-  static void configure(Dio dio) {
-    // Real production pins for the server (Primary + Backup)
-    // To get pins: openssl s_client -connect your-api.com:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64
-    const allowedPins = [
-      'sha256/oBTD/ZWLoIUhpfzgjHtjfO/M0nohlVWgkYM7D/0A470=', // Primary: communityapi.prishusoft.com (Leaf Fingerprint)
-      'sha256/lrzsBiZJdvN0YHearCjFp8/oo8Cq4RqP/O4FwL3fCMY=', // Backup: ISRG Root X1 (Root Fingerprint)
-    ];
+  static const List<String> primaryPins = [
+    'sha256/PLACEHOLDER_PRIMARY_PIN_BASE64_1=',
+    'sha256/PLACEHOLDER_PRIMARY_PIN_BASE64_2=',
+  ];
 
+  static const List<String> backupPins = [
+    'sha256/PLACEHOLDER_BACKUP_PIN_BASE64_1=',
+  ];
+
+  static final DateTime pinExpiryDate = DateTime(2027, 12, 31);
+
+  static void configure(Dio dio) {
     final adapter = dio.httpClientAdapter as IOHttpClientAdapter;
 
     adapter.createHttpClient = () {
       final client = HttpClient(
         context: SecurityContext(withTrustedRoots: true),
       );
-      
-      // Reject all certificates that are not trusted by the OS trust store
-      // AND later subject them to the pinning check.
+
       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
         if (kDebugMode) {
-          print('Certificate validation failed for $host. Allowing for debug.');
-          return true; // Allow in debug
+          AppLogger.d('WARNING: Bypassing SSL Pinning in Debug Mode');
+          return true;
         }
-        return false; // Reject in release
+        return false;
       };
-      
+
       return client;
     };
 
-    // Use validateCertificate for actual pinning (checking against specific hashes).
-    adapter.validateCertificate = (X509Certificate? cert, String host, int port) {
-      if (cert == null) return false;
+    adapter.validateCertificate =
+        (X509Certificate? cert, String host, int port) {
 
-      // Hash the certificate DER
-      final hash = sha256.convert(cert.der).bytes;
-      final base64Hash = base64.encode(hash);
-      final currentPin = 'sha256/$base64Hash';
+          if (kDebugMode) return true;
 
-      final isValidPin = allowedPins.contains(currentPin);
-      
-      // Basic host validation
-      final expectedHost = Uri.parse(AppEnvironment.I.apiBaseUrl).host;
-      final isValidHost = host == expectedHost;
-      
-      if (!isValidPin || !isValidHost) {
-        AppLogger.e('PINNING/HOST FAILURE for $host. Pin valid: $isValidPin, Host valid: $isValidHost');
-        if (kDebugMode) {
-          AppLogger.d('Allowing pinning failure in debug mode. In production, this will fail.');
-          return true; 
-        }
-        return false; 
-      }
+          if (cert == null) return false;
 
-      return true;
-    };
+          final expectedHost = Uri.parse(AppEnvironment.I.apiBaseUrl).host;
+          if (host != expectedHost) {
+            AppLogger.e('Host mismatch: $host != $expectedHost');
+            return false;
+          }
+
+          final hash = sha256.convert(cert.der).bytes;
+          final base64Hash = base64.encode(hash);
+          final currentPin = 'sha256/$base64Hash';
+
+          final allValidPins = [...primaryPins, ...backupPins];
+          if (DateTime.now().isAfter(pinExpiryDate)) {
+            AppLogger.e(
+              'CRITICAL: Certificate pins have expired! Initiate rotation.',
+            );
+          }
+
+          if (!allValidPins.contains(currentPin)) {
+            AppLogger.e('PINNING FAILURE for $host. Invalid PIN: $currentPin');
+            return false;
+          }
+
+          return true;
+        };
   }
 }

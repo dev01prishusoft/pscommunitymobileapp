@@ -1,3 +1,4 @@
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,20 +9,43 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 
-class ProfileFormController extends GetxController {
+class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
-  // Fallback defaults
   final defaultGenders = ['Male', 'Female', 'Other'];
   final defaultMaritalStatuses = ['Married', 'Unmarried', 'Widow', 'Divorced'];
   final defaultBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-  final defaultRelations = ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother'];
+  final defaultRelations = [
+    'Self',
+    'Wife',
+    'Son',
+    'Daughter',
+    'Father',
+    'Mother',
+  ];
   final defaultAddressTypes = ['Home', 'Office', 'Other'];
   final defaultQualifications = ['Graduate', 'HSC', 'SSC', 'Post Graduate'];
-  final defaultOccupationTypes = ['Agriculture', 'Business', 'Job', 'Profession'];
-  final defaultSigns = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
-
-  // Reactive dropdown lists
+  final defaultOccupationTypes = [
+    'Agriculture',
+    'Business',
+    'Job',
+    'Profession',
+  ];
+  final defaultSigns = [
+    'Aries',
+    'Taurus',
+    'Gemini',
+    'Cancer',
+    'Leo',
+    'Virgo',
+    'Libra',
+    'Scorpio',
+    'Sagittarius',
+    'Capricorn',
+    'Aquarius',
+    'Pisces',
+  ];
   final genderList = <String>[].obs;
   final maritalStatusList = <String>[].obs;
   final bloodGroupList = <String>[].obs;
@@ -30,8 +54,6 @@ class ProfileFormController extends GetxController {
   final qualificationList = <String>[].obs;
   final occupationTypeList = <String>[].obs;
   final signList = <String>[].obs;
-
-  // Personal Tab
   final memberNo = ''.obs;
   final firstName = ''.obs;
   final middleName = ''.obs;
@@ -47,8 +69,6 @@ class ProfileFormController extends GetxController {
   final bloodGroup = 'A+'.obs;
   final sign = 'Aries'.obs;
   final isActive = true.obs;
-
-  // Contact & Verify
   final mobileNo = ''.obs;
   final mobileVerified = false.obs;
   final secondaryMobile = ''.obs;
@@ -56,35 +76,23 @@ class ProfileFormController extends GetxController {
   final entryPersonMobile = ''.obs;
   final emergencyContactName = ''.obs;
   final emergencyContactNo = ''.obs;
-
-  // Family & Parents
   final isFamilyHead = false.obs;
   final relation = 'Self'.obs;
   final motherFatherName = ''.obs;
   final gotra = ''.obs;
   final mothersGotra = ''.obs;
   final openToMarriage = false.obs;
-
-  // Assets & Life
   final ownLand = false.obs;
   final ownHouse = false.obs;
   final twoWheeler = false.obs;
   final fourWheeler = false.obs;
   final monthlyIncome = ''.obs;
-
-  // Social Media
   final facebook = ''.obs;
   final whatsapp = ''.obs;
   final instagram = ''.obs;
   final twitter = ''.obs;
-
-  // Addresses (List of addresses)
   final addresses = <AddressModel>[].obs;
-
-  // Education (List of education)
   final educationList = <EducationModel>[].obs;
-
-  // Work History
   final occupationType = 'Agriculture'.obs;
   final occupation = ''.obs;
   final jobPosition = ''.obs;
@@ -100,12 +108,14 @@ class ProfileFormController extends GetxController {
   final workArea = ''.obs;
   final workAddressLine1 = ''.obs;
   final workAddressLine2 = ''.obs;
-
-  // Image Handling
   final Rx<File?> profileImage = Rx<File?>(null);
   final RxDouble uploadProgress = 0.0.obs;
-
-  // TextEditingControllers
+  late final TextEditingController memberNoCtrl;
+  late final TextEditingController tobCtrl;
+  late final TextEditingController motherFatherNameCtrl;
+  late final TextEditingController companyNameCtrl;
+  late final TextEditingController businessNameCtrl;
+  late final TextEditingController entryPersonMobileCtrl;
   late final TextEditingController firstNameCtrl;
   late final TextEditingController middleNameCtrl;
   late final TextEditingController lastNameCtrl;
@@ -114,15 +124,15 @@ class ProfileFormController extends GetxController {
   late final TextEditingController dobCtrl;
   late final TextEditingController heightCtrl;
   late final TextEditingController weightCtrl;
-  
+
   late final TextEditingController mobileCtrl;
   late final TextEditingController secondaryMobileCtrl;
   late final TextEditingController emailCtrl;
   late final TextEditingController emergencyNameCtrl;
   late final TextEditingController emergencyNoCtrl;
-  
+
   late final TextEditingController monthlyIncomeCtrl;
-  
+
   late final TextEditingController facebookCtrl;
   late final TextEditingController whatsappCtrl;
   late final TextEditingController instagramCtrl;
@@ -147,28 +157,28 @@ class ProfileFormController extends GetxController {
     gender.value = m.genderName ?? '';
     maritalStatus.value = m.maritalStatusName ?? '';
     bloodGroup.value = m.bloodGroupName ?? '';
-    
+
     mobileNo.value = m.mobileNo ?? '';
     secondaryMobile.value = m.secondaryMobile ?? '';
     email.value = m.emailAddress ?? '';
     emergencyContactName.value = m.emergencyContactName ?? '';
     emergencyContactNo.value = m.emergencyContactNo ?? '';
-    
+
     motherFatherName.value = m.motherFatherName ?? '';
     gotra.value = m.gotraName ?? '';
     openToMarriage.value = m.isLookingforMarriage ?? false;
-    
+
     ownLand.value = m.isOwnLand ?? false;
     ownHouse.value = m.isOwnHouse ?? false;
     twoWheeler.value = m.hasTwoWheeler ?? false;
     fourWheeler.value = m.hasFourWheeler ?? false;
     monthlyIncome.value = m.monthlyIncome?.toString() ?? '';
-    
+
     facebook.value = m.facebookUrl ?? '';
     whatsapp.value = m.whatsappUrl ?? '';
     instagram.value = m.instagramUrl ?? '';
     twitter.value = m.twitterUrl ?? '';
-    
+
     occupationType.value = m.occupationTypeName ?? '';
     occupation.value = m.occupationName ?? '';
     jobPosition.value = m.jobPositionName ?? '';
@@ -188,6 +198,14 @@ class ProfileFormController extends GetxController {
   }
 
   void _initializeControllers() {
+    memberNoCtrl = TextEditingController(text: memberNo.value);
+    tobCtrl = TextEditingController(text: tob.value);
+    motherFatherNameCtrl = TextEditingController(text: motherFatherName.value);
+    companyNameCtrl = TextEditingController(text: companyName.value);
+    businessNameCtrl = TextEditingController(text: businessName.value);
+    entryPersonMobileCtrl = TextEditingController(
+      text: entryPersonMobile.value,
+    );
     firstNameCtrl = TextEditingController(text: firstName.value);
     middleNameCtrl = TextEditingController(text: middleName.value);
     lastNameCtrl = TextEditingController(text: lastName.value);
@@ -196,15 +214,15 @@ class ProfileFormController extends GetxController {
     dobCtrl = TextEditingController(text: dob.value);
     heightCtrl = TextEditingController(text: height.value);
     weightCtrl = TextEditingController(text: weight.value);
-    
+
     mobileCtrl = TextEditingController(text: mobileNo.value);
     secondaryMobileCtrl = TextEditingController(text: secondaryMobile.value);
     emailCtrl = TextEditingController(text: email.value);
     emergencyNameCtrl = TextEditingController(text: emergencyContactName.value);
     emergencyNoCtrl = TextEditingController(text: emergencyContactNo.value);
-    
+
     monthlyIncomeCtrl = TextEditingController(text: monthlyIncome.value);
-    
+
     facebookCtrl = TextEditingController(text: facebook.value);
     whatsappCtrl = TextEditingController(text: whatsapp.value);
     instagramCtrl = TextEditingController(text: instagram.value);
@@ -213,7 +231,13 @@ class ProfileFormController extends GetxController {
 
   @override
   void onClose() {
-    Future<void>.delayed(const Duration(milliseconds: 500), () {
+    Future<void>.delayed(Duration(milliseconds: 500), () {
+      memberNoCtrl.dispose();
+      tobCtrl.dispose();
+      motherFatherNameCtrl.dispose();
+      companyNameCtrl.dispose();
+      businessNameCtrl.dispose();
+      entryPersonMobileCtrl.dispose();
       firstNameCtrl.dispose();
       middleNameCtrl.dispose();
       lastNameCtrl.dispose();
@@ -239,16 +263,34 @@ class ProfileFormController extends GetxController {
   Future<void> loadAllDropdowns() async {
     await Future.wait([
       _fetchDropdown('/gender/dropdown', genderList, defaultGenders),
-      _fetchDropdown('/MaritalStatus/dropdown', maritalStatusList, defaultMaritalStatuses),
-      _fetchDropdown('/BloodGroup/dropdown', bloodGroupList, defaultBloodGroups),
+      _fetchDropdown(
+        '/MaritalStatus/dropdown',
+        maritalStatusList,
+        defaultMaritalStatuses,
+      ),
+      _fetchDropdown(
+        '/BloodGroup/dropdown',
+        bloodGroupList,
+        defaultBloodGroups,
+      ),
       _fetchDropdown('/RelationType/dropdown', relationList, defaultRelations),
-      _fetchDropdown('/AddressType/dropdown', addressTypeList, defaultAddressTypes),
-      _fetchDropdown('/EducationalQualification/list/dropdown', qualificationList, defaultQualifications),
-      _fetchDropdown('/Occupation/dropdown', occupationTypeList, defaultOccupationTypes),
+      _fetchDropdown(
+        '/AddressType/dropdown',
+        addressTypeList,
+        defaultAddressTypes,
+      ),
+      _fetchDropdown(
+        '/EducationalQualification/list/dropdown',
+        qualificationList,
+        defaultQualifications,
+      ),
+      _fetchDropdown(
+        '/Occupation/dropdown',
+        occupationTypeList,
+        defaultOccupationTypes,
+      ),
       _fetchDropdown('/Sign/dropdown', signList, defaultSigns),
     ]);
-    
-    // Ensure currently selected values are present in the list, if not, add them or select first
     _ensureSelectionValue(gender, genderList);
     _ensureSelectionValue(maritalStatus, maritalStatusList);
     _ensureSelectionValue(bloodGroup, bloodGroupList);
@@ -263,7 +305,11 @@ class ProfileFormController extends GetxController {
     }
   }
 
-  Future<void> _fetchDropdown(String path, RxList<String> targetList, List<String> fallbacks) async {
+  Future<void> _fetchDropdown(
+    String path,
+    RxList<String> targetList,
+    List<String> fallbacks,
+  ) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
       final response = await apiClient.get('/api/v1$path');
@@ -275,26 +321,36 @@ class ProfileFormController extends GetxController {
           if (rawData is List) {
             list = rawData;
           } else if (rawData is Map<String, dynamic>) {
-            list = (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ?? [];
+            list =
+                (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ??
+                [];
           }
-          final items = list.map((e) {
-            final map = e as Map<String, dynamic>;
-            // Extract text/name safely
-            final textKeys = ['text', 'Text', 'name', 'Name', 'value', 'Value'];
-            for (final key in textKeys) {
-              if (map.containsKey(key) && map[key] != null) {
-                return map[key].toString().trim();
-              }
-            }
-            // Fallback to first non-id value
-            for (final entry in map.entries) {
-              if (!entry.key.toLowerCase().contains('id')) {
-                return entry.value.toString().trim();
-              }
-            }
-            return '';
-          }).where((s) => s.isNotEmpty).toList();
-          
+          final items = list
+              .map((e) {
+                final map = e as Map<String, dynamic>;
+                final textKeys = [
+                  'text',
+                  'Text',
+                  'name',
+                  'Name',
+                  'value',
+                  'Value',
+                ];
+                for (final key in textKeys) {
+                  if (map.containsKey(key) && map[key] != null) {
+                    return map[key].toString().trim();
+                  }
+                }
+                for (final entry in map.entries) {
+                  if (!entry.key.toLowerCase().contains('id')) {
+                    return entry.value.toString().trim();
+                  }
+                }
+                return '';
+              })
+              .where((s) => s.isNotEmpty)
+              .toList();
+
           if (items.isNotEmpty) {
             targetList.assignAll(items);
             return;
@@ -302,13 +358,17 @@ class ProfileFormController extends GetxController {
         }
       }
     } catch (e) {
-      // Fail silently and use fallback
     }
     targetList.assignAll(fallbacks);
   }
 
   void addAddress() {
-    addresses.add(AddressModel(type: addressTypeList.isNotEmpty ? addressTypeList.first : 'Home', isPrimary: false));
+    addresses.add(
+      AddressModel(
+        type: addressTypeList.isNotEmpty ? addressTypeList.first : 'Home',
+        isPrimary: false,
+      ),
+    );
   }
 
   void removeAddress(int index) {
@@ -316,7 +376,14 @@ class ProfileFormController extends GetxController {
   }
 
   void addEducation() {
-    educationList.add(EducationModel(qualification: qualificationList.isNotEmpty ? qualificationList.first : 'Graduate', isHighest: false));
+    educationList.add(
+      EducationModel(
+        qualification: qualificationList.isNotEmpty
+            ? qualificationList.first
+            : 'Graduate',
+        isHighest: false,
+      ),
+    );
   }
 
   void removeEducation(int index) {
@@ -338,7 +405,7 @@ class ProfileFormController extends GetxController {
         AndroidUiSettings(
           toolbarTitle: 'Crop Profile Photo',
           toolbarColor: AppColors.primary,
-          toolbarWidgetColor: Colors.white,
+          toolbarWidgetColor: AppColors.white,
           initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: true,
         ),
@@ -351,7 +418,18 @@ class ProfileFormController extends GetxController {
     );
 
     if (croppedFile != null) {
-      profileImage.value = File(croppedFile.path);
+      final compressedFile = await FlutterImageCompress.compressAndGetFile(
+        croppedFile.path,
+        croppedFile.path
+            .replaceAll('.jpg', '_compressed.jpg')
+            .replaceAll('.png', '_compressed.jpg'),
+        quality: 75,
+        minWidth: 1080,
+        minHeight: 1080,
+      );
+      profileImage.value = compressedFile != null
+          ? File(compressedFile.path)
+          : File(croppedFile.path);
     }
   }
 
@@ -360,32 +438,35 @@ class ProfileFormController extends GetxController {
     uploadProgress.value = 0.0;
   }
 
-  Future<void> submitForm() async {
+  void submitForm() {
     if (formKey.currentState?.validate() ?? false) {
-      // Form is valid, gather values and submit
       firstName.value = firstNameCtrl.text;
       lastName.value = lastNameCtrl.text;
       
-      // Simulate API call and upload progress
-      try {
+      submitThrottled(() async {
         uploadProgress.value = 0.1;
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(Duration(milliseconds: 500));
         uploadProgress.value = 0.5;
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(Duration(milliseconds: 500));
         uploadProgress.value = 1.0;
+
+        Get.snackbar(
+          'Success',
+          'Profile updated successfully!',
+          backgroundColor: AppColors.green,
+          colorText: AppColors.white,
+        );
         
-        Get.snackbar('Success', 'Profile updated successfully!',
-            backgroundColor: Colors.green, colorText: Colors.white);
-      } catch (e) {
-        Get.snackbar('Error', 'Failed to update profile',
-            backgroundColor: Colors.red, colorText: Colors.white);
-      } finally {
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(Duration(milliseconds: 500));
         uploadProgress.value = 0.0;
-      }
+      });
     } else {
-      Get.snackbar('Validation Error', 'Please fill all required fields correctly.',
-          backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+        'Validation Error',
+        'Please fill all required fields correctly.',
+        backgroundColor: AppColors.red,
+        colorText: AppColors.white,
+      );
     }
   }
 }

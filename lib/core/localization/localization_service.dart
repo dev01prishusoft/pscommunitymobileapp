@@ -12,16 +12,15 @@ class LocalizationService {
   LocalizationService(this._storage);
 
   final SecureStorageService _storage;
-  static const _localeKey = 'app_locale';
-  final Rx<Locale> currentLocale = const Locale('en', 'US').obs;
-  
+  static final _localeKey = 'app_locale';
+  final Rx<Locale> currentLocale = Locale('en', 'US').obs;
+
   final RxList<Language> languages = <Language>[].obs;
   bool _isFetchingLanguages = false;
 
   late Map<String, Map<String, String>> keys;
 
   Future<void> bootstrap() async {
-    // Load translations in parallel
     final results = await Future.wait([
       rootBundle.loadString('assets/locales/en_US.json'),
       rootBundle.loadString('assets/locales/gu_IN.json'),
@@ -31,8 +30,6 @@ class LocalizationService {
       'en_US': Map<String, String>.from(jsonDecode(results[0]) as Map),
       'gj_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
     };
-
-    // Restore saved locale
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {
       final parts = savedLocale.split('_');
@@ -61,7 +58,6 @@ class LocalizationService {
         );
       }
     } catch (_) {
-      // Non-fatal — fallback language codes are shown in the dropdown
     } finally {
       _isFetchingLanguages = false;
     }

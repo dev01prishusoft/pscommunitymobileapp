@@ -2,24 +2,27 @@ import 'package:pscommunitymobileapp/features/member/domain/repositories/member_
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:dio/dio.dart';
+
 class MemberRepositoryImpl implements MemberRepository {
-  // ignore: unused_field
+  MemberRepositoryImpl(this._apiClient);
   final ApiClient _apiClient;
 
-  MemberRepositoryImpl(this._apiClient);
-
   @override
-  Future<List<Member>> getMembers() async {
+  Future<Result<PaginatedResponse<Member>>> getMembers() async {
     return searchMembers(pageNumber: 1, pageSize: 50);
   }
 
   @override
-  Future<List<Member>> searchMembers({
+  Future<Result<PaginatedResponse<Member>>> searchMembers({
     String? query,
     int? genderId,
     bool? lookingForMarriage,
     int pageNumber = 1,
     int pageSize = 20,
+    CancelToken? cancelToken,
   }) async {
     final queryParameters = <String, dynamic>{
       'pageNumber': pageNumber,
@@ -29,13 +32,12 @@ class MemberRepositoryImpl implements MemberRepository {
       if (lookingForMarriage != null) 'lookingForMarriage': lookingForMarriage,
     };
 
-    final response = await _apiClient.getPaginated<Member>(
+    return await _apiClient.getPaginated<Member>(
       '/api/v1/member/MemberSearch',
       queryParameters: queryParameters,
+      cancelToken: cancelToken,
       listKey: 'members',
       fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
     );
-
-    return response.data;
   }
 }

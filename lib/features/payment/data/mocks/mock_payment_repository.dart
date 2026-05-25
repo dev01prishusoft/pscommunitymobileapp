@@ -66,7 +66,11 @@ class MockPaymentRepository implements PaymentRepository {
     if (paymentTypeId == 1) {
       return [
         PaymentCategory(id: 1, name: 'Family Membership', defaultAmount: 1000),
-        PaymentCategory(id: 2, name: 'Individual Membership', defaultAmount: 500),
+        PaymentCategory(
+          id: 2,
+          name: 'Individual Membership',
+          defaultAmount: 500,
+        ),
       ];
     }
     return [

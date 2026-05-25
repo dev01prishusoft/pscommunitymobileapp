@@ -4,8 +4,11 @@ import 'package:pscommunitymobileapp/core/localization/localization_validator.da
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('LocalizationValidator should not throw exceptions on valid JSON', () async {
-    // This assumes the actual assets are valid
-    await expectLater(LocalizationValidator.validate(), completes);
-  });
+  test(
+    'LocalizationValidator should not throw exceptions on valid JSON',
+    () async {
+      // This assumes the actual assets are valid
+      await expectLater(LocalizationValidator.validate(), completes);
+    },
+  );
 }

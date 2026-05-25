@@ -1,7 +1,4 @@
 class PaymentType {
-  final int id;
-  final String name;
-
   PaymentType({required this.id, required this.name});
 
   factory PaymentType.fromJson(Map<String, dynamic> json) {
@@ -10,4 +7,6 @@ class PaymentType {
       name: json['name'] as String? ?? '',
     );
   }
+  final int id;
+  final String name;
 }

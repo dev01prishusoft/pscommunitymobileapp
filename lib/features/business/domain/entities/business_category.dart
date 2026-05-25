@@ -1,11 +1,5 @@
 class BusinessCategory {
-  final String title;
-  final String iconKey;
-
-  const BusinessCategory({
-    required this.title,
-    required this.iconKey,
-  });
+  BusinessCategory({required this.title, required this.iconKey});
 
   factory BusinessCategory.fromJson(Map<String, dynamic> json) {
     return BusinessCategory(
@@ -13,4 +7,6 @@ class BusinessCategory {
       iconKey: json['iconKey'] as String? ?? '',
     );
   }
+  final String title;
+  final String iconKey;
 }

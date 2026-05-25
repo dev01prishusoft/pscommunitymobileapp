@@ -5,21 +5,19 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
+  TokenPair({this.accessToken, this.refreshToken});
   final String? accessToken;
   final String? refreshToken;
-
-  const TokenPair({this.accessToken, this.refreshToken});
 }
 
 class TokenManager {
+  TokenManager(this._storage);
   final SecureStorageService _storage;
 
-  final Rx<TokenPair> authState = const TokenPair().obs;
+  final Rx<TokenPair> authState = TokenPair().obs;
 
-  TokenManager(this._storage);
-
-  static const _accessKey = 'access_token';
-  static const _refreshKey = 'refresh_token';
+  static final _accessKey = 'access_token';
+  static final _refreshKey = 'refresh_token';
 
   Future<void> bootstrap() async {
     try {
@@ -27,12 +25,13 @@ class TokenManager {
         _storage.read(_accessKey),
         _storage.read(_refreshKey),
       ]);
-      authState.value = TokenPair(accessToken: results[0], refreshToken: results[1]);
-    } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint('TokenManager.bootstrap error: $e\n$stack');
-      }
-      authState.value = const TokenPair();
+      authState.value = TokenPair(
+        accessToken: results[0],
+        refreshToken: results[1],
+      );
+    } catch (e) {
+      if (kDebugMode) {}
+      authState.value = TokenPair();
     }
   }
 
@@ -43,10 +42,8 @@ class TokenManager {
         _storage.write(_refreshKey, refresh),
       ]);
       authState.value = TokenPair(accessToken: access, refreshToken: refresh);
-    } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint('TokenManager.saveTokens error: $e\n$stack');
-      }
+    } catch (e) {
+      if (kDebugMode) {}
       rethrow;
     }
   }
@@ -57,11 +54,9 @@ class TokenManager {
         _storage.delete(_accessKey),
         _storage.delete(_refreshKey),
       ]);
-      authState.value = const TokenPair();
-    } catch (e, stack) {
-      if (kDebugMode) {
-        debugPrint('TokenManager.clearTokens error: $e\n$stack');
-      }
+      authState.value = TokenPair();
+    } catch (e) {
+      if (kDebugMode) {}
       rethrow;
     }
   }
@@ -73,28 +68,19 @@ class TokenManager {
 
   String? get accessToken => authState.value.accessToken;
   String? get refreshToken => authState.value.refreshToken;
-
-  /// True when the current session can be used or recovered by refresh.
-  bool get hasToken => hasValidAccessToken || hasRefreshToken;
-
-  /// True only when an access token exists and is not expired.
+  bool get hasToken => hasValidAccessToken;
   bool get hasValidAccessToken {
     final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return false;
     return !_isJwtExpired(token);
   }
 
-  /// Backward-compatible alias for code that checks access-token validity.
   bool get hasValidToken => hasValidAccessToken;
-
-  /// True when a refresh token exists in memory.
-  /// The server remains the source of truth for refresh-token validity.
   bool get hasRefreshToken {
     final token = authState.value.refreshToken;
     return token != null && token.isNotEmpty;
   }
 
-  /// True when the access token is missing, invalid, or expired.
   bool get isAccessTokenExpired {
     final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return true;
@@ -123,12 +109,20 @@ class TokenManager {
     }
   }
 
+  static String? _cachedAccessToken;
+  static DateTime? _cachedAccessExpiry;
+
   static bool _isJwtExpired(String token) {
+    if (token == _cachedAccessToken && _cachedAccessExpiry != null) {
+      return DateTime.now().toUtc().isAfter(
+        _cachedAccessExpiry!.subtract(Duration(seconds: 30)),
+      );
+    }
     final payload = _decodeJwtPayload(token);
     if (payload == null) return true;
 
     final Object? exp = payload['exp'];
-    if (exp == null) return false;
+    if (exp == null) return true;
 
     final seconds = _expirySeconds(exp);
     if (seconds == null) return true;
@@ -138,8 +132,11 @@ class TokenManager {
       isUtc: true,
     );
 
+    _cachedAccessToken = token;
+    _cachedAccessExpiry = expiry;
+
     return DateTime.now().toUtc().isAfter(
-      expiry.subtract(const Duration(seconds: 30)),
+      expiry.subtract(Duration(seconds: 30)),
     );
   }
 

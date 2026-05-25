@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -35,31 +37,28 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     if (_receiptId == null) {
       return Scaffold(
         appBar: AppBar(title: Text(LK.paymentReceipt.tr)),
-        body: const Center(child: Text('Invalid Receipt ID')),
+        body: Center(child: Text('Invalid Receipt ID')),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.paymentReceipt.tr,
-          style: const TextStyle(
-            color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
         ),
         centerTitle: false,
         actions: [
           IconButton(
             onPressed: () => _shareReceipt(),
-            icon: const Icon(Icons.share, color: AppColors.primary),
+            icon: Icon(Icons.share, color: AppColors.primary),
           ),
         ],
       ),
@@ -67,13 +66,13 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         future: _receiptFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
-            return const Center(child: Text('No data found'));
+            return Center(child: Text('No data found'));
           }
 
           final data = snapshot.data!;
@@ -85,87 +84,84 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Widget _buildContent(Map<String, dynamic> data) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(20.0),
       child: Column(
         children: [
-          // Header Info
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+            padding: EdgeInsets.symmetric(vertical: 32, horizontal: 24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.border),
             ),
             child: Column(
               children: [
-                const Icon(Icons.account_balance, size: 60, color: Color(0xFF002B5B)),
-                const SizedBox(height: 16),
+                Icon(Icons.account_balance, size: 60, color: AppColors.navyBlue),
+                SizedBox(height: 16.h),
                 Text(
                   LK.samajName.tr,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.headlineLarge.copyWith(
                     color: AppColors.secondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Text(
                   LK.officialPaymentReceipt.tr,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.mutedForeground,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-
-          // Details Sections
-          _buildReceiptSection(
-            LK.receiptDetailsLabel.tr,
-            [
-              _buildInfoRow(LK.receiptNoLabel.tr, data['receiptNo']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.dateLabel.tr, data['date']?.toString() ?? 'N/A'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildReceiptSection(
-            LK.memberDetailsLabel.tr,
-            [
-              _buildInfoRow(LK.nameLabel.tr, data['name']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.memberNoLabel.tr, data['memberNo']?.toString() ?? 'N/A'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildReceiptSection(
-            LK.paymentDetailsLabel.tr,
-            [
-              _buildInfoRow(LK.typeLabel.tr, data['type']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.categoryLabel.tr, data['category']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.amountLabel.tr, data['amount']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.modeLabel.tr, data['mode']?.toString() ?? 'N/A'),
-              _buildStatusRow(LK.statusLabel.tr, data['status']?.toString() ?? 'N/A'),
-              _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']?.toString() ?? 'N/A'),
-            ],
-          ),
-          const SizedBox(height: 32),
-
-          // Download PDF Button
+          SizedBox(height: 20.h),
+          _buildReceiptSection(LK.receiptDetailsLabel.tr, [
+            _buildInfoRow(
+              LK.receiptNoLabel.tr,
+              data['receiptNo']?.toString() ?? 'N/A',
+            ),
+            _buildInfoRow(LK.dateLabel.tr, data['date']?.toString() ?? 'N/A'),
+          ]),
+          SizedBox(height: 16.h),
+          _buildReceiptSection(LK.memberDetailsLabel.tr, [
+            _buildInfoRow(LK.nameLabel.tr, data['name']?.toString() ?? 'N/A'),
+            _buildInfoRow(
+              LK.memberNoLabel.tr,
+              data['memberNo']?.toString() ?? 'N/A',
+            ),
+          ]),
+          SizedBox(height: 16.h),
+          _buildReceiptSection(LK.paymentDetailsLabel.tr, [
+            _buildInfoRow(LK.typeLabel.tr, data['type']?.toString() ?? 'N/A'),
+            _buildInfoRow(
+              LK.categoryLabel.tr,
+              data['category']?.toString() ?? 'N/A',
+            ),
+            _buildInfoRow(
+              LK.amountLabel.tr,
+              data['amount']?.toString() ?? 'N/A',
+            ),
+            _buildInfoRow(LK.modeLabel.tr, data['mode']?.toString() ?? 'N/A'),
+            _buildStatusRow(
+              LK.statusLabel.tr,
+              data['status']?.toString() ?? 'N/A',
+            ),
+            _buildInfoRow(
+              LK.transactionIdLabel.tr,
+              data['transactionId']?.toString() ?? 'N/A',
+            ),
+          ]),
+          SizedBox(height: 32.h),
           ElevatedButton.icon(
             onPressed: () => _generateAndPrintPdf(data),
-            icon: const Icon(Icons.file_download, color: Colors.white),
+            icon: Icon(Icons.file_download, color: AppColors.white),
             label: Text(
               LK.downloadPdf.tr,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
             ),
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 56),
+              minimumSize: Size(double.infinity, 56),
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -173,7 +169,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               elevation: 0,
             ),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: 40.h),
         ],
       ),
     );
@@ -182,9 +178,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   Widget _buildReceiptSection(String title, List<Widget> children) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -195,18 +191,18 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: AppTextStyles.labelMedium.copyWith(
                   color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(child: Divider(color: AppColors.primary.withValues(alpha: 0.2))),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Divider(color: AppColors.primary.withValues(alpha: 0.2)),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           ...children,
         ],
       ),
@@ -215,26 +211,23 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
           SizedBox(
-            width: 110,
+            width: 110.w,
             child: Text(
               label,
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mutedForeground,
-                fontSize: 14,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: AppTextStyles.labelLarge.copyWith(
                 color: AppColors.secondary,
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
               ),
             ),
           ),
@@ -245,26 +238,25 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Widget _buildStatusRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
           SizedBox(
-            width: 110,
+            width: 110.w,
             child: Text(
               label,
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mutedForeground,
-                fontSize: 14,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                color: value.toLowerCase() == 'success' ? Colors.green : Colors.orange,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+              style: AppTextStyles.labelLarge.copyWith(
+                color: value.toLowerCase() == 'success'
+                    ? AppColors.green
+                    : AppColors.orange,
               ),
             ),
           ),
@@ -274,7 +266,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   }
 
   Future<void> _shareReceipt() async {
-     await SharePlus.instance.share(ShareParams(text: 'Official Receipt from ${LK.samajName.tr}'));
+    await SharePlus.instance.share(
+      ShareParams(text: 'Official Receipt from ${LK.samajName.tr}'),
+    );
   }
 
   Future<void> _generateAndPrintPdf(Map<String, dynamic> data) async {
@@ -289,9 +283,15 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             children: [
               pw.Header(
                 level: 0,
-                child: pw.Text(LK.samajName.tr, style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                child: pw.Text(
+                  LK.samajName.tr,
+                  style: pw.TextStyle(
+                    fontSize: 24.sp,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
               ),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 20.h),
               pw.Text('${LK.receiptNoLabel.tr} ${data['receiptNo']}'),
               pw.Text('${LK.dateLabel.tr} ${data['date']}'),
               pw.Divider(),
@@ -304,14 +304,22 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Text('${LK.modeLabel.tr} ${data['mode']}'),
               pw.Text('${LK.statusLabel.tr} ${data['status']}'),
               pw.Text('${LK.transactionIdLabel.tr} ${data['transactionId']}'),
-              pw.SizedBox(height: 40),
-              pw.Text('Thank you for your payment!', style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+              pw.SizedBox(height: 40.h),
+              pw.Text(
+                'Thank you for your payment!',
+                style: pw.TextStyle(
+                  fontSize: 14.sp,
+                  fontStyle: pw.FontStyle.italic,
+                ),
+              ),
             ],
           );
         },
       ),
     );
 
-    await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
   }
 }

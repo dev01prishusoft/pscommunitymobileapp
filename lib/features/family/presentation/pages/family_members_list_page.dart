@@ -1,3 +1,4 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -17,7 +18,7 @@ class FamilyMembersListPage extends StatefulWidget {
 class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   final FamilyController _controller = Get.find<FamilyController>();
   final TextEditingController _searchController = TextEditingController();
-  
+
   late int _areaId;
   late String _areaName;
   late int _membersCount;
@@ -45,27 +46,27 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         centerTitle: false,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Get.back<void>(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               _areaName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2.h),
             Text(
               '$_membersCount ${LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.normal),
             ),
           ],
         ),
@@ -73,107 +74,128 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Obx(() => TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: LK.searchByNameHint.tr,
-                  hintStyle: const TextStyle(color: AppColors.mutedForeground, fontSize: 14),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.mutedForeground),
-                  suffixIcon: _controller.memberSearchQuery.value.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close, color: AppColors.mutedForeground, size: 20),
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            _searchController.clear();
-                            _controller.memberSearchQuery.value = '';
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              child: Obx(
+                () => TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: LK.searchByNameHint.tr,
+                    hintStyle: TextStyle(
+                      color: AppColors.mutedForeground,
+                      fontSize: 14.sp,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: AppColors.mutedForeground,
+                    ),
+                    suffixIcon: _controller.memberSearchQuery.value.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              color: AppColors.mutedForeground,
+                              size: 20,
+                            ),
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _searchController.clear();
+                              _controller.memberSearchQuery.value = '';
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onChanged: (value) {
+                    _controller.memberSearchQuery.value = value;
+                  },
                 ),
-                onChanged: (value) {
-                  _controller.memberSearchQuery.value = value;
-                },
-              )),
+              ),
             ),
           ),
 
           Expanded(
-            child: Obx(() => AppStateView(
-              state: _controller.familyListState.value,
-              onRetry: () => _controller.loadFamilies(_areaId),
-              child: _controller.filteredFamilies.isEmpty
-                  ? LayoutBuilder(
-                      builder: (context, constraints) => SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: AppEmptyState(
-                                icon: Icons.search_off,
-                                secondaryIcon: Icons.search,
-                                title: LK.noResultsFound.tr,
-                                subtitle: LK.trySelectingDifferentFilters.tr,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      itemCount: _controller.filteredFamilies.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final family = _controller.filteredFamilies[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  family.familyName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.secondary,
+            child: Obx(
+              () => AppStateView(
+                state: _controller.familyListState.value,
+                onRetry: () => _controller.loadFamilies(_areaId),
+                child: _controller.filteredFamilies.isEmpty
+                    ? LayoutBuilder(
+                        builder: (context, constraints) =>
+                            SingleChildScrollView(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(24.0),
+                                    child: AppEmptyState(
+                                      icon: Icons.search_off,
+                                      secondaryIcon: Icons.search,
+                                      title: LK.noResultsFound.tr,
+                                      subtitle:
+                                          LK.trySelectingDifferentFilters.tr,
+                                    ),
                                   ),
                                 ),
                               ),
-                              const Divider(height: 1),
-                              ...family.members.asMap().entries.map((entry) {
-                                return MemberTile(
-                                  member: entry.value,
-                                  showDivider: entry.key > 0,
-                                );
-                              }),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-            )),
+                            ),
+                      )
+                    : ListView.separated(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                        itemCount: _controller.filteredFamilies.length,
+                        separatorBuilder: (context, index) =>
+                            SizedBox(height: 16.h),
+                        itemBuilder: (context, index) {
+                          final family = _controller.filteredFamilies[index];
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Text(
+                                    family.familyName,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                                ),
+                                Divider(height: 1.h),
+                                ...family.members.asMap().entries.map((entry) {
+                                  return MemberTile(
+                                    member: entry.value,
+                                    showDivider: entry.key > 0,
+                                  );
+                                }),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 }
-

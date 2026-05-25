@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -13,20 +15,18 @@ class PaymentHistoryPage extends GetView<PaymentController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.paymentHistory.tr,
-          style: const TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
+          style: AppTextStyles.headlineMedium.copyWith(
+            color: AppColors.secondary,
           ),
         ),
         titleSpacing: 0,
@@ -34,98 +34,114 @@ class PaymentHistoryPage extends GetView<PaymentController> {
       ),
       body: Column(
         children: [
-          // Filters
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            color: AppColors.white,
             child: Column(
               children: [
                 Row(
                   children: [
                     Expanded(
-                      child: Obx(() => _buildFilterDropdown(
-                        label: '${LK.paymentTypeLabel.tr}:',
-                        hint: LK.allTypes.tr,
-                        value: controller.historyFilterType.value?.name,
-                        items: controller.paymentTypes.map((t) => t.name).toList(),
-                        onChanged: (val) {
-                          if (val == null) {
-                            controller.historyFilterType.value = null;
-                          } else {
-                            controller.historyFilterType.value = controller.paymentTypes.firstWhere((t) => t.name == val);
-                          }
-                          controller.loadHistory(paymentTypeId: controller.historyFilterType.value?.id);
-                        },
-                      )),
+                      child: Obx(
+                        () => _buildFilterDropdown(
+                          label: '${LK.paymentTypeLabel.tr}:',
+                          hint: LK.allTypes.tr,
+                          value: controller.historyFilterType.value?.name,
+                          items: controller.paymentTypes
+                              .map((t) => t.name)
+                              .toList(),
+                          onChanged: (val) {
+                            if (val == null) {
+                              controller.historyFilterType.value = null;
+                            } else {
+                              controller.historyFilterType.value = controller
+                                  .paymentTypes
+                                  .firstWhere((t) => t.name == val);
+                            }
+                            controller.loadHistory(
+                              paymentTypeId:
+                                  controller.historyFilterType.value?.id,
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: _buildFilterDropdown(
                         label: '${LK.categoryLabel.tr}:',
                         hint: LK.allCategories.tr,
-                        items: [], // Simplified for now
+                        items: [],
                         onChanged: (val) {},
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 Row(
                   children: [
                     Expanded(
-                      child: Obx(() => _buildFilterDropdown(
-                        label: '${LK.yearLabel.tr}:',
-                        hint: '2025',
-                        value: controller.selectedYear.value.isEmpty ? null : controller.selectedYear.value,
-                        items: ['2025', '2024', '2023'],
-                        onChanged: (val) {
-                          controller.selectedYear.value = val ?? '';
-                          controller.loadHistory(year: int.tryParse(val ?? ''));
-                        },
-                      )),
+                      child: Obx(
+                        () => _buildFilterDropdown(
+                          label: '${LK.yearLabel.tr}:',
+                          hint: '2025',
+                          value: controller.selectedYear.value.isEmpty
+                              ? null
+                              : controller.selectedYear.value,
+                          items: ['2025', '2024', '2023'],
+                          onChanged: (val) {
+                            controller.selectedYear.value = val ?? '';
+                            controller.loadHistory(
+                              year: int.tryParse(val ?? ''),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Expanded(
-                      child: Obx(() => _buildFilterDropdown(
-                        label: '${LK.statusLabel.tr}:',
-                        hint: LK.all.tr,
-                        value: controller.selectedStatus.value,
-                        items: ['All', 'Success', 'Pending', 'Failed'],
-                        onChanged: (val) {
-                          controller.selectedStatus.value = val ?? 'All';
-                          controller.loadHistory(status: val);
-                        },
-                      )),
+                      child: Obx(
+                        () => _buildFilterDropdown(
+                          label: '${LK.statusLabel.tr}:',
+                          hint: LK.all.tr,
+                          value: controller.selectedStatus.value,
+                          items: ['All', 'Success', 'Pending', 'Failed'],
+                          onChanged: (val) {
+                            controller.selectedStatus.value = val ?? 'All';
+                            controller.loadHistory(status: val);
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
-          // List
           Expanded(
-            child: Obx(() => AppStateView(
-              state: controller.historyState.value,
-              onRetry: () => controller.loadHistory(),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.payments.length,
-                itemBuilder: (context, index) {
-                  final payment = controller.payments[index];
-                  return _PaymentCard(payment: payment);
-                },
+            child: Obx(
+              () => AppStateView(
+                state: controller.historyState.value,
+                onRetry: () => controller.loadHistory(),
+                child: ListView.builder(
+                  padding: EdgeInsets.all(16),
+                  itemCount: controller.payments.length,
+                  itemBuilder: (context, index) {
+                    final payment = controller.payments[index];
+                    return _PaymentCard(payment: payment);
+                  },
+                ),
               ),
-            )),
+            ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed<void>(AppRouter.makePayment),
-        backgroundColor: const Color(0xFF29B6F6),
+        backgroundColor: AppColors.info,
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: Icon(Icons.add, color: AppColors.white, size: 28),
       ),
     );
   }
@@ -142,27 +158,40 @@ class PaymentHistoryPage extends GetView<PaymentController> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
-        const SizedBox(width: 6),
+        SizedBox(width: 6.w),
         Expanded(
           child: Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            height: 32.h,
+            padding: EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: AppColors.grey.shade300),
               borderRadius: BorderRadius.circular(6),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 isExpanded: true,
                 value: value,
-                hint: Text(hint, style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
-                style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500),
-                icon: const Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black54),
+                hint: Text(
+                  hint,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.black87,
+                  ),
+                ),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.black87,
+                ),
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 16,
+                  color: AppColors.black54,
+                ),
                 items: [
                   DropdownMenuItem(value: null, child: Text(hint)),
-                  ...items.map((s) => DropdownMenuItem(value: s, child: Text(s))),
+                  ...items.map(
+                    (s) => DropdownMenuItem(value: s, child: Text(s)),
+                  ),
                 ],
                 onChanged: onChanged,
               ),
@@ -183,62 +212,58 @@ class _PaymentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconColor = _getIconColor(payment.title);
     final iconData = _getIconData(payment.title);
-    
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.grey.shade200),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(iconData, color: iconColor, size: 24),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   payment.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF0F172A),
-                    fontSize: 14,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.secondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Text(
                   '₹${payment.amount}  |  ${payment.date}',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.grey,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
                 Row(
                   children: [
                     Text(
                       '${payment.method}  |  ',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
                       ),
                     ),
                     Text(
-                      payment.status,
-                      style: TextStyle(
-                        color: payment.status.toLowerCase() == 'success' ? const Color(0xFF4CAF50) : Colors.orange,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
+                      payment.status.displayName,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: payment.status == PaymentStatus.success
+                            ? AppColors.success
+                            : AppColors.orange,
                       ),
                     ),
                   ],
@@ -247,27 +272,28 @@ class _PaymentCard extends StatelessWidget {
             ),
           ),
           OutlinedButton(
-            onPressed: () => Get.toNamed<void>(AppRouter.paymentReceipt, arguments: {'receiptId': payment.id}),
+            onPressed: () => Get.toNamed<void>(
+              AppRouter.paymentReceipt,
+              arguments: {'receiptId': payment.id},
+            ),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              side: const BorderSide(color: Color(0xFF29B6F6)),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              side: BorderSide(color: AppColors.info),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              minimumSize: const Size(0, 32),
+              minimumSize: Size(0, 32),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   LK.receipt.tr,
-                  style: const TextStyle(
-                    color: Color(0xFF29B6F6),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.info,
                   ),
                 ),
-                const Icon(Icons.chevron_right, size: 16, color: Color(0xFF29B6F6)),
+                Icon(Icons.chevron_right, size: 16, color: AppColors.info),
               ],
             ),
           ),
@@ -279,16 +305,22 @@ class _PaymentCard extends StatelessWidget {
   IconData _getIconData(String title) {
     if (title.toLowerCase().contains('life member')) return Icons.badge;
     if (title.toLowerCase().contains('membership')) return Icons.assignment;
-    if (title.toLowerCase().contains('donation')) return Icons.volunteer_activism;
+    if (title.toLowerCase().contains('donation')) {
+      return Icons.volunteer_activism;
+    }
     if (title.toLowerCase().contains('temple')) return Icons.account_balance;
     return Icons.receipt;
   }
 
   Color _getIconColor(String title) {
-    if (title.toLowerCase().contains('life member')) return Colors.orange.shade700;
-    if (title.toLowerCase().contains('membership')) return Colors.blue.shade700;
+    if (title.toLowerCase().contains('life member')) {
+      return AppColors.orange.shade700;
+    }
+    if (title.toLowerCase().contains('membership')) {
+      return AppColors.blue.shade700;
+    }
     if (title.toLowerCase().contains('donation')) return Colors.teal;
-    if (title.toLowerCase().contains('temple')) return const Color(0xFF1E293B);
-    return Colors.grey.shade700;
+    if (title.toLowerCase().contains('temple')) return AppColors.secondary;
+    return AppColors.grey.shade700;
   }
 }

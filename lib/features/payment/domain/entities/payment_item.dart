@@ -1,13 +1,38 @@
-class PaymentItem {
-  final int id;
-  final String title;
-  final String amount;
-  final String date;
-  final String method;
-  final String status;
-  final String type; // used to determine icon and color in UI
+enum PaymentStatus {
+  success,
+  pending,
+  failed,
+  unknown;
 
-  const PaymentItem({
+  static PaymentStatus fromString(String val) {
+    switch (val.toLowerCase()) {
+      case 'success':
+        return PaymentStatus.success;
+      case 'pending':
+        return PaymentStatus.pending;
+      case 'failed':
+        return PaymentStatus.failed;
+      default:
+        return PaymentStatus.unknown;
+    }
+  }
+
+  String get displayName {
+    switch (this) {
+      case PaymentStatus.success:
+        return 'Success';
+      case PaymentStatus.pending:
+        return 'Pending';
+      case PaymentStatus.failed:
+        return 'Failed';
+      case PaymentStatus.unknown:
+        return 'Unknown';
+    }
+  }
+}
+
+class PaymentItem {
+  PaymentItem({
     required this.id,
     required this.title,
     required this.amount,
@@ -24,8 +49,15 @@ class PaymentItem {
       amount: json['amount'] as String? ?? '',
       date: json['date'] as String? ?? '',
       method: json['method'] as String? ?? '',
-      status: json['status'] as String? ?? '',
+      status: PaymentStatus.fromString(json['status'] as String? ?? ''),
       type: json['type'] as String? ?? '',
     );
   }
+  final int id;
+  final String title;
+  final String amount;
+  final String date;
+  final String method;
+  final PaymentStatus status;
+  final String type;
 }

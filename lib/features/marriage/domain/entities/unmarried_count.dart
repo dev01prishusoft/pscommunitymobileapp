@@ -1,8 +1,4 @@
 class UnmarriedCount {
-  final int genderId;
-  final String genderName;
-  final int count;
-
   UnmarriedCount({
     required this.genderId,
     required this.genderName,
@@ -16,4 +12,7 @@ class UnmarriedCount {
       count: json['unMarriedCount'] as int? ?? 0,
     );
   }
+  final int genderId;
+  final String genderName;
+  final int count;
 }

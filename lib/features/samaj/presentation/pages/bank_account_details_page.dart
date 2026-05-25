@@ -1,4 +1,7 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -12,100 +15,94 @@ class BankAccountDetailsPage extends StatelessWidget {
     final bank = Get.arguments as BankAccount;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.bankAccountDetails.tr,
-          style: const TextStyle(
-            color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
         ),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(10.0),
         child: Column(
           children: [
-            // Bank Info Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
+                    color: AppColors.black.withValues(alpha: 0.02),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF002B5B),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.navyBlue,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.account_balance,
-                        color: Colors.white, size: 40),
+                    child: Icon(
+                      Icons.account_balance,
+                      color: AppColors.white,
+                      size: 40,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Text(
                     bank.bankName,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.headlineLarge.copyWith(
                       color: AppColors.secondary,
                     ),
                   ),
                   if (bank.isPrimary)
                     Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                      padding: EdgeInsets.only(top: 4.0),
                       child: Text(
                         LK.primaryAccount.tr,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF1B8D5E),
-                          fontWeight: FontWeight.bold,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.deepGreen,
                         ),
                       ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
-
-            // Details Section
+            SizedBox(height: 10.h),
             _buildDetailsCard([
-              _buildDetailItem(LK.accountHolderNameLabel.tr, bank.accountHolderName),
-              _buildDetailItem(LK.accountNumberLabel.tr, bank.accountNumber),
+              _buildDetailItem(
+                LK.accountHolderNameLabel.tr,
+                bank.accountHolderName,
+              ),
+              _buildDetailItem(LK.accountNumberLabel.tr, bank.accountNumber, showCopyAction: true),
               _buildDetailItem(LK.accountTypeLabel.tr, bank.accountType),
               _buildDetailItem(LK.bankNameLabel.tr, bank.bankName),
               _buildDetailItem(LK.branchNameLabel.tr, bank.branchName),
-              _buildDetailItem(LK.ifscCodeLabel.tr, bank.ifscCode),
+              _buildDetailItem(LK.ifscCodeLabel.tr, bank.ifscCode, showCopyAction: true),
               _buildDetailItem(LK.micrCodeLabel.tr, bank.micrCode),
               _buildDetailItem(LK.swiftCodeLabel.tr, bank.swiftCode),
               _buildDetailItem(LK.upiIdLabel.tr, bank.upiId),
             ]),
-            const SizedBox(height: 20),
-
-            // QR Code Section
+            SizedBox(height: 20.h),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
@@ -113,30 +110,31 @@ class BankAccountDetailsPage extends StatelessWidget {
                 children: [
                   Text(
                     LK.scanToPay.tr,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.titleLarge.copyWith(
                       color: AppColors.secondary,
-                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  // QR Placeholder
+                  SizedBox(height: 20.h),
                   Container(
-                    width: 180,
-                    height: 180,
-                    padding: const EdgeInsets.all(12),
+                    width: 180.w,
+                    height: 180.h,
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: AppColors.grey.shade200),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
-                      child: Icon(Icons.qr_code_2, size: 160, color: Colors.grey.shade800),
+                      child: Icon(
+                        Icons.qr_code_2,
+                        size: 160,
+                        color: AppColors.grey.shade800,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
           ],
         ),
       ),
@@ -146,21 +144,19 @@ class BankAccountDetailsPage extends StatelessWidget {
   Widget _buildDetailsCard(List<Widget> children) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
-  Widget _buildDetailItem(String label, String value) {
+  Widget _buildDetailItem(String label, String value, {bool showCopyAction = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -168,23 +164,49 @@ class BankAccountDetailsPage extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: const TextStyle(
+              style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.mutedForeground,
-                fontSize: 13,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Expanded(
             flex: 3,
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.right,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                ),
+                if (showCopyAction && value.isNotEmpty) ...[
+                  SizedBox(width: 4.w),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: value));
+                      Get.snackbar(
+                        LK.success.tr,
+                        '$label copied to clipboard',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: AppColors.primary,
+                        colorText: AppColors.white,
+                        margin: EdgeInsets.all(16),
+                      );
+                    },
+                    child: Icon(
+                      Icons.copy,
+                      size: 16.sp,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

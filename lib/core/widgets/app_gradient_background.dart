@@ -1,10 +1,10 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppGradientBackground extends StatelessWidget {
-  final Widget child;
-
   const AppGradientBackground({super.key, required this.child});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class AppGradientBackground extends StatelessWidget {
         Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFFFFFFFF), AppColors.accent],
               begin: Alignment.topCenter,
@@ -25,8 +25,8 @@ class AppGradientBackground extends StatelessWidget {
           top: -100,
           left: -100,
           child: Container(
-            width: 300,
-            height: 300,
+            width: 300.w,
+            height: 300.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.primary.withValues(alpha: 0.05),
@@ -37,8 +37,8 @@ class AppGradientBackground extends StatelessWidget {
           bottom: -50,
           right: -50,
           child: Container(
-            width: 200,
-            height: 200,
+            width: 200.w,
+            height: 200.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.primary.withValues(alpha: 0.08),

@@ -1,9 +1,4 @@
 class RazorpayOrder {
-  final String orderId;
-  final int amountInPaise;
-  final String currency;
-  final String keyId;
-
   RazorpayOrder({
     required this.orderId,
     required this.amountInPaise,
@@ -19,4 +14,8 @@ class RazorpayOrder {
       keyId: json['keyId'] as String? ?? '',
     );
   }
+  final String orderId;
+  final int amountInPaise;
+  final String currency;
+  final String keyId;
 }

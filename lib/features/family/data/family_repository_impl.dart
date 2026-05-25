@@ -9,7 +9,6 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
 
 class FamilyRepositoryImpl implements FamilyRepository {
-
   FamilyRepositoryImpl(this._apiClient);
   final ApiClient _apiClient;
 
@@ -20,7 +19,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
       '${ApiEndpoints.memberDetail}/$memberId',
       fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
     );
-    return response.data!;
+    return response.dataOrNull!.data!;
   }
 
   @override
@@ -28,9 +27,11 @@ class FamilyRepositoryImpl implements FamilyRepository {
     AppLogger.d('Member Address Request for ID: $memberId');
     final response = await _apiClient.getParsed<List<MemberAddress>>(
       '${ApiEndpoints.memberAddress}/$memberId',
-      fromJsonT: (json) => (json as List).map((e) => MemberAddress.fromJson(e as Map<String, dynamic>)).toList(),
+      fromJsonT: (json) => (json as List)
+          .map((e) => MemberAddress.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
-    return response.data ?? [];
+    return response.dataOrNull?.data ?? [];
   }
 
   @override
@@ -39,7 +40,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
       ApiEndpoints.stateDropdown,
       fromJsonT: (json) => _parseDropdownListData(json),
     );
-    return response.data ?? [];
+    return response.dataOrNull?.data ?? [];
   }
 
   @override
@@ -49,7 +50,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
       queryParameters: {'stateId': stateId},
       fromJsonT: (json) => _parseDropdownListData(json),
     );
-    return response.data ?? [];
+    return response.dataOrNull?.data ?? [];
   }
 
   @override
@@ -59,7 +60,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
       queryParameters: {'districtId': districtId},
       fromJsonT: (json) => _parseDropdownListData(json),
     );
-    return response.data ?? [];
+    return response.dataOrNull?.data ?? [];
   }
 
   List<DropdownItem> _parseDropdownListData(dynamic data) {
@@ -67,7 +68,9 @@ class FamilyRepositoryImpl implements FamilyRepository {
       data = data['data'] ?? data['items'] ?? [];
     }
     if (data is! List) return [];
-    return data.map((e) => DropdownItem.fromJson(e as Map<String, dynamic>)).toList();
+    return data
+        .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -87,7 +90,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     };
 
     AppLogger.d('Family Areas Request: $queryParameters');
-    
+
     try {
       final response = await _apiClient.getPaginated<FamilyArea>(
         ApiEndpoints.familyAreas,
@@ -95,7 +98,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         listKey: 'data',
         fromJsonT: (json) => FamilyArea.fromJson(json as Map<String, dynamic>),
       );
-      return response.data;
+      return response.dataOrNull?.data ?? [];
     } on Exception catch (e) {
       AppLogger.e('GetFamilyAreaForSamaj Error', e);
       rethrow;
@@ -103,7 +106,11 @@ class FamilyRepositoryImpl implements FamilyRepository {
   }
 
   @override
-  Future<List<Family>> getFamiliesByArea(int areaId, {int pageNo = 1, int pageSize = 20}) async {
+  Future<List<Family>> getFamiliesByArea(
+    int areaId, {
+    int pageNo = 1,
+    int pageSize = 20,
+  }) async {
     final queryParameters = <String, dynamic>{
       'areaId': areaId,
       'pageNumber': pageNo,
@@ -111,7 +118,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     };
 
     AppLogger.d('Families By Area Request: $queryParameters');
-    
+
     try {
       final response = await _apiClient.getPaginated<Family>(
         ApiEndpoints.getFamiliesByArea,
@@ -119,7 +126,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         listKey: 'families',
         fromJsonT: (json) => Family.fromJson(json as Map<String, dynamic>),
       );
-      return response.data;
+      return response.dataOrNull?.data ?? [];
     } on Exception catch (e) {
       AppLogger.e('GetFamiliesByArea Error', e);
       rethrow;

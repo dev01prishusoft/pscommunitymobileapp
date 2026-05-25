@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 
 class SplashController extends GetxController {
-  static const _splashDuration = Duration(milliseconds: 2500);
+  static final _splashDuration = Duration(milliseconds: 2500);
 
   Timer? _navigationTimer;
 
@@ -25,7 +25,6 @@ class SplashController extends GetxController {
   }
 
   void _navigateToHome() {
-    // Guard: only navigate if this controller is still active
     if (!isClosed) {
       Get.offNamed<void>(AppRouter.home);
     }

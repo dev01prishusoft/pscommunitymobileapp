@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -30,56 +32,51 @@ class _BusinessPageState extends State<BusinessPage> {
       appBar: AppBar(
         title: Text(
           LK.businessInfo.tr,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            letterSpacing: 0.5,
-          ),
+          style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white),
         ),
         centerTitle: false,
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
         ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(24),
-          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
         ),
       ),
       body: SafeArea(
-        child: Obx(() => AppStateView(
-          state: controller.state.value,
-          onRetry: controller.loadCategories,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.9,
+        child: Obx(
+          () => AppStateView(
+            state: controller.state.value,
+            onRetry: controller.loadCategories,
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.9,
+                ),
+                itemCount: controller.categories.length,
+                itemBuilder: (context, index) {
+                  final category = controller.categories[index];
+                  return _CategoryCard(category: category);
+                },
               ),
-              itemCount: controller.categories.length,
-              itemBuilder: (context, index) {
-                final category = controller.categories[index];
-                return _CategoryCard(category: category);
-              },
             ),
           ),
-        )),
+        ),
       ),
     );
   }
 }
 
 class _CategoryCard extends StatelessWidget {
-  final BusinessCategory category;
-
   const _CategoryCard({required this.category});
+  final BusinessCategory category;
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +88,9 @@ class _CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppColors.black.withValues(alpha: 0.05),
               blurRadius: 15,
-              offset: const Offset(0, 8),
+              offset: Offset(0, 8),
             ),
           ],
         ),
@@ -101,7 +98,7 @@ class _CategoryCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
@@ -112,16 +109,14 @@ class _CategoryCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
                 category.title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: AppTextStyles.labelLarge.copyWith(
                   color: AppColors.foreground,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
                   letterSpacing: 0.3,
                 ),
                 maxLines: 2,

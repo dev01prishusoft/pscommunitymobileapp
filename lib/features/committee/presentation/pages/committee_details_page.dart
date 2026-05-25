@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -29,14 +31,11 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        title: Text(
-          node.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        foregroundColor: AppColors.white,
+        title: Text(node.name, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
       ),
       body: Obx(
         () => AppStateView(
@@ -49,27 +48,24 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   }
 
   Widget _buildContent(CommitteeDetail? detail) {
-    if (detail == null) return const SizedBox.shrink();
+    if (detail == null) return SizedBox.shrink();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // COMMITTEE INFO Section
           _buildSection(
             title: LK.committeeInfo.tr,
             icon: Icons.account_balance,
             child: Column(
               children: [
                 _buildInfoRow(LK.nameLabel.tr, detail.name),
-                const Divider(height: 12, thickness: 0.5),
+                Divider(height: 12.h, thickness: 0.5),
                 _buildInfoRow(LK.descriptionLabel.tr, detail.description),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-
-          // ROLES Section
+          SizedBox(height: 16.h),
           if (detail.roles.isNotEmpty)
             _buildSection(
               title:
@@ -77,9 +73,9 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
               icon: Icons.verified_user,
               child: ListView.separated(
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: detail.roles.length,
-                separatorBuilder: (context, index) => const Divider(),
+                separatorBuilder: (context, index) => Divider(),
                 itemBuilder: (context, index) {
                   final role = detail.roles[index];
                   return _buildRoleTile(
@@ -91,9 +87,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                 },
               ),
             ),
-          const SizedBox(height: 16),
-
-          // MEMBERS Section
+          SizedBox(height: 16.h),
           _buildSection(
             title: '${LK.membersCount.tr} (${detail.members.length})',
             icon: Icons.groups,
@@ -101,15 +95,17 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
               children: [
                 if (detail.members.isEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: EdgeInsets.symmetric(vertical: 20),
                     child: Text(LK.noMembersFound.tr),
                   )
                 else
                   ListView.separated(
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: detail.members.length > 3 ? 3 : detail.members.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: detail.members.length > 3
+                        ? 3
+                        : detail.members.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 8.h),
                     itemBuilder: (context, index) {
                       final member = detail.members[index];
                       return _buildMemberTile(
@@ -117,13 +113,13 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         member.memberId,
                         member.name,
                         member.startDate?.split('T').first ?? '',
-                        '--', // Reports to not in API yet
+                        '--',
                         member.roleName,
                         '',
                       );
                     },
                   ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(
@@ -137,13 +133,12 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     children: [
                       Text(
                         LK.showMore.tr,
-                        style: const TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(
+                      SizedBox(width: 4.w),
+                      Icon(
                         Icons.arrow_forward,
                         size: 16,
                         color: AppColors.primary,
@@ -173,19 +168,22 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
     }
   }
 
-  Widget _buildSection(
-      {required String title, required IconData icon, required Widget child}) {
+  Widget _buildSection({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.02),
             blurRadius: 8,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -193,17 +191,15 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
                 Icon(icon, color: AppColors.primary, size: 24),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.titleLarge.copyWith(
                     color: AppColors.primary,
-                    fontSize: 16,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -211,7 +207,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: child,
           ),
         ],
@@ -221,27 +217,24 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 100.w,
             child: Text(
               label,
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.mutedForeground,
-                fontSize: 14,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: AppTextStyles.labelLarge.copyWith(
                 color: AppColors.secondary,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
               ),
             ),
           ),
@@ -251,37 +244,38 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   }
 
   Widget _buildRoleTile(
-      IconData icon, String title, String subtitle, int count) {
+    IconData icon,
+    String title,
+    String subtitle,
+    int count,
+  ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: AppColors.primary, size: 24),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.labelLarge.copyWith(
                     color: AppColors.secondary,
-                    fontSize: 15,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.mutedForeground,
-                    fontSize: 13,
                   ),
                 ),
               ],
@@ -298,21 +292,26 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
     String name,
     String since,
     String reportsTo,
-      String tag, String imageUrl) {
+    String tag,
+    String imageUrl,
+  ) {
     return InkWell(
       onTap: () {
-        Get.toNamed<void>(AppRouter.memberProfile, arguments: {'memberId': memberId});
+        Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': memberId},
+        );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            const CircleAvatar(
-              radius: 28,
+            CircleAvatar(
+              radius: 28.r,
               backgroundColor: AppColors.muted,
               child: Icon(Icons.person, color: AppColors.mutedForeground),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,47 +321,46 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     children: [
                       Text(
                         name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.secondary,
-                          fontSize: 15,
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                              color: AppColors.primary.withValues(alpha: 0.3)),
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Text(
                           tag,
-                          style: const TextStyle(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6.h),
                   RichText(
                     text: TextSpan(
-                      style: const TextStyle(
-                          color: AppColors.mutedForeground, fontSize: 12),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.mutedForeground,
+                      ),
                       children: [
                         TextSpan(text: '${LK.sinceColon.tr} '),
-                        TextSpan(
-                            text: since,
-                            style: const TextStyle(fontWeight: FontWeight.w600)),
-                        const TextSpan(text: '   |   '),
+                        TextSpan(text: since, style: AppTextStyles.labelLarge),
+                        TextSpan(text: '   |   '),
                         TextSpan(text: '${LK.reportsToColon.tr} '),
                         TextSpan(
-                            text: reportsTo,
-                            style: const TextStyle(fontWeight: FontWeight.w600)),
+                          text: reportsTo,
+                          style: AppTextStyles.labelLarge,
+                        ),
                       ],
                     ),
                   ),

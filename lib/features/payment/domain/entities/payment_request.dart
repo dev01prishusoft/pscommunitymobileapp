@@ -1,14 +1,4 @@
 class PaymentRequest {
-  final int id;
-  final String title;
-  final double amount;
-  final String amountFormatted;
-  final String dueDate;
-  final String dueDateRaw;
-  final int paymentTypeId;
-  final int paymentCategoryId;
-  final String icon;
-
   PaymentRequest({
     required this.id,
     required this.title,
@@ -34,4 +24,13 @@ class PaymentRequest {
       icon: json['icon'] as String? ?? 'general',
     );
   }
+  final int id;
+  final String title;
+  final double amount;
+  final String amountFormatted;
+  final String dueDate;
+  final String dueDateRaw;
+  final int paymentTypeId;
+  final int paymentCategoryId;
+  final String icon;
 }

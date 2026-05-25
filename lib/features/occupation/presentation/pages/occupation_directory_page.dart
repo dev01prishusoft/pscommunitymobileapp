@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -8,13 +10,14 @@ import 'package:pscommunitymobileapp/features/occupation/presentation/controller
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
   const OccupationDirectoryPage({super.key});
 
   @override
-  State<OccupationDirectoryPage> createState() => _OccupationDirectoryPageState();
+  State<OccupationDirectoryPage> createState() =>
+      _OccupationDirectoryPageState();
 }
 
 class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
@@ -31,7 +34,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       _controller.loadOccupations(refresh: false);
     }
   }
@@ -46,34 +50,27 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: Text(
-          LK.occupationDirectory.tr,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(LK.occupationDirectory.tr, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
         backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: AppColors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
         ),
       ),
       body: Column(
         children: [
-          // Search Bar
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: AppTextField(
               controller: _searchController,
               hint: LK.searchOccupation.tr,
               icon: Icons.search,
               onChanged: _controller.search,
               suffixIcon: IconButton(
-                icon: const Icon(Icons.close, size: 20),
+                icon: Icon(Icons.close, size: 20),
                 onPressed: () {
                   _searchController.clear();
                   _controller.clearSearch();
@@ -81,61 +78,63 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               ),
             ),
           ),
-
-          // Occupation Dropdown
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Obx(
               () => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
                   color: AppColors.muted.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: AppColors.border.withValues(alpha: 0.5),
                   ),
-              ),
-                child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  value: _controller.selectedOccupationType.value?.id ?? 0,
-                  isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
-                    style: const TextStyle(
-                      color: AppColors.foreground,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
-                  items: _controller.occupationTypes.map((type) {
-                    return DropdownMenuItem<int>(
-                      value: type.id,
-                        child: Text(type.text),
-                    );
-                  }).toList(),
-                  onChanged: (id) {
-                    final type = _controller.occupationTypes.firstWhere((t) => t.id == id);
-                    _controller.onOccupationTypeChanged(id == 0 ? null : type);
-                  },
                 ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: _controller.selectedOccupationType.value?.id ?? 0,
+                    isExpanded: true,
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.primary,
+                    ),
+                    style: AppTextStyles.titleSmall.copyWith(
+                      color: AppColors.foreground,
+                    ),
+                    items: _controller.occupationTypes.map((type) {
+                      return DropdownMenuItem<int>(
+                        value: type.id,
+                        child: Text(type.text),
+                      );
+                    }).toList(),
+                    onChanged: (id) {
+                      final type = _controller.occupationTypes.firstWhere(
+                        (t) => t.id == id,
+                      );
+                      _controller.onOccupationTypeChanged(
+                        id == 0 ? null : type,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
-
-          // Grid View
+          SizedBox(height: 16.h),
           Expanded(
-            child: Obx(() => AppStateView(
-              state: _controller.state.value,
-              onRetry: _controller.loadOccupations,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    Expanded(
+            child: Obx(
+              () => AppStateView(
+                state: _controller.state.value,
+                onRetry: _controller.loadOccupations,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      Expanded(
                         child: _controller.filteredOccupations.isEmpty
                             ? Padding(
-                                padding: const EdgeInsets.all(24.0),
+                                padding: EdgeInsets.all(24.0),
                                 child: AppEmptyState(
                                   icon: Icons.work_off_outlined,
                                   secondaryIcon: Icons.search,
@@ -146,7 +145,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                             : GridView.builder(
                                 controller: _scrollController,
                                 gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                    SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3,
                                       crossAxisSpacing: 12,
                                       mainAxisSpacing: 12,
@@ -160,16 +159,17 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                                   return _buildOccupationCard(occ);
                                 },
                               ),
-                    ),
-                    if (_controller.isNextPageLoading.value)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Center(child: CircularProgressIndicator()),
                       ),
-                  ],
+                      if (_controller.isNextPageLoading.value)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -184,14 +184,14 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: AppColors.black.withValues(alpha: 0.02),
               blurRadius: 4,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -199,17 +199,19 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             occ.logoUrl != null && occ.logoUrl!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: occ.logoUrl!,
-                    height: 40,
-                    width: 40,
+                ? CachedImg(
+                    url: occ.logoUrl!,
+                    height: 40.h,
+                    width: 40.w,
                     memCacheHeight: 120,
                     memCacheWidth: 120,
                     fit: BoxFit.contain,
-                    placeholder: (context, url) => const SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    placeholder: (context, url) => SizedBox(
+                      height: 40.h,
+                      width: 40.w,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
                     errorWidget: (context, url, error) => Icon(
                       _getIconData(occ.iconKey),
@@ -222,15 +224,13 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                     size: 40,
                     color: AppColors.primary,
                   ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              padding: EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
                 occ.name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.labelMedium.copyWith(
                   color: AppColors.secondary,
                 ),
                 maxLines: 2,

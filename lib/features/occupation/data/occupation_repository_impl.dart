@@ -6,9 +6,8 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 
 class OccupationRepositoryImpl implements OccupationRepository {
-
   OccupationRepositoryImpl(this._apiClient);
-  
+
   final ApiClient _apiClient;
 
   @override
@@ -31,9 +30,10 @@ class OccupationRepositoryImpl implements OccupationRepository {
         ApiEndpoints.occupations,
         queryParameters: queryParameters,
         listKey: 'occupations',
-        fromJsonT: (json) => OccupationItem.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            OccupationItem.fromJson(json as Map<String, dynamic>),
       );
-      return response.data;
+      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetOccupations Error', e, stack);
       return [];
@@ -44,9 +44,10 @@ class OccupationRepositoryImpl implements OccupationRepository {
   Future<OccupationItem> getOccupationDetails(int id) async {
     final response = await _apiClient.getParsed<OccupationItem>(
       '${ApiEndpoints.occupationDetail}/$id',
-      fromJsonT: (json) => OccupationItem.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) =>
+          OccupationItem.fromJson(json as Map<String, dynamic>),
     );
-    return response.data!;
+    return response.dataOrNull!.data!;
   }
 
   @override
@@ -56,7 +57,7 @@ class OccupationRepositoryImpl implements OccupationRepository {
         ApiEndpoints.occupationDropdown,
         fromJsonT: (json) => _parseDropdownListData(json),
       );
-      return response.data ?? [];
+      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetOccupationDropdown Error', e, stack);
       return [];
@@ -69,7 +70,9 @@ class OccupationRepositoryImpl implements OccupationRepository {
     if (rawData is List) {
       list = rawData;
     } else if (rawData is Map<String, dynamic>) {
-      list = (rawData['data'] ?? rawData['occupations'] ?? <dynamic>[]) as List? ?? [];
+      list =
+          (rawData['data'] ?? rawData['occupations'] ?? <dynamic>[]) as List? ??
+          [];
     }
 
     return list
@@ -77,4 +80,3 @@ class OccupationRepositoryImpl implements OccupationRepository {
         .toList();
   }
 }
-

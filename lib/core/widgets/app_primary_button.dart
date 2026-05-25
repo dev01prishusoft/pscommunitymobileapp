@@ -1,14 +1,9 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 
 class AppPrimaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final double? width;
-  final double height;
-
   const AppPrimaryButton({
     super.key,
     required this.text,
@@ -17,6 +12,11 @@ class AppPrimaryButton extends StatelessWidget {
     this.width,
     this.height = 56,
   });
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final double? width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class AppPrimaryButton extends StatelessWidget {
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.25),
               blurRadius: 12,
-              offset: const Offset(0, 6),
+              offset: Offset(0, 6),
             ),
         ],
       ),
@@ -38,7 +38,7 @@ class AppPrimaryButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.white,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -46,18 +46,14 @@ class AppPrimaryButton extends StatelessWidget {
           ),
         ),
         child: isLoading
-            ? const AppLoadingIndicator(
+            ? AppLoadingIndicator(
                 size: 20,
                 strokeWidth: 2,
-                color: Colors.white,
+                color: AppColors.white,
               )
             : Text(
                 text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
+                style: AppTextStyles.titleLarge.copyWith(letterSpacing: 0.5),
               ),
       ),
     );

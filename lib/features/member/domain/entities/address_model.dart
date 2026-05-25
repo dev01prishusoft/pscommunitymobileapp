@@ -1,15 +1,4 @@
 class AddressModel {
-  String type;
-  String state;
-  String district;
-  String taluka;
-  String area;
-  String pincode;
-  String line1;
-  String line2;
-  String landmark;
-  bool isPrimary;
-
   AddressModel({
     this.type = '',
     this.state = '',
@@ -22,6 +11,31 @@ class AddressModel {
     this.landmark = '',
     this.isPrimary = false,
   });
+
+  factory AddressModel.fromJson(Map<String, dynamic> json) {
+    return AddressModel(
+      type: json['type'] as String? ?? '',
+      state: json['state'] as String? ?? '',
+      district: json['district'] as String? ?? '',
+      taluka: json['taluka'] as String? ?? '',
+      area: json['area'] as String? ?? '',
+      pincode: json['pincode'] as String? ?? '',
+      line1: json['line1'] as String? ?? '',
+      line2: json['line2'] as String? ?? '',
+      landmark: json['landmark'] as String? ?? '',
+      isPrimary: json['isPrimary'] as bool? ?? false,
+    );
+  }
+  String type;
+  String state;
+  String district;
+  String taluka;
+  String area;
+  String pincode;
+  String line1;
+  String line2;
+  String landmark;
+  bool isPrimary;
 
   AddressModel copyWith({
     String? type,
@@ -46,21 +60,6 @@ class AddressModel {
       line2: line2 ?? this.line2,
       landmark: landmark ?? this.landmark,
       isPrimary: isPrimary ?? this.isPrimary,
-    );
-  }
-
-  factory AddressModel.fromJson(Map<String, dynamic> json) {
-    return AddressModel(
-      type: json['type'] as String? ?? '',
-      state: json['state'] as String? ?? '',
-      district: json['district'] as String? ?? '',
-      taluka: json['taluka'] as String? ?? '',
-      area: json['area'] as String? ?? '',
-      pincode: json['pincode'] as String? ?? '',
-      line1: json['line1'] as String? ?? '',
-      line2: json['line2'] as String? ?? '',
-      landmark: json['landmark'] as String? ?? '',
-      isPrimary: json['isPrimary'] as bool? ?? false,
     );
   }
 

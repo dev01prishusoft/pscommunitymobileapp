@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -6,14 +8,21 @@ import 'package:pscommunitymobileapp/features/payment/presentation/controllers/p
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 
-class MakePaymentPage extends GetView<PaymentController> {
+class MakePaymentPage extends StatefulWidget {
   const MakePaymentPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController amountController = TextEditingController();
-    
-    // Listen to enteredAmount changes to update the text field
+  State<MakePaymentPage> createState() => _MakePaymentPageState();
+}
+
+class _MakePaymentPageState extends State<MakePaymentPage> {
+  final controller = Get.find<PaymentController>();
+  late final TextEditingController amountController;
+
+  @override
+  void initState() {
+    super.initState();
+    amountController = TextEditingController();
     ever(controller.enteredAmount, (double val) {
       if (val > 0) {
         amountController.text = val.toStringAsFixed(0);
@@ -21,58 +30,63 @@ class MakePaymentPage extends GetView<PaymentController> {
         amountController.clear();
       }
     });
+  }
 
+  @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.makePayment.tr,
-          style: const TextStyle(
-            color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
         ),
         centerTitle: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(24.0),
         child: Column(
           children: [
-            // Payment Type Section
             _buildSectionHeader(LK.paymentTypeHeader.tr),
-            Obx(() => _buildDropdownField<PaymentType>(
-              hint: LK.selectPaymentType.tr,
-              value: controller.selectedType.value,
-              items: controller.paymentTypes,
-              onChanged: (type) => controller.onTypeChanged(type),
-              itemLabel: (type) => type.name,
-            )),
-            const SizedBox(height: 24),
-
-            // Category Section
+            Obx(
+              () => _buildDropdownField<PaymentType>(
+                hint: LK.selectPaymentType.tr,
+                value: controller.selectedType.value,
+                items: controller.paymentTypes,
+                onChanged: (type) => controller.onTypeChanged(type),
+                itemLabel: (type) => type.name,
+              ),
+            ),
+            SizedBox(height: 24.h),
             _buildSectionHeader(LK.categoryHeader.tr),
-            Obx(() => _buildDropdownField<PaymentCategory>(
-              hint: LK.selectCategory.tr,
-              value: controller.selectedCategory.value,
-              items: controller.categories,
-              onChanged: (cat) => controller.onCategoryChanged(cat),
-              itemLabel: (cat) => cat.name,
-              isEnabled: controller.selectedType.value != null,
-            )),
-            const SizedBox(height: 24),
-
-            // Amount Section
+            Obx(
+              () => _buildDropdownField<PaymentCategory>(
+                hint: LK.selectCategory.tr,
+                value: controller.selectedCategory.value,
+                items: controller.categories,
+                onChanged: (cat) => controller.onCategoryChanged(cat),
+                itemLabel: (cat) => cat.name,
+                isEnabled: controller.selectedType.value != null,
+              ),
+            ),
+            SizedBox(height: 24.h),
             _buildSectionHeader(LK.amountHeader.tr),
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
@@ -83,32 +97,28 @@ class MakePaymentPage extends GetView<PaymentController> {
                     children: [
                       Text(
                         LK.amountLabel.tr,
-                        style: const TextStyle(
+                        style: AppTextStyles.bodyLarge.copyWith(
                           color: AppColors.mutedForeground,
-                          fontSize: 16,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Text(
+                      SizedBox(width: 12.w),
+                      Text(
                         '₹',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                        style: AppTextStyles.displaySmall.copyWith(
                           color: AppColors.secondary,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: TextField(
                           controller: amountController,
                           keyboardType: TextInputType.number,
-                          onChanged: (val) => controller.enteredAmount.value = double.tryParse(val) ?? 0,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          onChanged: (val) => controller.enteredAmount.value =
+                              double.tryParse(val) ?? 0,
+                          style: AppTextStyles.displaySmall.copyWith(
                             color: AppColors.secondary,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: '0',
                           ),
@@ -116,24 +126,22 @@ class MakePaymentPage extends GetView<PaymentController> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
+                  Divider(),
+                  SizedBox(height: 12.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         LK.minAmountLabel.tr,
-                        style: const TextStyle(
+                        style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.mutedForeground,
-                          fontSize: 12,
                         ),
                       ),
                       Text(
                         LK.maxAmountLabel.tr,
-                        style: const TextStyle(
+                        style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.mutedForeground,
-                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -141,33 +149,31 @@ class MakePaymentPage extends GetView<PaymentController> {
                 ],
               ),
             ),
-            const SizedBox(height: 40),
-
-            // Pay Now Button
-            Obx(() => ElevatedButton(
-              onPressed: controller.isProcessingPayment.value 
-                  ? null 
-                  : () => controller.initiatePayment(),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            SizedBox(height: 40.h),
+            Obx(
+              () => ElevatedButton(
+                onPressed: controller.isProcessingPayment.value
+                    ? null
+                    : () => controller.initiatePayment(),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 56),
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
-                elevation: 0,
-              ),
-              child: controller.isProcessingPayment.value
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(
-                      LK.payNow.tr,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1,
+                child: controller.isProcessingPayment.value
+                    ? CircularProgressIndicator(color: AppColors.white)
+                    : Text(
+                        LK.payNow.tr,
+                        style: AppTextStyles.headlineSmall.copyWith(
+                          color: AppColors.white,
+                          letterSpacing: 1,
+                        ),
                       ),
-                    ),
-            )),
+              ),
+            ),
           ],
         ),
       ),
@@ -176,20 +182,20 @@ class MakePaymentPage extends GetView<PaymentController> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: EdgeInsets.only(bottom: 12.0),
       child: Row(
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: AppTextStyles.labelMedium.copyWith(
               color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
               letterSpacing: 1,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(child: Divider(color: AppColors.primary.withValues(alpha: 0.3))),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Divider(color: AppColors.primary.withValues(alpha: 0.3)),
+          ),
         ],
       ),
     );
@@ -204,22 +210,27 @@ class MakePaymentPage extends GetView<PaymentController> {
     bool isEnabled = true,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isEnabled ? Colors.white : Colors.grey[100],
+        color: isEnabled ? AppColors.white : AppColors.grey[100],
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: value,
-          hint: Text(hint, style: const TextStyle(color: AppColors.mutedForeground, fontSize: 14)),
+          hint: Text(
+            hint,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.mutedForeground,
+            ),
+          ),
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.secondary),
+          icon: Icon(Icons.keyboard_arrow_down, color: AppColors.secondary),
           items: items.map((T item) {
             return DropdownMenuItem<T>(
               value: item,
-              child: Text(itemLabel(item), style: const TextStyle(fontSize: 14)),
+              child: Text(itemLabel(item), style: AppTextStyles.bodyMedium),
             );
           }).toList(),
           onChanged: isEnabled ? onChanged : null,

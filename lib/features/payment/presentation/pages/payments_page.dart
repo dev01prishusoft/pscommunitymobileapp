@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -14,95 +16,91 @@ class PaymentsPage extends GetView<PaymentController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.payments.tr,
-          style: const TextStyle(
+          style: AppTextStyles.headlineMedium.copyWith(
             color: AppColors.secondary,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
           ),
         ),
         titleSpacing: 0,
         centerTitle: false,
       ),
-      body: Obx(() => AppStateView(
-            state: controller.dashboardState.value,
-            onRetry: controller.loadDashboard,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top section - Quick Actions
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildQuickActionButton(
-                          label: LK.makePayment.tr,
-                          icon: Icons.credit_card,
-                          color: const Color(0xFF29B6F6),
-                          onTap: () => Get.toNamed<void>(AppRouter.makePayment),
-                        ),
+      body: Obx(
+        () => AppStateView(
+          state: controller.dashboardState.value,
+          onRetry: controller.loadDashboard,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        label: LK.makePayment.tr,
+                        icon: Icons.credit_card,
+                        color: AppColors.info,
+                        onTap: () => Get.toNamed<void>(AppRouter.makePayment),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildQuickActionButton(
-                          label: LK.paymentHistory.tr,
-                          icon: Icons.history,
-                          color: const Color(0xFF4CAF50),
-                          onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
-                        ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        label: LK.paymentHistory.tr,
+                        icon: Icons.history,
+                        color: AppColors.success,
+                        onTap: () =>
+                            Get.toNamed<void>(AppRouter.paymentHistory),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Due Summary
-                  if (controller.dashboard.value != null) ...[
-                    _buildSectionHeader(LK.dueSummary.tr),
-                    const SizedBox(height: 12),
-                    _buildDueSummaryCard(),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Requested Payments
-                  if (controller.dashboard.value?.pendingPayments.isNotEmpty ?? false) ...[
-                    _buildSectionHeader(
-                      LK.requestedPayments.tr,
-                      subtitle: '(${LK.adminSent.tr})',
-                    ),
-                    const SizedBox(height: 12),
-                    ...controller.dashboard.value!.pendingPayments.map(
-                      (req) => _buildPaymentRequestCard(req),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // Paid Payments
-                  if (controller.dashboard.value?.paidPayments.isNotEmpty ?? false) ...[
-                    _buildSectionHeader(
-                      LK.requestedPaymentsPaid.tr,
-                      subtitle: '(${LK.adminSent.tr})',
-                      icon: Icons.check_circle,
-                      iconColor: AppColors.success,
-                    ),
-                    const SizedBox(height: 12),
-                    ...controller.dashboard.value!.paidPayments.map(
-                      (req) => _buildPaidPaymentCard(req),
                     ),
                   ],
+                ),
+                SizedBox(height: 24.h),
+                if (controller.dashboard.value != null) ...[
+                  _buildSectionHeader(LK.dueSummary.tr),
+                  SizedBox(height: 12.h),
+                  _buildDueSummaryCard(),
+                  SizedBox(height: 24.h),
                 ],
-              ),
+                if (controller.dashboard.value?.pendingPayments.isNotEmpty ??
+                    false) ...[
+                  _buildSectionHeader(
+                    LK.requestedPayments.tr,
+                    subtitle: '(${LK.adminSent.tr})',
+                  ),
+                  SizedBox(height: 12.h),
+                  ...controller.dashboard.value!.pendingPayments.map(
+                    (req) => _buildPaymentRequestCard(req),
+                  ),
+                  SizedBox(height: 24.h),
+                ],
+                if (controller.dashboard.value?.paidPayments.isNotEmpty ??
+                    false) ...[
+                  _buildSectionHeader(
+                    LK.requestedPaymentsPaid.tr,
+                    subtitle: '(${LK.adminSent.tr})',
+                    icon: Icons.check_circle,
+                    iconColor: AppColors.success,
+                  ),
+                  SizedBox(height: 12.h),
+                  ...controller.dashboard.value!.paidPayments.map(
+                    (req) => _buildPaidPaymentCard(req),
+                  ),
+                ],
+              ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -116,7 +114,7 @@ class PaymentsPage extends GetView<PaymentController> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           border: Border.all(color: color.withValues(alpha: 0.5)),
           borderRadius: BorderRadius.circular(12),
@@ -125,14 +123,10 @@ class PaymentsPage extends GetView<PaymentController> {
         child: Column(
           children: [
             Icon(icon, color: color, size: 28),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(
               label.toUpperCase(),
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+              style: AppTextStyles.labelMedium.copyWith(color: color),
             ),
           ],
         ),
@@ -140,29 +134,27 @@ class PaymentsPage extends GetView<PaymentController> {
     );
   }
 
-  Widget _buildSectionHeader(String title, {String? subtitle, IconData? icon, Color? iconColor}) {
+  Widget _buildSectionHeader(
+    String title, {
+    String? subtitle,
+    IconData? icon,
+    Color? iconColor,
+  }) {
     return Row(
       children: [
         if (icon != null) ...[
           Icon(icon, size: 20, color: iconColor),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
         ],
         Text(
           title.toUpperCase(),
-          style: const TextStyle(
-            color: Color(0xFF29B6F6),
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-          ),
+          style: AppTextStyles.labelMedium.copyWith(color: AppColors.info),
         ),
         if (subtitle != null) ...[
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Text(
             subtitle,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
           ),
         ],
       ],
@@ -172,9 +164,9 @@ class PaymentsPage extends GetView<PaymentController> {
   Widget _buildDueSummaryCard() {
     final dash = controller.dashboard.value!;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
@@ -186,35 +178,31 @@ class PaymentsPage extends GetView<PaymentController> {
             children: [
               Text(
                 LK.totalDue.tr,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.h),
               Text(
                 '₹${dash.totalDue}',
-                style: const TextStyle(
-                  color: Color(0xFFE53935),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 22,
+                style: AppTextStyles.headlineLarge.copyWith(
+                  color: AppColors.destructive,
                 ),
               ),
             ],
           ),
           if (dash.totalDue > 0)
             ElevatedButton(
-              onPressed: () => controller.initiatePayment(customAmount: dash.totalDue),
+              onPressed: () =>
+                  controller.initiatePayment(customAmount: dash.totalDue),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF29B6F6),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.info,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
-              child: Text(LK.payAll.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
+              child: Text(LK.payAll.tr, style: AppTextStyles.labelLarge),
             ),
         ],
       ),
@@ -223,52 +211,51 @@ class PaymentsPage extends GetView<PaymentController> {
 
   Widget _buildPaymentRequestCard(PaymentRequest req) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: _getIconColor(req.title).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(_getIconData(req.title), color: _getIconColor(req.title)),
+            child: Icon(
+              _getIconData(req.title),
+              color: _getIconColor(req.title),
+            ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   req.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xFF0F172A),
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.secondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Row(
                   children: [
                     Text(
                       req.amountFormatted,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Text(
                       '${LK.dueLabel.tr} ${req.dueDate}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFE53935),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.destructive,
                       ),
                     ),
                   ],
@@ -277,14 +264,17 @@ class PaymentsPage extends GetView<PaymentController> {
             ),
           ),
           GestureDetector(
-            onTap: () => controller.initiatePayment(adminPaymentRequestId: req.id),
+            onTap: () =>
+                controller.initiatePayment(adminPaymentRequestId: req.id),
             child: Row(
               children: [
                 Text(
                   LK.payNowButton.tr,
-                  style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF29B6F6), fontSize: 13),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.info,
+                  ),
                 ),
-                const Icon(Icons.chevron_right, size: 16, color: Color(0xFF29B6F6)),
+                Icon(Icons.chevron_right, size: 16, color: AppColors.info),
               ],
             ),
           ),
@@ -295,45 +285,41 @@ class PaymentsPage extends GetView<PaymentController> {
 
   Widget _buildPaidPaymentCard(PaidPaymentRequest req) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
-          const Icon(Icons.check_circle, color: AppColors.success),
-          const SizedBox(width: 16),
+          Icon(Icons.check_circle, color: AppColors.success),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   req.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xFF0F172A),
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.secondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Row(
                   children: [
                     Text(
                       req.amountFormatted,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Text(
                       '${LK.paidLabel.tr} ${req.paidDate}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF4CAF50),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.success,
                       ),
                     ),
                   ],
@@ -342,14 +328,19 @@ class PaymentsPage extends GetView<PaymentController> {
             ),
           ),
           GestureDetector(
-            onTap: () => Get.toNamed<void>(AppRouter.paymentReceipt, arguments: {'receiptId': req.receiptId}),
+            onTap: () => Get.toNamed<void>(
+              AppRouter.paymentReceipt,
+              arguments: {'receiptId': req.receiptId},
+            ),
             child: Row(
               children: [
                 Text(
                   LK.receipt.tr,
-                  style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF29B6F6), fontSize: 13),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.info,
+                  ),
                 ),
-                const Icon(Icons.chevron_right, size: 16, color: Color(0xFF29B6F6)),
+                Icon(Icons.chevron_right, size: 16, color: AppColors.info),
               ],
             ),
           ),
@@ -367,10 +358,12 @@ class PaymentsPage extends GetView<PaymentController> {
   }
 
   Color _getIconColor(String type) {
-    if (type.toLowerCase().contains('life member')) return Colors.orange.shade700;
-    if (type.toLowerCase().contains('membership')) return Colors.blueGrey;
+    if (type.toLowerCase().contains('life member')) {
+      return AppColors.orange.shade700;
+    }
+    if (type.toLowerCase().contains('membership')) return AppColors.blueGrey;
     if (type.toLowerCase().contains('donation')) return Colors.teal;
-    if (type.toLowerCase().contains('temple')) return const Color(0xFF1E293B);
-    return Colors.grey.shade700;
+    if (type.toLowerCase().contains('temple')) return AppColors.secondary;
+    return AppColors.grey.shade700;
   }
 }

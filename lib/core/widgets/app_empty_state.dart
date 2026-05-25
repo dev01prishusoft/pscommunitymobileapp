@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 
 class AppEmptyState extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final IconData? secondaryIcon;
-  final Widget? actionButton;
-
   const AppEmptyState({
     super.key,
     required this.icon,
@@ -16,12 +12,17 @@ class AppEmptyState extends StatelessWidget {
     this.secondaryIcon,
     this.actionButton,
   });
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final IconData? secondaryIcon;
+  final Widget? actionButton;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20.0),
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl, horizontal: AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(16),
@@ -34,40 +35,38 @@ class AppEmptyState extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Icon(
-                icon, 
-                size: 80, 
-                color: AppColors.primary.withOpacity(0.15)
+                icon,
+                size: 80,
+                color: AppColors.primary.withValues(alpha: 0.15),
               ),
               if (secondaryIcon != null)
                 Positioned(
                   top: 10,
-                  child: Icon(secondaryIcon, size: 40, color: AppColors.primary),
+                  child: Icon(
+                    secondaryIcon,
+                    size: 40,
+                    color: AppColors.primary,
+                  ),
                 ),
             ],
           ),
-          const SizedBox(height: 16),
+          AppSpacing.vL,
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.headlineSmall.copyWith(
               color: AppColors.secondary,
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.vS,
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.mutedForeground,
             ),
           ),
-          if (actionButton != null) ...[
-            const SizedBox(height: 24),
-            actionButton!,
-          ],
+          if (actionButton != null) ...[AppSpacing.vXxl, actionButton!],
         ],
       ),
     );

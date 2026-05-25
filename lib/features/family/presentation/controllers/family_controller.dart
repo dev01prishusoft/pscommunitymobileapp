@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
@@ -10,32 +11,25 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
 
 class FamilyController extends GetxController {
-
   FamilyController(this._repository);
   final FamilyRepository _repository;
 
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<FamilyArea> areas = <FamilyArea>[].obs;
   final RxList<Family> families = <Family>[].obs;
-  
+
   final Rx<AppState> familyListState = AppState.loading.obs;
   final Rx<AppState> memberDetailState = AppState.loading.obs;
   final Rxn<Member> selectedMember = Rxn<Member>();
   final RxList<MemberAddress> memberAddresses = <MemberAddress>[].obs;
-  
+
   final RxBool filtersExpanded = true.obs;
-  
-  // Loading States
   final RxBool isStatesLoading = false.obs;
   final RxBool isDistrictsLoading = false.obs;
   final RxBool isTalukasLoading = false.obs;
-
-  // Dropdown Lists
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
-
-  // Selected Values
   final Rxn<DropdownItem> selectedState = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
@@ -82,7 +76,9 @@ class FamilyController extends GetxController {
       try {
         await Future.wait([
           loadAreas(),
-          _repository.getDistricts(state.id).then((results) => districts.assignAll(results))
+          _repository
+              .getDistricts(state.id)
+              .then((results) => districts.assignAll(results)),
         ]);
       } catch (e) {
         AppLogger.e('Failed to load districts', e);
@@ -104,7 +100,9 @@ class FamilyController extends GetxController {
       try {
         await Future.wait([
           loadAreas(),
-          _repository.getTalukas(district.id).then((results) => talukas.assignAll(results))
+          _repository
+              .getTalukas(district.id)
+              .then((results) => talukas.assignAll(results)),
         ]);
       } catch (e) {
         AppLogger.e('Failed to load talukas', e);
@@ -118,7 +116,6 @@ class FamilyController extends GetxController {
 
   void onTalukaChanged(DropdownItem? taluka) {
     selectedTaluka.value = taluka;
-    // Refresh list with new filter
     loadAreas();
   }
 
@@ -138,7 +135,11 @@ class FamilyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debounce(memberSearchQuery, (_) => _filterFamilies(), time: const Duration(milliseconds: 300));
+    debounce(
+      memberSearchQuery,
+      (_) => _filterFamilies(),
+      time: Duration(milliseconds: 300),
+    );
   }
 
   void _filterFamilies() {
@@ -146,20 +147,28 @@ class FamilyController extends GetxController {
       filteredFamilies.assignAll(families);
       return;
     }
-    
+
     final query = memberSearchQuery.value.toLowerCase();
-    final results = families.map((family) {
-      final matchingMembers = family.members.where((member) {
-        final name = member.name.toLowerCase();
-        final mobile = member.mobileNo?.toLowerCase() ?? '';
-        final memberId = member.id.toLowerCase();
-        return name.contains(query) || mobile.contains(query) || memberId.contains(query);
-      }).toList();
-      
-      if (matchingMembers.isEmpty) return null;
-      return Family(familyName: family.familyName, members: matchingMembers);
-    }).whereType<Family>().toList();
-    
+    final results = families
+        .map((family) {
+          final matchingMembers = family.members.where((member) {
+            final name = member.name.toLowerCase();
+            final mobile = member.mobileNo?.toLowerCase() ?? '';
+            final memberId = member.id.toLowerCase();
+            return name.contains(query) ||
+                mobile.contains(query) ||
+                memberId.contains(query);
+          }).toList();
+
+          if (matchingMembers.isEmpty) return null;
+          return Family(
+            familyName: family.familyName,
+            members: matchingMembers,
+          );
+        })
+        .whereType<Family>()
+        .toList();
+
     filteredFamilies.assignAll(results);
   }
 
@@ -199,7 +208,7 @@ class FamilyController extends GetxController {
 
         if (areas.isEmpty) {
           state.value = AppState.empty;
-      } else {
+        } else {
           state.value = AppState.data;
         }
 
@@ -237,8 +246,10 @@ class FamilyController extends GetxController {
     try {
       final results = await _repository.getFamiliesByArea(areaId);
       families.assignAll(results);
-      _filterFamilies(); // Apply initial filter
-      familyListState.value = filteredFamilies.isEmpty ? AppState.empty : AppState.data;
+      _filterFamilies();
+      familyListState.value = filteredFamilies.isEmpty
+          ? AppState.empty
+          : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load families for areaId: $areaId', e, stack);
       familyListState.value = AppState.error;
@@ -252,6 +263,42 @@ class FamilyController extends GetxController {
     districts.clear();
     talukas.clear();
     await loadAreas();
+  }
+
+  String formatGender(Member member) => (member.genderName ?? LK.na).tr;
+  String formatBloodGroup(Member member) => member.bloodGroupName ?? LK.na;
+  String formatHeight(Member member) => '${member.height ?? 0} cm';
+  String formatWeight(Member member) => '${member.weight ?? 0} kg';
+  String formatMotherFather(Member member) => member.motherFatherName ?? LK.na;
+  String formatOccupation(Member member) =>
+      member.occupationName ?? member.occupationTypeName ?? LK.na;
+  String formatOccupationArea(Member member) =>
+      member.occupationAreaName ?? LK.na;
+  String formatMaritalStatus(Member member) =>
+      (member.maritalStatusName ?? LK.na).tr;
+  String formatMobileNo(Member member) => member.mobileNo ?? LK.na;
+  String formatEmergencyContact(Member member) =>
+      member.emergencyContactNo ?? LK.na;
+  String formatGotra(Member member) => member.gotraName ?? LK.na;
+  String formatEmail(Member member) => member.emailAddress ?? LK.na;
+  String formatIncome(Member member) => '₹${member.monthlyIncome ?? 0}';
+
+  Future<void> launchSafeUrl(String urlString) async {
+    try {
+      final Uri url = Uri.parse(urlString);
+      if (urlString.startsWith('tel:')) {
+        final String number = urlString.replaceFirst('tel:', '');
+        final Uri telUri = Uri(scheme: 'tel', path: number);
+        if (await canLaunchUrl(telUri)) {
+          await launchUrl(telUri);
+        }
+      } else {
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        }
+      }
+    } catch (e) {
+    }
   }
 
   String getFormattedDateOfBirth(Member member) {

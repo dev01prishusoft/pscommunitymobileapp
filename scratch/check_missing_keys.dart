@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
 import 'dart:io';
 
@@ -32,8 +33,12 @@ void main() {
   }
 
   print('Missing in en_US.json: ${missingEn.length}');
-  for (final key in missingEn) print('  - $key');
+  for (final key in missingEn) {
+    print('  - $key');
+  }
 
   print('\nMissing in gu_IN.json: ${missingGu.length}');
-  for (final key in missingGu) print('  - $key');
+  for (final key in missingGu) {
+    print('  - $key');
+  }
 }

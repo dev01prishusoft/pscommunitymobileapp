@@ -1,11 +1,12 @@
+// ignore_for_file: avoid_print
 import 'dart:io';
-import '../lib/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 void main() {
   final keys = LK.allValues;
   final seen = <String>{};
   bool hasDuplicates = false;
-  
+
   for (final key in keys) {
     if (seen.contains(key)) {
       print('Duplicate: $key');
@@ -13,7 +14,7 @@ void main() {
     }
     seen.add(key);
   }
-  
+
   if (hasDuplicates) {
     exit(1);
   } else {

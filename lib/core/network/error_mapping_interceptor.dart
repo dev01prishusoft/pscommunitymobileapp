@@ -11,13 +11,13 @@ class ErrorMappingInterceptor extends Interceptor {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        failure = const TimeoutFailure();
+        failure = TimeoutFailure();
         break;
       case DioExceptionType.badResponse:
         final status = err.response?.statusCode;
         final data = err.response?.data;
         String? apiMessage;
-        
+
         if (data is Map<String, dynamic>) {
           apiMessage = _extractMessage(data);
         }
@@ -44,21 +44,22 @@ class ErrorMappingInterceptor extends Interceptor {
           final socketErr = err.error as SocketException;
           failure = NetworkFailure('Network Error: ${socketErr.message}');
         } else if (err.error is HandshakeException) {
-          failure = const CertificatePinningFailure();
+          failure = CertificatePinningFailure();
         } else {
-          failure = ServerFailure(err.message ?? 'An unexpected error occurred');
+          failure = ServerFailure(
+            err.message ?? 'An unexpected error occurred',
+          );
         }
         break;
       default:
-        failure = const ServerFailure();
+        failure = ServerFailure();
     }
-
-    // Pass the typed failure forward as the error
     handler.next(err.copyWith(error: failure));
   }
 
   String? _extractMessage(Map<String, dynamic> data) {
-    final msg = data['message'] ?? data['Message'] ?? data['error'] ?? data['Error'];
+    final msg =
+        data['message'] ?? data['Message'] ?? data['error'] ?? data['Error'];
     if (msg is String && msg.isNotEmpty) {
       return msg;
     }

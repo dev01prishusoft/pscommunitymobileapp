@@ -10,7 +10,7 @@ class PrivacyPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(LK.privacyPolicy.tr)),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Text(LK.privacyContent.tr),
       ),
     );

@@ -117,12 +117,10 @@ class OccupationController extends GetxController {
 
   void search(String query) {
     searchQuery.value = query;
-    // loadOccupations is called via debounce
   }
 
   void clearSearch() {
+    if (searchQuery.value.isEmpty) return;
     searchQuery.value = '';
-    filteredOccupations.assignAll(occupations);
-    state.value = occupations.isEmpty ? AppState.empty : AppState.data;
   }
 }

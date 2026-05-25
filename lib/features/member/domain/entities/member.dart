@@ -1,57 +1,7 @@
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class Member {
-  final int memberId;
-  final String? memberNo;
-  final String firstName;
-  final String? middleName;
-  final String lastName;
-  final String? fullNameSearchText;
-  final String? dateOfBirth;
-  final String? dateOfBirthTime;
-  final int? weight;
-  final int? height;
-  final String? mobileNo;
-  final String? secondaryMobile;
-  final String? emailAddress;
-  final String? genderName;
-  final String? maritalStatusName;
-  final String? bloodGroupName;
-  final bool? isLookingforMarriage;
-  final String? jobPositionName;
-  final String? otherJobPosition;
-  final int? monthlyIncome;
-  final bool? isOwnLand;
-  final bool? isOwnHouse;
-  final bool? hasTwoWheeler;
-  final bool? hasFourWheeler;
-  final String? emergencyContactNo;
-  final String? emergencyContactName;
-  final String? facebookUrl;
-  final String? whatsappUrl;
-  final String? instagramUrl;
-  final String? twitterUrl;
-  final String? profilePhotoFullUrl;
-  final String? gotraName;
-  final String? motherFatherName;
-  final String? occupationTypeName;
-  final String? occupationName;
-  final String? otherOccupation;
-  final String? occupationDescription;
-  final String? companyName;
-  final String? businessName;
-  final String? occupationTalukaName;
-  final String? occupationDistrictName;
-  final String? occupationStateName;
-  final String? occupationAreaName;
-  final String? occupationAddressLine1;
-  final String? occupationAddressLine2;
-  final String? occupationLandmark;
-  final String? occupationPincode;
-  final int? familyId;
-  final int? apiAge;
-
-  const Member({
+  Member({
     required this.memberId,
     this.memberNo,
     required this.firstName,
@@ -69,6 +19,7 @@ class Member {
     this.maritalStatusName,
     this.bloodGroupName,
     this.isLookingforMarriage,
+    this.educationName,
     this.jobPositionName,
     this.otherJobPosition,
     this.monthlyIncome,
@@ -103,30 +54,18 @@ class Member {
     this.apiAge,
   });
 
-  String get fullName => '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();
-  String get name => fullName;
-  String get gender => genderName ?? '';
-  String get occupation => occupationName ?? occupationTypeName ?? '';
-  String get area => occupationAreaName ?? '';
-  String get gotra => gotraName ?? '';
-  int get age {
-    if (dateOfBirth == null) return apiAge ?? 0;
-    try {
-      final dob = DateTime.parse(dateOfBirth!);
-      final now = DateTime.now();
-      int ageCount = now.year - dob.year;
-      if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
-        ageCount--;
-      }
-      return ageCount;
-    } catch (_) {
-      return apiAge ?? 0;
-    }
-  }
-
   factory Member.fromJson(Map<String, dynamic> json) {
-    String? getString(String key, [String? fallbackKey, String? fallbackKey2, String? fallbackKey3]) {
-      final val = json[key] ?? json[fallbackKey] ?? json[fallbackKey2] ?? json[fallbackKey3];
+    String? getString(
+      String key, [
+      String? fallbackKey,
+      String? fallbackKey2,
+      String? fallbackKey3,
+    ]) {
+      final val =
+          json[key] ??
+          json[fallbackKey] ??
+          json[fallbackKey2] ??
+          json[fallbackKey3];
       if (val == null) return null;
       final s = val.toString().trim();
       return s.isEmpty ? null : s;
@@ -135,14 +74,24 @@ class Member {
     final String fullName = getString('memberName', 'name', 'fullName') ?? '';
     final List<String> nameParts = fullName.split(' ');
     final String fallbackFirst = nameParts.isNotEmpty ? nameParts[0] : '';
-    final String fallbackLast = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    final String fallbackLast = nameParts.length > 1
+        ? nameParts.sublist(1).join(' ')
+        : '';
     final int fallbackAge = (json['age'] as num?)?.toInt() ?? 0;
 
-    final String? profilePhoto = getString('profilePhotoFullUrl', 'memberProfileUrl', 'profileUrl');
+    final String? profilePhoto = getString(
+      'profilePhotoFullUrl',
+      'memberProfileUrl',
+      'profileUrl',
+    );
     String? fullProfileUrl = profilePhoto;
-    if (fullProfileUrl != null && fullProfileUrl.isNotEmpty && !fullProfileUrl.startsWith('http')) {
+    if (fullProfileUrl != null &&
+        fullProfileUrl.isNotEmpty &&
+        !fullProfileUrl.startsWith('http')) {
       final baseUrl = AppEnvironment.I.apiBaseUrl;
-      fullProfileUrl = fullProfileUrl.startsWith('/') ? '$baseUrl$fullProfileUrl' : '$baseUrl/$fullProfileUrl';
+      fullProfileUrl = fullProfileUrl.startsWith('/')
+          ? '$baseUrl$fullProfileUrl'
+          : '$baseUrl/$fullProfileUrl';
     }
 
     return Member(
@@ -161,9 +110,18 @@ class Member {
       secondaryMobile: getString('secondaryMobile'),
       emailAddress: getString('emailAddress'),
       genderName: getString('genderName', 'gender'),
-      maritalStatusName: getString('maritalStatusName', 'maritalStatus', 'marritalStatus'),
+      maritalStatusName: getString(
+        'maritalStatusName',
+        'maritalStatus',
+        'marritalStatus',
+      ),
       bloodGroupName: getString('bloodGroupName'),
-      isLookingforMarriage: (json['isLookingforMarriage'] ?? json['LookingforMarriage'] ?? json['isLookingForMarriage']) as bool?,
+      isLookingforMarriage:
+          (json['isLookingforMarriage'] ??
+                  json['LookingforMarriage'] ??
+                  json['isLookingForMarriage'])
+              as bool?,
+      educationName: getString('educationName', 'educationalQualification', 'education'),
       jobPositionName: getString('jobPositionName'),
       otherJobPosition: getString('otherJobPosition'),
       monthlyIncome: (json['monthlyIncome'] as num?)?.toInt(),
@@ -186,15 +144,99 @@ class Member {
       occupationDescription: getString('occupationDescription'),
       companyName: getString('companyName'),
       businessName: getString('businessName'),
-      occupationTalukaName: getString('occupationTalukaName', 'memberTalukaName', 'talukaName'),
-      occupationDistrictName: getString('occupationDistrictName', 'districtName'),
+      occupationTalukaName: getString(
+        'occupationTalukaName',
+        'memberTalukaName',
+        'talukaName',
+      ),
+      occupationDistrictName: getString(
+        'occupationDistrictName',
+        'districtName',
+      ),
       occupationStateName: getString('occupationStateName', 'stateName'),
-      occupationAreaName: getString('occupationAreaName', 'memberAreaName', 'areaName'),
+      occupationAreaName: getString(
+        'occupationAreaName',
+        'memberAreaName',
+        'areaName',
+      ),
       occupationAddressLine1: getString('occupationAddressLine1'),
       occupationAddressLine2: getString('occupationAddressLine2'),
       occupationLandmark: getString('occupationLandmark'),
       occupationPincode: getString('occupationPincode'),
       familyId: json['familyId'] as int?,
     );
+  }
+  final int memberId;
+  final String? memberNo;
+  final String firstName;
+  final String? middleName;
+  final String lastName;
+  final String? fullNameSearchText;
+  final String? dateOfBirth;
+  final String? dateOfBirthTime;
+  final int? weight;
+  final int? height;
+  final String? mobileNo;
+  final String? secondaryMobile;
+  final String? emailAddress;
+  final String? genderName;
+  final String? maritalStatusName;
+  final String? bloodGroupName;
+  final bool? isLookingforMarriage;
+  final String? educationName;
+  final String? jobPositionName;
+  final String? otherJobPosition;
+  final int? monthlyIncome;
+  final bool? isOwnLand;
+  final bool? isOwnHouse;
+  final bool? hasTwoWheeler;
+  final bool? hasFourWheeler;
+  final String? emergencyContactNo;
+  final String? emergencyContactName;
+  final String? facebookUrl;
+  final String? whatsappUrl;
+  final String? instagramUrl;
+  final String? twitterUrl;
+  final String? profilePhotoFullUrl;
+  final String? gotraName;
+  final String? motherFatherName;
+  final String? occupationTypeName;
+  final String? occupationName;
+  final String? otherOccupation;
+  final String? occupationDescription;
+  final String? companyName;
+  final String? businessName;
+  final String? occupationTalukaName;
+  final String? occupationDistrictName;
+  final String? occupationStateName;
+  final String? occupationAreaName;
+  final String? occupationAddressLine1;
+  final String? occupationAddressLine2;
+  final String? occupationLandmark;
+  final String? occupationPincode;
+  final int? familyId;
+  final int? apiAge;
+
+  String get fullName =>
+      '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();
+  String get name => fullName;
+  String get gender => genderName ?? '';
+  String get occupation => occupationName ?? occupationTypeName ?? '';
+  String get area => occupationAreaName ?? '';
+  String get gotra => gotraName ?? '';
+  int get age {
+    if (dateOfBirth == null) return apiAge ?? 0;
+    try {
+      final dob = DateTime.parse(dateOfBirth!);
+      final now = DateTime.now();
+      int ageCount = now.year - dob.year;
+      if (now.month < dob.month ||
+          (now.month == dob.month && now.day < dob.day)) {
+        ageCount--;
+      }
+      return ageCount;
+    } catch (_) {
+      return apiAge ?? 0;
+    }
   }
 }

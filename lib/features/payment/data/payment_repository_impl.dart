@@ -18,9 +18,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
     try {
       final response = await _apiClient.getParsed<PaymentDashboard>(
         ApiEndpoints.paymentDashboard,
-        fromJsonT: (json) => PaymentDashboard.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            PaymentDashboard.fromJson(json as Map<String, dynamic>),
       );
-      return response.data!;
+      return response.dataOrNull!.data!;
     } catch (e, stack) {
       AppLogger.e('GetDashboard Error', e, stack);
       rethrow;
@@ -32,9 +33,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
     try {
       final response = await _apiClient.getParsed<List<PaymentType>>(
         ApiEndpoints.paymentTypes,
-        fromJsonT: (json) => (json as List).map((e) => PaymentType.fromJson(e as Map<String, dynamic>)).toList(),
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentType.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
-      return response.data ?? [];
+      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetPaymentTypes Error', e, stack);
       rethrow;
@@ -47,9 +50,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
       final response = await _apiClient.getParsed<List<PaymentCategory>>(
         ApiEndpoints.paymentCategories,
         queryParameters: {'paymentTypeId': paymentTypeId},
-        fromJsonT: (json) => (json as List).map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>)).toList(),
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
-      return response.data ?? [];
+      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetCategories Error', e, stack);
       rethrow;
@@ -70,11 +75,13 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'amount': amount,
           'paymentTypeId': paymentTypeId,
           'paymentCategoryId': paymentCategoryId,
-          if (adminPaymentRequestId != null) 'adminPaymentRequestId': adminPaymentRequestId,
+          if (adminPaymentRequestId != null)
+            'adminPaymentRequestId': adminPaymentRequestId,
         },
-        fromJsonT: (json) => RazorpayOrder.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
-      return response.data!;
+      return response.dataOrNull!.data!;
     } catch (e, stack) {
       AppLogger.e('CreateOrder Error', e, stack);
       rethrow;
@@ -101,11 +108,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'amount': amount,
           'paymentTypeId': paymentTypeId,
           'paymentCategoryId': paymentCategoryId,
-          if (adminPaymentRequestId != null) 'adminPaymentRequestId': adminPaymentRequestId,
+          if (adminPaymentRequestId != null)
+            'adminPaymentRequestId': adminPaymentRequestId,
         },
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
-      return response.data ?? {};
+      return response.dataOrNull?.data ?? {};
     } catch (e, stack) {
       AppLogger.e('VerifyPayment Error', e, stack);
       rethrow;
@@ -130,9 +138,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
       final response = await _apiClient.getParsed<List<PaymentItem>>(
         ApiEndpoints.paymentHistory,
         queryParameters: queryParameters,
-        fromJsonT: (json) => (json as List).map((e) => PaymentItem.fromJson(e as Map<String, dynamic>)).toList(),
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
-      return response.data ?? [];
+      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetHistory Error', e, stack);
       rethrow;
@@ -146,7 +156,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         '${ApiEndpoints.paymentReceipt}/$receiptId',
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
-      return response.data ?? {};
+      return response.dataOrNull?.data ?? {};
     } catch (e, stack) {
       AppLogger.e('GetReceipt Error', e, stack);
       rethrow;

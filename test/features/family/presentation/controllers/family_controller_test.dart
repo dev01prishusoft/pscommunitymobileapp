@@ -20,26 +20,50 @@ class MockFamilyRepository implements FamilyRepository {
   }) async {
     getAreasCallCount++;
     lastPageNo = pageNo;
-    
+
     if (shouldThrow) throw Exception('API Error');
 
     if (pageNo == 1) {
-      return List.generate(20, (i) => FamilyArea(id: i, title: 'Title', location: 'Loc', members: 10, families: 2));
+      return List.generate(
+        20,
+        (i) => FamilyArea(
+          id: i,
+          title: 'Title',
+          location: 'Loc',
+          members: 10,
+          families: 2,
+        ),
+      );
     } else if (pageNo == 2) {
-      return List.generate(5, (i) => FamilyArea(id: 20 + i, title: 'Title', location: 'Loc', members: 10, families: 2));
+      return List.generate(
+        5,
+        (i) => FamilyArea(
+          id: 20 + i,
+          title: 'Title',
+          location: 'Loc',
+          members: 10,
+          families: 2,
+        ),
+      );
     }
     return [];
   }
 
   @override
-  Future<List<DropdownItem>> getStates() async => [DropdownItem(id: 1, text: 'Gujarat')];
-  
+  Future<List<DropdownItem>> getStates() async => [
+    DropdownItem(id: 1, text: 'Gujarat'),
+  ];
+
   @override
-  Future<List<DropdownItem>> getDistricts(int stateId) async => [DropdownItem(id: 2, text: 'Ahmedabad')];
-  
+  Future<List<DropdownItem>> getDistricts(int stateId) async => [
+    DropdownItem(id: 2, text: 'Ahmedabad'),
+  ];
+
   @override
-  Future<List<DropdownItem>> getTalukas(int districtId) async => [DropdownItem(id: 3, text: 'Daskroi')];
-  
+  Future<List<DropdownItem>> getTalukas(int districtId) async => [
+    DropdownItem(id: 3, text: 'Daskroi'),
+  ];
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -68,7 +92,10 @@ void main() {
   test('filter cascade triggers data reload correctly', () async {
     await controller.onStateChanged(DropdownItem(id: 1, text: 'Gujarat'));
     expect(controller.selectedState.value?.text, 'Gujarat');
-    expect(repository.getAreasCallCount, 1); // it reloads areas when state changes
+    expect(
+      repository.getAreasCallCount,
+      1,
+    ); // it reloads areas when state changes
     expect(controller.districts.length, 1); // loaded districts
     expect(controller.talukas.isEmpty, true);
 

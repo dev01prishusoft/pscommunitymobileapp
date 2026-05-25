@@ -7,15 +7,14 @@ import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 class AuthGuard extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
-    // If UI Review Mode is enabled, bypass auth check
     if (kUiReviewMode) return null;
 
     final auth = Get.find<AuthState>();
-    
+
     if (!auth.isAuthenticated.value) {
-      return const RouteSettings(name: AppRouter.login);
+      return RouteSettings(name: AppRouter.login);
     }
-    
+
     return null;
   }
 }

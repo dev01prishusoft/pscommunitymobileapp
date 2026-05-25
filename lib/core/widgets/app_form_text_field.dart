@@ -1,24 +1,15 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppFormTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final String? hint;
-  final bool isRequired;
-  final TextInputType keyboardType;
-  final String? Function(String?)? validator;
-  final int maxLines;
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
-  final bool obscureText;
-  final void Function(String)? onChanged;
-
   const AppFormTextField({
     super.key,
-    required this.controller,
+    this.controller,
+    this.initialValue,
     required this.label,
     this.hint,
     this.isRequired = false,
@@ -30,6 +21,18 @@ class AppFormTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
   });
+  final TextEditingController? controller;
+  final String? initialValue;
+  final String label;
+  final String? hint;
+  final bool isRequired;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final int maxLines;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final bool obscureText;
+  final void Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -39,55 +42,62 @@ class AppFormTextField extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+            style: AppTextStyles.titleSmall.copyWith(
               color: AppColors.secondary,
             ),
             children: [
               if (isRequired)
-                const TextSpan(
+                TextSpan(
                   text: ' *',
-                  style: TextStyle(color: Colors.red),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.red,
+                  ),
                 ),
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
+          initialValue: initialValue,
           keyboardType: keyboardType,
           maxLines: maxLines,
           obscureText: obscureText,
           onChanged: onChanged,
-          style: const TextStyle(fontSize: 14, color: AppColors.foreground),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.mutedForeground, fontSize: 14),
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.mutedForeground,
+            ),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: AppColors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
+              borderSide: BorderSide(
+                color: AppColors.border.withValues(alpha: 0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: BorderSide(color: AppColors.red),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              borderSide: BorderSide(color: AppColors.red, width: 1.5.w),
             ),
           ),
           validator: (value) {
@@ -105,28 +115,3 @@ class AppFormTextField extends StatelessWidget {
   }
 }
 
-class AppValidators {
-  static String? url(String? value) {
-    if (value == null || value.trim().isEmpty) return null; // Let isRequired handle empties
-    
-    // Simple URL regex
-    final regex = RegExp(
-      r'^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$',
-      caseSensitive: false,
-    );
-    if (!regex.hasMatch(value)) {
-      return 'Please enter a valid URL';
-    }
-    return null;
-  }
-  
-  static String? email(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!regex.hasMatch(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
-}

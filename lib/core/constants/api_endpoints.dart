@@ -1,43 +1,36 @@
 class ApiEndpoints {
-  static const String login = '/api/v1/auth/login';
-  static const String refreshToken = '/api/v1/auth/refresh-token';
-  static const String forgotPassword = '/api/v1/auth/forgot-password';
-  static const String resetPassword = '/api/v1/auth/reset-password';
-  static const String memberLogin = '/api/v1/auth/member-login';
-  static const String memberUpdatePassword = '/api/v1/auth/member-update-password';
-  
-  // Features
-  static const String members = '/api/v1/member/list';
-  static const String memberSearch = '/api/v1/member/MemberSearch';
-  static const String familyAreas = '/api/v1/family/GetFamilyAreaForSamaj';
-  static const String getFamiliesByArea = '/api/v1/family/GetFamilyByArea';
-  static const String families = '/api/v1/Area/list';
-  static const String committees = '/api/v1/committee/list';
-  static const String committeeDetail = '/api/v1/committee';
-  static const String payments = '/api/v1/PaymentMode/list';
-  static const String occupations = '/api/v1/Occupation/list';
-  static const String occupationDetail = '/api/v1/Occupation';
-  static const String business = '/api/v1/AddressType/list';
-  static const String marriage = '/api/v1/marriage/list';
-  static const String unmarriedCount = '/api/v1/metrimonial/UnMarriedCount';
-  static const String languageDropdown = '/api/v1/member/language-dropdown';
-  static const String memberDetail = '/api/v1/member';
-  static const String memberAddress = '/api/v1/member-address/member';
-  static const String samajDetail = '/api/v1/member/samaj-detail';
-  static const String sansthas = '/api/v1/SamajSanstha/list';
-  
-  // Payments
-  static const String paymentDashboard = '/api/v1/payment/dashboard';
-  static const String paymentTypes = '/api/v1/PaymentType/dropdown';
-  static const String paymentCategories = '/api/v1/PaymentCategory/dropdown';
-  static const String createOrder = '/api/v1/payment/create-order';
-  static const String verifyPayment = '/api/v1/payment/verify';
-  static const String paymentHistory = '/api/v1/payment/history';
-  static const String paymentReceipt = '/api/v1/payment/receipt';
-
-  // Dropdowns
-  static const String stateDropdown = '/api/v1/state/dropdown';
-  static const String districtDropdown = '/api/v1/district/dropdown';
-  static const String talukaDropdown = '/api/v1/taluka/dropdown';
-  static const String occupationDropdown = '/api/v1/Occupation/dropdown';
+  static String login = '/api/v1/auth/login';
+  static String refreshToken = '/api/v1/auth/refresh-token';
+  static String forgotPassword = '/api/v1/auth/forgot-password';
+  static String resetPassword = '/api/v1/auth/reset-password';
+  static String memberLogin = '/api/v1/auth/member-login';
+  static String memberUpdatePassword = '/api/v1/auth/member-update-password';
+  static String members = '/api/v1/member/list';
+  static String memberSearch = '/api/v1/member/MemberSearch';
+  static String familyAreas = '/api/v1/family/GetFamilyAreaForSamaj';
+  static String getFamiliesByArea = '/api/v1/family/GetFamilyByArea';
+  static String families = '/api/v1/Area/list';
+  static String committees = '/api/v1/committee/list';
+  static String committeeDetail = '/api/v1/committee';
+  static String payments = '/api/v1/PaymentMode/list';
+  static String occupations = '/api/v1/Occupation/list';
+  static String occupationDetail = '/api/v1/Occupation';
+  static String business = '/api/v1/AddressType/list';
+  static String marriage = '/api/v1/marriage/list';
+  static String unmarriedCount = '/api/v1/metrimonial/UnMarriedCount';
+  static String languageDropdown = '/api/v1/member/language-dropdown';
+  static String memberDetail = '/api/v1/member';
+  static String memberAddress = '/api/v1/member-address/member';
+  static String samajDetail = '/api/v1/member/samaj-detail';
+  static String paymentDashboard = '/api/v1/payment/dashboard';
+  static String paymentTypes = '/api/v1/PaymentType/dropdown';
+  static String paymentCategories = '/api/v1/PaymentCategory/dropdown';
+  static String createOrder = '/api/v1/payment/create-order';
+  static String verifyPayment = '/api/v1/payment/verify';
+  static String paymentHistory = '/api/v1/payment/history';
+  static String paymentReceipt = '/api/v1/payment/receipt';
+  static String stateDropdown = '/api/v1/state/dropdown';
+  static String districtDropdown = '/api/v1/district/dropdown';
+  static String talukaDropdown = '/api/v1/taluka/dropdown';
+  static String occupationDropdown = '/api/v1/Occupation/dropdown';
 }

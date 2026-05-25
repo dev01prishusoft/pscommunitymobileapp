@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
@@ -6,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -19,47 +22,38 @@ class MarriagePage extends GetView<MarriageController> {
       appBar: AppBar(
         title: Text(LK.marriage.tr),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
         ),
       ),
       body: Stack(
         children: [
-          // Main Scrollable Content
           CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Summary Cards
                     Obx(() {
-                      final maleCount = controller.unmarriedCounts
-                          .firstWhereOrNull((e) => e.genderId == 1)
-                          ?.count ?? 0;
-                      final femaleCount = controller.unmarriedCounts
-                          .firstWhereOrNull((e) => e.genderId == 6)
-                          ?.count ?? 0;
-                          
                       return Padding(
-                        padding: const EdgeInsets.all(16.0),
+          padding: AppSpacing.pL,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: _buildSummaryCard(
                                 label: LK.unmarriedMale.tr,
-                                count: maleCount.toString(),
+                                count: controller.unmarriedMaleCount.toString(),
                                 icon: Icons.group,
-                                iconColor: Colors.blue,
-                                textColor: Colors.blue,
+                                iconColor: AppColors.blue,
+                                textColor: AppColors.blue,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
                             Expanded(
                               child: _buildSummaryCard(
                                 label: LK.unmarriedFemale.tr,
-                                count: femaleCount.toString(),
+                                count: controller.unmarriedFemaleCount.toString(),
                                 icon: Icons.person,
                                 iconColor: Colors.pink,
                                 textColor: Colors.pink,
@@ -69,51 +63,63 @@ class MarriagePage extends GetView<MarriageController> {
                         ),
                       );
                     }),
-
-                    // Filters Row (Gender & Looking for)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Row(
                         children: [
                           Expanded(
                             flex: 5,
                             child: Row(
                               children: [
-                                Text(LK.showLabel.tr, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
-                                const SizedBox(width: 2),
+                                Text(
+                                  LK.showLabel.tr,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.mutedForeground,
+                                  ),
+                                ),
+                                SizedBox(width: 2.w),
                                 Flexible(
                                   child: Text(
                                     LK.lookingForMarriage.tr,
-                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                                    style: AppTextStyles.labelSmall,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                   ),
                                 ),
-                                Obx(() => SizedBox(
-                                  height: 24,
-                                  width: 36,
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Switch(
-                                      value: controller.lookingForMarriage.value,
-                                      onChanged: (val) {
-                                        controller.lookingForMarriage.value = val;
-                                      },
-                                      activeThumbColor: AppColors.primary,
+                                Obx(
+                                  () => SizedBox(
+                                    height: 24.h,
+                                    width: 36.w,
+                                    child: FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Switch(
+                                        value:
+                                            controller.lookingForMarriage.value,
+                                        onChanged: (val) {
+                                          controller.lookingForMarriage.value =
+                                              val;
+                                        },
+                                        activeThumbColor: AppColors.primary,
+                                      ),
                                     ),
                                   ),
-                                )),
+                                ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6.w),
                           Expanded(
                             flex: 4,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text(LK.gender.tr, style: const TextStyle(fontSize: 11, color: AppColors.mutedForeground)),
-                                const SizedBox(width: 4),
+                                Text(
+                                  LK.gender.tr,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.mutedForeground,
+                                  ),
+                                ),
+                                SizedBox(width: 4.w),
                                 Expanded(
                                   child: _buildDropdownField(
                                     rxValue: controller.selectedGender,
@@ -131,10 +137,8 @@ class MarriagePage extends GetView<MarriageController> {
                         ],
                       ),
                     ),
-
-                    // Search Bar
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: AppSpacing.pL,
                       child: Row(
                         children: [
                           Expanded(
@@ -145,57 +149,57 @@ class MarriagePage extends GetView<MarriageController> {
                               },
                               decoration: InputDecoration(
                                 hintText: LK.searchByFirstNameHint.tr,
-                                prefixIcon: const Icon(Icons.search),
+                                prefixIcon: Icon(Icons.search),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.close),
+                                  icon: Icon(Icons.close),
                                   onPressed: () {
                                     controller.searchTextController.clear();
                                     controller.searchQuery.value = '';
                                   },
                                   padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
+                                  constraints: BoxConstraints(),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0,
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          // Filter Toggle Button
-                          Obx(() => InkWell(
-                            onTap: () => controller.toggleAdvancedFilters(),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: _dropdownDecoration().copyWith(
-                                color: controller.isAdvancedFiltersOpen.value
-                                    ? AppColors.primary
-                                    : Colors.white,
-                              ),
-                              child: Icon(
-                                Icons.tune,
-                                size: 20,
-                                color: controller.isAdvancedFiltersOpen.value
-                                    ? Colors.white
-                                    : AppColors.secondary,
+                          SizedBox(width: 8.w),
+                          Obx(
+                            () => InkWell(
+                              onTap: () => controller.toggleAdvancedFilters(),
+                              child: Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: _dropdownDecoration().copyWith(
+                                  color: controller.isAdvancedFiltersOpen.value
+                                      ? AppColors.primary
+                                      : AppColors.white,
+                                ),
+                                child: Icon(
+                                  Icons.tune,
+                                  size: 20,
+                                  color: controller.isAdvancedFiltersOpen.value
+                                      ? AppColors.white
+                                      : AppColors.secondary,
+                                ),
                               ),
                             ),
-                          )),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // Member List using SliverList for performance
               Obx(() {
                 if (controller.state.value == AppState.data) {
                   return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _buildMemberCard(controller.filteredMembers[index]);
-                      },
-                      childCount: controller.filteredMembers.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return _buildMemberCard(
+                        controller.filteredMembers[index],
+                      );
+                    }, childCount: controller.filteredMembers.length),
                   );
                 } else {
                   return SliverToBoxAdapter(
@@ -204,309 +208,353 @@ class MarriagePage extends GetView<MarriageController> {
                       child: AppStateView(
                         state: controller.state.value,
                         emptyMessage: LK.noMatchesFound.tr,
-                        child: const SizedBox.shrink(),
+                        child: SizedBox.shrink(),
                       ),
                     ),
                   );
                 }
               }),
-              const SliverToBoxAdapter(child: SizedBox(height: 80)), // Space for bottom
+              SliverToBoxAdapter(child: SizedBox(height: 80.h)),
             ],
           ),
+          Obx(
+            () => controller.isAdvancedFiltersOpen.value
+                ? GestureDetector(
+                    onTap: () => controller.isAdvancedFiltersOpen.value = false,
+                    child: Container(
+                      color: AppColors.black26,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  )
+                : SizedBox.shrink(),
+          ),
 
-          // Sliding Advanced Filters Panel
-          Obx(() => controller.isAdvancedFiltersOpen.value
-            ? GestureDetector(
-                onTap: () => controller.isAdvancedFiltersOpen.value = false,
+          Obx(
+            () => AnimatedPositioned(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              top: controller.isAdvancedFiltersOpen.value
+                  ? 0
+                  : -MediaQuery.of(context).size.height * 1.5,
+              left: 0,
+              right: 0,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                ),
                 child: Container(
-                  color: Colors.black26,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              )
-            : const SizedBox.shrink()),
-          
-          Obx(() => AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            top: controller.isAdvancedFiltersOpen.value ? 0 : -MediaQuery.of(context).size.height * 1.5,
-            left: 0,
-            right: 0,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.85,
-              ),
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(12)),
+                  margin: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.tune, color: AppColors.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            LK.advancedFilters.tr,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.secondary),
+                    ],
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(12),
                           ),
-                          const Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () =>
-                                controller.isAdvancedFiltersOpen.value = false,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        child: Row(
                           children: [
-                            _buildFilterRow(
-                              label: LK.ageRangeLabel.tr,
-                              fromRx: controller.selectedAgeFrom,
-                              toRx: controller.selectedAgeTo,
-                              staticItems: controller.ages,
+                            Icon(Icons.tune, color: AppColors.primary),
+                            SizedBox(width: 8.w),
+                            Text(
+                              LK.advancedFilters.tr,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.secondary,
+                              ),
                             ),
-                            const SizedBox(height: 12),
-                            _buildFilterRow(
-                              label: LK.heightRangeLabel.tr,
-                              fromRx: controller.selectedHeightFrom,
-                              toRx: controller.selectedHeightTo,
-                              staticItems: controller.heights,
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Text(LK.gotraLabel.tr,
-                                      style: const TextStyle(fontSize: 13)),
-                                ),
-                                Expanded(
-                                  child: _buildDropdownField(
-                                    rxValue: controller.selectedGotra,
-                                    rxItems: controller.dynamicGotras,
-                                    mapper: _translateFallback,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Obx(() => Checkbox(
-                                  value: controller.excludeSameGotra.value,
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  onChanged: (val) =>
-                                      controller.excludeSameGotra.value = val!,
-                                )),
-                                Flexible(
-                                  child: Text(LK.excludeSameGotra.tr,
-                                      style: const TextStyle(fontSize: 11)),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Text(LK.maritalStatusLabel.tr,
-                                      style: const TextStyle(fontSize: 13)),
-                                ),
-                                Expanded(
-                                  child: _buildDropdownField(
-                                    rxValue: controller.selectedMaritalStatus,
-                                    staticItems: controller.maritalStatuses,
-                                    mapper: (val) {
-                                      if (val == 'All') return LK.all.tr;
-                                      final key = MaritalStatusMapper.getLabelKey(val);
-                                      return key != null ? key.tr : val;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(LK.residenceLabel.tr,
-                                        style: const TextStyle(fontSize: 13)),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(LK.stateLabel.tr,
-                                              style: const TextStyle(fontSize: 11)),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: _buildDropdownField(
-                                              rxValue: controller.selectedState,
-                                              rxItems: controller.states,
-                                              prependAll: true,
-                                              itemStringifier: (e) => (e as dynamic).text as String,
-                                              mapper: _translateFallback,
-                                              onChanged: (val) => controller.onStateChanged(val),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(LK.districtLabel.tr,
-                                              style: const TextStyle(fontSize: 11)),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: _buildDropdownField(
-                                              rxValue: controller.selectedDistrict,
-                                              rxItems: controller.districts,
-                                              prependAll: true,
-                                              itemStringifier: (e) => (e as dynamic).text as String,
-                                              mapper: _translateFallback,
-                                              onChanged: (val) => controller.onDistrictChanged(val),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Text(LK.talukaLabel.tr,
-                                              style: const TextStyle(fontSize: 11)),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: _buildDropdownField(
-                                              rxValue: controller.selectedTaluka,
-                                              rxItems: controller.talukas,
-                                              prependAll: true,
-                                              itemStringifier: (e) => (e as dynamic).text as String,
-                                              mapper: _translateFallback,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(LK.areaLabel.tr,
-                                              style: const TextStyle(fontSize: 11)),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: _buildDropdownField(
-                                              rxValue: controller.selectedArea,
-                                              rxItems: controller.dynamicAreas,
-                                              mapper: _translateFallback,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Text(LK.educationLabel.tr,
-                                      style: const TextStyle(fontSize: 13)),
-                                ),
-                                Expanded(
-                                  child: _buildDropdownField(
-                                    rxValue: controller.selectedEducation,
-                                    rxItems: controller.dynamicEducations,
-                                    mapper: _translateFallback,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Text(LK.occupationLabel.tr,
-                                      style: const TextStyle(fontSize: 13)),
-                                ),
-                                Expanded(
-                                  child: _buildDropdownField(
-                                    rxValue: controller.selectedOccupation,
-                                    rxItems: controller.dynamicOccupations,
-                                    mapper: _translateFallback,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildFilterRow(
-                              label: LK.incomeRangeLabel.tr,
-                              fromRx: controller.selectedIncomeFrom,
-                              toRx: controller.selectedIncomeTo,
-                              staticItems: controller.incomeRanges,
-                              mapper: _translateFallback,
-                            ),
-                            const SizedBox(height: 24),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // applyFilters is automatic due to debouncer
-                                      controller.isAdvancedFiltersOpen.value = false;
-                                    },
-                                    child: Text(LK.applyFilters.tr),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () => controller.clearFilters(),
-                                    child: Text(LK.clearAll.tr),
-                                  ),
-                                ),
-                              ],
+                            Spacer(),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () =>
+                                  controller.isAdvancedFiltersOpen.value =
+                                      false,
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: AppSpacing.pL,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildFilterRow(
+                                label: LK.ageRangeLabel.tr,
+                                fromRx: controller.selectedAgeFrom,
+                                toRx: controller.selectedAgeTo,
+                                staticItems: controller.ages,
+                              ),
+                              SizedBox(height: 12.h),
+                              _buildFilterRow(
+                                label: LK.heightRangeLabel.tr,
+                                fromRx: controller.selectedHeightFrom,
+                                toRx: controller.selectedHeightTo,
+                                staticItems: controller.heights,
+                              ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80.w,
+                                    child: Text(
+                                      LK.gotraLabel.tr,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _buildDropdownField(
+                                      rxValue: controller.selectedGotra,
+                                      rxItems: controller.dynamicGotras,
+                                      mapper: _translateFallback,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Obx(
+                                    () => Checkbox(
+                                      value: controller.excludeSameGotra.value,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (val) =>
+                                          controller.excludeSameGotra.value =
+                                              val!,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      LK.excludeSameGotra.tr,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80.w,
+                                    child: Text(
+                                      LK.maritalStatusLabel.tr,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _buildDropdownField(
+                                      rxValue: controller.selectedMaritalStatus,
+                                      staticItems: controller.maritalStatuses,
+                                      mapper: (val) {
+                                        if (val == 'All') return LK.all.tr;
+                                        final key =
+                                            MaritalStatusMapper.getLabelKey(
+                                              val,
+                                            );
+                                        return key != null ? key.tr : val;
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 80.w,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        LK.residenceLabel.tr,
+                                        style: AppTextStyles.bodySmall,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              LK.stateLabel.tr,
+                                              style: AppTextStyles.bodySmall,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Expanded(
+                                              child: _buildDropdownField(
+                                                rxValue:
+                                                    controller.selectedState,
+                                                rxItems: controller.states,
+                                                prependAll: true,
+                                                itemStringifier: (e) =>
+                                                    (e as dynamic).text
+                                                        as String,
+                                                mapper: _translateFallback,
+                                                onChanged: (val) => controller
+                                                    .onStateChanged(val),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8.w),
+                                            Text(
+                                              LK.districtLabel.tr,
+                                              style: AppTextStyles.bodySmall,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Expanded(
+                                              child: _buildDropdownField(
+                                                rxValue:
+                                                    controller.selectedDistrict,
+                                                rxItems: controller.districts,
+                                                prependAll: true,
+                                                itemStringifier: (e) =>
+                                                    (e as dynamic).text
+                                                        as String,
+                                                mapper: _translateFallback,
+                                                onChanged: (val) => controller
+                                                    .onDistrictChanged(val),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              LK.talukaLabel.tr,
+                                              style: AppTextStyles.bodySmall,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Expanded(
+                                              child: _buildDropdownField(
+                                                rxValue:
+                                                    controller.selectedTaluka,
+                                                rxItems: controller.talukas,
+                                                prependAll: true,
+                                                itemStringifier: (e) =>
+                                                    (e as dynamic).text
+                                                        as String,
+                                                mapper: _translateFallback,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8.w),
+                                            Text(
+                                              LK.areaLabel.tr,
+                                              style: AppTextStyles.bodySmall,
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Expanded(
+                                              child: _buildDropdownField(
+                                                rxValue:
+                                                    controller.selectedArea,
+                                                rxItems:
+                                                    controller.dynamicAreas,
+                                                mapper: _translateFallback,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80.w,
+                                    child: Text(
+                                      LK.educationLabel.tr,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _buildDropdownField(
+                                      rxValue: controller.selectedEducation,
+                                      rxItems: controller.dynamicEducations,
+                                      mapper: _translateFallback,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 80.w,
+                                    child: Text(
+                                      LK.occupationLabel.tr,
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _buildDropdownField(
+                                      rxValue: controller.selectedOccupation,
+                                      rxItems: controller.dynamicOccupations,
+                                      mapper: _translateFallback,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              _buildFilterRow(
+                                label: LK.incomeRangeLabel.tr,
+                                fromRx: controller.selectedIncomeFrom,
+                                toRx: controller.selectedIncomeTo,
+                                staticItems: controller.incomeRanges,
+                                mapper: _translateFallback,
+                              ),
+                              SizedBox(height: 24.h),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        controller.isAdvancedFiltersOpen.value =
+                                            false;
+                                      },
+                                      child: Text(LK.applyFilters.tr),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () =>
+                                          controller.clearFilters(),
+                                      child: Text(LK.clearAll.tr),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          )),
+          ),
         ],
       ),
     );
   }
-
-  // --- Helper Methods ---
 
   String _translateFallback(String val) {
     if (val == 'All') return LK.all.tr;
@@ -515,7 +563,7 @@ class MarriagePage extends GetView<MarriageController> {
   }
 
   BoxDecoration _dropdownDecoration() => BoxDecoration(
-    color: Colors.white,
+    color: AppColors.white,
     border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
     borderRadius: BorderRadius.circular(8),
   );
@@ -528,30 +576,30 @@ class MarriagePage extends GetView<MarriageController> {
     required Color textColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: AppColors.black.withValues(alpha: 0.02),
             blurRadius: 5,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: iconColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 16),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,21 +607,17 @@ class MarriagePage extends GetView<MarriageController> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 11, 
+                  style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.mutedForeground,
-                    fontWeight: FontWeight.w500,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   count,
-                  style: TextStyle(
-                    fontSize: 18, 
-                    fontWeight: FontWeight.bold, 
+                  style: AppTextStyles.headlineSmall.copyWith(
                     color: textColor,
-                    height: 1.2,
+                    height: 1.2.h,
                   ),
                 ),
               ],
@@ -590,7 +634,7 @@ class MarriagePage extends GetView<MarriageController> {
 }
 
 class _MarriageMemberCard extends StatelessWidget {
-  const _MarriageMemberCard({super.key, required this.member});
+  const _MarriageMemberCard({required this.member});
 
   final Member member;
 
@@ -603,77 +647,87 @@ class _MarriageMemberCard extends StatelessWidget {
     final infoString = infoParts.join(' | ');
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppSpacing.pL,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MemberAvatar(
               imageUrl: member.profilePhotoFullUrl,
               gender: member.gender,
-              radius: 30,
+              radius: 30.r,
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     member.name,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary),
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      color: AppColors.secondary,
+                    ),
                   ),
                   if (infoString.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       infoString,
-                      style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.mutedForeground,
+                      ),
                     ),
                   ],
                   if (member.area.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 16, color: AppColors.primary),
-                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 4.w),
                         Expanded(
                           child: Text(
                             member.area,
-                            style: const TextStyle(fontSize: 13, color: AppColors.mutedForeground),
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.mutedForeground,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ],
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Row(
                     children: [
-                      Text(LK.lookingForMarriage.tr,
-                          style: const TextStyle(fontSize: 13)),
-                      const SizedBox(width: 4),
                       Text(
-                        (member.isLookingforMarriage == true) ? LK.yes.tr : LK.no.tr,
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: (member.isLookingforMarriage == true)
-                                ? Colors.green
-                                : Colors.red),
+                        LK.lookingForMarriage.tr,
+                        style: AppTextStyles.bodySmall,
                       ),
-                      const Spacer(),
+                      SizedBox(width: 4.w),
+                      Text(
+                        (member.isLookingforMarriage == true)
+                            ? LK.yes.tr
+                            : LK.no.tr,
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: (member.isLookingforMarriage == true)
+                              ? AppColors.green
+                              : AppColors.red,
+                        ),
+                      ),
+                      Spacer(),
                       OutlinedButton(
                         onPressed: () => Get.toNamed<void>(
                           AppRouter.memberProfile,
                           arguments: {'memberId': member.memberId},
                         ),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          side: const BorderSide(color: AppColors.primary),
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          side: BorderSide(color: AppColors.primary),
                         ),
-                        child: Text(LK.view.tr, style: const TextStyle(fontSize: 12)),
+                        child: Text(LK.view.tr, style: AppTextStyles.bodySmall),
                       ),
                     ],
                   ),
@@ -698,8 +752,8 @@ extension MarriagePageFilters on MarriagePage {
     return Row(
       children: [
         SizedBox(
-          width: 80,
-          child: Text(label, style: const TextStyle(fontSize: 13)),
+          width: 80.w,
+          child: Text(label, style: AppTextStyles.bodySmall),
         ),
         Expanded(
           child: _buildDropdownField(
@@ -708,9 +762,9 @@ extension MarriagePageFilters on MarriagePage {
             mapper: mapper,
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8.w),
         Text(LK.to.tr),
-        const SizedBox(width: 8),
+        SizedBox(width: 8.w),
         Expanded(
           child: _buildDropdownField(
             rxValue: toRx,
@@ -733,7 +787,7 @@ extension MarriagePageFilters on MarriagePage {
     String Function(String)? mapper,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: _dropdownDecoration(),
       child: DropdownButtonHideUnderline(
         child: Obx(() {
@@ -744,20 +798,27 @@ extension MarriagePageFilters on MarriagePage {
           } else if (rxItems != null) {
             if (prependAll) items.add('All');
             if (prependAny) items.add('Any');
-            items.addAll(rxItems.map((e) => itemStringifier != null ? itemStringifier(e) : e.toString()));
+            items.addAll(
+              rxItems.map(
+                (e) =>
+                    itemStringifier != null ? itemStringifier(e) : e.toString(),
+              ),
+            );
           }
-          
+
           if (!items.contains(val) && items.isNotEmpty) {
             items.add(val);
           }
-          
+
           return DropdownButton<String>(
             value: val,
             isDense: true,
             isExpanded: true,
-            focusColor: Colors.transparent,
-            style: const TextStyle(fontSize: 12, color: AppColors.foreground),
-            icon: const Icon(Icons.arrow_drop_down, size: 20),
+            focusColor: AppColors.transparent,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.foreground,
+            ),
+            icon: Icon(Icons.arrow_drop_down, size: 20),
             items: items.toSet().toList().map((e) {
               return DropdownMenuItem(
                 value: e,

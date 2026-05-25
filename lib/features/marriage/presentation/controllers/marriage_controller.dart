@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
@@ -13,7 +15,11 @@ import 'package:pscommunitymobileapp/features/member/presentation/controllers/pr
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class MarriageController extends GetxController {
-  MarriageController(this._repository, this._memberRepository, this._familyRepository);
+  MarriageController(
+    this._repository,
+    this._memberRepository,
+    this._familyRepository,
+  );
 
   final MarriageRepository _repository;
   final MemberRepository _memberRepository;
@@ -21,13 +27,11 @@ class MarriageController extends GetxController {
 
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<UnmarriedCount> unmarriedCounts = <UnmarriedCount>[].obs;
-  
-  // Filter Observables
   final RxBool lookingForMarriage = true.obs;
   final RxString selectedGender = 'All'.obs;
   final RxBool isAdvancedFiltersOpen = false.obs;
   final RxBool excludeSameGotra = false.obs;
-  
+
   final RxString selectedAgeFrom = '18'.obs;
   final RxString selectedAgeTo = '60'.obs;
   final RxString selectedHeightFrom = '120 cm'.obs;
@@ -42,32 +46,46 @@ class MarriageController extends GetxController {
   final RxString selectedOccupation = 'Any'.obs;
   final RxString selectedIncomeFrom = 'Any'.obs;
   final RxString selectedIncomeTo = 'Any'.obs;
-  
+
   final TextEditingController searchTextController = TextEditingController();
   final RxString searchQuery = ''.obs;
-  
-  // Filter Options (Static)
   final List<String> ages = List.generate(43, (i) => (18 + i).toString());
   final List<String> heights = List.generate(121, (i) => '${(120 + i)} cm');
-  final List<String> maritalStatuses = ['All', 'Unmarried', 'Married', 'Widow', 'Widower', 'Divorced'];
-  final List<String> incomeRanges = ['Any', '1-2 Lakh', '2-5 Lakh', '5-10 Lakh', '10+ Lakh'];
-  
-  // Dynamic Lists
+  final List<String> maritalStatuses = [
+    'All',
+    'Unmarried',
+    'Married',
+    'Widow',
+    'Widower',
+    'Divorced',
+  ];
+  final List<String> incomeRanges = [
+    'Any',
+    '1-2 Lakh',
+    '2-5 Lakh',
+    '5-10 Lakh',
+    '10+ Lakh',
+  ];
   final RxList<String> dynamicGotras = <String>['Any'].obs;
   final RxList<String> dynamicOccupations = <String>['Any'].obs;
   final RxList<String> dynamicEducations = <String>['Any'].obs;
   final RxList<String> dynamicAreas = <String>['All'].obs;
-  
+
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
 
   final RxList<Member> filteredMembers = <Member>[].obs;
 
+  int get unmarriedMaleCount =>
+      unmarriedCounts.firstWhereOrNull((e) => e.genderId == 1)?.count ?? 0;
+
+  int get unmarriedFemaleCount =>
+      unmarriedCounts.firstWhereOrNull((e) => e.genderId == 6)?.count ?? 0;
+
   @override
   void onInit() {
     super.onInit();
-    // Debounce search and filter changes to avoid excessive API calls
     final List<RxInterface<dynamic>> filterObservables = [
       searchQuery,
       selectedGender,
@@ -92,12 +110,10 @@ class MarriageController extends GetxController {
     Timer? debounceTimer;
     everAll(filterObservables, (_) {
       debounceTimer?.cancel();
-      debounceTimer = Timer(const Duration(milliseconds: 300), () => applyFilters());
+      debounceTimer = Timer(Duration(milliseconds: 300), () => applyFilters());
     });
-    
-    // Initial fetch
     loadProfiles();
-    
+
     loadLocations();
     loadAllDropdowns();
   }
@@ -117,11 +133,11 @@ class MarriageController extends GetxController {
     selectedTaluka.value = 'All';
     districts.clear();
     talukas.clear();
-    
+
     if (stateName == 'All') {
       return;
     }
-    
+
     final stateId = states.firstWhereOrNull((s) => s.text == stateName)?.id;
     if (stateId != null) {
       final d = await _familyRepository.getDistricts(stateId);
@@ -133,12 +149,14 @@ class MarriageController extends GetxController {
     selectedDistrict.value = districtName;
     selectedTaluka.value = 'All';
     talukas.clear();
-    
+
     if (districtName == 'All') {
       return;
     }
-    
-    final districtId = districts.firstWhereOrNull((d) => d.text == districtName)?.id;
+
+    final districtId = districts
+        .firstWhereOrNull((d) => d.text == districtName)
+        ?.id;
     if (districtId != null) {
       final t = await _familyRepository.getTalukas(districtId);
       talukas.assignAll(t);
@@ -163,11 +181,10 @@ class MarriageController extends GetxController {
         ),
         _repository.getUnmarriedCounts(),
       ]);
-      
-      List<Member> members = results[0] as List<Member>;
-      _updateDynamicLists(members);
 
-      // Local Search Filter (Issue 13)
+      final memberResult = results[0] as Result<PaginatedResponse<Member>>;
+      List<Member> members = memberResult.dataOrNull?.data ?? [];
+      _updateDynamicLists(members);
       if (searchQuery.isNotEmpty) {
         final query = searchQuery.value.toLowerCase();
         members = members.where((m) {
@@ -184,44 +201,44 @@ class MarriageController extends GetxController {
               mobile.contains(query);
         }).toList();
       }
-
-      // Gotras are extracted from active members to show relevant Gotras
-      final gotras = members
-          .map((m) => m.gotra.trim())
-          .where((g) => g.isNotEmpty)
-          .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
-          .toSet()
-          .toList()
-        ..sort();
+      final gotras =
+          members
+              .map((m) => m.gotra.trim())
+              .where((g) => g.isNotEmpty)
+              .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
+              .toSet()
+              .toList()
+            ..sort();
       dynamicGotras.assignAll(['Any', ...gotras]);
-
-      // Areas are extracted dynamically from active members
-      final areas = members
-          .map((m) => m.area.trim())
-          .where((a) => a.isNotEmpty)
-          .toSet()
-          .toList()
-        ..sort();
+      final areas =
+          members
+              .map((m) => m.area.trim())
+              .where((a) => a.isNotEmpty)
+              .toSet()
+              .toList()
+            ..sort();
       dynamicAreas.assignAll(['All', ...areas]);
-
-      // Populate locations from members (Issue 11)
-      final memStates = members.map((m) => m.occupationStateName).whereType<String>().toSet().toList()..sort();
-      if (memStates.isNotEmpty) {
-        // We can either update the 'states' dropdown or use a separate dynamic list
-        // For simplicity and consistency with Gotra/Occupation, let's ensure the dropdown matches
-      }
-
-      // Apply Local Advanced Filters
+      final memStates =
+          members
+              .map((m) => m.occupationStateName)
+              .whereType<String>()
+              .toSet()
+              .toList()
+            ..sort();
+      if (memStates.isNotEmpty) {}
       if (selectedAgeFrom.value != '18' || selectedAgeTo.value != '60') {
         final minAge = int.tryParse(selectedAgeFrom.value) ?? 18;
         final maxAge = int.tryParse(selectedAgeTo.value) ?? 60;
-        members = members.where((m) => m.age >= minAge && m.age <= maxAge).toList();
+        members = members
+            .where((m) => m.age >= minAge && m.age <= maxAge)
+            .toList();
       }
-      
-      // Height Filter (Issue 8 - converted to CM)
-      if (selectedHeightFrom.value != '120 cm' || selectedHeightTo.value != '210 cm') {
-        final minH = int.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 120;
-        final maxH = int.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 210;
+      if (selectedHeightFrom.value != '120 cm' ||
+          selectedHeightTo.value != '210 cm') {
+        final minH =
+            int.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 120;
+        final maxH =
+            int.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 210;
         members = members.where((m) {
           final h = m.height ?? 0;
           return h >= minH && h <= maxH;
@@ -232,11 +249,12 @@ class MarriageController extends GetxController {
         members = members.where((m) {
           final mGotra = m.gotra.trim();
           if (mGotra.isEmpty) return false;
-          final normalized = mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
+          final normalized =
+              mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
           return normalized == selectedGotra.value;
         }).toList();
       }
-      
+
       if (excludeSameGotra.value) {
         try {
           final profileController = Get.find<ProfileFormController>();
@@ -248,40 +266,62 @@ class MarriageController extends GetxController {
       }
 
       if (selectedMaritalStatus.value != 'All') {
-        members = members.where((m) => (m.maritalStatusName ?? '') == selectedMaritalStatus.value).toList();
+        members = members
+            .where(
+              (m) => (m.maritalStatusName ?? '') == selectedMaritalStatus.value,
+            )
+            .toList();
       }
-      
+
       if (selectedState.value != 'All') {
-        members = members.where((m) => (m.occupationStateName ?? '') == selectedState.value).toList();
+        members = members
+            .where((m) => (m.occupationStateName ?? '') == selectedState.value)
+            .toList();
       }
-      
+
       if (selectedDistrict.value != 'All') {
-        members = members.where((m) => (m.occupationDistrictName ?? '') == selectedDistrict.value).toList();
+        members = members
+            .where(
+              (m) => (m.occupationDistrictName ?? '') == selectedDistrict.value,
+            )
+            .toList();
       }
-      
+
       if (selectedTaluka.value != 'All') {
-        members = members.where((m) => (m.occupationTalukaName ?? '') == selectedTaluka.value).toList();
+        members = members
+            .where(
+              (m) => (m.occupationTalukaName ?? '') == selectedTaluka.value,
+            )
+            .toList();
       }
-      
+
       if (selectedArea.value != 'All') {
         members = members.where((m) => m.area == selectedArea.value).toList();
       }
 
       if (selectedEducation.value != 'Any') {
-        members = members.where((m) => (m.jobPositionName ?? '').contains(selectedEducation.value)).toList();
+        members = members
+            .where(
+              (m) =>
+                  (m.educationName ?? '').contains(selectedEducation.value),
+            )
+            .toList();
       }
 
       if (selectedOccupation.value != 'Any') {
-        members = members.where((m) => 
-          (m.occupationName ?? '') == selectedOccupation.value ||
-          (m.occupationTypeName ?? '') == selectedOccupation.value
-        ).toList();
+        members = members
+            .where(
+              (m) =>
+                  (m.occupationName ?? '') == selectedOccupation.value ||
+                  (m.occupationTypeName ?? '') == selectedOccupation.value,
+            )
+            .toList();
       }
 
-      if (selectedIncomeFrom.value != 'Any' || selectedIncomeTo.value != 'Any') {
-        // Income filtering (simplified for the predefined ranges)
+      if (selectedIncomeFrom.value != 'Any' ||
+          selectedIncomeTo.value != 'Any') {
         members = members.where((m) {
-          return true; // Placeholder for complex range matching
+          return true;
         }).toList();
       }
 
@@ -304,7 +344,6 @@ class MarriageController extends GetxController {
 
   void clearFilters() {
     searchQuery.value = '';
-    // Preserve main toggles: selectedGender and lookingForMarriage
     selectedAgeFrom.value = '18';
     selectedAgeTo.value = '60';
     selectedHeightFrom.value = '120 cm';
@@ -320,11 +359,9 @@ class MarriageController extends GetxController {
     selectedIncomeFrom.value = 'Any';
     selectedIncomeTo.value = 'Any';
     excludeSameGotra.value = false;
-    // applyFilters() will be triggered by everAll debouncer automatically
   }
 
   void _updateDynamicLists(List<Member> members) {
-    // Collect all unique gotras
     final gotras = members
         .map((m) => m.gotra.trim())
         .where((g) => g.isNotEmpty)
@@ -333,8 +370,6 @@ class MarriageController extends GetxController {
         .toList();
     gotras.sort();
     dynamicGotras.assignAll(['Any', ...gotras]);
-
-    // Collect all unique areas
     final areas = members
         .map((m) => m.area.trim())
         .where((a) => a.isNotEmpty)
@@ -346,12 +381,30 @@ class MarriageController extends GetxController {
 
   Future<void> loadAllDropdowns() async {
     await Future.wait([
-      _fetchDropdown('/EducationalQualification/list/dropdown', dynamicEducations, ['Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD']),
-      _fetchDropdown('/Occupation/dropdown', dynamicOccupations, ['Private Employee', 'Government Employee', 'Business Owner', 'Farmer', 'Housewife', 'Student', 'Retired', 'Unemployed', 'Other']),
+      _fetchDropdown(
+        '/EducationalQualification/list/dropdown',
+        dynamicEducations,
+        ['Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD'],
+      ),
+      _fetchDropdown('/Occupation/dropdown', dynamicOccupations, [
+        'Private Employee',
+        'Government Employee',
+        'Business Owner',
+        'Farmer',
+        'Housewife',
+        'Student',
+        'Retired',
+        'Unemployed',
+        'Other',
+      ]),
     ]);
   }
 
-  Future<void> _fetchDropdown(String path, RxList<String> targetList, List<String> fallbacks) async {
+  Future<void> _fetchDropdown(
+    String path,
+    RxList<String> targetList,
+    List<String> fallbacks,
+  ) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
       final response = await apiClient.get('/api/v1$path');
@@ -363,24 +416,36 @@ class MarriageController extends GetxController {
           if (rawData is List) {
             list = rawData;
           } else if (rawData is Map<String, dynamic>) {
-            list = (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ?? [];
+            list =
+                (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ??
+                [];
           }
-          final items = list.map((e) {
-            final map = e as Map<String, dynamic>;
-            final textKeys = ['text', 'Text', 'name', 'Name', 'value', 'Value'];
-            for (final key in textKeys) {
-              if (map.containsKey(key) && map[key] != null) {
-                return map[key].toString().trim();
-              }
-            }
-            for (final entry in map.entries) {
-              if (!entry.key.toLowerCase().contains('id')) {
-                return entry.value.toString().trim();
-              }
-            }
-            return '';
-          }).where((s) => s.isNotEmpty).toList();
-          
+          final items = list
+              .map((e) {
+                final map = e as Map<String, dynamic>;
+                final textKeys = [
+                  'text',
+                  'Text',
+                  'name',
+                  'Name',
+                  'value',
+                  'Value',
+                ];
+                for (final key in textKeys) {
+                  if (map.containsKey(key) && map[key] != null) {
+                    return map[key].toString().trim();
+                  }
+                }
+                for (final entry in map.entries) {
+                  if (!entry.key.toLowerCase().contains('id')) {
+                    return entry.value.toString().trim();
+                  }
+                }
+                return '';
+              })
+              .where((s) => s.isNotEmpty)
+              .toList();
+
           if (items.isNotEmpty) {
             targetList.assignAll(['Any', ...items]);
             return;

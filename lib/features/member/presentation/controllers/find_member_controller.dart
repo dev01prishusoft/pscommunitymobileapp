@@ -1,102 +1,47 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/utils/pagination_mixin.dart';
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:dio/dio.dart';
 
-class FindMemberController extends GetxController {
+class FindMemberController extends PaginationMixin<Member> {
+  FindMemberController(this._repository);
   final MemberRepository _repository;
 
-  FindMemberController(this._repository);
-
-  final Rx<AppState> state = AppState.loading.obs;
-  final RxList<Member> members = <Member>[].obs;
   final RxString searchQuery = ''.obs;
-  final RxBool isSearching = false.obs;
-  String _lastQuery = '';
-  
-  // Pagination
-  int _currentPage = 1;
-  final int _pageSize = 20;
-  final RxBool hasMore = true.obs;
-  final RxBool isLoadingMore = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Debounce search to avoid too many API calls
-    debounce(searchQuery, (_) => loadMembers(showLoading: false), time: const Duration(milliseconds: 500));
+    refreshData(showInitialLoading: true);
   }
 
-  Future<void> loadMembers({bool showLoading = true}) async {
-    // If it's a debounced call and query has not changed, return early
-    if (!showLoading && searchQuery.value == _lastQuery) {
-      return;
-    }
-    _lastQuery = searchQuery.value;
-
-    if (showLoading) {
-      state.value = AppState.loading;
+  @override
+  Future<Result<List<Member>>> fetchPage(int page, CancelToken? cancelToken) async {
+    final result = await _repository.searchMembers(
+      query: searchQuery.value,
+      pageNumber: page,
+      pageSize: pageSize,
+      cancelToken: cancelToken,
+    );
+    
+    if (result is Success<PaginatedResponse<Member>>) {
+      return Success(result.data.data);
     } else {
-      isSearching.value = true;
-    }
-    
-    _currentPage = 1;
-    hasMore.value = true;
-    
-    try {
-      final results = await _repository.searchMembers(
-        query: searchQuery.value,
-        pageNumber: _currentPage,
-        pageSize: _pageSize,
-      );
-      
-      members.assignAll(results);
-      hasMore.value = results.length >= _pageSize;
-      state.value = members.isEmpty ? AppState.empty : AppState.data;
-    } catch (e, stack) {
-      AppLogger.e('Failed to load members', e, stack);
-      if (showLoading) {
-        state.value = AppState.error;
-      }
-    } finally {
-      isSearching.value = false;
+      return Error((result as Error).failure);
     }
   }
 
-  Future<void> loadMoreMembers() async {
-    if (isLoadingMore.value || !hasMore.value) return;
-    
-    isLoadingMore.value = true;
-    _currentPage++;
-    
-    try {
-      final results = await _repository.searchMembers(
-        query: searchQuery.value,
-        pageNumber: _currentPage,
-        pageSize: _pageSize,
-      );
-      
-      if (results.isEmpty) {
-        hasMore.value = false;
-      } else {
-        members.addAll(results);
-        hasMore.value = results.length >= _pageSize;
-      }
-    } catch (e, stack) {
-      AppLogger.e('Failed to load more members', e, stack);
-      _currentPage--; // Revert page on error
-    } finally {
-      isLoadingMore.value = false;
-    }
-  }
-
-  void onSearchChanged(String query) {
-    searchQuery.value = query;
+  void updateSearch(String query) {
+    onSearchChanged(query, (q) => searchQuery.value = q);
   }
 
   void clearSearch() {
+    if (searchQuery.value.isEmpty) return;
+    searchDebouncer.cancel();
     searchQuery.value = '';
-    loadMembers(showLoading: true);
+    refreshData(showInitialLoading: true);
   }
 }

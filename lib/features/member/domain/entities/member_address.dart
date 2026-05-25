@@ -1,19 +1,5 @@
 class MemberAddress {
-  final int memberAddressId;
-  final int memberId;
-  final int addressTypeId;
-  final String addressTypeName;
-  final String stateName;
-  final String districtName;
-  final String talukaName;
-  final String areaName;
-  final String addressLine1;
-  final String addressLine2;
-  final String landmark;
-  final String pincode;
-  final bool isPrimary;
-
-  const MemberAddress({
+  MemberAddress({
     required this.memberAddressId,
     required this.memberId,
     required this.addressTypeId,
@@ -46,6 +32,19 @@ class MemberAddress {
       isPrimary: json['isPrimary'] as bool? ?? false,
     );
   }
+  final int memberAddressId;
+  final int memberId;
+  final int addressTypeId;
+  final String addressTypeName;
+  final String stateName;
+  final String districtName;
+  final String talukaName;
+  final String areaName;
+  final String addressLine1;
+  final String addressLine2;
+  final String landmark;
+  final String pincode;
+  final bool isPrimary;
 
   String get fullAddress {
     final parts = [

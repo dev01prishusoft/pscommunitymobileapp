@@ -1,12 +1,9 @@
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 
 class MemberAvatar extends StatelessWidget {
-  final String? imageUrl;
-  final String? gender;
-  final double radius;
-  final String? fallbackName;
-
   const MemberAvatar({
     super.key,
     required this.imageUrl,
@@ -14,22 +11,25 @@ class MemberAvatar extends StatelessWidget {
     this.radius = 30.0,
     this.fallbackName,
   });
+  final String? imageUrl;
+  final String? gender;
+  final double radius;
+  final String? fallbackName;
 
   @override
   Widget build(BuildContext context) {
     final avatarColors = _getAvatarColors(gender ?? '');
-    final memCacheSize = (radius * 3).toInt(); // Approx density x3 for caching
+    final memCacheSize = (radius * 3).toInt();
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: imageUrl!,
+      return CachedImg(
+        url: imageUrl!,
         memCacheHeight: memCacheSize,
         memCacheWidth: memCacheSize,
-        imageBuilder: (context, imageProvider) => CircleAvatar(
-          radius: radius,
-          backgroundImage: imageProvider,
-        ),
-        placeholder: (context, url) => _buildFallback(avatarColors, isLoading: true),
+        imageBuilder: (context, imageProvider) =>
+            CircleAvatar(radius: radius, backgroundImage: imageProvider),
+        placeholder: (context, url) =>
+            _buildFallback(avatarColors, isLoading: true),
         errorWidget: (context, url, error) => _buildFallback(avatarColors),
       );
     }
@@ -37,12 +37,15 @@ class MemberAvatar extends StatelessWidget {
     return _buildFallback(avatarColors);
   }
 
-  Widget _buildFallback(({Color background, Color icon}) colors, {bool isLoading = false}) {
+  Widget _buildFallback(
+    ({Color background, Color icon}) colors, {
+    bool isLoading = false,
+  }) {
     if (isLoading) {
       return CircleAvatar(
         radius: radius,
         backgroundColor: colors.background,
-        child: const CircularProgressIndicator(strokeWidth: 2),
+        child: CircularProgressIndicator(strokeWidth: 2),
       );
     }
 
@@ -53,9 +56,8 @@ class MemberAvatar extends StatelessWidget {
         backgroundColor: colors.background,
         child: Text(
           initial,
-          style: TextStyle(
+          style: AppTextStyles.labelLarge.copyWith(
             color: colors.icon,
-            fontWeight: FontWeight.bold,
             fontSize: radius * 0.8,
           ),
         ),
@@ -71,8 +73,8 @@ class MemberAvatar extends StatelessWidget {
 
   ({Color background, Color icon}) _getAvatarColors(String gender) {
     if (gender.toLowerCase() == 'female') {
-      return (background: const Color(0xFFFCE4EC), icon: Colors.pink);
+      return (background: Color(0xFFFCE4EC), icon: Colors.pink);
     }
-    return (background: const Color(0xFFE3F2FD), icon: Colors.blue);
+    return (background: Color(0xFFE3F2FD), icon: AppColors.blue);
   }
 }

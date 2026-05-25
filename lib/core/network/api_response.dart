@@ -1,24 +1,18 @@
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class ApiResponse<T> {
-  final bool succeeded;
-  final String? message;
-  final T? data;
-
-  ApiResponse({
-    required this.succeeded,
-    this.message,
-    this.data,
-  });
+  ApiResponse({required this.succeeded, this.message, this.data});
 
   factory ApiResponse.fromJson(
-    Map<String, dynamic> json, 
-    T Function(Object? json)? fromJsonT
+    Map<String, dynamic> json,
+    T Function(Object? json)? fromJsonT,
   ) {
     if (json['succeeded'] != true) {
-      throw ServerFailure(json['message']?.toString() ?? 'Server error occurred');
+      throw ServerFailure(
+        json['message']?.toString() ?? 'Server error occurred',
+      );
     }
-    
+
     return ApiResponse<T>(
       succeeded: json['succeeded'] as bool? ?? false,
       message: json['message'] as String?,
@@ -27,17 +21,12 @@ class ApiResponse<T> {
           : null,
     );
   }
+  final bool succeeded;
+  final String? message;
+  final T? data;
 }
 
 class PaginatedResponse<T> {
-  final bool succeeded;
-  final String? message;
-  final List<T> data;
-  final int pageNumber;
-  final int pageSize;
-  final int totalRecords;
-  final int totalPages;
-
   PaginatedResponse({
     required this.succeeded,
     this.message,
@@ -54,7 +43,9 @@ class PaginatedResponse<T> {
     T Function(Object? json) fromJsonT,
   ) {
     if (json['succeeded'] != true) {
-      throw ServerFailure(json['message']?.toString() ?? 'Server error occurred');
+      throw ServerFailure(
+        json['message']?.toString() ?? 'Server error occurred',
+      );
     }
 
     final dataObj = json['data'];
@@ -70,7 +61,7 @@ class PaginatedResponse<T> {
     } else if (dataObj is List) {
       list = dataObj;
     }
-    
+
     return PaginatedResponse<T>(
       succeeded: json['succeeded'] as bool? ?? false,
       message: json['message'] as String?,
@@ -81,4 +72,11 @@ class PaginatedResponse<T> {
       totalPages: totalPages,
     );
   }
+  final bool succeeded;
+  final String? message;
+  final List<T> data;
+  final int pageNumber;
+  final int pageSize;
+  final int totalRecords;
+  final int totalPages;
 }

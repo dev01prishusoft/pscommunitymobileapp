@@ -12,10 +12,14 @@ abstract class FamilyRepository {
     int pageNo = 1,
     int pageSize = 20,
   });
-  Future<List<Family>> getFamiliesByArea(int areaId, {int pageNo = 1, int pageSize = 20});
+  Future<List<Family>> getFamiliesByArea(
+    int areaId, {
+    int pageNo = 1,
+    int pageSize = 20,
+  });
   Future<Member> getMemberDetails(int memberId);
   Future<List<MemberAddress>> getMemberAddresses(int memberId);
-  
+
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
   Future<List<DropdownItem>> getTalukas(int districtId);

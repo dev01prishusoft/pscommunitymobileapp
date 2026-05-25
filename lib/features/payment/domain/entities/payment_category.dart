@@ -1,8 +1,4 @@
 class PaymentCategory {
-  final int id;
-  final String name;
-  final double defaultAmount;
-
   PaymentCategory({
     required this.id,
     required this.name,
@@ -16,4 +12,7 @@ class PaymentCategory {
       defaultAmount: (json['defaultAmount'] as num?)?.toDouble() ?? 0.0,
     );
   }
+  final int id;
+  final String name;
+  final double defaultAmount;
 }

@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -10,11 +12,7 @@ import 'package:pscommunitymobileapp/core/mappers/relation_mapper.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 
 class MemberTile extends StatelessWidget {
-  const MemberTile({
-    super.key,
-    required this.member,
-    required this.showDivider,
-  });
+  const MemberTile({super.key, required this.member, required this.showDivider});
 
   final FamilyMember member;
   final bool showDivider;
@@ -23,19 +21,18 @@ class MemberTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (showDivider)
-          const Divider(indent: 70, endIndent: 16),
+        if (showDivider) Divider(indent: 70, endIndent: 16),
         InkWell(
           onTap: () => Get.toNamed<void>(
             AppRouter.memberProfile,
             arguments: {'memberId': int.tryParse(member.id) ?? 0},
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
                 _buildAvatar(),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,64 +42,92 @@ class MemberTile extends StatelessWidget {
                           Flexible(
                             child: Text(
                               member.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                              style: AppTextStyles.labelLarge.copyWith(
                                 color: AppColors.secondary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (member.isHead) ...[
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8.w),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFDCFCE7), // specific accent color
+                                color: AppColors.lightGreen,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 LK.familyHead.tr,
-                                style: const TextStyle(
-                                  color: Color(0xFF16A34A),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: AppColors.success,
                                 ),
                               ),
                             ),
                           ],
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Builder(
                         builder: (context) {
-                          final genderKey = GenderMapper.getLabelKey(member.gender);
-                          final relKey = RelationMapper.getLabelKey(member.relation);
-                          final statusKey = MaritalStatusMapper.getLabelKey(member.maritalStatus);
-                          
-                          const metaStyle = TextStyle(fontSize: 12, color: AppColors.mutedForeground);
-                          const dot = Text(' • ', style: metaStyle);
-                          
+                          final genderKey = GenderMapper.getLabelKey(
+                            member.gender,
+                          );
+                          final relKey = RelationMapper.getLabelKey(
+                            member.relation,
+                          );
+                          final statusKey = MaritalStatusMapper.getLabelKey(
+                            member.maritalStatus,
+                          );
+
+                          final metaStyle = AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.mutedForeground,
+                          );
+                          final dot = Text(
+                            ' • ',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.mutedForeground,
+                            ),
+                          );
+
                           return Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Text(genderKey != null ? genderKey.tr : member.gender, style: metaStyle),
+                              Text(
+                                genderKey != null
+                                    ? genderKey.tr
+                                    : member.gender,
+                                style: metaStyle,
+                              ),
                               dot,
-                              Text(relKey != null ? relKey.tr : member.relation, style: metaStyle),
+                              Text(
+                                relKey != null ? relKey.tr : member.relation,
+                                style: metaStyle,
+                              ),
                               dot,
-                              Text(statusKey != null ? statusKey.tr : member.maritalStatus, style: metaStyle),
-                              if (member.occupation.isNotEmpty && member.occupation.toLowerCase() != 'n/a' && member.occupation.toLowerCase() != 'none') ...[
+                              Text(
+                                statusKey != null
+                                    ? statusKey.tr
+                                    : member.maritalStatus,
+                                style: metaStyle,
+                              ),
+                              if (member.occupation.isNotEmpty &&
+                                  member.occupation.toLowerCase() != 'n/a' &&
+                                  member.occupation.toLowerCase() !=
+                                      'none') ...[
                                 dot,
                                 Text(member.occupation, style: metaStyle),
                               ],
                             ],
                           );
-                        }
+                        },
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.border, size: 20),
+                Icon(Icons.chevron_right, color: AppColors.border, size: 20),
               ],
             ),
           ),
@@ -116,7 +141,7 @@ class MemberTile extends StatelessWidget {
       imageUrl: member.profileImageUrl,
       gender: member.gender,
       fallbackName: member.name,
-      radius: 22,
+      radius: 22.r,
     );
   }
 }

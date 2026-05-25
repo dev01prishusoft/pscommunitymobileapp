@@ -1,13 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class RoleMapper {
-  /// Returns the localization key for a given role string.
-  /// Since backend roles might be dynamic, if it doesn't match known
-  /// static role keys, it returns null instead of falling back to raw values.
   static String? getLabelKey(String? role) {
     if (role == null || role.isEmpty) return null;
-    
+
     switch (role.toLowerCase().trim()) {
       case 'president':
         return LK.rolePresident;
@@ -22,7 +19,7 @@ class RoleMapper {
       case 'committee member':
         return LK.roleCommitteeMember;
       default:
-        if (kDebugMode) debugPrint('Unknown role: $role');
+        AppLogger.w('Unknown role: $role');
         return null;
     }
   }

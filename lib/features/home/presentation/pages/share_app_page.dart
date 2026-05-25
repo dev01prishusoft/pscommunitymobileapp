@@ -8,12 +8,11 @@ import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/sam
 
 /// Share-the-app screen.
 /// All share/copy/WhatsApp logic lives in [ShareController].
-class ShareAppPage extends StatelessWidget {
+class ShareAppPage extends GetView<ShareController> {
   const ShareAppPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = Get.find<ShareController>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -22,7 +21,7 @@ class ShareAppPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back<void>(),
         ),
         title: Text(
           LK.share.tr,
@@ -39,22 +38,22 @@ class ShareAppPage extends StatelessWidget {
           children: [
             _HeaderCard(),
             const SizedBox(height: 20),
-            _AppLinkCard(ctrl: ctrl),
+            _AppLinkCard(ctrl: controller),
             const SizedBox(height: 12),
-            _QrCard(ctrl: ctrl),
+            _QrCard(ctrl: controller),
             const SizedBox(height: 24),
             _ShareButton(
               icon: Icons.chat_bubble,
               label: LK.shareAppViaWhatsApp.tr,
               color: const Color(0xFF25D366),
-              onTap: ctrl.shareViaWhatsApp,
+              onTap: controller.shareViaWhatsApp,
             ),
             const SizedBox(height: 16),
             _ShareButton(
               icon: Icons.share,
               label: LK.shareAppViaOther.tr,
               color: AppColors.primary,
-              onTap: ctrl.shareGeneral,
+              onTap: controller.shareGeneral,
             ),
             const SizedBox(height: 20),
           ],
@@ -63,8 +62,6 @@ class ShareAppPage extends StatelessWidget {
     );
   }
 }
-
-// ─── Shared decoration ────────────────────────────────────────────────────────
 
 BoxDecoration _cardDecoration({double radius = 16}) => BoxDecoration(
       color: Colors.white,
@@ -79,9 +76,7 @@ BoxDecoration _cardDecoration({double radius = 16}) => BoxDecoration(
       ],
     );
 
-// ─── Header Card ──────────────────────────────────────────────────────────────
-
-class _HeaderCard extends StatelessWidget {
+class _HeaderCard extends GetView<SamajController> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -104,10 +99,9 @@ class _HeaderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Read samaj name reactively
           Obx(() {
             final samajName =
-                Get.find<SamajController>().samaj.value?.name ??
+                controller.samaj.value?.name ??
                     LK.samajName.tr;
             return Text(
               samajName,
@@ -131,8 +125,6 @@ class _HeaderCard extends StatelessWidget {
     );
   }
 }
-
-// ─── App Link Card ────────────────────────────────────────────────────────────
 
 class _AppLinkCard extends StatelessWidget {
   const _AppLinkCard({required this.ctrl});
@@ -167,14 +159,13 @@ class _AppLinkCard extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
-                  // Allow full link to wrap across lines instead of being cut off
                   softWrap: true,
                   overflow: TextOverflow.visible,
                 ),
               ),
               const SizedBox(width: 12),
               ElevatedButton.icon(
-                onPressed: ctrl.copyLink, // ← actually copies now
+                onPressed: ctrl.copyLink,
                 icon: const Icon(Icons.copy, size: 16, color: AppColors.primary),
                 label: Text(
                   LK.copyLink.tr,
@@ -203,8 +194,6 @@ class _AppLinkCard extends StatelessWidget {
   }
 }
 
-// ─── QR Card ──────────────────────────────────────────────────────────────────
-
 class _QrCard extends StatelessWidget {
   const _QrCard({required this.ctrl});
 
@@ -218,7 +207,6 @@ class _QrCard extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          // Real QR code generated from the actual app link
           QrImageView(
             data: ctrl.appLink,
             version: QrVersions.auto,
@@ -242,7 +230,7 @@ class _QrCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: ctrl.shareGeneral, // Share message (not QR image)
+            onPressed: ctrl.shareGeneral,
             icon: const Icon(Icons.share, size: 18),
             label: Text(LK.shareQR.tr),
             style: OutlinedButton.styleFrom(
@@ -259,8 +247,6 @@ class _QrCard extends StatelessWidget {
     );
   }
 }
-
-// ─── Share Button ─────────────────────────────────────────────────────────────
 
 class _ShareButton extends StatelessWidget {
   const _ShareButton({
