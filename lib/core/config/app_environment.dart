@@ -34,8 +34,8 @@ class AppEnvironment {
 
   static void init() {
     if (_instance != null) return;
-    const flavorString = String.fromEnvironment('FLAVOR', defaultValue: 'dev');
-    final flavor = flavorString == 'prod' ? Flavor.prod : Flavor.dev;
+    const flavorString = String.fromEnvironment('FLAVOR', defaultValue: 'prod');
+    final flavor = flavorString == 'dev' ? Flavor.dev : Flavor.prod;
 
     _instance = AppEnvironment._(
       flavor: flavor,

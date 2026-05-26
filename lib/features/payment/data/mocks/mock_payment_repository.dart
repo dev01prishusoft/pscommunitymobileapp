@@ -85,6 +85,11 @@ class MockPaymentRepository implements PaymentRepository {
     required int paymentTypeId,
     required int paymentCategoryId,
     int? adminPaymentRequestId,
+    String currency = 'INR',
+    int memberId = 0,
+    int paymentStatusId = 0,
+    int paymentModeId = 0,
+    String? description,
   }) async {
     AppLogger.i('Mock: createOrder');
     return RazorpayOrder(

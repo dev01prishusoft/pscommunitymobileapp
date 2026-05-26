@@ -5,6 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AppWebViewPage extends StatefulWidget {
   const AppWebViewPage({super.key, required this.title, required this.url});
@@ -170,7 +172,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
                         });
                         _controller.reload();
                       },
-                      child: Text('Retry'),
+                      child: Text(LK.retry.tr),
                     ),
                   ],
                 ),

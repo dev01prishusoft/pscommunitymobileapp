@@ -9,9 +9,11 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
+  Member? _currentMember;
   final formKey = GlobalKey<FormState>();
   final defaultGenders = ['Male', 'Female', 'Other'];
   final defaultMaritalStatuses = ['Married', 'Unmarried', 'Widow', 'Divorced'];
@@ -81,6 +83,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final motherFatherName = ''.obs;
   final gotra = ''.obs;
   final mothersGotra = ''.obs;
+  final gotraList = <String>[].obs;
+  final mothersGotraList = <String>[].obs;
   final openToMarriage = false.obs;
   final ownLand = false.obs;
   final ownHouse = false.obs;
@@ -146,6 +150,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   }
 
   void loadFromMember(Member m) {
+    _currentMember = m;
     memberNo.value = m.memberNo ?? '';
     firstName.value = m.firstName;
     middleName.value = m.middleName ?? '';
@@ -194,7 +199,33 @@ class ProfileFormController extends GetxController with FormStateMixin {
     workAddressLine1.value = m.occupationAddressLine1 ?? '';
     workAddressLine2.value = m.occupationAddressLine2 ?? '';
 
-    _initializeControllers();
+    memberNoCtrl.text = memberNo.value;
+    tobCtrl.text = tob.value;
+    motherFatherNameCtrl.text = motherFatherName.value;
+    companyNameCtrl.text = companyName.value;
+    businessNameCtrl.text = businessName.value;
+    entryPersonMobileCtrl.text = entryPersonMobile.value;
+    firstNameCtrl.text = firstName.value;
+    middleNameCtrl.text = middleName.value;
+    lastNameCtrl.text = lastName.value;
+    firstNameEnCtrl.text = firstNameEn.value;
+    lastNameEnCtrl.text = lastNameEn.value;
+    dobCtrl.text = dob.value;
+    heightCtrl.text = height.value;
+    weightCtrl.text = weight.value;
+
+    mobileCtrl.text = mobileNo.value;
+    secondaryMobileCtrl.text = secondaryMobile.value;
+    emailCtrl.text = email.value;
+    emergencyNameCtrl.text = emergencyContactName.value;
+    emergencyNoCtrl.text = emergencyContactNo.value;
+
+    monthlyIncomeCtrl.text = monthlyIncome.value;
+
+    facebookCtrl.text = facebook.value;
+    whatsappCtrl.text = whatsapp.value;
+    instagramCtrl.text = instagram.value;
+    twitterCtrl.text = twitter.value;
   }
 
   void _initializeControllers() {
@@ -290,6 +321,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         defaultOccupationTypes,
       ),
       _fetchDropdown('/Sign/dropdown', signList, defaultSigns),
+      _fetchDropdown('/Gotra/dropdown', gotraList, ['Parmar', 'Chauhan', 'Solanki', 'Rathod']),
+      _fetchDropdown('/Gotra/dropdown', mothersGotraList, ['Parmar', 'Chauhan', 'Solanki', 'Rathod']),
     ]);
     _ensureSelectionValue(gender, genderList);
     _ensureSelectionValue(maritalStatus, maritalStatusList);
@@ -297,6 +330,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(relation, relationList);
     _ensureSelectionValue(occupationType, occupationTypeList);
     _ensureSelectionValue(sign, signList);
+    _ensureSelectionValue(gotra, gotraList);
+    _ensureSelectionValue(mothersGotra, mothersGotraList);
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
@@ -445,20 +480,54 @@ class ProfileFormController extends GetxController with FormStateMixin {
       
       submitThrottled(() async {
         uploadProgress.value = 0.1;
-        await Future<void>.delayed(Duration(milliseconds: 500));
-        uploadProgress.value = 0.5;
-        await Future<void>.delayed(Duration(milliseconds: 500));
-        uploadProgress.value = 1.0;
-
-        Get.snackbar(
-          'Success',
-          'Profile updated successfully!',
-          backgroundColor: AppColors.green,
-          colorText: AppColors.white,
-        );
         
-        await Future<void>.delayed(Duration(milliseconds: 500));
-        uploadProgress.value = 0.0;
+        try {
+          final memberRepository = Get.find<MemberRepository>();
+          final memberToSubmit = Member(
+            memberId: _currentMember?.memberId ?? 0,
+            memberNo: memberNoCtrl.text,
+            firstName: firstNameCtrl.text,
+            lastName: lastNameCtrl.text,
+            middleName: middleNameCtrl.text,
+            mobileNo: mobileCtrl.text,
+            emailAddress: emailCtrl.text,
+            genderName: gender.value,
+            maritalStatusName: maritalStatus.value,
+            bloodGroupName: bloodGroup.value,
+            dateOfBirth: dob.value,
+            dateOfBirthTime: tob.value,
+            height: int.tryParse(heightCtrl.text),
+            weight: int.tryParse(weightCtrl.text),
+            gotraName: gotra.value,
+          );
+
+          final result = await memberRepository.updateProfile(memberToSubmit);
+          
+          if (result.isSuccess) {
+            Get.snackbar(
+              'Success',
+              'Profile updated successfully!',
+              backgroundColor: AppColors.green,
+              colorText: AppColors.white,
+            );
+          } else {
+            Get.snackbar(
+              'Error',
+              result.failureOrNull?.message ?? 'Failed to update profile',
+              backgroundColor: AppColors.red,
+              colorText: AppColors.white,
+            );
+          }
+        } catch (e) {
+          Get.snackbar(
+            'Error',
+            'An unexpected error occurred.',
+            backgroundColor: AppColors.red,
+            colorText: AppColors.white,
+          );
+        } finally {
+          uploadProgress.value = 0.0;
+        }
       });
     } else {
       Get.snackbar(

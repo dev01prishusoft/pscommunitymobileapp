@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class ConnectivityService {
   ConnectivityService({required Connectivity connectivity})
@@ -12,7 +13,8 @@ class ConnectivityService {
       return false;
     }
     try {
-      final lookup = await InternetAddress.lookup('google.com');
+      final host = Uri.parse(AppEnvironment.I.apiBaseUrl).host;
+      final lookup = await InternetAddress.lookup(host);
       return lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty;
     } on SocketException catch (_) {
       return false;

@@ -1,6 +1,5 @@
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/core/constants/app_strings_preboot.dart';
@@ -41,25 +40,27 @@ class FatalErrorScreen extends StatelessWidget {
                   color: PrebootColors.errorIcon,
                   size: 80,
                 ),
-                SizedBox(height: 24.h),
+                SizedBox(height: 24),
                 Text(
                   PrebootStrings.initError,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.displaySmall.copyWith(
+                  style: const TextStyle(
+                    fontSize: 36,
                     color: PrebootColors.textPrimary,
                     letterSpacing: -0.5,
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 16),
                 Text(
                   PrebootStrings.initBody,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyLarge.copyWith(
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: PrebootColors.textSecondary,
-                    height: 1.5.h,
+                    height: 1.5,
                   ),
                 ),
-                SizedBox(height: 32.h),
+                SizedBox(height: 32),
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -72,15 +73,17 @@ class FatalErrorScreen extends StatelessWidget {
                     children: [
                       Text(
                         PrebootStrings.errorLog,
-                        style: AppTextStyles.labelSmall.copyWith(
+                        style: const TextStyle(
+                          fontSize: 11,
                           color: PrebootColors.logHeader,
                           letterSpacing: 1,
                         ),
                       ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 12),
                       Text(
                         '$error',
-                        style: AppTextStyles.bodySmall.copyWith(
+                        style: const TextStyle(
+                          fontSize: 12,
                           color: PrebootColors.logText,
                           fontFamily: 'monospace',
                         ),
@@ -88,7 +91,7 @@ class FatalErrorScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 48.h),
+                SizedBox(height: 48),
                 ElevatedButton(
                   onPressed: () {
                     SystemNavigator.pop();
@@ -104,7 +107,8 @@ class FatalErrorScreen extends StatelessWidget {
                   ),
                   child: Text(
                     PrebootStrings.closeApp,
-                    style: AppTextStyles.labelLarge.copyWith(
+                    style: const TextStyle(
+                      fontSize: 14,
                       letterSpacing: 0.5,
                     ),
                   ),

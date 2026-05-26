@@ -23,8 +23,8 @@ class ApiEndpoints {
   static String memberAddress = '/api/v1/member-address/member';
   static String samajDetail = '/api/v1/member/samaj-detail';
   static String paymentDashboard = '/api/v1/payment/dashboard';
-  static String paymentTypes = '/api/v1/PaymentType/dropdown';
-  static String paymentCategories = '/api/v1/PaymentCategory/dropdown';
+  static String paymentTypes = '/api/v1/payment-type/dropdown';
+  static String paymentCategories = '/api/v1/payment-category/dropdown';
   static String createOrder = '/api/v1/payment/create-order';
   static String verifyPayment = '/api/v1/payment/verify';
   static String paymentHistory = '/api/v1/payment/history';

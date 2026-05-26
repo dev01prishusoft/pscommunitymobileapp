@@ -19,10 +19,23 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final LoginController _controller = Get.put(
-    LoginController(Get.find()),
-    tag: UniqueKey().toString(),
-  );
+  late final LoginController _controller;
+  final String _tag = 'login_controller_tag';
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.put(
+      LoginController(Get.find()),
+      tag: _tag,
+    );
+  }
+
+  @override
+  void dispose() {
+    Get.delete<LoginController>(tag: _tag);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

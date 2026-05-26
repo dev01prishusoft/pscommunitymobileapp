@@ -14,4 +14,6 @@ abstract class MemberRepository {
     int pageSize = 20,
     CancelToken? cancelToken,
   });
+
+  Future<Result<bool>> updateProfile(Member member);
 }

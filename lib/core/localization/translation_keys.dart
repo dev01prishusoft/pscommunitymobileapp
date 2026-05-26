@@ -100,6 +100,19 @@ class LK {
   static String deleteAccount = 'Delete Account';
   static String deleteAccountConfirm =
       'Are you sure you want to delete your account? This action cannot be undone.';
+  static String fieldRequired = 'This field is required';
+  static String sessionExpired = 'Session Expired';
+  static String sessionExpiredBody = 'You have been logged out due to inactivity.';
+  static String pleaseEnterEmail = 'Please enter email address';
+  static String pleaseEnterValidEmail = 'Please enter a valid email address';
+  static String passwordMinLength = 'Password must be at least 8 characters';
+  static String passwordLowercase = 'Password must contain at least one lowercase letter';
+  static String passwordUppercase = 'Password must contain at least one uppercase letter';
+  static String passwordNumber = 'Password must contain at least one number';
+  static String passwordSpecialChar = 'Password must contain at least one special character (!@#\$&*~)';
+  static String pleaseEnterOTP = 'Please enter OTP';
+  static String pleaseEnterValidOTP = 'Please enter a valid OTP';
+  static String pleaseEnterValidURL = 'Please enter a valid URL';
   static String retry = 'Retry';
   static String somethingWrong = 'Something went wrong';
   static String noResultsFound = 'No results found';
@@ -358,7 +371,7 @@ class LK {
   static String saveChanges = 'Save Changes';
   static String addMember = 'Add Member';
   static String memberNoHint = 'PSC-2026-0512160358';
-  static String fieldRequired = 'This field is required';
+
 
   static List<String> allValues = [
     appTitle,
@@ -705,5 +718,17 @@ class LK {
     deleteAccount,
     deleteAccountConfirm,
     fieldRequired,
+    sessionExpired,
+    sessionExpiredBody,
+    pleaseEnterEmail,
+    pleaseEnterValidEmail,
+    passwordMinLength,
+    passwordLowercase,
+    passwordUppercase,
+    passwordNumber,
+    passwordSpecialChar,
+    pleaseEnterOTP,
+    pleaseEnterValidOTP,
+    pleaseEnterValidURL,
   ];
 }

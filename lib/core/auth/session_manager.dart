@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class SessionManager extends GetxController {
   SessionManager(this._authState);
@@ -39,8 +40,8 @@ class SessionManager extends GetxController {
     if (_authState.isAuthenticated.value) {
       _authState.logoutAndRedirect();
       Get.snackbar(
-        'Session Expired',
-        'You have been logged out due to inactivity.',
+        LK.sessionExpired.tr,
+        LK.sessionExpiredBody.tr,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,

@@ -18,7 +18,8 @@ abstract class PaginationMixin<T> extends GetxController {
   
   final ScrollController scrollController = ScrollController();
   final Debouncer searchDebouncer = Debouncer(milliseconds: 500);
-  CancelToken? cancelToken;
+  CancelToken? refreshCancelToken;
+  CancelToken? loadMoreCancelToken;
 
   /// Override this method to provide the API call logic.
   Future<Result<List<T>>> fetchPage(int page, CancelToken? cancelToken);
@@ -33,7 +34,8 @@ abstract class PaginationMixin<T> extends GetxController {
   void onClose() {
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
-    cancelToken?.cancel();
+    refreshCancelToken?.cancel();
+    loadMoreCancelToken?.cancel();
     searchDebouncer.dispose();
     super.onClose();
   }
@@ -59,11 +61,11 @@ abstract class PaginationMixin<T> extends GetxController {
     
     _resetPaginationState();
     
-    cancelToken?.cancel();
-    cancelToken = CancelToken();
+    refreshCancelToken?.cancel();
+    refreshCancelToken = CancelToken();
 
     try {
-      final result = await fetchPage(page, cancelToken);
+      final result = await fetchPage(page, refreshCancelToken);
       _handlePageResult(result, isRefresh: true);
     } catch (e) {
       if (e is DioException && e.type == DioExceptionType.cancel) return;
@@ -80,11 +82,11 @@ abstract class PaginationMixin<T> extends GetxController {
     isLoadingMore.value = true;
     page++;
     
-    cancelToken?.cancel();
-    cancelToken = CancelToken();
+    loadMoreCancelToken?.cancel();
+    loadMoreCancelToken = CancelToken();
 
     try {
-      final result = await fetchPage(page, cancelToken);
+      final result = await fetchPage(page, loadMoreCancelToken);
       _handlePageResult(result, isRefresh: false);
     } catch (e) {
       if (e is DioException && e.type == DioExceptionType.cancel) return;

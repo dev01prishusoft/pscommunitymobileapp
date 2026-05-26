@@ -378,5 +378,17 @@
   "to": "to",
   "welcomes you": "welcomes you",
   "yrs": "yrs",
-  "This field is required": "This field is required"
+  "This field is required": "This field is required",
+  "Session Expired": "Session Expired",
+  "You have been logged out due to inactivity.": "You have been logged out due to inactivity.",
+  "Please enter email address": "Please enter email address",
+  "Please enter a valid email address": "Please enter a valid email address",
+  "Password must be at least 8 characters": "Password must be at least 8 characters",
+  "Password must contain at least one lowercase letter": "Password must contain at least one lowercase letter",
+  "Password must contain at least one uppercase letter": "Password must contain at least one uppercase letter",
+  "Password must contain at least one number": "Password must contain at least one number",
+  "Password must contain at least one special character (!@#$&*~)": "Password must contain at least one special character (!@#$&*~)",
+  "Please enter OTP": "Please enter OTP",
+  "Please enter a valid OTP": "Please enter a valid OTP",
+  "Please enter a valid URL": "Please enter a valid URL"
 }

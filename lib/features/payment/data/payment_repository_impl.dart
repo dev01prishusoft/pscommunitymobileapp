@@ -67,16 +67,26 @@ class PaymentRepositoryImpl implements PaymentRepository {
     required int paymentTypeId,
     required int paymentCategoryId,
     int? adminPaymentRequestId,
+    String currency = 'INR',
+    int memberId = 0,
+    int paymentStatusId = 0,
+    int paymentModeId = 0,
+    String? description,
   }) async {
     try {
       final response = await _apiClient.postParsed<RazorpayOrder>(
         ApiEndpoints.createOrder,
         data: {
           'amount': amount,
+          'currency': currency,
           'paymentTypeId': paymentTypeId,
           'paymentCategoryId': paymentCategoryId,
           if (adminPaymentRequestId != null)
             'adminPaymentRequestId': adminPaymentRequestId,
+          'memberId': memberId,
+          'paymentStatusId': paymentStatusId,
+          'paymentModeId': paymentModeId,
+          if (description != null) 'description': description,
         },
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),

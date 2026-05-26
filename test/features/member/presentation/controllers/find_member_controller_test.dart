@@ -37,6 +37,12 @@ class MockMemberRepository implements MemberRepository {
     
     return Success(PaginatedResponse(data: items, totalRecords: 25, pageSize: 20, pageNumber: pageNumber, totalPages: 2, succeeded: true));
   }
+
+  @override
+  Future<Result<bool>> updateProfile(Member member) async {
+    if (shouldThrow) return Error(ServerFailure('API Error'));
+    return const Success(true);
+  }
 }
 
 void main() {

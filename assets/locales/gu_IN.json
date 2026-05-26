@@ -378,5 +378,17 @@
   "to": "થી",
   "welcomes you": "આપનું સ્વાગત કરે છે",
   "yrs": "વર્ષ",
-  "This field is required": "આ ક્ષેત્ર જરૂરી છે"
+  "This field is required": "આ ક્ષેત્ર જરૂરી છે",
+  "Session Expired": "સત્ર સમાપ્ત",
+  "You have been logged out due to inactivity.": "નિષ્ક્રિયતાને કારણે તમને લોગ આઉટ કરવામાં આવ્યા છે.",
+  "Please enter email address": "કૃપા કરીને ઇમેઇલ સરનામું દાખલ કરો",
+  "Please enter a valid email address": "કૃપા કરીને માન્ય ઇમેઇલ સરનામું દાખલ કરો",
+  "Password must be at least 8 characters": "પાસવર્ડ ઓછામાં ઓછો 8 અક્ષરોનો હોવો જોઈએ",
+  "Password must contain at least one lowercase letter": "પાસવર્ડમાં ઓછામાં ઓછો એક નાનો અક્ષર હોવો જોઈએ",
+  "Password must contain at least one uppercase letter": "પાસવર્ડમાં ઓછામાં ઓછો એક મોટો અક્ષર હોવો જોઈએ",
+  "Password must contain at least one number": "પાસવર્ડમાં ઓછામાં ઓછો એક નંબર હોવો જોઈએ",
+  "Password must contain at least one special character (!@#$&*~)": "પાસવર્ડમાં ઓછામાં ઓછું એક વિશિષ્ટ પાત્ર હોવું આવશ્યક છે (!@#$&*~)",
+  "Please enter OTP": "કૃપા કરીને OTP દાખલ કરો",
+  "Please enter a valid OTP": "કૃપા કરીને માન્ય OTP દાખલ કરો",
+  "Please enter a valid URL": "કૃપા કરીને માન્ય URL દાખલ કરો"
 }

@@ -127,7 +127,9 @@ class PaymentController extends GetxController {
         amount: amount,
         paymentTypeId: typeId,
         paymentCategoryId: categoryId,
+        paymentModeId: typeId,
         adminPaymentRequestId: adminPaymentRequestId,
+        description: LK.paymentForCommunity.tr,
       );
 
       const envKey = String.fromEnvironment('RAZORPAY_KEY');

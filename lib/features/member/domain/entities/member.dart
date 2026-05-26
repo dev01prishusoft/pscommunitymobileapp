@@ -239,4 +239,28 @@ class Member {
       return apiAge ?? 0;
     }
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'memberId': memberId,
+      'memberNo': memberNo,
+      'firstName': firstName,
+      'middleName': middleName,
+      'lastName': lastName,
+      'dateOfBirth': dateOfBirth,
+      'dateOfBirthTime': dateOfBirthTime,
+      'weight': weight,
+      'height': height,
+      'mobileNo': mobileNo,
+      'secondaryMobile': secondaryMobile,
+      'emailAddress': emailAddress,
+      'genderName': genderName,
+      'maritalStatusName': maritalStatusName,
+      'bloodGroupName': bloodGroupName,
+      'isLookingforMarriage': isLookingforMarriage,
+      'educationName': educationName,
+      'gotraName': gotraName,
+      // Add other fields if necessary
+    };
+  }
 }

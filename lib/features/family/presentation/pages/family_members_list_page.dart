@@ -81,20 +81,20 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Obx(
-                () => TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: LK.searchByNameHint.tr,
-                    hintStyle: TextStyle(
-                      color: AppColors.mutedForeground,
-                      fontSize: 14.sp,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: AppColors.mutedForeground,
-                    ),
-                    suffixIcon: _controller.memberSearchQuery.value.isNotEmpty
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: LK.searchByNameHint.tr,
+                  hintStyle: TextStyle(
+                    color: AppColors.mutedForeground,
+                    fontSize: 14.sp,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: AppColors.mutedForeground,
+                  ),
+                  suffixIcon: Obx(
+                    () => _controller.memberSearchQuery.value.isNotEmpty
                         ? IconButton(
                             icon: Icon(
                               Icons.close,
@@ -107,16 +107,16 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                               _controller.memberSearchQuery.value = '';
                             },
                           )
-                        : null,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        : SizedBox.shrink(),
                   ),
-                  onChanged: (value) {
-                    _controller.memberSearchQuery.value = value;
-                  },
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
+                onChanged: (value) {
+                  _controller.memberSearchQuery.value = value;
+                },
               ),
             ),
           ),

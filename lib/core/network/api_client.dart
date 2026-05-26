@@ -108,6 +108,14 @@ class ApiClient {
     return request(path, method: 'POST', data: data, cancelToken: cancelToken);
   }
 
+  Future<Response<dynamic>> put(
+    String path, {
+    dynamic data,
+    CancelToken? cancelToken,
+  }) {
+    return request(path, method: 'PUT', data: data, cancelToken: cancelToken);
+  }
+
   Future<Result<ApiResponse<T>>> getParsed<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -152,6 +160,23 @@ class ApiClient {
   }) async {
     try {
       final response = await post(path, data: data, cancelToken: cancelToken);
+      return Success(ApiResponse<T>.fromJson(
+        response.data as Map<String, dynamic>,
+        fromJsonT,
+      ));
+    } catch (e) {
+      return Error(NetworkExceptionMapper.map(e));
+    }
+  }
+
+  Future<Result<ApiResponse<T>>> putParsed<T>(
+    String path, {
+    dynamic data,
+    CancelToken? cancelToken,
+    T Function(Object? json)? fromJsonT,
+  }) async {
+    try {
+      final response = await put(path, data: data, cancelToken: cancelToken);
       return Success(ApiResponse<T>.fromJson(
         response.data as Map<String, dynamic>,
         fromJsonT,

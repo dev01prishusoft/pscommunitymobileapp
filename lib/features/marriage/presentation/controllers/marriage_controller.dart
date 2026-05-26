@@ -11,8 +11,10 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/marriage/utils/marriage_filter_applicator.dart';
 
 class MarriageController extends GetxController {
   MarriageController(
@@ -24,6 +26,8 @@ class MarriageController extends GetxController {
   final MarriageRepository _repository;
   final MemberRepository _memberRepository;
   final FamilyRepository _familyRepository;
+
+  Timer? _debounceTimer;
 
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<UnmarriedCount> unmarriedCounts = <UnmarriedCount>[].obs;
@@ -107,10 +111,9 @@ class MarriageController extends GetxController {
       excludeSameGotra,
     ];
 
-    Timer? debounceTimer;
     everAll(filterObservables, (_) {
-      debounceTimer?.cancel();
-      debounceTimer = Timer(Duration(milliseconds: 300), () => applyFilters());
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(Duration(milliseconds: 300), () => applyFilters());
     });
     loadProfiles();
 
@@ -185,147 +188,35 @@ class MarriageController extends GetxController {
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
       List<Member> members = memberResult.dataOrNull?.data ?? [];
       _updateDynamicLists(members);
-      if (searchQuery.isNotEmpty) {
-        final query = searchQuery.value.toLowerCase();
-        members = members.where((m) {
-          final fullName = m.fullName.toLowerCase();
-          final occupation = m.occupation.toLowerCase();
-          final age = m.age.toString();
-          final memberNo = (m.memberNo ?? '').toLowerCase();
-          final mobile = (m.mobileNo ?? '').toLowerCase();
-
-          return fullName.contains(query) ||
-              occupation.contains(query) ||
-              age.contains(query) ||
-              memberNo.contains(query) ||
-              mobile.contains(query);
-        }).toList();
-      }
-      final gotras =
-          members
-              .map((m) => m.gotra.trim())
-              .where((g) => g.isNotEmpty)
-              .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
-              .toSet()
-              .toList()
-            ..sort();
-      dynamicGotras.assignAll(['Any', ...gotras]);
-      final areas =
-          members
-              .map((m) => m.area.trim())
-              .where((a) => a.isNotEmpty)
-              .toSet()
-              .toList()
-            ..sort();
-      dynamicAreas.assignAll(['All', ...areas]);
-      final memStates =
-          members
-              .map((m) => m.occupationStateName)
-              .whereType<String>()
-              .toSet()
-              .toList()
-            ..sort();
-      if (memStates.isNotEmpty) {}
-      if (selectedAgeFrom.value != '18' || selectedAgeTo.value != '60') {
-        final minAge = int.tryParse(selectedAgeFrom.value) ?? 18;
-        final maxAge = int.tryParse(selectedAgeTo.value) ?? 60;
-        members = members
-            .where((m) => m.age >= minAge && m.age <= maxAge)
-            .toList();
-      }
-      if (selectedHeightFrom.value != '120 cm' ||
-          selectedHeightTo.value != '210 cm') {
-        final minH =
-            int.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 120;
-        final maxH =
-            int.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 210;
-        members = members.where((m) {
-          final h = m.height ?? 0;
-          return h >= minH && h <= maxH;
-        }).toList();
-      }
-
-      if (selectedGotra.value != 'Any') {
-        members = members.where((m) {
-          final mGotra = m.gotra.trim();
-          if (mGotra.isEmpty) return false;
-          final normalized =
-              mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
-          return normalized == selectedGotra.value;
-        }).toList();
-      }
-
+      
+      String? myGotra;
       if (excludeSameGotra.value) {
         try {
           final profileController = Get.find<ProfileFormController>();
-          final myGotra = profileController.gotra.value;
-          if (myGotra.isNotEmpty) {
-            members = members.where((m) => m.gotra != myGotra).toList();
-          }
+          myGotra = profileController.gotra.value;
         } catch (_) {}
       }
 
-      if (selectedMaritalStatus.value != 'All') {
-        members = members
-            .where(
-              (m) => (m.maritalStatusName ?? '') == selectedMaritalStatus.value,
-            )
-            .toList();
-      }
+      final filterState = MarriageFilterState(
+        searchQuery: searchQuery.value,
+        selectedAgeFrom: selectedAgeFrom.value,
+        selectedAgeTo: selectedAgeTo.value,
+        selectedHeightFrom: selectedHeightFrom.value,
+        selectedHeightTo: selectedHeightTo.value,
+        selectedGotra: selectedGotra.value,
+        selectedMaritalStatus: selectedMaritalStatus.value,
+        selectedState: selectedState.value,
+        selectedDistrict: selectedDistrict.value,
+        selectedTaluka: selectedTaluka.value,
+        selectedArea: selectedArea.value,
+        selectedEducation: selectedEducation.value,
+        selectedOccupation: selectedOccupation.value,
+        excludeSameGotra: excludeSameGotra.value,
+        myGotra: myGotra,
+      );
 
-      if (selectedState.value != 'All') {
-        members = members
-            .where((m) => (m.occupationStateName ?? '') == selectedState.value)
-            .toList();
-      }
-
-      if (selectedDistrict.value != 'All') {
-        members = members
-            .where(
-              (m) => (m.occupationDistrictName ?? '') == selectedDistrict.value,
-            )
-            .toList();
-      }
-
-      if (selectedTaluka.value != 'All') {
-        members = members
-            .where(
-              (m) => (m.occupationTalukaName ?? '') == selectedTaluka.value,
-            )
-            .toList();
-      }
-
-      if (selectedArea.value != 'All') {
-        members = members.where((m) => m.area == selectedArea.value).toList();
-      }
-
-      if (selectedEducation.value != 'Any') {
-        members = members
-            .where(
-              (m) =>
-                  (m.educationName ?? '').contains(selectedEducation.value),
-            )
-            .toList();
-      }
-
-      if (selectedOccupation.value != 'Any') {
-        members = members
-            .where(
-              (m) =>
-                  (m.occupationName ?? '') == selectedOccupation.value ||
-                  (m.occupationTypeName ?? '') == selectedOccupation.value,
-            )
-            .toList();
-      }
-
-      if (selectedIncomeFrom.value != 'Any' ||
-          selectedIncomeTo.value != 'Any') {
-        members = members.where((m) {
-          return true;
-        }).toList();
-      }
-
-      filteredMembers.assignAll(members);
+      final filtered = MarriageFilterApplicator.apply(members, filterState);
+      filteredMembers.assignAll(filtered);
       unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
       state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
@@ -462,6 +353,7 @@ class MarriageController extends GetxController {
   @override
   void onClose() {
     searchTextController.dispose();
+    _debounceTimer?.cancel();
     super.onClose();
   }
 }

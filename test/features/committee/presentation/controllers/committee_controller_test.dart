@@ -54,11 +54,11 @@ void main() {
 
   test('toggleNode toggles isExpanded and refreshes', () async {
     final node = CommitteeNode(id: 1, name: 'Test');
-    expect(node.isExpanded, true);
+    expect(controller.nodeExpansion[node.id] ?? true, true);
 
     controller.toggleNode(node);
 
-    expect(node.isExpanded, false);
+    expect(controller.nodeExpansion[node.id], false);
   });
 
   test('onSearchChanged updates query string', () {

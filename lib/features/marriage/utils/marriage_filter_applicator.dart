@@ -1,0 +1,117 @@
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+
+class MarriageFilterState {
+  MarriageFilterState({
+    this.searchQuery = '',
+    this.selectedAgeFrom = '18',
+    this.selectedAgeTo = '60',
+    this.selectedHeightFrom = '120 cm',
+    this.selectedHeightTo = '210 cm',
+    this.selectedGotra = 'Any',
+    this.selectedMaritalStatus = 'All',
+    this.selectedState = 'All',
+    this.selectedDistrict = 'All',
+    this.selectedTaluka = 'All',
+    this.selectedArea = 'All',
+    this.selectedEducation = 'Any',
+    this.selectedOccupation = 'Any',
+    this.excludeSameGotra = false,
+    this.myGotra,
+  });
+
+  final String searchQuery;
+  final String selectedAgeFrom;
+  final String selectedAgeTo;
+  final String selectedHeightFrom;
+  final String selectedHeightTo;
+  final String selectedGotra;
+  final String selectedMaritalStatus;
+  final String selectedState;
+  final String selectedDistrict;
+  final String selectedTaluka;
+  final String selectedArea;
+  final String selectedEducation;
+  final String selectedOccupation;
+  final bool excludeSameGotra;
+  final String? myGotra;
+}
+
+class MarriageFilterApplicator {
+  static List<Member> apply(List<Member> members, MarriageFilterState filters) {
+    var result = members;
+
+    if (filters.searchQuery.isNotEmpty) {
+      final query = filters.searchQuery.toLowerCase();
+      result = result.where((m) {
+        final fullName = m.fullName.toLowerCase();
+        final occupation = m.occupation.toLowerCase();
+        final age = m.age.toString();
+        final memberNo = (m.memberNo ?? '').toLowerCase();
+        final mobile = (m.mobileNo ?? '').toLowerCase();
+        return fullName.contains(query) ||
+            occupation.contains(query) ||
+            age.contains(query) ||
+            memberNo.contains(query) ||
+            mobile.contains(query);
+      }).toList();
+    }
+
+    if (filters.selectedAgeFrom != '18' || filters.selectedAgeTo != '60') {
+      final minAge = int.tryParse(filters.selectedAgeFrom) ?? 18;
+      final maxAge = int.tryParse(filters.selectedAgeTo) ?? 60;
+      result = result.where((m) => m.age >= minAge && m.age <= maxAge).toList();
+    }
+
+    if (filters.selectedHeightFrom != '120 cm' || filters.selectedHeightTo != '210 cm') {
+      final minH = int.tryParse(filters.selectedHeightFrom.replaceAll(' cm', '')) ?? 120;
+      final maxH = int.tryParse(filters.selectedHeightTo.replaceAll(' cm', '')) ?? 210;
+      result = result.where((m) {
+        final h = m.height ?? 0;
+        return h >= minH && h <= maxH;
+      }).toList();
+    }
+
+    if (filters.selectedGotra != 'Any') {
+      result = result.where((m) {
+        final mGotra = m.gotra.trim();
+        if (mGotra.isEmpty) return false;
+        final normalized = mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
+        return normalized == filters.selectedGotra;
+      }).toList();
+    }
+
+    if (filters.excludeSameGotra && filters.myGotra != null && filters.myGotra!.isNotEmpty) {
+      result = result.where((m) => m.gotra != filters.myGotra).toList();
+    }
+
+    if (filters.selectedMaritalStatus != 'All') {
+      result = result.where((m) => (m.maritalStatusName ?? '') == filters.selectedMaritalStatus).toList();
+    }
+
+    if (filters.selectedState != 'All') {
+      result = result.where((m) => (m.occupationStateName ?? '') == filters.selectedState).toList();
+    }
+
+    if (filters.selectedDistrict != 'All') {
+      result = result.where((m) => (m.occupationDistrictName ?? '') == filters.selectedDistrict).toList();
+    }
+
+    if (filters.selectedTaluka != 'All') {
+      result = result.where((m) => (m.occupationTalukaName ?? '') == filters.selectedTaluka).toList();
+    }
+
+    if (filters.selectedArea != 'All') {
+      result = result.where((m) => m.area == filters.selectedArea).toList();
+    }
+
+    if (filters.selectedEducation != 'Any') {
+      result = result.where((m) => (m.educationName ?? '').contains(filters.selectedEducation)).toList();
+    }
+
+    if (filters.selectedOccupation != 'Any') {
+      result = result.where((m) => (m.occupationName ?? '') == filters.selectedOccupation || (m.occupationTypeName ?? '') == filters.selectedOccupation).toList();
+    }
+
+    return result.toList();
+  }
+}

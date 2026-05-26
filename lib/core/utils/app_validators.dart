@@ -7,7 +7,7 @@ class AppValidators {
 
   static String? required(String? value, {String? customMessage}) {
     if (value == null || value.trim().isEmpty) {
-      return customMessage ?? 'This field is required';
+      return customMessage ?? LK.fieldRequired.tr;
     }
     return null;
   }
@@ -24,10 +24,10 @@ class AppValidators {
 
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter email address';
+      return LK.pleaseEnterEmail.tr;
     }
     if (!_emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address';
+      return LK.pleaseEnterValidEmail.tr;
     }
     return null;
   }
@@ -37,29 +37,29 @@ class AppValidators {
       return LK.pleaseEnterPassword.tr;
     }
     if (value.length < 8) {
-      return 'Password must be at least 8 characters';
+      return LK.passwordMinLength.tr;
     }
     if (!RegExp(r'(?=.*[a-z])').hasMatch(value)) {
-      return 'Password must contain at least one lowercase letter';
+      return LK.passwordLowercase.tr;
     }
     if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
-      return 'Password must contain at least one uppercase letter';
+      return LK.passwordUppercase.tr;
     }
     if (!RegExp(r'(?=.*[0-9])').hasMatch(value)) {
-      return 'Password must contain at least one number';
+      return LK.passwordNumber.tr;
     }
     if (!RegExp(r'(?=.*[!@#\$&*~])').hasMatch(value)) {
-      return 'Password must contain at least one special character (!@#\$&*~)';
+      return LK.passwordSpecialChar.tr;
     }
     return null;
   }
 
   static String? otp(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter OTP';
+      return LK.pleaseEnterOTP.tr;
     }
     if (value.length < 4) {
-      return 'Please enter a valid OTP';
+      return LK.pleaseEnterValidOTP.tr;
     }
     return null;
   }
@@ -67,7 +67,7 @@ class AppValidators {
   static String? url(String? value) {
     if (value == null || value.trim().isEmpty) return null;
     if (!Uri.parse(value.trim()).isAbsolute) {
-      return 'Please enter a valid URL';
+      return LK.pleaseEnterValidURL.tr;
     }
     return null;
   }

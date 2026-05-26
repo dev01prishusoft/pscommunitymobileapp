@@ -40,4 +40,18 @@ class MemberRepositoryImpl implements MemberRepository {
       fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
     );
   }
+
+  @override
+  Future<Result<bool>> updateProfile(Member member) async {
+    final result = await _apiClient.putParsed<bool>(
+      '/api/v1/member',
+      data: member.toJson(),
+      fromJsonT: (json) => true,
+    );
+    if (result.isSuccess) {
+      return Success(result.dataOrNull?.data ?? true);
+    } else {
+      return Error(result.failureOrNull!);
+    }
+  }
 }

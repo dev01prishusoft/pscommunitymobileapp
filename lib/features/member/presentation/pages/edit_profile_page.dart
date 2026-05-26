@@ -317,25 +317,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   AppSpacing.vM,
                   _buildFieldPair(
-                    AppFormDropdown<String>(
-                      value: 'Parmar',
-                      items: ['Parmar', 'Chauhan', 'Solanki', 'Rathod']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (v) {},
-                      label: LK.gotraLabel.tr,
+                    Obx(
+                      () => AppFormDropdown<String>(
+                        value: controller.gotraList.contains(controller.gotra.value)
+                            ? controller.gotra.value
+                            : (controller.gotraList.isNotEmpty
+                                ? controller.gotraList.first
+                                : 'Parmar'),
+                        items: (controller.gotraList.isEmpty ? ['Parmar', 'Chauhan', 'Solanki', 'Rathod'] : controller.gotraList)
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => controller.gotra.value = v!,
+                        label: LK.gotraLabel.tr,
+                      ),
                     ),
-                    AppFormDropdown<String>(
-                      value: 'Parmar',
-                      items: ['Parmar', 'Chauhan', 'Solanki', 'Rathod']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (v) {},
-                      label: LK.mothersGotra.tr,
+                    Obx(
+                      () => AppFormDropdown<String>(
+                        value: controller.mothersGotraList.contains(controller.mothersGotra.value)
+                            ? controller.mothersGotra.value
+                            : (controller.mothersGotraList.isNotEmpty
+                                ? controller.mothersGotraList.first
+                                : 'Parmar'),
+                        items: (controller.mothersGotraList.isEmpty ? ['Parmar', 'Chauhan', 'Solanki', 'Rathod'] : controller.mothersGotraList)
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) => controller.mothersGotra.value = v!,
+                        label: LK.mothersGotra.tr,
+                      ),
                     ),
                   ),
                   _buildCheckbox(LK.matrimonial.tr, controller.openToMarriage),

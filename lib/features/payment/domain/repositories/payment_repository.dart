@@ -13,6 +13,11 @@ abstract class PaymentRepository {
     required int paymentTypeId,
     required int paymentCategoryId,
     int? adminPaymentRequestId,
+    String currency = 'INR',
+    int memberId = 0,
+    int paymentStatusId = 0,
+    int paymentModeId = 0,
+    String? description,
   });
   Future<Map<String, dynamic>> verifyPayment({
     required String razorpayOrderId,
