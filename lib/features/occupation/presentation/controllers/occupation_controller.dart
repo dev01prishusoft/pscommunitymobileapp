@@ -6,9 +6,9 @@ import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
 
 class OccupationController extends GetxController {
-  final OccupationRepository _repository;
-
   OccupationController(this._repository);
+
+  final OccupationRepository _repository;
 
   final Rx<AppState> state = AppState.loading.obs;
   final Rx<AppState> detailsState = AppState.loading.obs;

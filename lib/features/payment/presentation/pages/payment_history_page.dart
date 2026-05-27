@@ -52,27 +52,42 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                               .toList(),
                           onChanged: (val) {
                             if (val == null) {
-                              controller.historyFilterType.value = null;
+                              controller.onHistoryTypeChanged(null);
                             } else {
-                              controller.historyFilterType.value = controller
+                              controller.onHistoryTypeChanged(controller
                                   .paymentTypes
-                                  .firstWhere((t) => t.name == val);
+                                  .firstWhere((t) => t.name == val));
                             }
-                            controller.loadHistory(
-                              paymentTypeId:
-                                  controller.historyFilterType.value?.id,
-                            );
                           },
                         ),
                       ),
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
-                      child: _buildFilterDropdown(
-                        label: '${LK.categoryLabel.tr}:',
-                        hint: LK.allCategories.tr,
-                        items: [],
-                        onChanged: (val) {},
+                      child: Obx(
+                        () => _buildFilterDropdown(
+                          label: '${LK.categoryLabel.tr}:',
+                          hint: LK.allCategories.tr,
+                          value: controller.historyFilterCategory.value?.name,
+                          items: controller.historyCategories
+                              .map((c) => c.name)
+                              .toList(),
+                          onChanged: (val) {
+                            if (val == null) {
+                              controller.historyFilterCategory.value = null;
+                            } else {
+                              controller.historyFilterCategory.value = controller
+                                  .historyCategories
+                                  .firstWhere((c) => c.name == val);
+                            }
+                            controller.loadHistory(
+                              paymentTypeId: controller.historyFilterType.value?.id,
+                              categoryId: controller.historyFilterCategory.value?.id,
+                              year: int.tryParse(controller.selectedYear.value),
+                              status: controller.selectedStatus.value,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -92,7 +107,10 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                           onChanged: (val) {
                             controller.selectedYear.value = val ?? '';
                             controller.loadHistory(
+                              paymentTypeId: controller.historyFilterType.value?.id,
+                              categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(val ?? ''),
+                              status: controller.selectedStatus.value,
                             );
                           },
                         ),
@@ -108,7 +126,12 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                           items: ['All', 'Success', 'Pending', 'Failed'],
                           onChanged: (val) {
                             controller.selectedStatus.value = val ?? 'All';
-                            controller.loadHistory(status: val);
+                            controller.loadHistory(
+                              paymentTypeId: controller.historyFilterType.value?.id,
+                              categoryId: controller.historyFilterCategory.value?.id,
+                              year: int.tryParse(controller.selectedYear.value),
+                              status: val,
+                            );
                           },
                         ),
                       ),
@@ -252,10 +275,12 @@ class _PaymentCard extends StatelessWidget {
                 SizedBox(height: 2.h),
                 Row(
                   children: [
-                    Text(
-                      '${payment.method}  |  ',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.grey,
+                    Expanded(
+                      child: Text(
+                        '${payment.type}  |  ${payment.method}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.grey,
+                        ),
                       ),
                     ),
                     Text(
@@ -263,14 +288,30 @@ class _PaymentCard extends StatelessWidget {
                       style: AppTextStyles.bodySmall.copyWith(
                         color: payment.status == PaymentStatus.success
                             ? AppColors.success
-                            : AppColors.orange,
+                            : payment.status == PaymentStatus.failed
+                                ? AppColors.destructive
+                                : AppColors.orange,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
+                if (payment.notes.isNotEmpty) ...[
+                  SizedBox(height: 6.h),
+                  Text(
+                    payment.notes.replaceAll(RegExp(r'\r\n|\n'), ' '),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
+          SizedBox(width: 8.w),
           OutlinedButton(
             onPressed: () => Get.toNamed<void>(
               AppRouter.paymentReceipt,

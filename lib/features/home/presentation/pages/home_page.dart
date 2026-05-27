@@ -65,6 +65,7 @@ class _HomeHeader extends GetView<SamajController> {
         final samaj = controller.samaj.value;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          
           children: [
             Expanded(child: _SamajNameText(samaj: samaj)),
             _SamajLogo(samaj: samaj),

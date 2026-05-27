@@ -24,7 +24,6 @@ import 'package:pscommunitymobileapp/features/occupation/data/occupation_reposit
 import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/features/payment/data/payment_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/payment/data/mocks/mock_payment_repository.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/family/data/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
@@ -91,10 +90,7 @@ class DI {
           () => OccupationController(occupationRepository),
           fenix: true,
         );
-        final PaymentRepository paymentRepository =
-            kDebugMode && AppEnvironment.I.flavor == Flavor.dev
-            ? MockPaymentRepository()
-            : PaymentRepositoryImpl(apiClient);
+        final PaymentRepository paymentRepository = PaymentRepositoryImpl(apiClient);
         Get.lazyPut(() => PaymentController(paymentRepository), fenix: true);
         final businessRepository = BusinessRepositoryImpl(apiClient);
         Get.lazyPut(() => BusinessController(businessRepository), fenix: true);

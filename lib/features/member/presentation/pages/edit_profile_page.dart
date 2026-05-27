@@ -323,11 +323,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ? controller.gotra.value
                             : (controller.gotraList.isNotEmpty
                                 ? controller.gotraList.first
-                                : 'Parmar'),
-                        items: (controller.gotraList.isEmpty ? ['Parmar', 'Chauhan', 'Solanki', 'Rathod'] : controller.gotraList)
+                                : null),
+                        items: controller.gotraList
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
-                        onChanged: (v) => controller.gotra.value = v!,
+                        onChanged: (v) {
+                          if (v != null) controller.gotra.value = v;
+                        },
                         label: LK.gotraLabel.tr,
                       ),
                     ),
@@ -337,11 +339,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ? controller.mothersGotra.value
                             : (controller.mothersGotraList.isNotEmpty
                                 ? controller.mothersGotraList.first
-                                : 'Parmar'),
-                        items: (controller.mothersGotraList.isEmpty ? ['Parmar', 'Chauhan', 'Solanki', 'Rathod'] : controller.mothersGotraList)
+                                : null),
+                        items: controller.mothersGotraList
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
-                        onChanged: (v) => controller.mothersGotra.value = v!,
+                        onChanged: (v) {
+                          if (v != null) controller.mothersGotra.value = v;
+                        },
                         label: LK.mothersGotra.tr,
                       ),
                     ),

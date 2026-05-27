@@ -59,7 +59,8 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-}
+      // Ignore error
+    }
   }
 
   bool _hasError = false;

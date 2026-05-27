@@ -44,7 +44,7 @@ void main() {
     // 5. Remove trailing // inline comments (but preserve http:// https://)
     //    Only remove if the comment does NOT contain a URL
     modified = modified.replaceAllMapped(
-      RegExp(r'(\s+)//(?!/)(?!.*https?://)(.*)$', multiLine: true),
+      RegExp(r'(\s+)//(?!/)(?!.*https?://)(.*)$', multiLine: true), 
       (m) => '',
     );
 
@@ -57,11 +57,9 @@ void main() {
       final removedLineCount =
           original.split('\n').length - modified.split('\n').length;
       linesRemoved += removedLineCount;
-      print('Modified: ${entity.path} (-$removedLineCount lines)');
     }
   }
 
-  print('\nDone. Modified $filesModified files, removed ~$linesRemoved lines.');
 }
 
 String _removeMatchingLines(String content, Pattern pattern) {

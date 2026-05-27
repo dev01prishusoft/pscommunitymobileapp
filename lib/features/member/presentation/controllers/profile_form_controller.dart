@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/education_m
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
   Member? _currentMember;
@@ -321,8 +322,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         defaultOccupationTypes,
       ),
       _fetchDropdown('/Sign/dropdown', signList, defaultSigns),
-      _fetchDropdown('/Gotra/dropdown', gotraList, ['Parmar', 'Chauhan', 'Solanki', 'Rathod']),
-      _fetchDropdown('/Gotra/dropdown', mothersGotraList, ['Parmar', 'Chauhan', 'Solanki', 'Rathod']),
+      _fetchDropdown('/Gotra/dropdown', gotraList, []),
+      _fetchDropdown('/Gotra/dropdown', mothersGotraList, []),
     ]);
     _ensureSelectionValue(gender, genderList);
     _ensureSelectionValue(maritalStatus, maritalStatusList);
@@ -393,6 +394,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       }
     } catch (e) {
+      // Ignore error
     }
     targetList.assignAll(fallbacks);
   }
@@ -505,23 +507,25 @@ class ProfileFormController extends GetxController with FormStateMixin {
           
           if (result.isSuccess) {
             Get.snackbar(
-              'Success',
-              'Profile updated successfully!',
+              LK.success.tr,
+              LK.profileUpdated.tr,
               backgroundColor: AppColors.green,
               colorText: AppColors.white,
             );
           } else {
             Get.snackbar(
-              'Error',
-              result.failureOrNull?.message ?? 'Failed to update profile',
+              LK.error.tr,
+              (result.failureOrNull?.message != null && result.failureOrNull!.message.isNotEmpty)
+                  ? result.failureOrNull!.message
+                  : LK.profileUpdateFailed.tr,
               backgroundColor: AppColors.red,
               colorText: AppColors.white,
             );
           }
         } catch (e) {
           Get.snackbar(
-            'Error',
-            'An unexpected error occurred.',
+            LK.error.tr,
+            LK.unexpectedError.tr,
             backgroundColor: AppColors.red,
             colorText: AppColors.white,
           );
@@ -531,8 +535,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
       });
     } else {
       Get.snackbar(
-        'Validation Error',
-        'Please fill all required fields correctly.',
+        LK.errorValidation.tr,
+        LK.pleaseFillRequiredFields.tr,
         backgroundColor: AppColors.red,
         colorText: AppColors.white,
       );

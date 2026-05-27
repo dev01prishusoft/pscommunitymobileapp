@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
@@ -88,6 +91,49 @@ class TokenManager {
   }
 
   Stream<TokenPair> get authStateStream => authState.stream;
+
+  int? get memberId {
+    final token = authState.value.accessToken;
+    if (token == null || token.isEmpty) return null;
+    final payload = _decodeJwtPayload(token);
+    if (payload == null) return null;
+    
+    final id = payload['memberId'] ?? 
+               payload['MemberId'] ?? 
+               payload['nameid'] ?? 
+               payload['id'] ??
+               payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
+               payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid'] ??
+               payload['MemberID'];
+               
+    if (id == null) {
+      // Log the payload keys to see what we actually got
+      AppLogger.e('JWT Payload keys: ${payload.keys.join(", ")}');
+    }
+
+    if (id is int) return id;
+    if (id is String) return int.tryParse(id);
+    return null;
+  }
+
+  String? get userPhone {
+    final token = authState.value.accessToken;
+    if (token == null || token.isEmpty) return null;
+    final payload = _decodeJwtPayload(token);
+    if (payload == null) return null;
+    return payload['mobile']?.toString() ?? 
+           payload['phone']?.toString() ?? 
+           payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone']?.toString();
+  }
+
+  String? get userEmail {
+    final token = authState.value.accessToken;
+    if (token == null || token.isEmpty) return null;
+    final payload = _decodeJwtPayload(token);
+    if (payload == null) return null;
+    return payload['email']?.toString() ?? 
+           payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']?.toString();
+  }
 
   static Map<String, dynamic>? _decodeJwtPayload(String token) {
     try {

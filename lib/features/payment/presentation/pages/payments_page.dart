@@ -306,6 +306,15 @@ class PaymentsPage extends GetView<PaymentController> {
                     color: AppColors.secondary,
                   ),
                 ),
+                if (req.memberName.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    req.memberName,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
                 SizedBox(height: 4.h),
                 Row(
                   children: [

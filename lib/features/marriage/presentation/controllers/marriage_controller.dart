@@ -186,7 +186,7 @@ class MarriageController extends GetxController {
       ]);
 
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
-      List<Member> members = memberResult.dataOrNull?.data ?? [];
+      final List<Member> members = memberResult.dataOrNull?.data ?? [];
       _updateDynamicLists(members);
       
       String? myGotra;

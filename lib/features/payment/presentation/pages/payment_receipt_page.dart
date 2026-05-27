@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -19,6 +21,7 @@ class PaymentReceiptPage extends StatefulWidget {
 
 class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   final controller = Get.find<PaymentController>();
+  final samajController = Get.find<SamajController>();
   late Future<Map<String, dynamic>> _receiptFuture;
   int? _receiptId;
 
@@ -97,10 +100,29 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             ),
             child: Column(
               children: [
-                Icon(Icons.account_balance, size: 60, color: AppColors.navyBlue),
+                if (samajController.samaj.value?.logoUrl != null &&
+                    samajController.samaj.value!.logoUrl.isNotEmpty)
+                  ClipOval(
+                    child: CachedImg(
+                      url: samajController.samaj.value!.logoUrl,
+                      memCacheWidth: 120,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.contain,
+                      placeholder: (_, __) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2)),
+                      errorWidget: (_, __, ___) => const Icon(
+                          Icons.account_balance,
+                          size: 60,
+                          color: AppColors.navyBlue),
+                    ),
+                  )
+                else
+                  const Icon(Icons.account_balance,
+                      size: 60, color: AppColors.navyBlue),
                 SizedBox(height: 16.h),
                 Text(
-                  LK.samajName.tr,
+                  samajController.samaj.value?.name ?? LK.samajName.tr,
                   style: AppTextStyles.headlineLarge.copyWith(
                     color: AppColors.secondary,
                   ),
@@ -121,11 +143,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               LK.receiptNoLabel.tr,
               data['receiptNo']?.toString() ?? 'N/A',
             ),
-            _buildInfoRow(LK.dateLabel.tr, data['date']?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.dateLabel.tr, (data['date'] ?? data['paymentDate'] ?? data['createdOn'] ?? data['transactionDate'])?.toString() ?? 'N/A'),
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.memberDetailsLabel.tr, [
-            _buildInfoRow(LK.nameLabel.tr, data['name']?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.nameLabel.tr, (data['name'] ?? data['memberName'] ?? data['fullName'])?.toString() ?? 'N/A'),
             _buildInfoRow(
               LK.memberNoLabel.tr,
               data['memberNo']?.toString() ?? 'N/A',
@@ -133,23 +155,23 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
-            _buildInfoRow(LK.typeLabel.tr, data['type']?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.typeLabel.tr, (data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A'),
             _buildInfoRow(
               LK.categoryLabel.tr,
-              data['category']?.toString() ?? 'N/A',
+              (data['category'] ?? data['paymentCategory'] ?? data['paymentCategoryName'])?.toString() ?? 'N/A',
             ),
             _buildInfoRow(
               LK.amountLabel.tr,
-              data['amount']?.toString() ?? 'N/A',
+              (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
             ),
-            _buildInfoRow(LK.modeLabel.tr, data['mode']?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.modeLabel.tr, (data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A'),
             _buildStatusRow(
               LK.statusLabel.tr,
-              data['status']?.toString() ?? 'N/A',
+              (data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A',
             ),
             _buildInfoRow(
               LK.transactionIdLabel.tr,
-              data['transactionId']?.toString() ?? 'N/A',
+              (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ?? 'N/A',
             ),
           ]),
           SizedBox(height: 32.h),
@@ -266,8 +288,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   }
 
   Future<void> _shareReceipt() async {
+    final samajName = samajController.samaj.value?.name ?? LK.samajName.tr;
     await SharePlus.instance.share(
-      ShareParams(text: 'Official Receipt from ${LK.samajName.tr}'),
+      ShareParams(text: 'Official Receipt from $samajName'),
     );
   }
 
@@ -284,7 +307,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Header(
                 level: 0,
                 child: pw.Text(
-                  LK.samajName.tr,
+                  samajController.samaj.value?.name ?? LK.samajName.tr,
                   style: pw.TextStyle(
                     fontSize: 24.sp,
                     fontWeight: pw.FontWeight.bold,

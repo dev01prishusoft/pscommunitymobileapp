@@ -6,12 +6,15 @@ import 'package:pscommunitymobileapp/features/payment/domain/repositories/paymen
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:flutter/material.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class PaymentController extends GetxController {
   PaymentController(this._repository);
@@ -19,8 +22,10 @@ class PaymentController extends GetxController {
   final Rx<AppState> dashboardState = AppState.loading.obs;
   final Rxn<PaymentDashboard> dashboard = Rxn<PaymentDashboard>();
   final RxList<PaymentType> paymentTypes = <PaymentType>[].obs;
+  final RxList<PaymentMode> paymentModes = <PaymentMode>[].obs;
   final RxList<PaymentCategory> categories = <PaymentCategory>[].obs;
   final Rxn<PaymentType> selectedType = Rxn<PaymentType>();
+  final Rxn<PaymentMode> selectedMode = Rxn<PaymentMode>();
   final Rxn<PaymentCategory> selectedCategory = Rxn<PaymentCategory>();
   final RxDouble enteredAmount = 0.0.obs;
   final RxBool isProcessingPayment = false.obs;
@@ -29,6 +34,8 @@ class PaymentController extends GetxController {
   final RxString selectedYear = ''.obs;
   final RxString selectedStatus = 'All'.obs;
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
+  final RxList<PaymentCategory> historyCategories = <PaymentCategory>[].obs;
+  final Rxn<PaymentCategory> historyFilterCategory = Rxn<PaymentCategory>();
   late Razorpay _razorpay;
   int? _pendingAdminRequestId;
 
@@ -41,6 +48,8 @@ class PaymentController extends GetxController {
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     loadDashboard();
     loadPaymentTypes();
+    loadPaymentModes();
+    loadHistory();
   }
 
   @override
@@ -69,6 +78,23 @@ class PaymentController extends GetxController {
     }
   }
 
+  Future<void> loadPaymentModes() async {
+    try {
+      final modes = await _repository.getPaymentModes();
+      paymentModes.assignAll(modes);
+    } catch (e) {
+      AppLogger.e('Failed to load payment modes', e);
+    }
+  }
+
+  void resetPaymentForm() {
+    selectedType.value = null;
+    selectedMode.value = null;
+    selectedCategory.value = null;
+    categories.clear();
+    enteredAmount.value = 0.0;
+  }
+
   Future<void> onTypeChanged(PaymentType? type) async {
     selectedType.value = type;
     selectedCategory.value = null;
@@ -83,6 +109,10 @@ class PaymentController extends GetxController {
         AppLogger.e('Failed to load categories', e);
       }
     }
+  }
+
+  void onModeChanged(PaymentMode? mode) {
+    selectedMode.value = mode;
   }
 
   void onCategoryChanged(PaymentCategory? cat) {
@@ -123,12 +153,27 @@ class PaymentController extends GetxController {
     _pendingAdminRequestId = adminPaymentRequestId;
 
     try {
+      final tokenManager = Get.find<TokenManager>();
+      final memberId = tokenManager.memberId ?? 0;
+
+      if (memberId == 0) {
+        Get.snackbar(LK.error.tr, 'Could not determine member ID from session. Please logout and login again.');
+        return;
+      }
+
+      final int paymentModeId = selectedMode.value?.id ?? 0;
+      final int paymentStatusId = 0;
+      
+      AppLogger.i('Initiating payment with: amount=$amount, typeId=$typeId, categoryId=$categoryId, memberId=$memberId');
+
       final order = await _repository.createOrder(
         amount: amount,
         paymentTypeId: typeId,
         paymentCategoryId: categoryId,
-        paymentModeId: typeId,
         adminPaymentRequestId: adminPaymentRequestId,
+        memberId: memberId,
+        paymentModeId: paymentModeId,
+        paymentStatusId: paymentStatusId,
         description: LK.paymentForCommunity.tr,
       );
 
@@ -140,15 +185,23 @@ class PaymentController extends GetxController {
         return;
       }
 
+      final String samajName = Get.isRegistered<SamajController>() 
+          ? (Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr)
+          : LK.samajName.tr;
+
       final options = {
         'key': key,
         'amount': order.amountInPaise,
-        'name': LK.samajName.tr,
+        'name': samajName,
         'order_id': order.orderId,
         'description': LK.paymentForCommunity.tr,
         'timeout': 300,
-        'prefill': {'contact': '', 'email': ''},
+        'prefill': {
+          'contact': (tokenManager.userPhone?.isNotEmpty ?? false) ? tokenManager.userPhone : '+919999999999', 
+          'email': (tokenManager.userEmail?.isNotEmpty ?? false) ? tokenManager.userEmail : 'test@example.com'
+        },
         'theme': {'color': '#1E3A8A'},
+        'currency': 'INR',
       };
 
       _razorpay.open(options);
@@ -221,6 +274,27 @@ class PaymentController extends GetxController {
   void _handleExternalWallet(ExternalWalletResponse response) {
     AppLogger.i('External Wallet: ${response.walletName}');
     Get.snackbar(LK.info.tr, LK.externalWalletSelected.tr);
+  }
+
+  Future<void> onHistoryTypeChanged(PaymentType? type) async {
+    historyFilterType.value = type;
+    historyFilterCategory.value = null;
+    historyCategories.clear();
+
+    if (type != null) {
+      try {
+        final results = await _repository.getCategories(type.id);
+        historyCategories.assignAll(results);
+      } catch (e) {
+        AppLogger.e('Failed to load history categories', e);
+      }
+    }
+    
+    await loadHistory(
+      paymentTypeId: type?.id,
+      year: int.tryParse(selectedYear.value),
+      status: selectedStatus.value,
+    );
   }
 
   Future<void> loadHistory({

@@ -4,8 +4,11 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_ca
 import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
+
 abstract class PaymentRepository {
   Future<PaymentDashboard> getDashboard();
+  Future<List<PaymentMode>> getPaymentModes();
   Future<List<PaymentType>> getPaymentTypes();
   Future<List<PaymentCategory>> getCategories(int paymentTypeId);
   Future<RazorpayOrder> createOrder({

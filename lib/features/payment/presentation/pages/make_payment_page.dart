@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 
 class MakePaymentPage extends StatefulWidget {
@@ -18,12 +19,16 @@ class MakePaymentPage extends StatefulWidget {
 class _MakePaymentPageState extends State<MakePaymentPage> {
   final controller = Get.find<PaymentController>();
   late final TextEditingController amountController;
+  late final Worker _amountListener;
 
   @override
   void initState() {
     super.initState();
+    // Reset the form so previous selections are cleared when entering the screen
+    controller.resetPaymentForm();
+    
     amountController = TextEditingController();
-    ever(controller.enteredAmount, (double val) {
+    _amountListener = ever(controller.enteredAmount, (double val) {
       if (val > 0) {
         amountController.text = val.toStringAsFixed(0);
       } else {
@@ -34,6 +39,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
 
   @override
   void dispose() {
+    _amountListener.dispose();
     amountController.dispose();
     super.dispose();
   }
@@ -67,6 +73,17 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                 items: controller.paymentTypes,
                 onChanged: (type) => controller.onTypeChanged(type),
                 itemLabel: (type) => type.name,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            _buildSectionHeader('PAYMENT MODE'),
+            Obx(
+              () => _buildDropdownField<PaymentMode>(
+                hint: 'Select Payment Mode',
+                value: controller.selectedMode.value,
+                items: controller.paymentModes,
+                onChanged: (mode) => controller.onModeChanged(mode),
+                itemLabel: (mode) => mode.name,
               ),
             ),
             SizedBox(height: 24.h),

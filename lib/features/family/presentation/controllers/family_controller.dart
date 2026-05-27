@@ -298,6 +298,7 @@ class FamilyController extends GetxController {
         }
       }
     } catch (e) {
+      // Ignore error
     }
   }
 

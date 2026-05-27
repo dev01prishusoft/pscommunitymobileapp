@@ -109,10 +109,14 @@ class LK {
   static String passwordLowercase = 'Password must contain at least one lowercase letter';
   static String passwordUppercase = 'Password must contain at least one uppercase letter';
   static String passwordNumber = 'Password must contain at least one number';
-  static String passwordSpecialChar = 'Password must contain at least one special character (!@#\$&*~)';
+  static String passwordSpecialChar = r'Password must contain at least one special character (!@#$&*~)';
   static String pleaseEnterOTP = 'Please enter OTP';
   static String pleaseEnterValidOTP = 'Please enter a valid OTP';
   static String pleaseEnterValidURL = 'Please enter a valid URL';
+  static String profileUpdated = 'Profile updated successfully!';
+  static String profileUpdateFailed = 'Failed to update profile';
+  static String unexpectedError = 'An unexpected error occurred.';
+  static String pleaseFillRequiredFields = 'Please fill all required fields correctly.';
   static String retry = 'Retry';
   static String somethingWrong = 'Something went wrong';
   static String noResultsFound = 'No results found';
@@ -372,6 +376,21 @@ class LK {
   static String addMember = 'Add Member';
   static String memberNoHint = 'PSC-2026-0512160358';
 
+
+  static String mother = 'Mother';
+  static String oPositive = 'O+';
+  static String oNegative = 'O-';
+  static String office = 'Office';
+  static String other = 'Other';
+  static String pisces = 'Pisces';
+  static String postGraduate = 'Post Graduate';
+  static String profession = 'Profession';
+  static String ssc = 'SSC';
+  static String sagittarius = 'Sagittarius';
+  static String scorpio = 'Scorpio';
+  static String son = 'Son';
+  static String taurus = 'Taurus';
+  static String virgo = 'Virgo';
 
   static List<String> allValues = [
     appTitle,
@@ -730,5 +749,24 @@ class LK {
     pleaseEnterOTP,
     pleaseEnterValidOTP,
     pleaseEnterValidURL,
+    profileUpdated,
+    profileUpdateFailed,
+    unexpectedError,
+    pleaseFillRequiredFields,
+    locationFilters,
+    mother,
+    oPositive,
+    oNegative,
+    office,
+    other,
+    pisces,
+    postGraduate,
+    profession,
+    ssc,
+    sagittarius,
+    scorpio,
+    son,
+    taurus,
+    virgo,
   ];
 }

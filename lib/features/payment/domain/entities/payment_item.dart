@@ -7,6 +7,7 @@ enum PaymentStatus {
   static PaymentStatus fromString(String val) {
     switch (val.toLowerCase()) {
       case 'success':
+      case 'completed':
         return PaymentStatus.success;
       case 'pending':
         return PaymentStatus.pending;
@@ -40,17 +41,19 @@ class PaymentItem {
     required this.method,
     required this.status,
     required this.type,
+    this.notes = '',
   });
 
   factory PaymentItem.fromJson(Map<String, dynamic> json) {
     return PaymentItem(
-      id: json['id'] as int? ?? 0,
-      title: json['title'] as String? ?? '',
-      amount: json['amount'] as String? ?? '',
-      date: json['date'] as String? ?? '',
-      method: json['method'] as String? ?? '',
-      status: PaymentStatus.fromString(json['status'] as String? ?? ''),
-      type: json['type'] as String? ?? '',
+      id: json['paymentId'] as int? ?? json['id'] as int? ?? 0,
+      title: json['memberName'] as String? ?? json['title'] as String? ?? '',
+      amount: json['amount']?.toString() ?? '',
+      date: json['paymentDate'] as String? ?? json['date'] as String? ?? '',
+      method: json['paymentModeName'] as String? ?? json['method'] as String? ?? '',
+      status: PaymentStatus.fromString(json['paymentStatusName'] as String? ?? json['status'] as String? ?? ''),
+      type: json['paymentTypeName'] as String? ?? json['type'] as String? ?? '',
+      notes: json['notes'] as String? ?? '',
     );
   }
   final int id;
@@ -60,4 +63,5 @@ class PaymentItem {
   final String method;
   final PaymentStatus status;
   final String type;
+  final String notes;
 }

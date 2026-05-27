@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
@@ -21,9 +22,27 @@ class PaymentRepositoryImpl implements PaymentRepository {
         fromJsonT: (json) =>
             PaymentDashboard.fromJson(json as Map<String, dynamic>),
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull!.data!;
     } catch (e, stack) {
       AppLogger.e('GetDashboard Error', e, stack);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<PaymentMode>> getPaymentModes() async {
+    try {
+      final response = await _apiClient.getParsed<List<PaymentMode>>(
+        ApiEndpoints.paymentModes,
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentMode.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      if (response.isFailure) throw response.failureOrNull!;
+      return response.dataOrNull?.data ?? [];
+    } catch (e, stack) {
+      AppLogger.e('GetPaymentModes Error', e, stack);
       rethrow;
     }
   }
@@ -37,6 +56,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
             .map((e) => PaymentType.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetPaymentTypes Error', e, stack);
@@ -54,6 +74,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
             .map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetCategories Error', e, stack);
@@ -81,16 +102,16 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'currency': currency,
           'paymentTypeId': paymentTypeId,
           'paymentCategoryId': paymentCategoryId,
-          if (adminPaymentRequestId != null)
-            'adminPaymentRequestId': adminPaymentRequestId,
+          'adminPaymentRequestId': adminPaymentRequestId ?? 0,
           'memberId': memberId,
           'paymentStatusId': paymentStatusId,
           'paymentModeId': paymentModeId,
-          if (description != null) 'description': description,
+          'description': description ?? "",
         },
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull!.data!;
     } catch (e, stack) {
       AppLogger.e('CreateOrder Error', e, stack);
@@ -123,6 +144,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         },
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? {};
     } catch (e, stack) {
       AppLogger.e('VerifyPayment Error', e, stack);
@@ -139,10 +161,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }) async {
     try {
       final queryParameters = <String, dynamic>{
-        if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
-        if (categoryId != null) 'categoryId': categoryId,
-        if (year != null) 'year': year,
-        if (status != null && status != 'All') 'status': status,
+        if (paymentTypeId != null) 'PaymentTypeId': paymentTypeId,
+        if (categoryId != null) 'CategoryId': categoryId,
+        if (year != null) 'Year': year,
+        if (status != null && status != 'All') 'Status': status,
       };
 
       final response = await _apiClient.getParsed<List<PaymentItem>>(
@@ -152,6 +174,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
             .map((e) => PaymentItem.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetHistory Error', e, stack);
@@ -166,6 +189,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         '${ApiEndpoints.paymentReceipt}/$receiptId',
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
+      if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? {};
     } catch (e, stack) {
       AppLogger.e('GetReceipt Error', e, stack);
