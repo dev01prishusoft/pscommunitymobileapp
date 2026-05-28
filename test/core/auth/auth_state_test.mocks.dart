@@ -104,6 +104,15 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
           as bool);
 
   @override
+  bool get isDefaultPassword =>
+      (super.noSuchMethod(
+            Invocation.getter(#isDefaultPassword),
+            returnValue: false,
+            returnValueForMissingStub: false,
+          )
+          as bool);
+
+  @override
   bool get isAccessTokenExpired =>
       (super.noSuchMethod(
             Invocation.getter(#isAccessTokenExpired),
@@ -131,9 +140,17 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
           as _i4.Future<void>);
 
   @override
-  _i4.Future<void> saveTokens(String? access, String? refresh) =>
+  _i4.Future<void> saveTokens(
+    String? access,
+    String? refresh, {
+    bool? isDefault = false,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#saveTokens, [access, refresh]),
+            Invocation.method(
+              #saveTokens,
+              [access, refresh],
+              {#isDefault: isDefault},
+            ),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )

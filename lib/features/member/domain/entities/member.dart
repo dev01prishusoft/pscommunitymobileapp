@@ -260,6 +260,16 @@ class Member {
       'isLookingforMarriage': isLookingforMarriage,
       'educationName': educationName,
       'gotraName': gotraName,
+      'jobPositionName': jobPositionName,
+      'companyName': companyName,
+      'businessName': businessName,
+      'monthlyIncome': monthlyIncome,
+      'occupationStateName': occupationStateName,
+      'occupationDistrictName': occupationDistrictName,
+      'occupationTalukaName': occupationTalukaName,
+      'occupationAreaName': occupationAreaName,
+      'occupationAddressLine1': occupationAddressLine1,
+      'occupationAddressLine2': occupationAddressLine2,
       // Add other fields if necessary
     };
   }

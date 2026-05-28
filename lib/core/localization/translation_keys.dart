@@ -356,6 +356,11 @@ class LK {
   static String businessName = 'Business Name';
   static String mobileNo = 'Mobile No';
 
+  static String state = 'State:';
+  static String district = 'District:';
+  static String taluka = 'Taluka:';
+  static String area = 'Area:';
+  
   static String memberNo = 'Member No';
   static String firstName = 'First Name';
   static String middleName = 'Middle Name';

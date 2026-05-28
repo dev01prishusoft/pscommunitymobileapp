@@ -152,7 +152,7 @@ class _HomeMenuGrid extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(context, desiredItemWidth: 120);
-            return GridView.builder(
+            return GridView.builder( 
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemCount: controller.menuItems.length,

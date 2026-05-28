@@ -24,6 +24,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   final samajController = Get.find<SamajController>();
   late Future<Map<String, dynamic>> _receiptFuture;
   int? _receiptId;
+  Map<String, dynamic>? _latestData;
 
   @override
   void initState() {
@@ -79,13 +80,44 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           }
 
           final data = snapshot.data!;
+          _latestData = data;
           return _buildContent(data);
         },
       ),
     );
   }
 
-  Widget _buildContent(Map<String, dynamic> data) {
+  String _formatDate(dynamic dateStr) {
+    if (dateStr == null) return 'N/A';
+    try {
+      final dt = DateTime.parse(dateStr.toString());
+      final hours = dt.hour;
+      final isPM = hours >= 12;
+      final displayHour = hours > 12 ? hours - 12 : (hours == 0 ? 12 : hours);
+      return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} ${displayHour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} ${isPM ? 'PM' : 'AM'}';
+    } catch (e) {
+      return dateStr.toString().split('.').first;
+    }
+  }
+
+  Map<String, String> _getParsedData(Map<String, dynamic> data) {
+    return {
+      'date': _formatDate(data['date'] ?? data['paymentDate'] ?? data['createdOn'] ?? data['transactionDate']),
+      'name': (data['name'] ?? data['memberName'] ?? data['fullName'])?.toString() ?? 'N/A',
+      'memberNo': data['memberNo']?.toString() ?? 'N/A',
+      'type': (data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A',
+      'category': (data['category'] ?? data['paymentCategory'] ?? data['paymentCategoryName'])?.toString() ?? 'N/A',
+      'amount': (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
+      'mode': (data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A',
+      'status': (data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A',
+      'transactionId': (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ?? 'N/A',
+      'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
+    };
+  }
+
+  Widget _buildContent(Map<String, dynamic> rawData) {
+    final data = _getParsedData(rawData);
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -141,42 +173,42 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           _buildReceiptSection(LK.receiptDetailsLabel.tr, [
             _buildInfoRow(
               LK.receiptNoLabel.tr,
-              data['receiptNo']?.toString() ?? 'N/A',
+              data['receiptNo']!,
             ),
-            _buildInfoRow(LK.dateLabel.tr, (data['date'] ?? data['paymentDate'] ?? data['createdOn'] ?? data['transactionDate'])?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.dateLabel.tr, data['date']!),
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.memberDetailsLabel.tr, [
-            _buildInfoRow(LK.nameLabel.tr, (data['name'] ?? data['memberName'] ?? data['fullName'])?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.nameLabel.tr, data['name']!),
             _buildInfoRow(
               LK.memberNoLabel.tr,
-              data['memberNo']?.toString() ?? 'N/A',
+              data['memberNo']!,
             ),
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
-            _buildInfoRow(LK.typeLabel.tr, (data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.typeLabel.tr, data['type']!),
             _buildInfoRow(
               LK.categoryLabel.tr,
-              (data['category'] ?? data['paymentCategory'] ?? data['paymentCategoryName'])?.toString() ?? 'N/A',
+              data['category']!,
             ),
             _buildInfoRow(
               LK.amountLabel.tr,
-              (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
+              data['amount']!,
             ),
-            _buildInfoRow(LK.modeLabel.tr, (data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A'),
+            _buildInfoRow(LK.modeLabel.tr, data['mode']!),
             _buildStatusRow(
               LK.statusLabel.tr,
-              (data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A',
+              data['status']!,
             ),
             _buildInfoRow(
               LK.transactionIdLabel.tr,
-              (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ?? 'N/A',
+              data['transactionId']!,
             ),
           ]),
           SizedBox(height: 32.h),
           ElevatedButton.icon(
-            onPressed: () => _generateAndPrintPdf(data),
+            onPressed: () => _generateAndPrintPdf(rawData),
             icon: Icon(Icons.file_download, color: AppColors.white),
             label: Text(
               LK.downloadPdf.tr,
@@ -288,13 +320,27 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   }
 
   Future<void> _shareReceipt() async {
-    final samajName = samajController.samaj.value?.name ?? LK.samajName.tr;
-    await SharePlus.instance.share(
-      ShareParams(text: 'Official Receipt from $samajName'),
+    if (_latestData == null) return;
+    final parsed = _getParsedData(_latestData!);
+    final pdf = await _generatePdfDocument(parsed);
+    final bytes = await pdf.save();
+    
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: 'receipt_${parsed['receiptNo']}.pdf',
     );
   }
 
   Future<void> _generateAndPrintPdf(Map<String, dynamic> data) async {
+    final parsed = _getParsedData(data);
+    final pdf = await _generatePdfDocument(parsed);
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+  
+  Future<pw.Document> _generatePdfDocument(Map<String, String> data) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -340,9 +386,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         },
       ),
     );
-
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
+    
+    return pdf;
   }
 }

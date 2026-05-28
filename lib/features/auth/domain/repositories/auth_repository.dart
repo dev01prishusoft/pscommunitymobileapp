@@ -14,4 +14,8 @@ abstract class AuthRepository {
     required String oldPassword,
     required String newPassword,
   });
+
+  Future<Result<AuthTokens>> memberRefreshToken({required String refreshToken});
+
+  Future<Result<void>> memberRevokeToken({required String refreshToken});
 }

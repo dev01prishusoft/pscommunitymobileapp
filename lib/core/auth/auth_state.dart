@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart' as pscommunitymobileapp_api_client;
 
 class AuthState {
   AuthState(this._tokenManager) {
@@ -18,6 +19,7 @@ class AuthState {
   }
 
   void logout() {
+    _revokeTokenCall();
     _tokenManager.clearTokens();
     if (Get.isRegistered<SamajController>()) {
       Get.find<SamajController>().clear();
@@ -25,7 +27,26 @@ class AuthState {
     Get.find<LocalizationService>().changeLocale('en', 'US');
   }
 
+  Future<void> _revokeTokenCall() async {
+    final token = _tokenManager.refreshToken;
+    if (token != null && token.isNotEmpty) {
+      try {
+        // Can't inject ApiClient via constructor due to circular dependency, so lazy find it
+        if (Get.isRegistered<pscommunitymobileapp_api_client.ApiClient>()) {
+          final apiClient = Get.find<pscommunitymobileapp_api_client.ApiClient>();
+          await apiClient.post(
+            '/api/v1/auth/member-revoke-token', 
+            data: {'refreshToken': token}
+          ).timeout(const Duration(seconds: 5));
+        }
+      } catch (e) {
+        // Ignore failure on logout
+      }
+    }
+  }
+
   Future<void> logoutAndRedirect() async {
+    await _revokeTokenCall();
     await _tokenManager.clearTokens();
     if (Get.isRegistered<SamajController>()) {
       Get.find<SamajController>().clear();

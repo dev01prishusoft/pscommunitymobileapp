@@ -107,17 +107,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     prefixIcon: Icon(Icons.language),
                   ),
                 ),
-                _buildFieldPair(
-                  AppFormDatePicker(
-                    controller: controller.dobCtrl,
-                    label: LK.birthDate.tr,
-                  ),
-                  AppFormTextField(
-                    controller: controller.tobCtrl,
-                    label: LK.timeOfBirth.tr,
-                    prefixIcon: Icon(Icons.access_time),
-                  ),
+                AppFormDatePicker(
+                  controller: controller.dobCtrl,
+                  label: LK.birthDate.tr,
                 ),
+                AppSpacing.vM,
+                AppFormTextField(
+                  controller: controller.tobCtrl,
+                  label: LK.timeOfBirth.tr,
+                  prefixIcon: Icon(Icons.access_time),
+                ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
@@ -229,7 +229,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     prefixIcon: Icon(Icons.height),
                   ),
                 ),
-                _buildCheckbox(LK.memberIsActive.tr, controller.isActive),
               ]),
 
               _buildSection(LK.contactVerify.tr, Icons.contact_phone_outlined, [
@@ -241,8 +240,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   prefixIcon: Icon(Icons.phone),
                 ),
                 AppSpacing.vM,
-                _buildCheckbox(LK.mobileVerified.tr, controller.mobileVerified),
-                AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.secondaryMobileCtrl,
                   label: LK.secondaryMobileLabel.tr,
@@ -253,23 +250,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 AppFormTextField(
                   controller: controller.emailCtrl,
                   label: LK.email.tr,
+                  isRequired: true,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(Icons.email_outlined),
                   validator: AppValidators.email,
                 ),
                 AppSpacing.vM,
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.entryPersonMobileCtrl,
-                    label: LK.entryPersonMobile.tr,
-                    prefixIcon: Icon(Icons.phone_callback),
-                  ),
-                  AppFormTextField(
-                    controller: controller.emergencyNameCtrl,
-                    label: LK.emergencyContactNameLabel.tr,
-                    prefixIcon: Icon(Icons.person_add_alt_1),
-                  ),
+                AppFormTextField(
+                  controller: controller.entryPersonMobileCtrl,
+                  label: LK.entryPersonMobile.tr,
+                  prefixIcon: Icon(Icons.phone_callback),
                 ),
+                AppSpacing.vM,
+                AppFormTextField(
+                  controller: controller.emergencyNameCtrl,
+                  label: LK.emergencyContactNameLabel.tr,
+                  prefixIcon: Icon(Icons.person_add_alt_1),
+                ),
+                AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.emergencyNoCtrl,
                   label: LK.emergencyContact.tr,
@@ -409,7 +407,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Obx(
           () => AppPrimaryButton(
             text: LK.saveChanges.tr,
-            onPressed: controller.submitForm,
+            onPressed: () => controller.submitForm(successMessage: LK.profileUpdated.tr),
             isLoading: controller.isFormLoading,
           ),
         ),
@@ -545,16 +543,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
             }
             return SizedBox.shrink();
           }),
-          AppSpacing.vL,
-          TextButton(
-            onPressed: controller.removePhoto,
-            child: Text(
-              LK.removePhoto.tr,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.destructive,
-              ),
-            ),
-          ),
+          Obx(() {
+            if (controller.profileImage.value != null) {
+              return Padding(
+                padding: EdgeInsets.only(top: AppSpacing.l),
+                child: TextButton(
+                  onPressed: controller.removePhoto,
+                  child: Text(
+                    LK.removePhoto.tr,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.destructive,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          }),
         ],
       ),
     );
@@ -790,6 +795,95 @@ class _EditProfilePageState extends State<EditProfilePage> {
           label: LK.monthlyIncomeLabel.tr,
           prefixIcon: Icon(Icons.currency_rupee),
         ),
+      ),
+      AppSpacing.vM,
+      AppFormTextField(
+        controller: controller.jobPositionCtrl,
+        label: LK.jobPositionLabel.tr,
+        prefixIcon: Icon(Icons.description_outlined),
+        onChanged: (v) => controller.jobPosition.value = v,
+      ),
+      AppSpacing.vM,
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workStateList.contains(controller.workState.value)
+              ? controller.workState.value
+              : (controller.workStateList.isNotEmpty
+                  ? controller.workStateList.first
+                  : null),
+          items: controller.workStateList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workState.value = v;
+          },
+          label: LK.state.tr,
+        ),
+      ),
+      AppSpacing.vM,
+      _buildFieldPair(
+        Obx(
+          () => AppFormDropdown<String>(
+            value: controller.workDistrictList.contains(controller.workDistrict.value)
+                ? controller.workDistrict.value
+                : (controller.workDistrictList.isNotEmpty
+                    ? controller.workDistrictList.first
+                    : null),
+            items: controller.workDistrictList
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) controller.workDistrict.value = v;
+            },
+            label: LK.district.tr,
+          ),
+        ),
+        Obx(
+          () => AppFormDropdown<String>(
+            value: controller.workTalukaList.contains(controller.workTaluka.value)
+                ? controller.workTaluka.value
+                : (controller.workTalukaList.isNotEmpty
+                    ? controller.workTalukaList.first
+                    : null),
+            items: controller.workTalukaList
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) controller.workTaluka.value = v;
+            },
+            label: LK.taluka.tr,
+          ),
+        ),
+      ),
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workAreaList.contains(controller.workArea.value)
+              ? controller.workArea.value
+              : (controller.workAreaList.isNotEmpty
+                  ? controller.workAreaList.first
+                  : null),
+          items: controller.workAreaList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workArea.value = v;
+          },
+          label: LK.area.tr,
+        ),
+      ),
+      AppSpacing.vM,
+      AppFormTextField(
+        controller: controller.workAddressLine1Ctrl,
+        label: LK.occupationAddressLine1Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine1.value = v,
+      ),
+      AppSpacing.vM,
+      AppFormTextField(
+        controller: controller.workAddressLine2Ctrl,
+        label: LK.occupationAddressLine2Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine2.value = v,
       ),
     ]);
   }

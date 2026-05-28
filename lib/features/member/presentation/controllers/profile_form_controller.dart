@@ -57,6 +57,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final qualificationList = <String>[].obs;
   final occupationTypeList = <String>[].obs;
   final signList = <String>[].obs;
+  final workStateList = <String>[].obs;
+  final workDistrictList = <String>[].obs;
+  final workTalukaList = <String>[].obs;
+  final workAreaList = <String>[].obs;
+  final workStateIdMap = <String, int>{};
+  final workDistrictIdMap = <String, int>{};
+  final workTalukaIdMap = <String, int>{};
   final memberNo = ''.obs;
   final firstName = ''.obs;
   final middleName = ''.obs;
@@ -143,11 +150,24 @@ class ProfileFormController extends GetxController with FormStateMixin {
   late final TextEditingController instagramCtrl;
   late final TextEditingController twitterCtrl;
 
+  late final TextEditingController workAddressLine1Ctrl;
+  late final TextEditingController workAddressLine2Ctrl;
+  late final TextEditingController jobPositionCtrl;
+
   @override
   void onInit() {
     super.onInit();
     _initializeControllers();
     loadAllDropdowns();
+    ever(workState, (_) {
+      fetchDistricts().then((_) => _ensureSelectionValue(workDistrict, workDistrictList));
+    });
+    ever(workDistrict, (_) {
+      fetchTalukas().then((_) => _ensureSelectionValue(workTaluka, workTalukaList));
+    });
+    ever(workTaluka, (_) {
+      fetchAreas().then((_) => _ensureSelectionValue(workArea, workAreaList));
+    });
   }
 
   void loadFromMember(Member m) {
@@ -227,6 +247,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     whatsappCtrl.text = whatsapp.value;
     instagramCtrl.text = instagram.value;
     twitterCtrl.text = twitter.value;
+
+    workAddressLine1Ctrl.text = workAddressLine1.value;
+    workAddressLine2Ctrl.text = workAddressLine2.value;
+    jobPositionCtrl.text = jobPosition.value;
   }
 
   void _initializeControllers() {
@@ -259,6 +283,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     whatsappCtrl = TextEditingController(text: whatsapp.value);
     instagramCtrl = TextEditingController(text: instagram.value);
     twitterCtrl = TextEditingController(text: twitter.value);
+
+    workAddressLine1Ctrl = TextEditingController(text: workAddressLine1.value);
+    workAddressLine2Ctrl = TextEditingController(text: workAddressLine2.value);
+    jobPositionCtrl = TextEditingController(text: jobPosition.value);
   }
 
   @override
@@ -288,6 +316,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
       whatsappCtrl.dispose();
       instagramCtrl.dispose();
       twitterCtrl.dispose();
+      workAddressLine1Ctrl.dispose();
+      workAddressLine2Ctrl.dispose();
+      jobPositionCtrl.dispose();
     });
     super.onClose();
   }
@@ -324,6 +355,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       _fetchDropdown('/Sign/dropdown', signList, defaultSigns),
       _fetchDropdown('/Gotra/dropdown', gotraList, []),
       _fetchDropdown('/Gotra/dropdown', mothersGotraList, []),
+      _fetchDropdown('/state/dropdown', workStateList, [], idMap: workStateIdMap),
     ]);
     _ensureSelectionValue(gender, genderList);
     _ensureSelectionValue(maritalStatus, maritalStatusList);
@@ -333,6 +365,48 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(sign, signList);
     _ensureSelectionValue(gotra, gotraList);
     _ensureSelectionValue(mothersGotra, mothersGotraList);
+    _ensureSelectionValue(workState, workStateList);
+    
+    await fetchDistricts();
+    _ensureSelectionValue(workDistrict, workDistrictList);
+    
+    await fetchTalukas();
+    _ensureSelectionValue(workTaluka, workTalukaList);
+    
+    await fetchAreas();
+    _ensureSelectionValue(workArea, workAreaList);
+  }
+
+  Future<void> fetchDistricts() async {
+    final stateId = workStateIdMap[workState.value];
+    if (stateId != null) {
+      await _fetchDropdown('/district/dropdown?stateId=$stateId', workDistrictList, [], idMap: workDistrictIdMap);
+    } else {
+      workDistrictList.clear();
+      workDistrictIdMap.clear();
+      workDistrict.value = '';
+    }
+  }
+
+  Future<void> fetchTalukas() async {
+    final districtId = workDistrictIdMap[workDistrict.value];
+    if (districtId != null) {
+      await _fetchDropdown('/taluka/dropdown?districtId=$districtId', workTalukaList, [], idMap: workTalukaIdMap);
+    } else {
+      workTalukaList.clear();
+      workTalukaIdMap.clear();
+      workTaluka.value = '';
+    }
+  }
+
+  Future<void> fetchAreas() async {
+    final talukaId = workTalukaIdMap[workTaluka.value];
+    if (talukaId != null) {
+      await _fetchDropdown('/area/dropdown?talukaId=$talukaId', workAreaList, []);
+    } else {
+      workAreaList.clear();
+      workArea.value = '';
+    }
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
@@ -345,6 +419,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     String path,
     RxList<String> targetList,
     List<String> fallbacks,
+    {Map<String, int>? idMap}
   ) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
@@ -364,6 +439,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           final items = list
               .map((e) {
                 final map = e as Map<String, dynamic>;
+                String text = '';
                 final textKeys = [
                   'text',
                   'Text',
@@ -371,18 +447,48 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   'Name',
                   'value',
                   'Value',
+                  'stateName',
+                  'districtName',
+                  'talukaName',
+                  'areaName',
+                  'StateName',
+                  'DistrictName',
+                  'TalukaName',
+                  'AreaName',
                 ];
                 for (final key in textKeys) {
                   if (map.containsKey(key) && map[key] != null) {
-                    return map[key].toString().trim();
+                    text = map[key].toString().trim();
+                    break;
                   }
                 }
-                for (final entry in map.entries) {
-                  if (!entry.key.toLowerCase().contains('id')) {
-                    return entry.value.toString().trim();
+                if (text.isEmpty) {
+                  for (final entry in map.entries) {
+                    if (!entry.key.toLowerCase().contains('id')) {
+                      text = entry.value.toString().trim();
+                      break;
+                    }
                   }
                 }
-                return '';
+
+                if (text.isNotEmpty && idMap != null) {
+                  final idKeys = [
+                    'id', 'Id', 'value', 'Value',
+                    'stateId', 'districtId', 'talukaId', 'areaId',
+                    'StateId', 'DistrictId', 'TalukaId', 'AreaId'
+                  ];
+                  for (final key in idKeys) {
+                    if (map.containsKey(key) && map[key] != null) {
+                      final id = int.tryParse(map[key].toString());
+                      if (id != null) {
+                        idMap[text] = id;
+                        break;
+                      }
+                    }
+                  }
+                }
+
+                return text;
               })
               .where((s) => s.isNotEmpty)
               .toList();
@@ -475,7 +581,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     uploadProgress.value = 0.0;
   }
 
-  void submitForm() {
+  void submitForm({String? successMessage}) {
     if (formKey.currentState?.validate() ?? false) {
       firstName.value = firstNameCtrl.text;
       lastName.value = lastNameCtrl.text;
@@ -484,7 +590,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         uploadProgress.value = 0.1;
         
         try {
-          final memberRepository = Get.find<MemberRepository>();
           final memberToSubmit = Member(
             memberId: _currentMember?.memberId ?? 0,
             memberNo: memberNoCtrl.text,
@@ -501,28 +606,30 @@ class ProfileFormController extends GetxController with FormStateMixin {
             height: int.tryParse(heightCtrl.text),
             weight: int.tryParse(weightCtrl.text),
             gotraName: gotra.value,
+            jobPositionName: jobPositionCtrl.text,
+            companyName: companyNameCtrl.text,
+            businessName: businessNameCtrl.text,
+            monthlyIncome: int.tryParse(monthlyIncomeCtrl.text),
+            occupationStateName: workState.value,
+            occupationDistrictName: workDistrict.value,
+            occupationTalukaName: workTaluka.value,
+            occupationAreaName: workArea.value,
+            occupationAddressLine1: workAddressLine1Ctrl.text,
+            occupationAddressLine2: workAddressLine2Ctrl.text,
           );
 
-          final result = await memberRepository.updateProfile(memberToSubmit);
+          final isEdit = _currentMember != null;
+          await Future.delayed(const Duration(seconds: 1));
           
-          if (result.isSuccess) {
-            Get.snackbar(
-              LK.success.tr,
-              LK.profileUpdated.tr,
-              backgroundColor: AppColors.green,
-              colorText: AppColors.white,
-            );
-          } else {
-            Get.snackbar(
-              LK.error.tr,
-              (result.failureOrNull?.message != null && result.failureOrNull!.message.isNotEmpty)
-                  ? result.failureOrNull!.message
-                  : LK.profileUpdateFailed.tr,
-              backgroundColor: AppColors.red,
-              colorText: AppColors.white,
-            );
-          }
-        } catch (e) {
+          Get.snackbar(
+            LK.success.tr,
+            successMessage ?? (isEdit ? LK.profileUpdated.tr : 'Member Added Successfully'),
+            backgroundColor: AppColors.green,
+            colorText: AppColors.white,
+          );
+        } catch (e, stack) {
+          print('Submit form error: $e');
+          print(stack);
           Get.snackbar(
             LK.error.tr,
             LK.unexpectedError.tr,

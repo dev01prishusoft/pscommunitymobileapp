@@ -22,15 +22,19 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   late final ProfileFormController controller;
   final ScrollController _scrollController = ScrollController();
 
+  late String controllerTag;
+
   @override
   void initState() {
     super.initState();
-    controller = Get.put(ProfileFormController(), tag: UniqueKey().toString());
+    controllerTag = UniqueKey().toString();
+    controller = Get.put(ProfileFormController(), tag: controllerTag);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    Get.delete<ProfileFormController>(tag: controllerTag);
     super.dispose();
   }
 
@@ -96,17 +100,17 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: Icon(Icons.language),
                   ),
                 ),
-                _buildFieldPair(
-                  AppFormDatePicker(
-                    controller: controller.dobCtrl,
-                    label: LK.birthDate.tr,
-                  ),
-                  AppFormTextField(
-                    controller: controller.tobCtrl,
-                    label: LK.timeOfBirth.tr,
-                    prefixIcon: Icon(Icons.access_time),
-                  ),
+                AppFormDatePicker(
+                  controller: controller.dobCtrl,
+                  label: LK.birthDate.tr,
                 ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.tobCtrl,
+                  label: LK.timeOfBirth.tr,
+                  prefixIcon: Icon(Icons.access_time),
+                ),
+                SizedBox(height: 12.h),
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
@@ -218,7 +222,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: Icon(Icons.height),
                   ),
                 ),
-                _buildCheckbox(LK.memberIsActive.tr, controller.isActive),
               ]),
 
               _buildSection(LK.contactVerify.tr, Icons.contact_phone_outlined, [
@@ -229,8 +232,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.phone),
                 ),
-                SizedBox(height: 12.h),
-                _buildCheckbox(LK.mobileVerified.tr, controller.mobileVerified),
                 SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: controller.secondaryMobileCtrl,
@@ -247,18 +248,18 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   validator: AppValidators.email,
                 ),
                 SizedBox(height: 12.h),
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.entryPersonMobileCtrl,
-                    label: LK.entryPersonMobile.tr,
-                    prefixIcon: Icon(Icons.phone_callback),
-                  ),
-                  AppFormTextField(
-                    controller: controller.emergencyNameCtrl,
-                    label: LK.emergencyContactNameLabel.tr,
-                    prefixIcon: Icon(Icons.person_add_alt_1),
-                  ),
+                AppFormTextField(
+                  controller: controller.entryPersonMobileCtrl,
+                  label: LK.entryPersonMobile.tr,
+                  prefixIcon: Icon(Icons.phone_callback),
                 ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.emergencyNameCtrl,
+                  label: LK.emergencyContactNameLabel.tr,
+                  prefixIcon: Icon(Icons.person_add_alt_1),
+                ),
+                SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: controller.emergencyNoCtrl,
                   label: LK.emergencyContact.tr,
@@ -386,7 +387,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         child: Obx(
           () => AppPrimaryButton(
             text: LK.saveChanges.tr,
-            onPressed: controller.submitForm,
+            onPressed: () => controller.submitForm(successMessage: 'Member Added Successfully'),
             isLoading: controller.isFormLoading,
           ),
         ),
@@ -522,16 +523,23 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             }
             return SizedBox.shrink();
           }),
-          SizedBox(height: 16.h),
-          TextButton(
-            onPressed: controller.removePhoto,
-            child: Text(
-              LK.removePhoto.tr,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.destructive,
-              ),
-            ),
-          ),
+          Obx(() {
+            if (controller.profileImage.value != null) {
+              return Padding(
+                padding: EdgeInsets.only(top: 16.h),
+                child: TextButton(
+                  onPressed: controller.removePhoto,
+                  child: Text(
+                    LK.removePhoto.tr,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.destructive,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          }),
         ],
       ),
     );
@@ -767,6 +775,95 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           label: LK.monthlyIncomeLabel.tr,
           prefixIcon: Icon(Icons.currency_rupee),
         ),
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.jobPositionCtrl,
+        label: LK.jobPositionLabel.tr,
+        prefixIcon: Icon(Icons.description_outlined),
+        onChanged: (v) => controller.jobPosition.value = v,
+      ),
+      SizedBox(height: 12.h),
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workStateList.contains(controller.workState.value)
+              ? controller.workState.value
+              : (controller.workStateList.isNotEmpty
+                  ? controller.workStateList.first
+                  : null),
+          items: controller.workStateList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workState.value = v;
+          },
+          label: LK.state.tr,
+        ),
+      ),
+      SizedBox(height: 12.h),
+      _buildFieldPair(
+        Obx(
+          () => AppFormDropdown<String>(
+            value: controller.workDistrictList.contains(controller.workDistrict.value)
+                ? controller.workDistrict.value
+                : (controller.workDistrictList.isNotEmpty
+                    ? controller.workDistrictList.first
+                    : null),
+            items: controller.workDistrictList
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) controller.workDistrict.value = v;
+            },
+            label: LK.district.tr,
+          ),
+        ),
+        Obx(
+          () => AppFormDropdown<String>(
+            value: controller.workTalukaList.contains(controller.workTaluka.value)
+                ? controller.workTaluka.value
+                : (controller.workTalukaList.isNotEmpty
+                    ? controller.workTalukaList.first
+                    : null),
+            items: controller.workTalukaList
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) controller.workTaluka.value = v;
+            },
+            label: LK.taluka.tr,
+          ),
+        ),
+      ),
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workAreaList.contains(controller.workArea.value)
+              ? controller.workArea.value
+              : (controller.workAreaList.isNotEmpty
+                  ? controller.workAreaList.first
+                  : null),
+          items: controller.workAreaList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workArea.value = v;
+          },
+          label: LK.area.tr,
+        ),
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine1Ctrl,
+        label: LK.occupationAddressLine1Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine1.value = v,
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine2Ctrl,
+        label: LK.occupationAddressLine2Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine2.value = v,
       ),
     ]);
   }

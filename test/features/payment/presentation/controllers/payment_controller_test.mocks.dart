@@ -7,13 +7,15 @@ import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart'
-    as _i7;
+    as _i8;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart'
     as _i2;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart'
-    as _i8;
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart'
+    as _i9;
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart'
     as _i6;
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart'
+    as _i7;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart'
     as _i3;
 import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart'
@@ -67,24 +69,34 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
           as _i5.Future<_i2.PaymentDashboard>);
 
   @override
-  _i5.Future<List<_i6.PaymentType>> getPaymentTypes() =>
+  _i5.Future<List<_i6.PaymentMode>> getPaymentModes() =>
       (super.noSuchMethod(
-            Invocation.method(#getPaymentTypes, []),
-            returnValue: _i5.Future<List<_i6.PaymentType>>.value(
-              <_i6.PaymentType>[],
+            Invocation.method(#getPaymentModes, []),
+            returnValue: _i5.Future<List<_i6.PaymentMode>>.value(
+              <_i6.PaymentMode>[],
             ),
           )
-          as _i5.Future<List<_i6.PaymentType>>);
+          as _i5.Future<List<_i6.PaymentMode>>);
 
   @override
-  _i5.Future<List<_i7.PaymentCategory>> getCategories(int? paymentTypeId) =>
+  _i5.Future<List<_i7.PaymentType>> getPaymentTypes() =>
       (super.noSuchMethod(
-            Invocation.method(#getCategories, [paymentTypeId]),
-            returnValue: _i5.Future<List<_i7.PaymentCategory>>.value(
-              <_i7.PaymentCategory>[],
+            Invocation.method(#getPaymentTypes, []),
+            returnValue: _i5.Future<List<_i7.PaymentType>>.value(
+              <_i7.PaymentType>[],
             ),
           )
-          as _i5.Future<List<_i7.PaymentCategory>>);
+          as _i5.Future<List<_i7.PaymentType>>);
+
+  @override
+  _i5.Future<List<_i8.PaymentCategory>> getCategories(int? paymentTypeId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCategories, [paymentTypeId]),
+            returnValue: _i5.Future<List<_i8.PaymentCategory>>.value(
+              <_i8.PaymentCategory>[],
+            ),
+          )
+          as _i5.Future<List<_i8.PaymentCategory>>);
 
   @override
   _i5.Future<_i3.RazorpayOrder> createOrder({
@@ -156,7 +168,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
           as _i5.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<List<_i8.PaymentItem>> getHistory({
+  _i5.Future<List<_i9.PaymentItem>> getHistory({
     int? paymentTypeId,
     int? categoryId,
     int? year,
@@ -169,11 +181,11 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
               #year: year,
               #status: status,
             }),
-            returnValue: _i5.Future<List<_i8.PaymentItem>>.value(
-              <_i8.PaymentItem>[],
+            returnValue: _i5.Future<List<_i9.PaymentItem>>.value(
+              <_i9.PaymentItem>[],
             ),
           )
-          as _i5.Future<List<_i8.PaymentItem>>);
+          as _i5.Future<List<_i9.PaymentItem>>);
 
   @override
   _i5.Future<Map<String, dynamic>> getReceipt(int? receiptId) =>

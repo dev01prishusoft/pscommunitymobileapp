@@ -69,7 +69,7 @@ void main() {
   test('onTypeChanged fetches categories and resets selected category', () async {
     Get.put(controller);
     final type = PaymentType(id: 1, name: 'Donation');
-    final category = PaymentCategory(id: 1, name: 'General', defaultAmount: 500);
+    final category = PaymentCategory(id: 1, name: 'General', defaultAmount: 500, minAmount: 100, maxAmount: 10000);
     when(mockRepository.getCategories(1)).thenAnswer((_) async => [category]);
 
     await controller.onTypeChanged(type);
@@ -83,7 +83,7 @@ void main() {
 
   test('onCategoryChanged updates amount', () {
     Get.put(controller);
-    final category = PaymentCategory(id: 1, name: 'General', defaultAmount: 1000);
+    final category = PaymentCategory(id: 1, name: 'General', defaultAmount: 1000, minAmount: 100, maxAmount: 10000);
     
     controller.onCategoryChanged(category);
 

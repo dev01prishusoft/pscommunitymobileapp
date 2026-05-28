@@ -79,6 +79,40 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Result<AuthTokens>> memberRefreshToken({required String refreshToken}) async {
+    final result = await _apiClient.postParsed<AuthTokens>(
+      ApiEndpoints.memberRefreshToken,
+      data: {'refreshToken': refreshToken},
+      fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
+    );
+    
+    if (result is Success<ApiResponse<AuthTokens>>) {
+      final tokens = result.data.data;
+      if (tokens == null) {
+        return Error(ServerFailure('Missing tokens in response'));
+      }
+      // Note: the interceptor will call saveTokens
+      return Success(tokens);
+    } else {
+      return Error((result as Error).failure);
+    }
+  }
+
+  @override
+  Future<Result<void>> memberRevokeToken({required String refreshToken}) async {
+    final result = await _apiClient.postParsed<void>(
+      ApiEndpoints.memberRevokeToken,
+      data: {'refreshToken': refreshToken},
+    );
+    
+    if (result is Success<ApiResponse<void>>) {
+      return const Success(null);
+    } else {
+      return Error((result as Error).failure);
+    }
+  }
+
   AuthTokens _mapAuthResponseData(Map<String, dynamic> authData) {
     final accessToken = authData['accessToken']?.toString() ?? '';
     final refreshToken = authData['refreshToken']?.toString() ?? '';

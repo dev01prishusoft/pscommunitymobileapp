@@ -25,7 +25,7 @@ class AuthInterceptor extends Interceptor {
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final path = options.path;
     if (!path.contains('/login') && !path.contains('/member-login') && !path.contains('/refresh-token')) {
-      if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenExpired) {
+      if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenNearExpiry) {
         try {
           await _refreshSingleFlight(_tokenManager.refreshToken!);
         } catch (_) {}
@@ -96,8 +96,11 @@ class AuthInterceptor extends Interceptor {
     _refreshCompleter = c;
 
     try {
+      final isMember = _tokenManager.memberId != null;
+      final refreshEndpoint = isMember ? ApiEndpoints.memberRefreshToken : ApiEndpoints.refreshToken;
+      
       final response = await _refreshDio.post<Map<String, dynamic>>(
-        ApiEndpoints.refreshToken,
+        refreshEndpoint,
         data: {
           'accessToken': _tokenManager.accessToken,
           'refreshToken': refreshToken,

@@ -90,6 +90,12 @@ class TokenManager {
     return _isJwtExpired(token);
   }
 
+  bool get isAccessTokenNearExpiry {
+    final token = authState.value.accessToken;
+    if (token == null || token.isEmpty) return true;
+    return _isJwtExpired(token, threshold: const Duration(minutes: 5));
+  }
+
   Stream<TokenPair> get authStateStream => authState.stream;
 
   int? get memberId {
@@ -158,10 +164,10 @@ class TokenManager {
   static String? _cachedAccessToken;
   static DateTime? _cachedAccessExpiry;
 
-  static bool _isJwtExpired(String token) {
+  static bool _isJwtExpired(String token, {Duration threshold = const Duration(seconds: 30)}) {
     if (token == _cachedAccessToken && _cachedAccessExpiry != null) {
       return DateTime.now().toUtc().isAfter(
-        _cachedAccessExpiry!.subtract(Duration(seconds: 30)),
+        _cachedAccessExpiry!.subtract(threshold),
       );
     }
     final payload = _decodeJwtPayload(token);
@@ -182,7 +188,7 @@ class TokenManager {
     _cachedAccessExpiry = expiry;
 
     return DateTime.now().toUtc().isAfter(
-      expiry.subtract(Duration(seconds: 30)),
+      expiry.subtract(threshold),
     );
   }
 

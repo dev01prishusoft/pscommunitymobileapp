@@ -144,9 +144,47 @@ class PaymentController extends GetxController {
       categoryId = selectedCategory.value?.id;
     }
 
-    if (typeId == null || categoryId == null || amount < 100) {
-      Get.snackbar(LK.error.tr, LK.selectValidPayment.tr);
-      return;
+    if (adminPaymentRequestId == null) {
+      if (typeId == null) {
+        _showErrorSnackbar('Please select Payment Type');
+        return;
+      }
+      if (selectedMode.value == null) {
+        _showErrorSnackbar('Please select Payment Mode');
+        return;
+      }
+      if (categoryId == null) {
+        _showErrorSnackbar('Please select Category');
+        return;
+      }
+    } else {
+      if (selectedMode.value == null) {
+        _showErrorSnackbar('Please select Payment Mode');
+        return;
+      }
+    }
+
+    final double minAmount = (selectedCategory.value?.minAmount ?? 0) > 0 
+        ? selectedCategory.value!.minAmount 
+        : 1.0; // Razorpay requires at least 1 INR
+    final double maxAmount = (selectedCategory.value?.maxAmount ?? 0) > 0 
+        ? selectedCategory.value!.maxAmount 
+        : double.infinity;
+
+    if (adminPaymentRequestId == null) {
+      if (amount < minAmount) {
+        _showErrorSnackbar('Amount must be at least ₹${minAmount.toInt()}');
+        return;
+      }
+      if (amount > maxAmount) {
+        _showErrorSnackbar('Amount cannot exceed ₹${maxAmount.toInt()}');
+        return;
+      }
+    } else {
+      if (amount <= 0) {
+        _showErrorSnackbar('Amount must be greater than zero');
+        return;
+      }
     }
 
     isProcessingPayment.value = true;
@@ -168,8 +206,8 @@ class PaymentController extends GetxController {
 
       final order = await _repository.createOrder(
         amount: amount,
-        paymentTypeId: typeId,
-        paymentCategoryId: categoryId,
+        paymentTypeId: typeId ?? 0,
+        paymentCategoryId: categoryId ?? 0,
         adminPaymentRequestId: adminPaymentRequestId,
         memberId: memberId,
         paymentModeId: paymentModeId,
@@ -245,6 +283,7 @@ class PaymentController extends GetxController {
       await loadDashboard();
 
       if (receiptId != null) {
+        resetPaymentForm();
         unawaited(
           Get.toNamed<void>(
             AppRouter.paymentReceipt,
@@ -253,6 +292,7 @@ class PaymentController extends GetxController {
         );
       } else {
         Get.back<void>();
+        resetPaymentForm();
         Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
       }
     } catch (e) {
@@ -266,7 +306,16 @@ class PaymentController extends GetxController {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     AppLogger.e('Payment Error: ${response.code} - ${response.message}');
-    Get.snackbar(LK.error.tr, response.message ?? LK.paymentFailed.tr);
+    
+    String message = response.message ?? LK.paymentFailed.tr;
+    
+    // Code 0 is PAYMENT_CANCELLED in Razorpay
+    if (response.code == Razorpay.PAYMENT_CANCELLED || 
+        message.toLowerCase().contains('undefined')) {
+      message = 'Payment cancelled';
+    }
+    
+    _showErrorSnackbar(message);
     isProcessingPayment.value = false;
     _pendingAdminRequestId = null;
   }
@@ -325,5 +374,17 @@ class PaymentController extends GetxController {
       AppLogger.e('Failed to load receipt', e);
       rethrow;
     }
+  }
+
+  void _showErrorSnackbar(String message) {
+    Get.snackbar(
+      LK.error.tr,
+      message,
+      backgroundColor: Colors.red.shade600,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 8,
+    );
   }
 }
