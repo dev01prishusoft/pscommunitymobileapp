@@ -128,64 +128,44 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                       ),
                       SizedBox(width: 8.w),
                       Expanded(
-                        child: TextField(
-                          controller: amountController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              if (newValue.text.isEmpty) return newValue;
-                              final val = double.tryParse(newValue.text);
-                              if (val == null) return oldValue;
-                              final maxAmount = controller.selectedCategory.value?.maxAmount ?? 0;
-                              if (maxAmount > 0 && val > maxAmount) {
-                                return oldValue;
-                              }
-                              return newValue;
-                            }),
-                          ],
-                          onChanged: (val) => controller.enteredAmount.value =
-                              double.tryParse(val) ?? 0,
-                          style: AppTextStyles.displaySmall.copyWith(
-                            color: AppColors.secondary,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: '0',
-                          ),
-                        ),
+                        child: Obx(() {
+                          final isFixed = controller.isAmountFixed;
+                          return TextField(
+                            controller: amountController,
+                            readOnly: isFixed,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(8),
+                              TextInputFormatter.withFunction((oldValue, newValue) {
+                                if (newValue.text.isEmpty) return newValue;
+                                final val = double.tryParse(newValue.text);
+                                if (val == null) return oldValue;
+                                final maxAmount = controller.selectedCategory.value?.maxAmount ?? 0;
+                                if (maxAmount > 0 && val > maxAmount) {
+                                  return oldValue;
+                                }
+                                return newValue;
+                              }),
+                            ],
+                            onChanged: (val) => controller.enteredAmount.value =
+                                double.tryParse(val) ?? 0,
+                            style: AppTextStyles.displaySmall.copyWith(
+                              color: isFixed ? AppColors.mutedForeground : AppColors.secondary,
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: '0',
+                            ),
+                          );
+                        }),
                       ),
                     ],
                   ),
                   SizedBox(height: 12.h),
                   Divider(),
                   SizedBox(height: 12.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Obx(() {
-                        final minAmount = controller.selectedCategory.value?.minAmount ?? 0;
-                        final minText = minAmount > 0 ? 'Min: ₹${minAmount.toInt()}' : 'Min: ₹1';
-                        return Text(
-                          minText,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.mutedForeground,
-                          ),
-                        );
-                      }),
-                      Obx(() {
-                        final maxAmount = controller.selectedCategory.value?.maxAmount ?? 0;
-                        final maxText = maxAmount > 0 ? 'Max: ₹${maxAmount.toInt()}' : 'Max: No Limit';
-                        return Text(
-                          maxText,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.mutedForeground,
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
+
                 ],
               ),
             ),

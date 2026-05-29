@@ -75,7 +75,7 @@ class AuthInterceptor extends Interceptor {
         options.headers['Authorization'] = 'Bearer $newToken';
         options.extra['isAuthRetry'] = true;
 
-        final response = await _mainDio.fetch<Map<String, dynamic>>(options);
+        final response = await _mainDio.fetch<dynamic>(options);
         return handler.resolve(response);
       } else {
         _onAuthFailure();
@@ -104,6 +104,7 @@ class AuthInterceptor extends Interceptor {
         data: {
           'accessToken': _tokenManager.accessToken,
           'refreshToken': refreshToken,
+          'mobileNo': _tokenManager.userPhone,
         },
       );
 
@@ -113,7 +114,11 @@ class AuthInterceptor extends Interceptor {
       final refresh = authData['refreshToken'] as String?;
 
       if (access != null && refresh != null) {
-        await _tokenManager.saveTokens(access, refresh);
+        await _tokenManager.saveTokens(
+          access, 
+          refresh,
+          isDefaultPassword: _tokenManager.isDefaultPassword,
+        );
         c.complete(access);
       } else {
         if (kDebugMode) {}

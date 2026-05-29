@@ -653,6 +653,88 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             onChanged: (v) => addr.line2 = v,
           ),
           SizedBox(height: 12.h),
+          Obx(() {
+            final stateList = controller.workStateList;
+            return AppFormDropdown<String>(
+              value: stateList.contains(addr.state)
+                  ? addr.state
+                  : (stateList.isNotEmpty ? stateList.first : null),
+              items: stateList
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  addr.state = v;
+                  addr.district = '';
+                  addr.taluka = '';
+                  addr.area = '';
+                  controller.addresses.refresh();
+                }
+              },
+              label: LK.state.tr,
+            );
+          }),
+          SizedBox(height: 12.h),
+          Obx(() {
+            final districtList = controller.getAddressDistricts(addr.state);
+            return AppFormDropdown<String>(
+              value: districtList.contains(addr.district)
+                  ? addr.district
+                  : (districtList.isNotEmpty ? districtList.first : null),
+              items: districtList
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  addr.district = v;
+                  addr.taluka = '';
+                  addr.area = '';
+                  controller.addresses.refresh();
+                }
+              },
+              label: LK.district.tr,
+            );
+          }),
+          SizedBox(height: 12.h),
+          Obx(() {
+            final talukaList = controller.getAddressTalukas(addr.district);
+            return AppFormDropdown<String>(
+              value: talukaList.contains(addr.taluka)
+                  ? addr.taluka
+                  : (talukaList.isNotEmpty ? talukaList.first : null),
+              items: talukaList
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  addr.taluka = v;
+                  addr.area = '';
+                  controller.addresses.refresh();
+                }
+              },
+              label: LK.taluka.tr,
+            );
+          }),
+          SizedBox(height: 12.h),
+          Obx(() {
+            final areaList = controller.getAddressAreas(addr.taluka);
+            return AppFormDropdown<String>(
+              value: areaList.contains(addr.area)
+                  ? addr.area
+                  : (areaList.isNotEmpty ? areaList.first : null),
+              items: areaList
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  addr.area = v;
+                  controller.addresses.refresh();
+                }
+              },
+              label: LK.area.tr,
+            );
+          }),
+          SizedBox(height: 12.h),
           _buildFieldPair(
             AppFormTextField(
               initialValue: addr.landmark,
@@ -731,6 +813,28 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ],
           ),
           SizedBox(height: 12.h),
+          Obx(
+            () => AppFormDropdown<String>(
+              value: controller.qualificationList.contains(edu.qualification)
+                  ? edu.qualification
+                  : (controller.qualificationList.isNotEmpty
+                      ? controller.qualificationList.first
+                      : controller.defaultQualifications.first),
+              items: (controller.qualificationList.isEmpty
+                      ? controller.defaultQualifications
+                      : controller.qualificationList)
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  edu.qualification = v;
+                  controller.educationList.refresh();
+                }
+              },
+              label: LK.qualificationLabel.tr,
+            ),
+          ),
+          SizedBox(height: 12.h),
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
@@ -784,6 +888,20 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         onChanged: (v) => controller.jobPosition.value = v,
       ),
       SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine1Ctrl,
+        label: LK.occupationAddressLine1Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine1.value = v,
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine2Ctrl,
+        label: LK.occupationAddressLine2Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        onChanged: (v) => controller.workAddressLine2.value = v,
+      ),
+      SizedBox(height: 12.h),
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workStateList.contains(controller.workState.value)
@@ -801,40 +919,40 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         ),
       ),
       SizedBox(height: 12.h),
-      _buildFieldPair(
-        Obx(
-          () => AppFormDropdown<String>(
-            value: controller.workDistrictList.contains(controller.workDistrict.value)
-                ? controller.workDistrict.value
-                : (controller.workDistrictList.isNotEmpty
-                    ? controller.workDistrictList.first
-                    : null),
-            items: controller.workDistrictList
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (v) {
-              if (v != null) controller.workDistrict.value = v;
-            },
-            label: LK.district.tr,
-          ),
-        ),
-        Obx(
-          () => AppFormDropdown<String>(
-            value: controller.workTalukaList.contains(controller.workTaluka.value)
-                ? controller.workTaluka.value
-                : (controller.workTalukaList.isNotEmpty
-                    ? controller.workTalukaList.first
-                    : null),
-            items: controller.workTalukaList
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (v) {
-              if (v != null) controller.workTaluka.value = v;
-            },
-            label: LK.taluka.tr,
-          ),
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workDistrictList.contains(controller.workDistrict.value)
+              ? controller.workDistrict.value
+              : (controller.workDistrictList.isNotEmpty
+                  ? controller.workDistrictList.first
+                  : null),
+          items: controller.workDistrictList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workDistrict.value = v;
+          },
+          label: LK.district.tr,
         ),
       ),
+      SizedBox(height: 12.h),
+      Obx(
+        () => AppFormDropdown<String>(
+          value: controller.workTalukaList.contains(controller.workTaluka.value)
+              ? controller.workTaluka.value
+              : (controller.workTalukaList.isNotEmpty
+                  ? controller.workTalukaList.first
+                  : null),
+          items: controller.workTalukaList
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) controller.workTaluka.value = v;
+          },
+          label: LK.taluka.tr,
+        ),
+      ),
+      SizedBox(height: 12.h),
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workAreaList.contains(controller.workArea.value)
@@ -850,20 +968,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           },
           label: LK.area.tr,
         ),
-      ),
-      SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.workAddressLine1Ctrl,
-        label: LK.occupationAddressLine1Label.tr,
-        prefixIcon: Icon(Icons.location_on_outlined),
-        onChanged: (v) => controller.workAddressLine1.value = v,
-      ),
-      SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.workAddressLine2Ctrl,
-        label: LK.occupationAddressLine2Label.tr,
-        prefixIcon: Icon(Icons.location_on_outlined),
-        onChanged: (v) => controller.workAddressLine2.value = v,
       ),
     ]);
   }

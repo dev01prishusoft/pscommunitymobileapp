@@ -27,7 +27,12 @@ class AuthRepositoryImpl implements AuthRepository {
       if (tokens == null) {
         return Error(ServerFailure('Missing tokens in response'));
       }
-      await _tokenManager.saveTokens(tokens.accessToken, tokens.refreshToken);
+      await _tokenManager.saveTokens(
+        tokens.accessToken, 
+        tokens.refreshToken,
+        isDefaultPassword: tokens.isDefaultPassword,
+        mobile: mobile,
+      );
       return Success(tokens);
     } else {
       return Error((result as Error).failure);
@@ -50,7 +55,12 @@ class AuthRepositoryImpl implements AuthRepository {
       if (tokens == null) {
         return Error(ServerFailure('Missing tokens in response'));
       }
-      await _tokenManager.saveTokens(tokens.accessToken, tokens.refreshToken);
+      await _tokenManager.saveTokens(
+        tokens.accessToken, 
+        tokens.refreshToken,
+        isDefaultPassword: tokens.isDefaultPassword,
+        mobile: mobile,
+      );
       return Success(tokens);
     } else {
       return Error((result as Error).failure);
@@ -83,7 +93,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Result<AuthTokens>> memberRefreshToken({required String refreshToken}) async {
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberRefreshToken,
-      data: {'refreshToken': refreshToken},
+      data: {
+        'accessToken': _tokenManager.accessToken,
+        'refreshToken': refreshToken,
+        'mobileNo': _tokenManager.userPhone,
+      },
       fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
     

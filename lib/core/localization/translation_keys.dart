@@ -117,6 +117,14 @@ class LK {
   static String profileUpdateFailed = 'Failed to update profile';
   static String unexpectedError = 'An unexpected error occurred.';
   static String pleaseFillRequiredFields = 'Please fill all required fields correctly.';
+  static String pleaseSelectPaymentType = 'pleaseSelectPaymentType';
+  static String pleaseSelectPaymentMode = 'pleaseSelectPaymentMode';
+  static String pleaseSelectCategory = 'pleaseSelectCategory';
+  static String amountMustBeAtLeast = 'amountMustBeAtLeast';
+  static String amountCannotExceed = 'amountCannotExceed';
+  static String amountMustBeGreaterThanZero = 'amountMustBeGreaterThanZero';
+  static String couldNotDetermineMemberId = 'couldNotDetermineMemberId';
+  static String paymentTimedOut = 'paymentTimedOut';
   static String retry = 'Retry';
   static String somethingWrong = 'Something went wrong';
   static String noResultsFound = 'No results found';
@@ -147,6 +155,7 @@ class LK {
   static String familyHead = 'Family Head';
   static String at = 'at';
   static String totalAreasLabel = 'Total Areas in @taluka: @count';
+  static String totalAreasAllLabel = 'Total Areas: @count';
   static String totalMembersLabel = 'Total Members: @count';
   static String totalFamiliesLabel = 'Total Families: @count';
   static String showingMembersLabel = 'Showing @count members';

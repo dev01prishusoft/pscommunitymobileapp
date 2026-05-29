@@ -20,7 +20,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late final LoginController _controller;
-  final String _tag = 'login_controller_tag';
+  final String _tag = UniqueKey().toString();
 
   @override
   void initState() {
@@ -30,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       tag: _tag,
     );
   }
+
 
   @override
   void dispose() {

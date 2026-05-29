@@ -229,11 +229,16 @@ class _ResultsHeader extends GetView<FamilyController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.areas.isEmpty) return SizedBox.shrink();
+      final isAll = controller.selectedTaluka.value == null;
       return Text(
-        LK.totalAreasLabel.trParams({
-          'taluka': controller.selectedTaluka.value?.text ?? 'All',
-          'count': controller.areas.length.toString(),
-        }),
+        isAll
+            ? LK.totalAreasAllLabel.trParams({
+                'count': controller.areas.length.toString(),
+              })
+            : LK.totalAreasLabel.trParams({
+                'taluka': controller.selectedTaluka.value!.text,
+                'count': controller.areas.length.toString(),
+              }),
         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondary),
       );
     });

@@ -34,8 +34,13 @@ class _FakeRx_0<T> extends _i1.SmartFake implements _i2.Rx<T> {
     : super(parent, parentInvocation);
 }
 
-class _FakeRxList_1<E> extends _i1.SmartFake implements _i2.RxList<E> {
-  _FakeRxList_1(Object parent, Invocation parentInvocation)
+class _FakeRxString_1 extends _i1.SmartFake implements _i2.RxString {
+  _FakeRxString_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeRxList_2<E> extends _i1.SmartFake implements _i2.RxList<E> {
+  _FakeRxList_2(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -59,6 +64,18 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
           as _i2.Rx<_i3.TokenPair>);
 
   @override
+  _i2.RxString get userPhoneRx =>
+      (super.noSuchMethod(
+            Invocation.getter(#userPhoneRx),
+            returnValue: _FakeRxString_1(this, Invocation.getter(#userPhoneRx)),
+            returnValueForMissingStub: _FakeRxString_1(
+              this,
+              Invocation.getter(#userPhoneRx),
+            ),
+          )
+          as _i2.RxString);
+
+  @override
   _i4.Stream<bool> get isLoggedInStream =>
       (super.noSuchMethod(
             Invocation.getter(#isLoggedInStream),
@@ -66,6 +83,15 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
             returnValueForMissingStub: _i4.Stream<bool>.empty(),
           )
           as _i4.Stream<bool>);
+
+  @override
+  bool get isDefaultPassword =>
+      (super.noSuchMethod(
+            Invocation.getter(#isDefaultPassword),
+            returnValue: false,
+            returnValueForMissingStub: false,
+          )
+          as bool);
 
   @override
   bool get hasToken =>
@@ -104,18 +130,18 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
           as bool);
 
   @override
-  bool get isDefaultPassword =>
+  bool get isAccessTokenExpired =>
       (super.noSuchMethod(
-            Invocation.getter(#isDefaultPassword),
+            Invocation.getter(#isAccessTokenExpired),
             returnValue: false,
             returnValueForMissingStub: false,
           )
           as bool);
 
   @override
-  bool get isAccessTokenExpired =>
+  bool get isAccessTokenNearExpiry =>
       (super.noSuchMethod(
-            Invocation.getter(#isAccessTokenExpired),
+            Invocation.getter(#isAccessTokenNearExpiry),
             returnValue: false,
             returnValueForMissingStub: false,
           )
@@ -143,13 +169,14 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
   _i4.Future<void> saveTokens(
     String? access,
     String? refresh, {
-    bool? isDefault = false,
+    bool? isDefaultPassword = false,
+    String? mobile,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
               #saveTokens,
               [access, refresh],
-              {#isDefault: isDefault},
+              {#isDefaultPassword: isDefaultPassword, #mobile: mobile},
             ),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
@@ -160,6 +187,15 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
   _i4.Future<void> clearTokens() =>
       (super.noSuchMethod(
             Invocation.method(#clearTokens, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> markPasswordReset() =>
+      (super.noSuchMethod(
+            Invocation.method(#markPasswordReset, []),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
@@ -190,11 +226,11 @@ class MockLocalizationService extends _i1.Mock
   _i2.RxList<_i7.Language> get languages =>
       (super.noSuchMethod(
             Invocation.getter(#languages),
-            returnValue: _FakeRxList_1<_i7.Language>(
+            returnValue: _FakeRxList_2<_i7.Language>(
               this,
               Invocation.getter(#languages),
             ),
-            returnValueForMissingStub: _FakeRxList_1<_i7.Language>(
+            returnValueForMissingStub: _FakeRxList_2<_i7.Language>(
               this,
               Invocation.getter(#languages),
             ),

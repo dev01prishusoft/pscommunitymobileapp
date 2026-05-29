@@ -7,7 +7,6 @@ import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -28,6 +27,14 @@ class PaymentController extends GetxController {
   final Rxn<PaymentMode> selectedMode = Rxn<PaymentMode>();
   final Rxn<PaymentCategory> selectedCategory = Rxn<PaymentCategory>();
   final RxDouble enteredAmount = 0.0.obs;
+
+  bool get isAmountFixed {
+    final cat = selectedCategory.value;
+    if (cat != null && cat.defaultAmount > 0) return true;
+    if (cat != null && cat.minAmount > 0 && cat.maxAmount > 0 && cat.minAmount == cat.maxAmount) return true;
+    return false;
+  }
+
   final RxBool isProcessingPayment = false.obs;
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
@@ -146,43 +153,40 @@ class PaymentController extends GetxController {
 
     if (adminPaymentRequestId == null) {
       if (typeId == null) {
-        _showErrorSnackbar('Please select Payment Type');
+        _showErrorSnackbar(LK.pleaseSelectPaymentType.tr);
         return;
       }
       if (selectedMode.value == null) {
-        _showErrorSnackbar('Please select Payment Mode');
+        _showErrorSnackbar(LK.pleaseSelectPaymentMode.tr);
         return;
       }
       if (categoryId == null) {
-        _showErrorSnackbar('Please select Category');
+        _showErrorSnackbar(LK.pleaseSelectCategory.tr);
         return;
       }
     } else {
       if (selectedMode.value == null) {
-        _showErrorSnackbar('Please select Payment Mode');
+        _showErrorSnackbar(LK.pleaseSelectPaymentMode.tr);
         return;
       }
     }
 
-    final double minAmount = (selectedCategory.value?.minAmount ?? 0) > 0 
-        ? selectedCategory.value!.minAmount 
-        : 1.0; // Razorpay requires at least 1 INR
-    final double maxAmount = (selectedCategory.value?.maxAmount ?? 0) > 0 
-        ? selectedCategory.value!.maxAmount 
-        : double.infinity;
-
     if (adminPaymentRequestId == null) {
-      if (amount < minAmount) {
-        _showErrorSnackbar('Amount must be at least ₹${minAmount.toInt()}');
+      if ((selectedCategory.value?.minAmount ?? 0) > 0 && amount < selectedCategory.value!.minAmount) {
+        _showErrorSnackbar('${LK.amountMustBeAtLeast.tr}${selectedCategory.value!.minAmount.toInt()}');
         return;
       }
-      if (amount > maxAmount) {
-        _showErrorSnackbar('Amount cannot exceed ₹${maxAmount.toInt()}');
+      if ((selectedCategory.value?.maxAmount ?? 0) > 0 && amount > selectedCategory.value!.maxAmount) {
+        _showErrorSnackbar('${LK.amountCannotExceed.tr}${selectedCategory.value!.maxAmount.toInt()}');
+        return;
+      }
+      if (amount <= 0) {
+        _showErrorSnackbar(LK.amountMustBeGreaterThanZero.tr);
         return;
       }
     } else {
       if (amount <= 0) {
-        _showErrorSnackbar('Amount must be greater than zero');
+        _showErrorSnackbar(LK.amountMustBeGreaterThanZero.tr);
         return;
       }
     }
@@ -195,7 +199,7 @@ class PaymentController extends GetxController {
       final memberId = tokenManager.memberId ?? 0;
 
       if (memberId == 0) {
-        Get.snackbar(LK.error.tr, 'Could not determine member ID from session. Please logout and login again.');
+        Get.snackbar(LK.error.tr, LK.couldNotDetermineMemberId.tr);
         return;
       }
 
@@ -308,11 +312,19 @@ class PaymentController extends GetxController {
     AppLogger.e('Payment Error: ${response.code} - ${response.message}');
     
     String message = response.message ?? LK.paymentFailed.tr;
+    bool shouldRedirectBack = false;
     
     // Code 0 is PAYMENT_CANCELLED in Razorpay
     if (response.code == Razorpay.PAYMENT_CANCELLED || 
         message.toLowerCase().contains('undefined')) {
       message = 'Payment cancelled';
+    } else if (message.toLowerCase().contains('timeout')) {
+      message = LK.paymentTimedOut.tr;
+      shouldRedirectBack = true;
+    }
+    
+    if (shouldRedirectBack) {
+      Get.back<void>();
     }
     
     _showErrorSnackbar(message);

@@ -35,5 +35,5 @@ class ApiEndpoints {
   static String stateDropdown = '/api/v1/state/dropdown';
   static String districtDropdown = '/api/v1/district/dropdown';
   static String talukaDropdown = '/api/v1/taluka/dropdown';
-  static String occupationDropdown = '/api/v1/Occupation/dropdown';
+  static String occupationDropdown = '/api/v1/occupation-type/dropdown';
 }

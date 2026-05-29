@@ -9,9 +9,10 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
   Member? _currentMember;
@@ -64,6 +65,14 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final workStateIdMap = <String, int>{};
   final workDistrictIdMap = <String, int>{};
   final workTalukaIdMap = <String, int>{};
+
+  final globalDistrictIdMap = <String, int>{};
+  final globalTalukaIdMap = <String, int>{};
+
+  final addressDistrictCache = <String, RxList<String>>{};
+  final addressTalukaCache = <String, RxList<String>>{};
+  final addressAreaCache = <String, RxList<String>>{};
+
   final memberNo = ''.obs;
   final firstName = ''.obs;
   final middleName = ''.obs;
@@ -348,7 +357,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         defaultQualifications,
       ),
       _fetchDropdown(
-        '/Occupation/dropdown',
+        ApiEndpoints.occupationDropdown,
         occupationTypeList,
         defaultOccupationTypes,
       ),
@@ -407,6 +416,48 @@ class ProfileFormController extends GetxController with FormStateMixin {
       workAreaList.clear();
       workArea.value = '';
     }
+  }
+
+  RxList<String> getAddressDistricts(String stateName) {
+    if (stateName.isEmpty) return <String>[].obs;
+    if (addressDistrictCache.containsKey(stateName)) {
+      return addressDistrictCache[stateName]!;
+    }
+    final list = <String>[].obs;
+    addressDistrictCache[stateName] = list;
+    final stateId = workStateIdMap[stateName];
+    if (stateId != null) {
+      _fetchDropdown('/district/dropdown?stateId=$stateId', list, [], idMap: globalDistrictIdMap);
+    }
+    return list;
+  }
+
+  RxList<String> getAddressTalukas(String districtName) {
+    if (districtName.isEmpty) return <String>[].obs;
+    if (addressTalukaCache.containsKey(districtName)) {
+      return addressTalukaCache[districtName]!;
+    }
+    final list = <String>[].obs;
+    addressTalukaCache[districtName] = list;
+    final districtId = globalDistrictIdMap[districtName] ?? workDistrictIdMap[districtName];
+    if (districtId != null) {
+      _fetchDropdown('/taluka/dropdown?districtId=$districtId', list, [], idMap: globalTalukaIdMap);
+    }
+    return list;
+  }
+
+  RxList<String> getAddressAreas(String talukaName) {
+    if (talukaName.isEmpty) return <String>[].obs;
+    if (addressAreaCache.containsKey(talukaName)) {
+      return addressAreaCache[talukaName]!;
+    }
+    final list = <String>[].obs;
+    addressAreaCache[talukaName] = list;
+    final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
+    if (talukaId != null) {
+      _fetchDropdown('/area/dropdown?talukaId=$talukaId', list, []);
+    }
+    return list;
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
@@ -590,36 +641,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         uploadProgress.value = 0.1;
         
         try {
-          final memberToSubmit = Member(
-            memberId: _currentMember?.memberId ?? 0,
-            memberNo: memberNoCtrl.text,
-            firstName: firstNameCtrl.text,
-            lastName: lastNameCtrl.text,
-            middleName: middleNameCtrl.text,
-            mobileNo: mobileCtrl.text,
-            emailAddress: emailCtrl.text,
-            genderName: gender.value,
-            maritalStatusName: maritalStatus.value,
-            bloodGroupName: bloodGroup.value,
-            dateOfBirth: dob.value,
-            dateOfBirthTime: tob.value,
-            height: int.tryParse(heightCtrl.text),
-            weight: int.tryParse(weightCtrl.text),
-            gotraName: gotra.value,
-            jobPositionName: jobPositionCtrl.text,
-            companyName: companyNameCtrl.text,
-            businessName: businessNameCtrl.text,
-            monthlyIncome: int.tryParse(monthlyIncomeCtrl.text),
-            occupationStateName: workState.value,
-            occupationDistrictName: workDistrict.value,
-            occupationTalukaName: workTaluka.value,
-            occupationAreaName: workArea.value,
-            occupationAddressLine1: workAddressLine1Ctrl.text,
-            occupationAddressLine2: workAddressLine2Ctrl.text,
-          );
-
           final isEdit = _currentMember != null;
-          await Future.delayed(const Duration(seconds: 1));
+          await Future<void>.delayed(const Duration(seconds: 1));
           
           Get.snackbar(
             LK.success.tr,
@@ -628,8 +651,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             colorText: AppColors.white,
           );
         } catch (e, stack) {
-          print('Submit form error: $e');
-          print(stack);
+          AppLogger.e('Submit form error', e, stack);
           Get.snackbar(
             LK.error.tr,
             LK.unexpectedError.tr,

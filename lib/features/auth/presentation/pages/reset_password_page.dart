@@ -11,8 +11,10 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_gradient_background.dart';
 import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -23,15 +25,11 @@ class ResetPasswordPage extends StatefulWidget {
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final formKey = GlobalKey<FormState>();
-  final mobileController = TextEditingController();
-  final oldPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    mobileController.dispose();
-    oldPasswordController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -49,9 +47,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       if (!formKey.currentState!.validate()) return;
 
+      final phone = Get.find<TokenManager>().userPhone ?? '';
       await controller.resetPassword(
-        mobileController.text,
-        oldPasswordController.text,
+        phone,
+        phone,
         newPasswordController.text,
       );
 
@@ -83,7 +82,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.secondary,
           ),
-          onPressed: () => Get.back<void>(),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Get.back<void>();
+            } else {
+              Get.find<AuthState>().logoutAndRedirect();
+            }
+          },
         ),
       ),
       body: AppGradientBackground(
@@ -126,24 +131,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ),
                             ),
                             SizedBox(height: 32.h),
-                            AppTextField(
-                              label: LK.mobileNumber.tr,
-                              controller: mobileController,
-                              hint: LK.mobileHint.tr,
-                              icon: Icons.phone_android_rounded,
-                              keyboardType: TextInputType.phone,
-                              validator: AppValidators.mobile,
-                            ),
-                            SizedBox(height: 20.h),
-                            AppTextField(
-                              label: LK.oldPassword.tr,
-                              controller: oldPasswordController,
-                              hint: LK.passwordHint.tr,
-                              icon: Icons.lock_open_rounded,
-                              obscureText: true,
-                              validator: AppValidators.required,
-                            ),
-                            SizedBox(height: 20.h),
                             AppTextField(
                               label: LK.newPassword.tr,
                               controller: newPasswordController,

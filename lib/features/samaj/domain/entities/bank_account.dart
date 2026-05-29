@@ -36,4 +36,19 @@ class BankAccount {
   final String swiftCode;
   final String upiId;
   final bool isPrimary;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'bankName': bankName,
+      'branchName': branchName,
+      'accountHolderName': accountHolderName,
+      'accountNumber': accountNumber,
+      'accountType': accountType,
+      'ifscCode': ifscCode,
+      'micrCode': micrCode,
+      'swiftCode': swiftCode,
+      'upiId': upiId,
+      'isPrimary': isPrimary,
+    };
+  }
 }

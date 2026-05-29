@@ -29,7 +29,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   void initState() {
     super.initState();
     _controller.clearSearch();
-    _controller.loadOccupations();
     _scrollController.addListener(_onScroll);
   }
 
@@ -133,7 +132,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                     children: [
                       Expanded(
                         child: _controller.filteredOccupations.isEmpty
-                            ? Padding(
+                            ? SingleChildScrollView(
                                 padding: EdgeInsets.all(24.0),
                                 child: AppEmptyState(
                                   icon: Icons.work_off_outlined,

@@ -13,6 +13,7 @@ class AuthState {
 
   final TokenManager _tokenManager;
   final RxBool isAuthenticated = false.obs;
+  bool _isLoggingOut = false;
 
   void _updateAuthStatus() {
     isAuthenticated.value = _tokenManager.hasToken;
@@ -46,11 +47,20 @@ class AuthState {
   }
 
   Future<void> logoutAndRedirect() async {
-    await _revokeTokenCall();
-    await _tokenManager.clearTokens();
-    if (Get.isRegistered<SamajController>()) {
-      Get.find<SamajController>().clear();
+    if (_isLoggingOut) return;
+    _isLoggingOut = true;
+    try {
+      await _revokeTokenCall();
+      await _tokenManager.clearTokens();
+      if (Get.isRegistered<SamajController>()) {
+        Get.find<SamajController>().clear();
+      }
+      await Get.find<LocalizationService>().changeLocale('en', 'US');
+      if (Get.currentRoute != AppRouter.login) {
+        await Get.offAllNamed<void>(AppRouter.login);
+      }
+    } finally {
+      _isLoggingOut = false;
     }
-    await Get.offAllNamed<void>(AppRouter.login);
   }
 }

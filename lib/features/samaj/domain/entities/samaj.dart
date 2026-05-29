@@ -9,6 +9,15 @@ class Samaj {
     required this.descriptionEnglish,
     required this.logoUrl,
     this.bankAccounts = const [],
+    this.searchText,
+    this.defaultLanguageId,
+    this.languageName,
+    this.languageCode,
+    this.isActive,
+    this.createdAt,
+    this.createdBy,
+    this.updatedAt,
+    this.updatedBy,
   });
 
   factory Samaj.fromJson(Map<String, dynamic> json) {
@@ -24,6 +33,15 @@ class Samaj {
               ?.map((e) => BankAccount.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      searchText: json['searchText'] as String?,
+      defaultLanguageId: json['defaultLanguageId'] as int?,
+      languageName: json['languageName'] as String?,
+      languageCode: json['languageCode'] as String?,
+      isActive: json['isActive'] as bool?,
+      createdAt: json['createdAt'] as String?,
+      createdBy: json['createdBy'] as int?,
+      updatedAt: json['updatedAt'] as String?,
+      updatedBy: json['updatedBy'] as int?,
     );
   }
   final int samajId;
@@ -33,4 +51,34 @@ class Samaj {
   final String descriptionEnglish;
   final String logoUrl;
   final List<BankAccount> bankAccounts;
+  final String? searchText;
+  final int? defaultLanguageId;
+  final String? languageName;
+  final String? languageCode;
+  final bool? isActive;
+  final String? createdAt;
+  final int? createdBy;
+  final String? updatedAt;
+  final int? updatedBy;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'samajId': samajId,
+      'name': name,
+      'nameEnglish': nameEnglish,
+      'description': description,
+      'descriptionEnglish': descriptionEnglish,
+      'logoUrl': logoUrl,
+      'bankAccounts': bankAccounts.map((e) => e.toJson()).toList(),
+      'searchText': searchText,
+      'defaultLanguageId': defaultLanguageId,
+      'languageName': languageName,
+      'languageCode': languageCode,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'createdBy': createdBy,
+      'updatedAt': updatedAt,
+      'updatedBy': updatedBy,
+    };
+  }
 }

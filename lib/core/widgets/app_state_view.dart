@@ -35,19 +35,25 @@ class AppStateView extends StatelessWidget {
           ),
         );
       case AppState.error:
-        return Padding(
-          padding: AppSpacing.pM,
-          child: AppErrorState(errorMessage: errorMessage, onRetry: onRetry),
+        return Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: AppSpacing.pM,
+              child: AppErrorState(errorMessage: errorMessage, onRetry: onRetry),
+            ),
+          ),
         );
       case AppState.empty:
         return Center(
-          child: Padding(
-            padding: AppSpacing.pM,
-            child: AppEmptyState(
-              icon: emptyIcon ?? Icons.search_off_rounded,
-              secondaryIcon: emptyIcon != null ? null : Icons.search,
-              title: emptyMessage ?? LK.noResultsFound.tr,
-              subtitle: LK.trySelectingDifferentFilters.tr,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: AppSpacing.pM,
+              child: AppEmptyState(
+                icon: emptyIcon ?? Icons.search_off_rounded,
+                secondaryIcon: emptyIcon != null ? null : Icons.search,
+                title: emptyMessage ?? LK.noResultsFound.tr,
+                subtitle: LK.trySelectingDifferentFilters.tr,
+              ),
             ),
           ),
         );

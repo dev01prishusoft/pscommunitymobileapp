@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
+
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
-  TokenPair({this.accessToken, this.refreshToken});
+  TokenPair({this.accessToken, this.refreshToken, this.isDefaultPassword = false});
   final String? accessToken;
   final String? refreshToken;
+  final bool isDefaultPassword;
 }
 
 class TokenManager {
@@ -19,32 +19,51 @@ class TokenManager {
 
   final Rx<TokenPair> authState = TokenPair().obs;
 
+  final RxString userPhoneRx = ''.obs;
+
   static final _accessKey = 'access_token';
   static final _refreshKey = 'refresh_token';
+  static final _defaultPwdKey = 'is_default_pwd';
+  static final _mobileKey = 'user_mobile';
 
   Future<void> bootstrap() async {
     try {
       final results = await Future.wait([
         _storage.read(_accessKey),
         _storage.read(_refreshKey),
+        _storage.read(_defaultPwdKey),
+        _storage.read(_mobileKey),
       ]);
       authState.value = TokenPair(
         accessToken: results[0],
         refreshToken: results[1],
+        isDefaultPassword: results[2] == 'true',
       );
+      userPhoneRx.value = results[3] ?? '';
     } catch (e) {
       if (kDebugMode) {}
       authState.value = TokenPair();
     }
   }
 
-  Future<void> saveTokens(String access, String refresh) async {
+  Future<void> saveTokens(String access, String refresh, {bool isDefaultPassword = false, String? mobile}) async {
     try {
-      await Future.wait([
+      final futures = <Future<void>>[
         _storage.write(_accessKey, access),
         _storage.write(_refreshKey, refresh),
-      ]);
-      authState.value = TokenPair(accessToken: access, refreshToken: refresh);
+        _storage.write(_defaultPwdKey, isDefaultPassword.toString()),
+      ];
+      if (mobile != null) {
+        futures.add(_storage.write(_mobileKey, mobile));
+        userPhoneRx.value = mobile;
+      }
+      await Future.wait(futures);
+
+      authState.value = TokenPair(
+        accessToken: access, 
+        refreshToken: refresh,
+        isDefaultPassword: isDefaultPassword,
+      );
     } catch (e) {
       if (kDebugMode) {}
       rethrow;
@@ -56,8 +75,11 @@ class TokenManager {
       await Future.wait([
         _storage.delete(_accessKey),
         _storage.delete(_refreshKey),
+        _storage.delete(_defaultPwdKey),
+        _storage.delete(_mobileKey),
       ]);
       authState.value = TokenPair();
+      userPhoneRx.value = '';
     } catch (e) {
       if (kDebugMode) {}
       rethrow;
@@ -69,9 +91,20 @@ class TokenManager {
     return !_isJwtExpired(pair.accessToken!);
   }).distinct();
 
+  Future<void> markPasswordReset() async {
+    await _storage.write(_defaultPwdKey, 'false');
+    authState.value = TokenPair(
+      accessToken: authState.value.accessToken,
+      refreshToken: authState.value.refreshToken,
+      isDefaultPassword: false,
+    );
+  }
+
+  bool get isDefaultPassword => authState.value.isDefaultPassword;
+
   String? get accessToken => authState.value.accessToken;
   String? get refreshToken => authState.value.refreshToken;
-  bool get hasToken => hasValidAccessToken;
+  bool get hasToken => hasRefreshToken || hasValidAccessToken;
   bool get hasValidAccessToken {
     final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return false;
@@ -123,6 +156,7 @@ class TokenManager {
   }
 
   String? get userPhone {
+    if (userPhoneRx.value.isNotEmpty) return userPhoneRx.value;
     final token = authState.value.accessToken;
     if (token == null || token.isEmpty) return null;
     final payload = _decodeJwtPayload(token);

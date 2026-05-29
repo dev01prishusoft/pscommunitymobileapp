@@ -25,10 +25,7 @@ class SessionManager extends GetxController {
   }
 
   void _startTimer() {
-    _stopTimer();
-    if (_authState.isAuthenticated.value) {
-      _inactivityTimer = Timer(_timeoutDuration, _onTimeout);
-    }
+    // Timer disabled per user request
   }
 
   void _stopTimer() {

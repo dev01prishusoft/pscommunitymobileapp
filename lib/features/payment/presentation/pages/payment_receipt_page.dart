@@ -7,7 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-import 'package:share_plus/share_plus.dart';
+
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -105,11 +105,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       'date': _formatDate(data['date'] ?? data['paymentDate'] ?? data['createdOn'] ?? data['transactionDate']),
       'name': (data['name'] ?? data['memberName'] ?? data['fullName'])?.toString() ?? 'N/A',
       'memberNo': data['memberNo']?.toString() ?? 'N/A',
-      'type': (data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A',
+      'type': ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A').tr,
       'category': (data['category'] ?? data['paymentCategory'] ?? data['paymentCategoryName'])?.toString() ?? 'N/A',
       'amount': (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
-      'mode': (data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A',
-      'status': (data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A',
+      'mode': ((data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A').tr,
+      'status': ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
       'transactionId': (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ?? 'N/A',
       'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
     };
@@ -341,7 +341,15 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   }
   
   Future<pw.Document> _generatePdfDocument(Map<String, String> data) async {
-    final pdf = pw.Document();
+    final font = await PdfGoogleFonts.hindVadodaraRegular();
+    final boldFont = await PdfGoogleFonts.hindVadodaraBold();
+    
+    final pdf = pw.Document(
+      theme: pw.ThemeData.withFont(
+        base: font,
+        bold: boldFont,
+      ),
+    );
 
     pdf.addPage(
       pw.Page(
@@ -375,10 +383,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Text('${LK.transactionIdLabel.tr} ${data['transactionId']}'),
               pw.SizedBox(height: 40.h),
               pw.Text(
-                'Thank you for your payment!',
+                'Thank you for your payment!'.tr,
                 style: pw.TextStyle(
                   fontSize: 14.sp,
-                  fontStyle: pw.FontStyle.italic,
                 ),
               ),
             ],

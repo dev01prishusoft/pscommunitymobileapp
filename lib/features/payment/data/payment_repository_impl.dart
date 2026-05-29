@@ -106,7 +106,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'memberId': memberId,
           'paymentStatusId': paymentStatusId,
           'paymentModeId': paymentModeId,
-          'description': description ?? "",
+          'description': description ?? '',
         },
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),

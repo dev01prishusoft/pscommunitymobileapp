@@ -44,7 +44,7 @@ class MockApiClient implements ApiClient {
 
 class MockTokenManager implements TokenManager {
   @override
-  Future<void> saveTokens(String accessToken, String refreshToken) async {}
+  Future<void> saveTokens(String accessToken, String refreshToken, {bool isDefaultPassword = false, String? mobile}) async {}
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -29,7 +29,7 @@ class MockTokenManager implements TokenManager {
   String? savedRefresh;
 
   @override
-  Future<void> saveTokens(String access, String refresh) async {
+  Future<void> saveTokens(String access, String refresh, {bool isDefaultPassword = false, String? mobile}) async {
     savedAccess = access;
     savedRefresh = refresh;
   }
