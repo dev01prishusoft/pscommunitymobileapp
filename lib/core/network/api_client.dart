@@ -32,6 +32,8 @@ class ApiClient {
     CertificatePinning.configure(_dio);
     CertificatePinning.configure(refreshDio);
 
+    refreshDio.interceptors.add(RetryInterceptor(dio: refreshDio, maxRetries: 1));
+
     if (AppEnvironment.I.enableLogging) {
       refreshDio.interceptors.add(
         PrettyDioLogger(

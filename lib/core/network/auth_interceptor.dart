@@ -106,6 +106,9 @@ class AuthInterceptor extends Interceptor {
           'refreshToken': refreshToken,
           'mobileNo': _tokenManager.userPhone,
         },
+        options: Options(
+          extra: {'retryable': true},
+        ),
       );
 
       final data = response.data ?? {};

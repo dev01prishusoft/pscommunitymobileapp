@@ -19,20 +19,11 @@ class LoginController extends GetxController with FormStateMixin {
   
   final RxBool obscurePassword = true.obs;
 
-  final mobileController = TextEditingController();
-  final passwordController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
-
-  @override
-  void onClose() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      mobileController.dispose();
-      passwordController.dispose();
-    });
-    super.onClose();
-  }
-
-  void submit() {
+  void submit({
+    required GlobalKey<FormState> formKey,
+    required String mobile,
+    required String password,
+  }) {
     if (kUiReviewMode) {
       Get.offNamed(AppRouter.postLoginSplash);
       return;
@@ -42,8 +33,8 @@ class LoginController extends GetxController with FormStateMixin {
 
     submitThrottled(() async {
       final result = await _login(
-        mobile: mobileController.text.trim(),
-        password: passwordController.text,
+        mobile: mobile.trim(),
+        password: password,
       );
 
       switch (result) {

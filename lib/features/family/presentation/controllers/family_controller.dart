@@ -241,18 +241,61 @@ class FamilyController extends GetxController {
     }
   }
 
-  Future<void> loadFamilies(int areaId) async {
-    familyListState.value = AppState.loading;
+  int _familiesPage = 1;
+  final RxBool hasMoreFamilies = true.obs;
+  final RxBool isNextPageFamiliesLoading = false.obs;
+
+  Future<void> loadFamilies(int areaId, {bool isRefresh = true}) async {
+    if (isRefresh) {
+      _familiesPage = 1;
+      hasMoreFamilies.value = true;
+      familyListState.value = AppState.loading;
+      families.clear();
+    } else {
+      if (!hasMoreFamilies.value || isNextPageFamiliesLoading.value) return;
+      isNextPageFamiliesLoading.value = true;
+    }
+
     try {
-      final results = await _repository.getFamiliesByArea(areaId);
-      families.assignAll(results);
+      final results = await _repository.getFamiliesByArea(
+        areaId,
+        pageNo: _familiesPage,
+        pageSize: _pageSize,
+      );
+
+      if (results.isEmpty) {
+        hasMoreFamilies.value = false;
+        if (families.isEmpty) {
+          familyListState.value = AppState.empty;
+        } else {
+          familyListState.value = AppState.data;
+        }
+        isNextPageFamiliesLoading.value = false;
+        return;
+      }
+
+      if (isRefresh) {
+        families.assignAll(results);
+      } else {
+        families.addAll(results);
+      }
+
+      _familiesPage++;
+      if (results.length < _pageSize) {
+        hasMoreFamilies.value = false;
+      }
+
       _filterFamilies();
       familyListState.value = filteredFamilies.isEmpty
           ? AppState.empty
           : AppState.data;
     } catch (e, stack) {
       AppLogger.e('Failed to load families for areaId: $areaId', e, stack);
-      familyListState.value = AppState.error;
+      if (isRefresh) {
+        familyListState.value = AppState.error;
+      }
+    } finally {
+      isNextPageFamiliesLoading.value = false;
     }
   }
 

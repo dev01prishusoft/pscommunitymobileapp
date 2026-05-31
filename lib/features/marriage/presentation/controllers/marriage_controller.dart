@@ -52,6 +52,7 @@ class MarriageController extends GetxController {
   final RxString selectedIncomeTo = 'Any'.obs;
 
   final TextEditingController searchTextController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   final RxString searchQuery = ''.obs;
   final List<String> ages = List.generate(43, (i) => (18 + i).toString());
   final List<String> heights = List.generate(121, (i) => '${(120 + i)} cm');
@@ -80,6 +81,13 @@ class MarriageController extends GetxController {
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
 
   final RxList<Member> filteredMembers = <Member>[].obs;
+  final List<Member> _allMembers = [];
+  
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  final RxBool hasMore = true.obs;
+  final RxBool isNextPageLoading = false.obs;
+  int _currentLoadRequestId = 0;
 
   int get unmarriedMaleCount =>
       unmarriedCounts.firstWhereOrNull((e) => e.genderId == 1)?.count ?? 0;
@@ -115,6 +123,13 @@ class MarriageController extends GetxController {
       _debounceTimer?.cancel();
       _debounceTimer = Timer(Duration(milliseconds: 300), () => applyFilters());
     });
+    
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        loadNextPage();
+      }
+    });
+
     loadProfiles();
 
     loadLocations();
@@ -166,8 +181,19 @@ class MarriageController extends GetxController {
     }
   }
 
-  Future<void> loadProfiles({bool showLoading = true}) async {
-    if (showLoading) state.value = AppState.loading;
+  Future<void> loadProfiles({bool showLoading = true, bool isRefresh = true}) async {
+    final requestId = ++_currentLoadRequestId;
+    
+    if (isRefresh) {
+      _currentPage = 1;
+      hasMore.value = true;
+      if (showLoading) state.value = AppState.loading;
+      _allMembers.clear();
+    } else {
+      if (!hasMore.value || isNextPageLoading.value) return;
+      isNextPageLoading.value = true;
+    }
+
     try {
       int? genderId;
       if (selectedGender.value == 'Male') {
@@ -181,13 +207,36 @@ class MarriageController extends GetxController {
           query: searchQuery.value,
           genderId: genderId,
           lookingForMarriage: lookingForMarriage.value,
+          pageNumber: _currentPage,
+          pageSize: _pageSize,
         ),
-        _repository.getUnmarriedCounts(),
+        if (isRefresh) _repository.getUnmarriedCounts(),
       ]);
 
+      if (requestId != _currentLoadRequestId) return;
+
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
-      final List<Member> members = memberResult.dataOrNull?.data ?? [];
-      _updateDynamicLists(members);
+      final List<Member> newMembers = memberResult.dataOrNull?.data ?? [];
+      
+      if (newMembers.isEmpty) {
+        hasMore.value = false;
+        if (_allMembers.isEmpty) {
+          state.value = AppState.empty;
+        } else {
+          state.value = AppState.data;
+        }
+        isNextPageLoading.value = false;
+        return;
+      }
+
+      _allMembers.addAll(newMembers);
+      
+      _currentPage++;
+      if (newMembers.length < _pageSize) {
+        hasMore.value = false;
+      }
+
+      _updateDynamicLists(_allMembers);
       
       String? myGotra;
       if (excludeSameGotra.value) {
@@ -215,18 +264,33 @@ class MarriageController extends GetxController {
         myGotra: myGotra,
       );
 
-      final filtered = MarriageFilterApplicator.apply(members, filterState);
+      final filtered = MarriageFilterApplicator.apply(_allMembers, filterState);
       filteredMembers.assignAll(filtered);
-      unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
+      
+      if (isRefresh && results.length > 1) {
+        unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
+      }
+      
       state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
+      if (requestId != _currentLoadRequestId) return;
       AppLogger.e('Failed to load marriage profiles', e, stack);
-      state.value = AppState.error;
+      if (isRefresh) {
+        state.value = AppState.error;
+      }
+    } finally {
+      if (requestId == _currentLoadRequestId) {
+        isNextPageLoading.value = false;
+      }
     }
   }
 
+  Future<void> loadNextPage() async {
+    await loadProfiles(showLoading: false, isRefresh: false);
+  }
+
   void applyFilters() {
-    loadProfiles(showLoading: false);
+    loadProfiles(showLoading: false, isRefresh: true);
   }
 
   void toggleAdvancedFilters() {
@@ -353,6 +417,7 @@ class MarriageController extends GetxController {
   @override
   void onClose() {
     searchTextController.dispose();
+    scrollController.dispose();
     _debounceTimer?.cancel();
     super.onClose();
   }

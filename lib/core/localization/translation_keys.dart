@@ -100,23 +100,31 @@ class LK {
   static String deleteAccount = 'Delete Account';
   static String deleteAccountConfirm =
       'Are you sure you want to delete your account? This action cannot be undone.';
+  static String accountDeleted = 'Account Deleted';
+  static String accountDeletedBody =
+      'Your account has been deleted successfully.';
   static String fieldRequired = 'This field is required';
   static String sessionExpired = 'Session Expired';
-  static String sessionExpiredBody = 'You have been logged out due to inactivity.';
+  static String sessionExpiredBody =
+      'You have been logged out due to inactivity.';
   static String pleaseEnterEmail = 'Please enter email address';
   static String pleaseEnterValidEmail = 'Please enter a valid email address';
   static String passwordMinLength = 'Password must be at least 8 characters';
-  static String passwordLowercase = 'Password must contain at least one lowercase letter';
-  static String passwordUppercase = 'Password must contain at least one uppercase letter';
+  static String passwordLowercase =
+      'Password must contain at least one lowercase letter';
+  static String passwordUppercase =
+      'Password must contain at least one uppercase letter';
   static String passwordNumber = 'Password must contain at least one number';
-  static String passwordSpecialChar = r'Password must contain at least one special character (!@#$&*~)';
+  static String passwordSpecialChar =
+      r'Password must contain at least one special character (!@#$&*~)';
   static String pleaseEnterOTP = 'Please enter OTP';
   static String pleaseEnterValidOTP = 'Please enter a valid OTP';
   static String pleaseEnterValidURL = 'Please enter a valid URL';
   static String profileUpdated = 'Profile updated successfully!';
   static String profileUpdateFailed = 'Failed to update profile';
   static String unexpectedError = 'An unexpected error occurred.';
-  static String pleaseFillRequiredFields = 'Please fill all required fields correctly.';
+  static String pleaseFillRequiredFields =
+      'Please fill all required fields correctly.';
   static String pleaseSelectPaymentType = 'pleaseSelectPaymentType';
   static String pleaseSelectPaymentMode = 'pleaseSelectPaymentMode';
   static String pleaseSelectCategory = 'pleaseSelectCategory';
@@ -133,6 +141,7 @@ class LK {
   static String noBankAccountsFound = 'No bank accounts found';
   static String noItemsFound = 'No items found';
   static String areaLabel = 'Area:';
+  static String thankYouForPayment = 'Thank you for your payment!';
   static String joinCommunity = 'Join our community today!';
   static String appLinkLabel = 'App Link:';
   static String copyLink = 'Copy Link';
@@ -369,7 +378,7 @@ class LK {
   static String district = 'District:';
   static String taluka = 'Taluka:';
   static String area = 'Area:';
-  
+
   static String memberNo = 'Member No';
   static String firstName = 'First Name';
   static String middleName = 'Middle Name';
@@ -389,7 +398,6 @@ class LK {
   static String saveChanges = 'Save Changes';
   static String addMember = 'Add Member';
   static String memberNoHint = 'PSC-2026-0512160358';
-
 
   static String mother = 'Mother';
   static String oPositive = 'O+';
@@ -495,6 +503,7 @@ class LK {
     noBankAccountsFound,
     noItemsFound,
     areaLabel,
+    thankYouForPayment,
     joinCommunity,
     appLinkLabel,
     copyLink,
@@ -750,6 +759,8 @@ class LK {
     pleaseEnterConfirmPassword,
     deleteAccount,
     deleteAccountConfirm,
+    accountDeleted,
+    accountDeletedBody,
     fieldRequired,
     sessionExpired,
     sessionExpiredBody,

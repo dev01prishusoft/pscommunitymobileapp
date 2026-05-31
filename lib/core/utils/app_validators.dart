@@ -39,6 +39,28 @@ class AppValidators {
     return null;
   }
 
+  static String? complexPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return LK.pleaseEnterPassword.tr;
+    }
+    if (value.length < 8) {
+      return LK.passwordMinLength.tr;
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return LK.passwordLowercase.tr;
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return LK.passwordUppercase.tr;
+    }
+    if (!RegExp(r'[0-9]').hasMatch(value)) {
+      return LK.passwordNumber.tr;
+    }
+    if (!RegExp(r'[!@#\$&*~]').hasMatch(value)) {
+      return LK.passwordSpecialChar.tr;
+    }
+    return null;
+  }
+
   static String? otp(String? value) {
     if (value == null || value.trim().isEmpty) {
       return LK.pleaseEnterOTP.tr;

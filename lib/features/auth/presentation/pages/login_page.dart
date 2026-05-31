@@ -20,21 +20,21 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late final LoginController _controller;
-  final String _tag = UniqueKey().toString();
+
+  final formKey = GlobalKey<FormState>();
+  final mobileController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _controller = Get.put(
-      LoginController(Get.find()),
-      tag: _tag,
-    );
+    _controller = Get.put(LoginController(Get.find()));
   }
-
 
   @override
   void dispose() {
-    Get.delete<LoginController>(tag: _tag);
+    mobileController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     child: Form(
-                      key: _controller.formKey,
+                      key: formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                           AppSpacing.vXxxl,
                           AppTextField(
                             label: LK.mobileNumber.tr,
-                            controller: _controller.mobileController,
+                            controller: mobileController,
                             hint: LK.mobileHint.tr,
                             icon: Icons.phone_outlined,
                             keyboardType: TextInputType.phone,
@@ -103,12 +103,13 @@ class _LoginPageState extends State<LoginPage> {
                           Obx(
                             () => AppTextField(
                               label: LK.password.tr,
-                              controller: _controller.passwordController,
+                              controller: passwordController,
                               hint: LK.passwordHint.tr,
                               icon: Icons.lock_outline_rounded,
                               obscureText: _controller.obscurePassword.value,
                               suffixIcon: IconButton(
                                 onPressed: _controller.togglePasswordVisibility,
+                                tooltip: _controller.obscurePassword.value ? 'Show Password' : 'Hide Password',
                                 icon: Icon(
                                   _controller.obscurePassword.value
                                       ? Icons.visibility_outlined
@@ -123,7 +124,11 @@ class _LoginPageState extends State<LoginPage> {
                           Obx(
                             () => AppPrimaryButton(
                               text: LK.signIn.tr,
-                              onPressed: () => _controller.submit(),
+                              onPressed: () => _controller.submit(
+                                formKey: formKey,
+                                mobile: mobileController.text,
+                                password: passwordController.text,
+                              ),
                               isLoading: _controller.isFormLoading,
                             ),
                           ),

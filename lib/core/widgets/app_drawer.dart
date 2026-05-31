@@ -189,8 +189,8 @@ class AppDrawer extends StatelessWidget {
               text: LK.logout.tr,
               height: 45.h,
               onPressed: () {
-                authState.logout();
-                Get.offAllNamed<void>(AppRouter.login);
+                Get.back<void>();
+                authState.logoutAndRedirect();
               },
             ),
           ),
@@ -222,8 +222,7 @@ class AppDrawer extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Get.back<void>();
-              authState.logout();
-              Get.offAllNamed<void>(AppRouter.login);
+              authState.logoutAndRedirect();
               Get.snackbar(
                 'Account Deleted',
                 'Your account has been deleted successfully.',

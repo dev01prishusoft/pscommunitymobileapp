@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
+import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class MockLoginUseCase implements LoginUseCase {
@@ -68,18 +69,22 @@ void main() {
   test('isLoading lifecycle, token save, and navigation on success', () async {
     expect(controller.isFormLoading, false);
 
-    controller.mobileController.text = '123';
-    controller.passwordController.text = 'password';
-    controller.submit();
+    controller.submit(
+      formKey: GlobalKey<FormState>(),
+      mobile: '123',
+      password: 'password',
+    );
     expect(controller.isFormLoading, false);
   });
 
   test('error propagation and AppState reset on failure', () async {
     mockUseCase.shouldThrow = true;
 
-    controller.mobileController.text = '123';
-    controller.passwordController.text = 'wrong';
-    controller.submit();
+    controller.submit(
+      formKey: GlobalKey<FormState>(),
+      mobile: '123',
+      password: 'wrong',
+    );
 
     expect(controller.isFormLoading, false);
   });

@@ -18,6 +18,7 @@ class FamilyMembersListPage extends StatefulWidget {
 class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   final FamilyController _controller = Get.find<FamilyController>();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   late int _areaId;
   late String _areaName;
@@ -35,11 +36,18 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
 
     _controller.memberSearchQuery.value = '';
     _controller.loadFamilies(_areaId);
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+        _controller.loadFamilies(_areaId, isRefresh: false);
+      }
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -101,6 +109,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                               color: AppColors.mutedForeground,
                               size: 20,
                             ),
+                            tooltip: LK.clearAll.tr,
                             padding: EdgeInsets.zero,
                             onPressed: () {
                               _searchController.clear();
@@ -150,14 +159,23 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                             ),
                       )
                     : ListView.separated(
+                        controller: _scrollController,
                         padding: EdgeInsets.symmetric(
                           horizontal: 16.0,
                           vertical: 8.0,
                         ),
-                        itemCount: _controller.filteredFamilies.length,
+                        itemCount: _controller.filteredFamilies.length + (_controller.hasMoreFamilies.value ? 1 : 0),
                         separatorBuilder: (context, index) =>
                             SizedBox(height: 16.h),
                         itemBuilder: (context, index) {
+                          if (index == _controller.filteredFamilies.length) {
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
                           final family = _controller.filteredFamilies[index];
                           return Container(
                             decoration: BoxDecoration(

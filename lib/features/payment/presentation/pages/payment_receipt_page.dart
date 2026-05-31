@@ -102,22 +102,46 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Map<String, String> _getParsedData(Map<String, dynamic> data) {
     return {
-      'date': _formatDate(data['date'] ?? data['paymentDate'] ?? data['createdOn'] ?? data['transactionDate']),
-      'name': (data['name'] ?? data['memberName'] ?? data['fullName'])?.toString() ?? 'N/A',
+      'date': _formatDate(
+        data['date'] ??
+            data['paymentDate'] ??
+            data['createdOn'] ??
+            data['transactionDate'],
+      ),
+      'name':
+          (data['name'] ?? data['memberName'] ?? data['fullName'])
+              ?.toString() ??
+          'N/A',
       'memberNo': data['memberNo']?.toString() ?? 'N/A',
-      'type': ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])?.toString() ?? 'N/A').tr,
-      'category': (data['category'] ?? data['paymentCategory'] ?? data['paymentCategoryName'])?.toString() ?? 'N/A',
+      'type':
+          ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])
+                      ?.toString() ??
+                  'N/A')
+              .tr,
+      'category':
+          (data['category'] ??
+                  data['paymentCategory'] ??
+                  data['paymentCategoryName'])
+              ?.toString() ??
+          'N/A',
       'amount': (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
-      'mode': ((data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])?.toString() ?? 'N/A').tr,
-      'status': ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
-      'transactionId': (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ?? 'N/A',
+      'mode':
+          ((data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])
+                      ?.toString() ??
+                  'N/A')
+              .tr,
+      'status':
+          ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
+      'transactionId':
+          (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ??
+          'N/A',
       'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
     };
   }
 
   Widget _buildContent(Map<String, dynamic> rawData) {
     final data = _getParsedData(rawData);
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -142,16 +166,21 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                       height: 60,
                       fit: BoxFit.contain,
                       placeholder: (_, __) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                       errorWidget: (_, __, ___) => const Icon(
-                          Icons.account_balance,
-                          size: 60,
-                          color: AppColors.navyBlue),
+                        Icons.account_balance,
+                        size: 60,
+                        color: AppColors.navyBlue,
+                      ),
                     ),
                   )
                 else
-                  const Icon(Icons.account_balance,
-                      size: 60, color: AppColors.navyBlue),
+                  const Icon(
+                    Icons.account_balance,
+                    size: 60,
+                    color: AppColors.navyBlue,
+                  ),
                 SizedBox(height: 16.h),
                 Text(
                   samajController.samaj.value?.name ?? LK.samajName.tr,
@@ -171,40 +200,22 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ),
           SizedBox(height: 20.h),
           _buildReceiptSection(LK.receiptDetailsLabel.tr, [
-            _buildInfoRow(
-              LK.receiptNoLabel.tr,
-              data['receiptNo']!,
-            ),
+            _buildInfoRow(LK.receiptNoLabel.tr, data['receiptNo']!),
             _buildInfoRow(LK.dateLabel.tr, data['date']!),
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.memberDetailsLabel.tr, [
             _buildInfoRow(LK.nameLabel.tr, data['name']!),
-            _buildInfoRow(
-              LK.memberNoLabel.tr,
-              data['memberNo']!,
-            ),
+            _buildInfoRow(LK.memberNoLabel.tr, data['memberNo']!),
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
             _buildInfoRow(LK.typeLabel.tr, data['type']!),
-            _buildInfoRow(
-              LK.categoryLabel.tr,
-              data['category']!,
-            ),
-            _buildInfoRow(
-              LK.amountLabel.tr,
-              data['amount']!,
-            ),
+            _buildInfoRow(LK.categoryLabel.tr, data['category']!),
+            _buildInfoRow(LK.amountLabel.tr, data['amount']!),
             _buildInfoRow(LK.modeLabel.tr, data['mode']!),
-            _buildStatusRow(
-              LK.statusLabel.tr,
-              data['status']!,
-            ),
-            _buildInfoRow(
-              LK.transactionIdLabel.tr,
-              data['transactionId']!,
-            ),
+            _buildStatusRow(LK.statusLabel.tr, data['status']!),
+            _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']!),
           ]),
           SizedBox(height: 32.h),
           ElevatedButton.icon(
@@ -324,7 +335,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     final parsed = _getParsedData(_latestData!);
     final pdf = await _generatePdfDocument(parsed);
     final bytes = await pdf.save();
-    
+
     await Printing.sharePdf(
       bytes: bytes,
       filename: 'receipt_${parsed['receiptNo']}.pdf',
@@ -339,16 +350,13 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       onLayout: (PdfPageFormat format) async => pdf.save(),
     );
   }
-  
+
   Future<pw.Document> _generatePdfDocument(Map<String, String> data) async {
     final font = await PdfGoogleFonts.hindVadodaraRegular();
     final boldFont = await PdfGoogleFonts.hindVadodaraBold();
-    
+
     final pdf = pw.Document(
-      theme: pw.ThemeData.withFont(
-        base: font,
-        bold: boldFont,
-      ),
+      theme: pw.ThemeData.withFont(base: font, bold: boldFont),
     );
 
     pdf.addPage(
@@ -383,17 +391,15 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Text('${LK.transactionIdLabel.tr} ${data['transactionId']}'),
               pw.SizedBox(height: 40.h),
               pw.Text(
-                'Thank you for your payment!'.tr,
-                style: pw.TextStyle(
-                  fontSize: 14.sp,
-                ),
+                LK.thankYouForPayment.tr,
+                style: pw.TextStyle(fontSize: 14.sp),
               ),
             ],
           );
         },
       ),
     );
-    
+
     return pdf;
   }
 }

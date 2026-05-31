@@ -29,6 +29,7 @@ class MarriagePage extends GetView<MarriageController> {
       body: Stack(
         children: [
           CustomScrollView(
+            controller: controller.scrollController,
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
@@ -152,6 +153,7 @@ class MarriagePage extends GetView<MarriageController> {
                                 prefixIcon: Icon(Icons.search),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.close),
+                                  tooltip: LK.clearAll.tr,
                                   onPressed: () {
                                     controller.searchTextController.clear();
                                     controller.searchQuery.value = '';
@@ -196,10 +198,15 @@ class MarriagePage extends GetView<MarriageController> {
                 if (controller.state.value == AppState.data) {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
+                      if (index == controller.filteredMembers.length) {
+                        return controller.isNextPageLoading.value 
+                            ? Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
+                            : SizedBox.shrink();
+                      }
                       return _buildMemberCard(
                         controller.filteredMembers[index],
                       );
-                    }, childCount: controller.filteredMembers.length),
+                    }, childCount: controller.filteredMembers.length + (controller.hasMore.value ? 1 : 0)),
                   );
                 } else {
                   return SliverToBoxAdapter(
@@ -281,6 +288,7 @@ class MarriagePage extends GetView<MarriageController> {
                             Spacer(),
                             IconButton(
                               icon: Icon(Icons.close),
+                              tooltip: LK.cancel.tr,
                               onPressed: () =>
                                   controller.isAdvancedFiltersOpen.value =
                                       false,

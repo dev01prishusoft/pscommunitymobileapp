@@ -147,7 +147,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                   color: AppColors.mutedForeground,
                                 ),
                               ),
-                              validator: AppValidators.password,
+                              validator: AppValidators.complexPassword,
                             ),
                             SizedBox(height: 20.h),
                             AppTextField(

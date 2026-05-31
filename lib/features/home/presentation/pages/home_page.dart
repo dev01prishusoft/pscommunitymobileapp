@@ -194,35 +194,39 @@ class _MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Get.toNamed<void>(item.route),
-      child: Container(
-        decoration: cardDecorationWithShadow,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: AppSpacing.pM,
-              decoration: BoxDecoration(
-                color: AppColors.lightBlue,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(item.icon, size: 32, color: AppColors.navyBlue),
-            ),
-            AppSpacing.vM,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.0),
-              child: Text(
-                item.labelKey.tr,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.navyBlue,
+    return Semantics(
+      button: true,
+      label: item.labelKey.tr,
+      child: GestureDetector(
+        onTap: () => Get.toNamed<void>(item.route),
+        child: Container(
+          decoration: cardDecorationWithShadow,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: AppSpacing.pM,
+                decoration: BoxDecoration(
+                  color: AppColors.lightBlue,
+                  shape: BoxShape.circle,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Icon(item.icon, size: 32, color: AppColors.navyBlue),
               ),
-            ),
-          ],
+              AppSpacing.vM,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                child: Text(
+                  item.labelKey.tr,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.navyBlue,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
