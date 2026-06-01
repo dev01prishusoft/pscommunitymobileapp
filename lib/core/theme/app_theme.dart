@@ -114,6 +114,7 @@ class AppTheme {
       filled: true,
       fillColor: AppColors.muted.withValues(alpha: 0.5),
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      errorMaxLines: 5,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

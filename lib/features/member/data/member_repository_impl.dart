@@ -54,4 +54,17 @@ class MemberRepositoryImpl implements MemberRepository {
       return Error(result.failureOrNull!);
     }
   }
+
+  @override
+  Future<Result<bool>> deleteAccount(int id) async {
+    final result = await _apiClient.postParsed<bool>(
+      '/api/v1/member/active-inactive/$id',
+      fromJsonT: (json) => true,
+    );
+    if (result.isSuccess) {
+      return const Success(true);
+    } else {
+      return Error(result.failureOrNull!);
+    }
+  }
 }

@@ -77,10 +77,10 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
               ),
             ),
             SizedBox(height: 24.h),
-            _buildSectionHeader('PAYMENT MODE'),
+            _buildSectionHeader(LK.paymentModeHeader.tr),
             Obx(
               () => _buildDropdownField<PaymentMode>(
-                hint: 'Select Payment Mode',
+                hint: LK.selectPaymentMode.tr,
                 value: controller.selectedMode.value,
                 items: controller.paymentModes,
                 onChanged: (mode) => controller.onModeChanged(mode),

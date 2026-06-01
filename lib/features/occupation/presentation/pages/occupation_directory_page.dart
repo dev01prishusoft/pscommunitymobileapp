@@ -103,7 +103,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                     items: _controller.occupationTypes.map((type) {
                       return DropdownMenuItem<int>(
                         value: type.id,
-                        child: Text(type.text),
+                        child: Text(type.id == 0 ? LK.all.tr : type.text),
                       );
                     }).toList(),
                     onChanged: (id) {
@@ -143,6 +143,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                               )
                             : GridView.builder(
                                 controller: _scrollController,
+                                padding: const EdgeInsets.only(bottom: 24.0),
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3,

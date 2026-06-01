@@ -56,15 +56,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       if (controller.isFormSuccess) {
         Get.snackbar(
-          LK.success.tr,
-          LK.successUpdate.tr,
+          LK.success,
+          LK.successUpdate,
           backgroundColor: AppColors.green,
           colorText: AppColors.white,
         );
         Get.offNamed<void>(AppRouter.postLoginSplash);
       } else if (controller.isFormError && controller.formError.value != null) {
         Get.snackbar(
-          LK.errorServer.tr,
+          LK.errorServer,
           controller.formError.value!,
           backgroundColor: AppColors.red,
           colorText: AppColors.white,
@@ -72,8 +72,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       }
     }
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Get.back<void>();
+        } else {
+          Get.find<AuthState>().logoutAndRedirect();
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         elevation: 0,
@@ -194,6 +204,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );

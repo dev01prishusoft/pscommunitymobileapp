@@ -63,4 +63,21 @@ class AuthState {
       _isLoggingOut = false;
     }
   }
+
+  Future<void> deleteAccountAndRedirect() async {
+    final memberId = _tokenManager.memberId;
+    if (memberId != null) {
+      if (Get.isRegistered<pscommunitymobileapp_api_client.ApiClient>()) {
+        final apiClient = Get.find<pscommunitymobileapp_api_client.ApiClient>();
+        try {
+          await apiClient.post(
+            '/api/v1/member/active-inactive/$memberId',
+          );
+        } catch (_) {
+          // Continue to logout even if api call fails
+        }
+      }
+    }
+    await logoutAndRedirect();
+  }
 }

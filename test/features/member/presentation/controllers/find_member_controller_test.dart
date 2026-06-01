@@ -43,6 +43,12 @@ class MockMemberRepository implements MemberRepository {
     if (shouldThrow) return Error(ServerFailure('API Error'));
     return const Success(true);
   }
+
+  @override
+  Future<Result<bool>> deleteAccount(int id) async {
+    if (shouldThrow) return Error(ServerFailure('API Error'));
+    return const Success(true);
+  }
 }
 
 void main() {

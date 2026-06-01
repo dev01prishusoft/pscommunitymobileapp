@@ -12,6 +12,7 @@ class OccupationItem {
     this.businessAddress,
     this.mobile,
     this.description,
+    this.isActive = true,
   });
 
   factory OccupationItem.fromJson(Map<String, dynamic> json) {
@@ -28,6 +29,7 @@ class OccupationItem {
       businessAddress: json['businessAddress'] as String?,
       mobile: json['mobileNo'] as String?,
       description: json['description'] as String?,
+      isActive: json['isActive'] as bool? ?? true,
     );
   }
   final int id;
@@ -42,4 +44,5 @@ class OccupationItem {
   final String? businessAddress;
   final String? mobile;
   final String? description;
+  final bool isActive;
 }

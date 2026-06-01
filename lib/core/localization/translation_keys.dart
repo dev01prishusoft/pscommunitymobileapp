@@ -62,7 +62,7 @@ class LK {
   static String updateLater = 'Update Later';
   static String reset = 'Reset';
   static String home = 'Home';
-  static String samajName = 'Andhariya Ganata Samaj';
+  static String samajName = '';
   static String privacyPolicy = 'Privacy Policy';
   static String termsAndConditions = 'Terms & Conditions';
   static String privacyContent = 'privacy_content';
@@ -229,6 +229,8 @@ class LK {
   static String receipt = 'Receipt';
   static String paymentTypeHeader = 'PAYMENT TYPE';
   static String selectPaymentType = 'Select Payment Type';
+  static String paymentModeHeader = 'PAYMENT MODE';
+  static String selectPaymentMode = 'Select Payment Mode';
   static String categoryHeader = 'CATEGORY';
   static String selectCategory = 'Select Category';
   static String amountHeader = 'Amount Header';
@@ -317,6 +319,7 @@ class LK {
   static String paymentGatewayMissing =
       'Payment gateway configuration missing.';
   static String paymentFailed = 'Payment failed';
+  static String paymentCancelled = 'Payment cancelled';
   static String pending = 'Pending';
   static String failed = 'Failed';
   static String rolePresident = 'President';

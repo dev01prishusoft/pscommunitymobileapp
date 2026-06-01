@@ -131,11 +131,21 @@ class _SplashContent extends GetView<SamajController> {
         children: [
           Obx(() => _AnimatedLogo(scaleAnim: scaleAnim, samaj: controller.samaj.value)),
           SizedBox(height: 32.h),
-          Obx(() => _AnimatedSamajName(fadeAnim: fadeAnim, samaj: controller.samaj.value)),
-          SizedBox(height: 8.h),
-          _AnimatedDivider(fadeAnim: fadeAnim),
-          SizedBox(height: 16.h),
-          _AnimatedWelcomeText(fadeAnim: fadeAnim),
+          Obx(() {
+            final samaj = controller.samaj.value;
+            if (samaj == null) {
+              return SizedBox(height: 116.h); // Maintain spacing when hidden
+            }
+            return Column(
+              children: [
+                _AnimatedSamajName(fadeAnim: fadeAnim, samaj: samaj),
+                SizedBox(height: 8.h),
+                _AnimatedDivider(fadeAnim: fadeAnim),
+                SizedBox(height: 16.h),
+                _AnimatedWelcomeText(fadeAnim: fadeAnim),
+              ],
+            );
+          }),
           SizedBox(height: 60.h),
         ],
       ),
@@ -166,14 +176,11 @@ class _AnimatedLogo extends StatelessWidget {
           height: 100.h,
           child: Center(child: CircularProgressIndicator()),
         ),
-        errorWidget: (context, url, error) => _fallbackLogo(),
+        errorWidget: (context, url, error) => SizedBox.shrink(),
       );
     }
-    return _fallbackLogo();
+    return SizedBox.shrink();
   }
-
-  Widget _fallbackLogo() =>
-      Image.asset('assets/images/prishusoft_logo.png', width: 300.w);
 }
 
 class _AnimatedSamajName extends StatelessWidget {
@@ -189,7 +196,7 @@ class _AnimatedSamajName extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Text(
-          samaj?.name ?? LK.samajName.tr,
+          samaj?.name ?? '',
           textAlign: TextAlign.center,
           style: AppTextStyles.displayLarge.copyWith(
             color: AppColors.navyBlue,

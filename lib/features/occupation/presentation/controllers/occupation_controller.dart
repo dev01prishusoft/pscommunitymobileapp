@@ -98,8 +98,9 @@ class OccupationController extends GetxController {
       if (results.isEmpty) {
         hasMore.value = false;
       } else {
-        occupations.addAll(results);
-        filteredOccupations.addAll(results);
+        final activeOccupations = results.where((occ) => occ.isActive).toList();
+        occupations.addAll(activeOccupations);
+        filteredOccupations.addAll(activeOccupations);
 
         _currentPage++;
         if (results.length < _pageSize) {

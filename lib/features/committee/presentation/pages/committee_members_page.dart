@@ -173,7 +173,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                     builder: (context) {
                       final valKey = RoleMapper.getLabelKey(val);
                       return Text(
-                        valKey != null ? valKey.tr : val,
+                        valKey != null ? valKey.tr : (val == 'All' ? LK.all.tr : val),
                         style: AppTextStyles.labelMedium,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

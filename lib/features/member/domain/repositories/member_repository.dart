@@ -16,4 +16,6 @@ abstract class MemberRepository {
   });
 
   Future<Result<bool>> updateProfile(Member member);
+
+  Future<Result<bool>> deleteAccount(int id);
 }

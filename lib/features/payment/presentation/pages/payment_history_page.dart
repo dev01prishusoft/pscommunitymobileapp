@@ -213,7 +213,7 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                 items: [
                   DropdownMenuItem(value: null, child: Text(hint)),
                   ...items.map(
-                    (s) => DropdownMenuItem(value: s, child: Text(s)),
+                    (s) => DropdownMenuItem(value: s, child: Text(s == 'All' ? LK.all.tr : s)),
                   ),
                 ],
                 onChanged: onChanged,

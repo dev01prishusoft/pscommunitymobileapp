@@ -234,6 +234,10 @@ class PaymentController extends GetxController {
           ? (Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr)
           : LK.samajName.tr;
 
+      final String? samajLogoUrl = Get.isRegistered<SamajController>()
+          ? Get.find<SamajController>().samaj.value?.logoUrl
+          : null;
+
       final options = {
         'key': key,
         'amount': order.amountInPaise,
@@ -241,6 +245,7 @@ class PaymentController extends GetxController {
         'order_id': order.orderId,
         'description': LK.paymentForCommunity.tr,
         'timeout': 300,
+        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty) 'image': samajLogoUrl,
         'prefill': {
           'contact': (tokenManager.userPhone?.isNotEmpty ?? false) ? tokenManager.userPhone : '+919999999999', 
           'email': (tokenManager.userEmail?.isNotEmpty ?? false) ? tokenManager.userEmail : 'test@example.com'
@@ -317,13 +322,12 @@ class PaymentController extends GetxController {
     String message = response.message ?? LK.paymentFailed.tr;
     bool shouldRedirectBack = false;
     
-    // Code 0 is PAYMENT_CANCELLED in Razorpay
-    if (response.code == Razorpay.PAYMENT_CANCELLED || 
-        message.toLowerCase().contains('undefined')) {
-      message = 'Payment cancelled';
-    } else if (message.toLowerCase().contains('timeout')) {
+    if (message.toLowerCase().contains('timeout')) {
       message = LK.paymentTimedOut.tr;
       shouldRedirectBack = true;
+    } else if (response.code == Razorpay.PAYMENT_CANCELLED || 
+        message.toLowerCase().contains('undefined')) {
+      message = LK.paymentCancelled.tr;
     }
     
     if (shouldRedirectBack) {

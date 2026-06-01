@@ -222,10 +222,10 @@ class AppDrawer extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Get.back<void>();
-              authState.logoutAndRedirect();
+              authState.deleteAccountAndRedirect();
               Get.snackbar(
-                'Account Deleted',
-                'Your account has been deleted successfully.',
+                'Account Deleted'.tr,
+                'Your account has been deleted successfully.'.tr,
                 snackPosition: SnackPosition.BOTTOM,
               );
             },

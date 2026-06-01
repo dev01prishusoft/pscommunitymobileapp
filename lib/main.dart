@@ -8,9 +8,13 @@ import 'package:pscommunitymobileapp/core/localization/localization_validator.da
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/widgets/fatal_error_screen.dart';
 import 'package:pscommunitymobileapp/core/lifecycle/app_lifecycle_observer.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'firebase_options.dart';
 
 void main() {
   runZonedGuarded(_bootstrap, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     debugPrint('UNCAUGHT ASYNC ERROR: $error\n$stack');
     AppLogger.e('Uncaught async error', error, stack);
   });
@@ -19,8 +23,13 @@ void main() {
 Future<void> _bootstrap() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+    
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
     FlutterError.onError = (FlutterErrorDetails details) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
       debugPrint('FLUTTER FRAMEWORK ERROR: ${details.exception}\n${details.stack}');
       AppLogger.e('Flutter framework error', details.exception, details.stack);
     };

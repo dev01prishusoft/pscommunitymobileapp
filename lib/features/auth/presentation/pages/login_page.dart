@@ -7,9 +7,9 @@ import 'package:pscommunitymobileapp/core/widgets/app_inline_error.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_gradient_background.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "413758830617",
+    "project_id": "pscommunity-9145d",
+    "storage_bucket": "pscommunity-9145d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413758830617:android:785897cd5bc76861d11288",
+        "android_client_info": {
+          "package_name": "com.pscommunity.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkCvS-gfO7KtN2pv_D9Fl5SgFjk_LDr-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
