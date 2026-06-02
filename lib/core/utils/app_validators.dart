@@ -41,22 +41,22 @@ class AppValidators {
 
   static String? complexPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return LK.pleaseEnterPassword.tr;
+      return LK.pleaseEnterPassword;
     }
     if (value.length < 8) {
-      return LK.passwordMinLength.tr;
+      return LK.passwordMinLength;
     }
     if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return LK.passwordLowercase.tr;
+      return LK.passwordLowercase;
     }
     if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return LK.passwordUppercase.tr;
+      return LK.passwordUppercase;
     }
     if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return LK.passwordNumber.tr;
+      return LK.passwordNumber;
     }
     if (!RegExp(r'[!@#\$&*~]').hasMatch(value)) {
-      return LK.passwordSpecialChar.tr;
+      return LK.passwordSpecialChar;
     }
     return null;
   }

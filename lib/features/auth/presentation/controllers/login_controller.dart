@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.d
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart' as ps_localization;
 
 enum LoginResult { success, requirePasswordReset, failure }
 
@@ -42,6 +43,7 @@ class LoginController extends GetxController with FormStateMixin {
           Get.offNamed(AppRouter.resetPassword);
           break;
         case LoginResult.success:
+          await Get.find<ps_localization.LocalizationService>().restoreSavedLocale();
           Get.offNamed(AppRouter.postLoginSplash);
           break;
         case LoginResult.failure:

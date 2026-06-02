@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -27,6 +28,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final formKey = GlobalKey<FormState>();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    final localizationService = Get.find<LocalizationService>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      localizationService.currentLocale.value = const Locale('en', 'US');
+    });
+  }
 
   @override
   void dispose() {
@@ -61,6 +70,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           backgroundColor: AppColors.green,
           colorText: AppColors.white,
         );
+        await Get.find<LocalizationService>().restoreSavedLocale();
         Get.offNamed<void>(AppRouter.postLoginSplash);
       } else if (controller.isFormError && controller.formError.value != null) {
         Get.snackbar(
@@ -133,7 +143,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              LK.resetPassword.tr,
+                                LK.resetPassword,
                               textAlign: TextAlign.center,
                               style: AppTextStyles.displaySmall.copyWith(
                                 color: AppColors.secondary,
@@ -142,9 +152,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                             SizedBox(height: 32.h),
                             AppTextField(
-                              label: LK.newPassword.tr,
+                                label: LK.newPassword,
                               controller: newPasswordController,
-                              hint: LK.passwordHint.tr,
+                                hint: LK.passwordHint,
                               icon: Icons.lock_outline_rounded,
                               obscureText: controller.obscureNewPassword.value,
                               suffixIcon: IconButton(
@@ -161,9 +171,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                             SizedBox(height: 20.h),
                             AppTextField(
-                              label: LK.confirmNewPassword.tr,
+                                label: LK.confirmNewPassword,
                               controller: confirmPasswordController,
-                              hint: LK.passwordHint.tr,
+                                hint: LK.passwordHint,
                               icon: Icons.lock_outline_rounded,
                               obscureText:
                                   controller.obscureConfirmPassword.value,
@@ -179,10 +189,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return LK.pleaseEnterConfirmPassword.tr;
+                                    return LK.pleaseEnterConfirmPassword;
                                 }
                                 if (value != newPasswordController.text) {
-                                  return LK.passwordsDoNotMatch.tr;
+                                    return LK.passwordsDoNotMatch;
                                 }
                                 return null;
                               },
@@ -190,7 +200,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             SizedBox(height: 32.h),
                             Obx(
                               () => AppPrimaryButton(
-                                text: LK.updatePassword.tr,
+                                  text: LK.updatePassword,
                                 onPressed: submit,
                                 isLoading: controller.isFormLoading,
                               ),
@@ -202,9 +212,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   ),
                 ],
               ),
+              ),
             ),
           ),
-        ),
         ),
       ),
     );

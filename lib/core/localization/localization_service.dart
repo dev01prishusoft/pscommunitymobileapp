@@ -41,6 +41,22 @@ class LocalizationService {
     }
   }
 
+  Future<void> restoreSavedLocale() async {
+    final savedLocale = await _storage.read(_localeKey);
+    if (savedLocale != null) {
+      final parts = savedLocale.split('_');
+      if (parts.length == 2) {
+        final locale = Locale(parts[0], parts[1]);
+        currentLocale.value = locale;
+        await Get.updateLocale(locale);
+      }
+    } else {
+      final defaultLocale = const Locale('en', 'US');
+      currentLocale.value = defaultLocale;
+      await Get.updateLocale(defaultLocale);
+    }
+  }
+
   Future<void> fetchLanguages() async {
     if (_isFetchingLanguages || languages.isNotEmpty) return;
     _isFetchingLanguages = true;
@@ -70,3 +86,4 @@ class LocalizationService {
     await _storage.write(_localeKey, '${langCode}_$countryCode');
   }
 }
+

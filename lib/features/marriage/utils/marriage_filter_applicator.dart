@@ -13,6 +13,9 @@ class MarriageFilterState {
     this.selectedDistrict = 'All',
     this.selectedTaluka = 'All',
     this.selectedArea = 'All',
+    this.selectedStateId,
+    this.selectedDistrictId,
+    this.selectedTalukaId,
     this.selectedEducation = 'Any',
     this.selectedOccupation = 'Any',
     this.excludeSameGotra = false,
@@ -30,6 +33,9 @@ class MarriageFilterState {
   final String selectedDistrict;
   final String selectedTaluka;
   final String selectedArea;
+  final int? selectedStateId;
+  final int? selectedDistrictId;
+  final int? selectedTalukaId;
   final String selectedEducation;
   final String selectedOccupation;
   final bool excludeSameGotra;
@@ -89,15 +95,27 @@ class MarriageFilterApplicator {
     }
 
     if (filters.selectedState != 'All') {
-      result = result.where((m) => (m.occupationStateName ?? '') == filters.selectedState).toList();
+      if (filters.selectedStateId != null) {
+        result = result.where((m) => m.stateId == filters.selectedStateId).toList();
+      } else {
+        result = result.where((m) => (m.occupationStateName ?? '') == filters.selectedState).toList();
+      }
     }
 
     if (filters.selectedDistrict != 'All') {
-      result = result.where((m) => (m.occupationDistrictName ?? '') == filters.selectedDistrict).toList();
+      if (filters.selectedDistrictId != null) {
+        result = result.where((m) => m.districtId == filters.selectedDistrictId).toList();
+      } else {
+        result = result.where((m) => (m.occupationDistrictName ?? '') == filters.selectedDistrict).toList();
+      }
     }
 
     if (filters.selectedTaluka != 'All') {
-      result = result.where((m) => (m.occupationTalukaName ?? '') == filters.selectedTaluka).toList();
+      if (filters.selectedTalukaId != null) {
+        result = result.where((m) => m.talukaId == filters.selectedTalukaId).toList();
+      } else {
+        result = result.where((m) => (m.occupationTalukaName ?? '') == filters.selectedTaluka).toList();
+      }
     }
 
     if (filters.selectedArea != 'All') {

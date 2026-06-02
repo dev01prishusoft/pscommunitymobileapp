@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -35,6 +36,7 @@ class MarriageController extends GetxController {
   final RxString selectedGender = 'All'.obs;
   final RxBool isAdvancedFiltersOpen = false.obs;
   final RxBool excludeSameGotra = false.obs;
+  String? _myGotra;
 
   final RxString selectedAgeFrom = '18'.obs;
   final RxString selectedAgeTo = '60'.obs;
@@ -134,6 +136,25 @@ class MarriageController extends GetxController {
 
     loadLocations();
     loadAllDropdowns();
+    _loadMyGotra();
+  }
+
+  Future<void> _loadMyGotra() async {
+    try {
+      if (Get.isRegistered<TokenManager>()) {
+        final tokenManager = Get.find<TokenManager>();
+        final memberId = tokenManager.memberId;
+        if (memberId != null) {
+          final member = await _familyRepository.getMemberDetails(memberId);
+          _myGotra = member.gotra.trim();
+          if (excludeSameGotra.value && _myGotra != null && _myGotra!.isNotEmpty) {
+            applyFilters();
+          }
+        }
+      }
+    } catch (e) {
+      AppLogger.e('Failed to load my gotra', e);
+    }
   }
 
   Future<void> loadLocations() async {
@@ -239,11 +260,8 @@ class MarriageController extends GetxController {
       _updateDynamicLists(_allMembers);
       
       String? myGotra;
-      if (excludeSameGotra.value) {
-        try {
-          final profileController = Get.find<ProfileFormController>();
-          myGotra = profileController.gotra.value;
-        } catch (_) {}
+      if (excludeSameGotra.value && _myGotra != null && _myGotra!.isNotEmpty) {
+        myGotra = _myGotra;
       }
 
       final filterState = MarriageFilterState(
@@ -258,6 +276,9 @@ class MarriageController extends GetxController {
         selectedDistrict: selectedDistrict.value,
         selectedTaluka: selectedTaluka.value,
         selectedArea: selectedArea.value,
+        selectedStateId: states.firstWhereOrNull((s) => s.text == selectedState.value)?.id,
+        selectedDistrictId: districts.firstWhereOrNull((d) => d.text == selectedDistrict.value)?.id,
+        selectedTalukaId: talukas.firstWhereOrNull((t) => t.text == selectedTaluka.value)?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
         excludeSameGotra: excludeSameGotra.value,

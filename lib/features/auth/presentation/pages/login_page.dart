@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_gradient_background.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,6 +30,10 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _controller = Get.put(LoginController(Get.find()));
+    final localizationService = Get.find<LocalizationService>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      localizationService.currentLocale.value = const Locale('en', 'US');
+    });
   }
 
   @override

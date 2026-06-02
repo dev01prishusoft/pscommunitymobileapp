@@ -224,8 +224,8 @@ class AppDrawer extends StatelessWidget {
               Get.back<void>();
               authState.deleteAccountAndRedirect();
               Get.snackbar(
-                'Account Deleted'.tr,
-                'Your account has been deleted successfully.'.tr,
+                LK.accountDeleted.tr,
+                LK.accountDeletedBody.tr,
                 snackPosition: SnackPosition.BOTTOM,
               );
             },

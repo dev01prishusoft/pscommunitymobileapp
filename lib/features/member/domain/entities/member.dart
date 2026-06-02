@@ -50,6 +50,10 @@ class Member {
     this.occupationAddressLine2,
     this.occupationLandmark,
     this.occupationPincode,
+    this.stateId,
+    this.districtId,
+    this.talukaId,
+    this.areaId,
     this.familyId,
     this.apiAge,
   });
@@ -163,6 +167,10 @@ class Member {
       occupationAddressLine2: getString('occupationAddressLine2'),
       occupationLandmark: getString('occupationLandmark'),
       occupationPincode: getString('occupationPincode'),
+      stateId: json['stateId'] as int?,
+      districtId: json['districtId'] as int?,
+      talukaId: json['talukaId'] as int?,
+      areaId: json['areaId'] as int?,
       familyId: json['familyId'] as int?,
     );
   }
@@ -214,6 +222,10 @@ class Member {
   final String? occupationAddressLine2;
   final String? occupationLandmark;
   final String? occupationPincode;
+  final int? stateId;
+  final int? districtId;
+  final int? talukaId;
+  final int? areaId;
   final int? familyId;
   final int? apiAge;
 
@@ -270,6 +282,10 @@ class Member {
       'occupationAreaName': occupationAreaName,
       'occupationAddressLine1': occupationAddressLine1,
       'occupationAddressLine2': occupationAddressLine2,
+      'stateId': stateId,
+      'districtId': districtId,
+      'talukaId': talukaId,
+      'areaId': areaId,
       // Add other fields if necessary
     };
   }
