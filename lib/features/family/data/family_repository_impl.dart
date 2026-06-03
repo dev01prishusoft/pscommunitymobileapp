@@ -63,6 +63,16 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return response.dataOrNull?.data ?? [];
   }
 
+  @override
+  Future<List<DropdownItem>> getAreas(int talukaId) async {
+    final response = await _apiClient.getParsed<List<DropdownItem>>(
+      ApiEndpoints.areaDropdown,
+      queryParameters: {'talukaId': talukaId},
+      fromJsonT: (json) => _parseDropdownListData(json),
+    );
+    return response.dataOrNull?.data ?? [];
+  }
+
   List<DropdownItem> _parseDropdownListData(dynamic data) {
     if (data is Map<String, dynamic>) {
       data = data['data'] ?? data['items'] ?? [];

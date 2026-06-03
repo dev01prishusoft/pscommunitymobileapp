@@ -12,6 +12,12 @@ class MaritalStatusMapper {
         return LK.unmarried;
       case 'single':
         return LK.unmarried;
+      case 'widow':
+        return LK.widow;
+      case 'widower':
+        return LK.widower;
+      case 'divorced':
+        return LK.divorced;
       default:
         AppLogger.w('Unknown marital status: $status');
         return null;

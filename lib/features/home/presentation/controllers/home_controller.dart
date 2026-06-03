@@ -14,7 +14,7 @@ class MenuItem {
 class HomeController extends GetxController {
   static const Map<String, List<String>> localeMap = {
     'EN': ['en', 'US'],
-    'GJ': ['gj', 'IN'],
+    'GJ': ['gu', 'IN'],
   };
 
   final List<MenuItem> menuItems = [

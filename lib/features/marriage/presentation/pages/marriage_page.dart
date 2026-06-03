@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -227,7 +228,10 @@ class MarriagePage extends GetView<MarriageController> {
           Obx(
             () => controller.isAdvancedFiltersOpen.value
                 ? GestureDetector(
-                    onTap: () => controller.isAdvancedFiltersOpen.value = false,
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      controller.isAdvancedFiltersOpen.value = false;
+                    },
                     child: Container(
                       color: AppColors.black26,
                       width: double.infinity,
@@ -248,7 +252,8 @@ class MarriagePage extends GetView<MarriageController> {
               right: 0,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                  maxHeight: MediaQuery.of(context).size.height * 0.85 -
+                      MediaQuery.of(context).viewInsets.bottom,
                 ),
                 child: Container(
                   margin: EdgeInsets.all(16),
@@ -289,16 +294,17 @@ class MarriagePage extends GetView<MarriageController> {
                             IconButton(
                               icon: Icon(Icons.close),
                               tooltip: LK.cancel.tr,
-                              onPressed: () =>
-                                  controller.isAdvancedFiltersOpen.value =
-                                      false,
+                              onPressed: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                controller.isAdvancedFiltersOpen.value = false;
+                              },
                               padding: EdgeInsets.zero,
                               constraints: BoxConstraints(),
                             ),
                           ],
                         ),
                       ),
-                      Expanded(
+                      Flexible(
                         child: SingleChildScrollView(
                           padding: AppSpacing.pL,
                           child: Column(
@@ -457,6 +463,8 @@ class MarriagePage extends GetView<MarriageController> {
                                                     (e as dynamic).text
                                                         as String,
                                                 mapper: _translateFallback,
+                                                onChanged: (val) => controller
+                                                    .onTalukaChanged(val),
                                               ),
                                             ),
                                             SizedBox(width: 8.w),
@@ -469,8 +477,11 @@ class MarriagePage extends GetView<MarriageController> {
                                               child: _buildDropdownField(
                                                 rxValue:
                                                     controller.selectedArea,
-                                                rxItems:
-                                                    controller.dynamicAreas,
+                                                rxItems: controller.areas,
+                                                prependAll: true,
+                                                itemStringifier: (e) =>
+                                                    (e as dynamic).text
+                                                        as String,
                                                 mapper: _translateFallback,
                                               ),
                                             ),
@@ -520,21 +531,34 @@ class MarriagePage extends GetView<MarriageController> {
                                 ],
                               ),
                               SizedBox(height: 12.h),
-                              _buildFilterRow(
+                              _buildIncomeTextRow(
                                 label: LK.incomeRangeLabel.tr,
-                                fromRx: controller.selectedIncomeFrom,
-                                toRx: controller.selectedIncomeTo,
-                                staticItems: controller.incomeRanges,
-                                mapper: _translateFallback,
+                                fromCtrl: controller.incomeFromCtrl,
+                                toCtrl: controller.incomeToCtrl,
                               ),
+                              Obx(() {
+                                if (controller.incomeError.value.isNotEmpty) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      controller.incomeError.value,
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              }),
                               SizedBox(height: 24.h),
                               Row(
                                 children: [
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        controller.isAdvancedFiltersOpen.value =
-                                            false;
+                                        FocusManager.instance.primaryFocus?.unfocus();
+                                        controller.closeAdvancedFilters();
                                       },
                                       child: Text(LK.applyFilters.tr),
                                     ),
@@ -567,6 +591,12 @@ class MarriagePage extends GetView<MarriageController> {
   String _translateFallback(String val) {
     if (val == 'All') return LK.all.tr;
     if (val == 'Any') return LK.any.tr;
+    if (val.contains('Lakh')) {
+      return val.replaceAll('Lakh', 'Lakh'.tr);
+    }
+    if (val.contains('Crore')) {
+      return val.replaceAll('Crore', 'Crore'.tr);
+    }
     return val;
   }
 
@@ -844,6 +874,52 @@ extension MarriagePageFilters on MarriagePage {
             },
           );
         }),
+      ),
+    );
+  }
+  Widget _buildIncomeTextRow({
+    required String label,
+    required TextEditingController fromCtrl,
+    required TextEditingController toCtrl,
+  }) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 80.w,
+          child: Text(label, style: AppTextStyles.bodySmall),
+        ),
+        Expanded(
+          child: _buildIncomeTextField(fromCtrl, '0'),
+        ),
+        SizedBox(width: 8.w),
+        Text(LK.to.tr),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: _buildIncomeTextField(toCtrl, '999999999'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncomeTextField(TextEditingController ctrl, String hint) {
+    return SizedBox(
+      height: 36.h,
+      child: TextField(
+        controller: ctrl,
+        keyboardType: TextInputType.number,
+        style: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.foreground,
+        ),
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(9),
+        ],
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: hint,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          // We rely on standard theme borders instead of custom container
+        ),
       ),
     );
   }

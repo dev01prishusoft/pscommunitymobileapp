@@ -18,6 +18,8 @@ class MarriageFilterState {
     this.selectedTalukaId,
     this.selectedEducation = 'Any',
     this.selectedOccupation = 'Any',
+    this.selectedIncomeFrom = '',
+    this.selectedIncomeTo = '',
     this.excludeSameGotra = false,
     this.myGotra,
   });
@@ -38,6 +40,8 @@ class MarriageFilterState {
   final int? selectedTalukaId;
   final String selectedEducation;
   final String selectedOccupation;
+  final String selectedIncomeFrom;
+  final String selectedIncomeTo;
   final bool excludeSameGotra;
   final String? myGotra;
 }
@@ -87,11 +91,19 @@ class MarriageFilterApplicator {
     }
 
     if (filters.excludeSameGotra && filters.myGotra != null && filters.myGotra!.isNotEmpty) {
-      result = result.where((m) => m.gotra != filters.myGotra).toList();
+      final myGotraLower = filters.myGotra!.trim().toLowerCase();
+      result = result.where((m) => m.gotra.trim().toLowerCase() != myGotraLower).toList();
     }
 
     if (filters.selectedMaritalStatus != 'All') {
-      result = result.where((m) => (m.maritalStatusName ?? '') == filters.selectedMaritalStatus).toList();
+      result = result.where((m) {
+        final status = (m.maritalStatusName ?? '').toLowerCase();
+        final selected = filters.selectedMaritalStatus.toLowerCase();
+        if (selected == 'unmarried') {
+          return status == 'unmarried' || status == 'single';
+        }
+        return status == selected;
+      }).toList();
     }
 
     if (filters.selectedState != 'All') {
@@ -128,6 +140,29 @@ class MarriageFilterApplicator {
 
     if (filters.selectedOccupation != 'Any') {
       result = result.where((m) => (m.occupationName ?? '') == filters.selectedOccupation || (m.occupationTypeName ?? '') == filters.selectedOccupation).toList();
+    }
+
+    int? getIncomeValue(String selection) {
+      if (selection.isEmpty) return null;
+      return int.tryParse(selection);
+    }
+
+    int? minIncome = getIncomeValue(filters.selectedIncomeFrom);
+    int? maxIncome = getIncomeValue(filters.selectedIncomeTo);
+
+    if (minIncome != null && maxIncome != null && minIncome > maxIncome) {
+      // Invalid range, ignore income filter
+      minIncome = null;
+      maxIncome = null;
+    }
+
+    if (minIncome != null || maxIncome != null) {
+      result = result.where((m) {
+        final income = m.monthlyIncome ?? 0;
+        if (minIncome != null && income < minIncome) return false;
+        if (maxIncome != null && income > maxIncome) return false;
+        return true;
+      }).toList();
     }
 
     return result.toList();

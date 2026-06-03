@@ -13,9 +13,10 @@ import 'package:pscommunitymobileapp/features/family/domain/repositories/family_
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
-import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
+
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/marriage/utils/marriage_filter_applicator.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class MarriageController extends GetxController {
   MarriageController(
@@ -50,8 +51,12 @@ class MarriageController extends GetxController {
   final RxString selectedArea = 'All'.obs;
   final RxString selectedEducation = 'Any'.obs;
   final RxString selectedOccupation = 'Any'.obs;
-  final RxString selectedIncomeFrom = 'Any'.obs;
-  final RxString selectedIncomeTo = 'Any'.obs;
+  final RxString selectedIncomeFrom = ''.obs;
+  final RxString selectedIncomeTo = ''.obs;
+  
+  final TextEditingController incomeFromCtrl = TextEditingController();
+  final TextEditingController incomeToCtrl = TextEditingController();
+  final RxString incomeError = ''.obs;
 
   final TextEditingController searchTextController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -66,21 +71,15 @@ class MarriageController extends GetxController {
     'Widower',
     'Divorced',
   ];
-  final List<String> incomeRanges = [
-    'Any',
-    '1-2 Lakh',
-    '2-5 Lakh',
-    '5-10 Lakh',
-    '10+ Lakh',
-  ];
+
   final RxList<String> dynamicGotras = <String>['Any'].obs;
   final RxList<String> dynamicOccupations = <String>['Any'].obs;
   final RxList<String> dynamicEducations = <String>['Any'].obs;
-  final RxList<String> dynamicAreas = <String>['All'].obs;
 
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
+  final RxList<DropdownItem> areas = <DropdownItem>[].obs;
 
   final RxList<Member> filteredMembers = <Member>[].obs;
   final List<Member> _allMembers = [];
@@ -102,13 +101,14 @@ class MarriageController extends GetxController {
     super.onInit();
     final List<RxInterface<dynamic>> filterObservables = [
       searchQuery,
-      selectedGender,
       lookingForMarriage,
+      selectedGender,
       selectedAgeFrom,
       selectedAgeTo,
       selectedHeightFrom,
       selectedHeightTo,
       selectedGotra,
+      excludeSameGotra,
       selectedMaritalStatus,
       selectedState,
       selectedDistrict,
@@ -118,8 +118,17 @@ class MarriageController extends GetxController {
       selectedOccupation,
       selectedIncomeFrom,
       selectedIncomeTo,
-      excludeSameGotra,
     ];
+
+    incomeFromCtrl.addListener(() {
+      selectedIncomeFrom.value = incomeFromCtrl.text;
+      _validateIncome();
+    });
+    
+    incomeToCtrl.addListener(() {
+      selectedIncomeTo.value = incomeToCtrl.text;
+      _validateIncome();
+    });
 
     everAll(filterObservables, (_) {
       _debounceTimer?.cancel();
@@ -133,10 +142,19 @@ class MarriageController extends GetxController {
     });
 
     loadProfiles();
-
     loadLocations();
     loadAllDropdowns();
     _loadMyGotra();
+  }
+
+  void _validateIncome() {
+    final min = int.tryParse(selectedIncomeFrom.value);
+    final max = int.tryParse(selectedIncomeTo.value);
+    if (min != null && max != null && min > max) {
+      incomeError.value = LK.fromGreaterToError.tr;
+    } else {
+      incomeError.value = '';
+    }
   }
 
   Future<void> _loadMyGotra() async {
@@ -170,8 +188,10 @@ class MarriageController extends GetxController {
     selectedState.value = stateName;
     selectedDistrict.value = 'All';
     selectedTaluka.value = 'All';
+    selectedArea.value = 'All';
     districts.clear();
     talukas.clear();
+    areas.clear();
 
     if (stateName == 'All') {
       return;
@@ -187,7 +207,9 @@ class MarriageController extends GetxController {
   Future<void> onDistrictChanged(String districtName) async {
     selectedDistrict.value = districtName;
     selectedTaluka.value = 'All';
+    selectedArea.value = 'All';
     talukas.clear();
+    areas.clear();
 
     if (districtName == 'All') {
       return;
@@ -199,6 +221,24 @@ class MarriageController extends GetxController {
     if (districtId != null) {
       final t = await _familyRepository.getTalukas(districtId);
       talukas.assignAll(t);
+    }
+  }
+
+  Future<void> onTalukaChanged(String talukaName) async {
+    selectedTaluka.value = talukaName;
+    selectedArea.value = 'All';
+    areas.clear();
+
+    if (talukaName == 'All') {
+      return;
+    }
+
+    final talukaId = talukas
+        .firstWhereOrNull((t) => t.text == talukaName)
+        ?.id;
+    if (talukaId != null) {
+      final a = await _familyRepository.getAreas(talukaId);
+      areas.assignAll(a);
     }
   }
 
@@ -281,6 +321,8 @@ class MarriageController extends GetxController {
         selectedTalukaId: talukas.firstWhereOrNull((t) => t.text == selectedTaluka.value)?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
+        selectedIncomeFrom: selectedIncomeFrom.value,
+        selectedIncomeTo: selectedIncomeTo.value,
         excludeSameGotra: excludeSameGotra.value,
         myGotra: myGotra,
       );
@@ -330,11 +372,33 @@ class MarriageController extends GetxController {
     selectedDistrict.value = 'All';
     selectedTaluka.value = 'All';
     selectedArea.value = 'All';
+    districts.clear();
+    talukas.clear();
+    areas.clear();
     selectedEducation.value = 'Any';
     selectedOccupation.value = 'Any';
-    selectedIncomeFrom.value = 'Any';
-    selectedIncomeTo.value = 'Any';
+    selectedIncomeFrom.value = '';
+    selectedIncomeTo.value = '';
+    incomeFromCtrl.clear();
+    incomeToCtrl.clear();
+    incomeError.value = '';
     excludeSameGotra.value = false;
+  }
+
+  void closeAdvancedFilters() {
+    if (incomeError.value.isNotEmpty) {
+      Get.rawSnackbar(
+        message: incomeError.value,
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    isAdvancedFiltersOpen.value = false;
+  }
+
+  void openAdvancedFilters() {
+    isAdvancedFiltersOpen.value = true;
   }
 
   void _updateDynamicLists(List<Member> members) {
@@ -346,13 +410,6 @@ class MarriageController extends GetxController {
         .toList();
     gotras.sort();
     dynamicGotras.assignAll(['Any', ...gotras]);
-    final areas = members
-        .map((m) => m.area.trim())
-        .where((a) => a.isNotEmpty)
-        .toSet()
-        .toList();
-    areas.sort();
-    dynamicAreas.assignAll(['All', ...areas]);
   }
 
   Future<void> loadAllDropdowns() async {

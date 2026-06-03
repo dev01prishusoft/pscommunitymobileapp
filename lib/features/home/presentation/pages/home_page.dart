@@ -240,7 +240,10 @@ class _LanguageDropdown extends GetView<LocalizationService> {
   Widget build(BuildContext context) {
 
     return Obx(() {
-      final currentCode = controller.currentLocale.value.languageCode.toUpperCase();
+      String currentCode = controller.currentLocale.value.languageCode.toUpperCase();
+      if (currentCode == 'GU') {
+        currentCode = 'GJ'; // Map standard 'gu' back to 'GJ' to match API data
+      }
       final homeController = Get.find<HomeController>();
       final List<String> codes = controller.languages.isNotEmpty
           ? controller.languages.map((l) => l.code.toUpperCase()).toSet().toList()

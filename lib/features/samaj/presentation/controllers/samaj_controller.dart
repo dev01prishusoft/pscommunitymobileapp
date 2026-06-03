@@ -45,7 +45,7 @@ class SamajController extends GetxController {
               if (code == 'EN') {
                 await localizationService.changeLocale('en', 'US');
               } else if (code == 'GJ' || code == 'GU') {
-                await localizationService.changeLocale('gj', 'IN');
+                await localizationService.changeLocale('gu', 'IN');
               }
             }
           } catch (e) {

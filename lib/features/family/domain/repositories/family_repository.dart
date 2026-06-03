@@ -23,4 +23,5 @@ abstract class FamilyRepository {
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
   Future<List<DropdownItem>> getTalukas(int districtId);
+  Future<List<DropdownItem>> getAreas(int talukaId);
 }

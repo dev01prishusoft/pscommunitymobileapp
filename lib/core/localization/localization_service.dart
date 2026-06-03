@@ -28,7 +28,7 @@ class LocalizationService {
 
     keys = {
       'en_US': Map<String, String>.from(jsonDecode(results[0]) as Map),
-      'gj_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
+      'gu_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
     };
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {

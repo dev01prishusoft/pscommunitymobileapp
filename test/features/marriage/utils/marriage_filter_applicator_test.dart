@@ -21,6 +21,7 @@ void main() {
         occupationAreaName: 'Bapunagar',
         educationName: 'B.E.',
         occupationName: 'Software Engineer',
+        monthlyIncome: 150000,
       ),
       Member(
         memberId: 2,
@@ -36,6 +37,7 @@ void main() {
         occupationAreaName: 'West',
         educationName: 'MBA',
         occupationName: 'Manager',
+        monthlyIncome: 300000,
       ),
       Member(
         memberId: 3,
@@ -51,6 +53,7 @@ void main() {
         occupationAreaName: 'Adajan',
         educationName: 'B.Com',
         occupationName: 'Accountant',
+        monthlyIncome: 50000,
       ),
     ];
   });
@@ -120,5 +123,21 @@ void main() {
     final result = MarriageFilterApplicator.apply(members, state);
     expect(result.length, 1);
     expect(result.first.firstName, 'Jane');
+  });
+
+  test('Filter by income range', () {
+    // John: 150000, Jane: 300000, Alice: 50000
+    final state1 = MarriageFilterState(selectedIncomeFrom: '1 Lakh');
+    final result1 = MarriageFilterApplicator.apply(members, state1);
+    expect(result1.length, 2); // John, Jane (min 1L, no max)
+    expect(result1.any((m) => m.firstName == 'Alice'), false);
+
+    final state2 = MarriageFilterState(selectedIncomeFrom: '1 Lakh', selectedIncomeTo: '5 Lakh');
+    final result2 = MarriageFilterApplicator.apply(members, state2);
+    expect(result2.length, 2); // John, Jane
+    
+    final state3 = MarriageFilterState(selectedIncomeTo: '2 Lakh');
+    final result3 = MarriageFilterApplicator.apply(members, state3);
+    expect(result3.length, 2); // John, Alice (max 2L)
   });
 }
