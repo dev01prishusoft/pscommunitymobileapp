@@ -10,8 +10,12 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
+
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -23,17 +27,39 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   late final ProfileFormController controller;
   final ScrollController _scrollController = ScrollController();
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(ProfileFormController(), tag: UniqueKey().toString());
 
-    if (Get.arguments != null) {
-      if (Get.arguments is Member) {
-        controller.loadFromMember(Get.arguments as Member);
-      } else if (Get.arguments is Map && Get.arguments['member'] is Member) {
-        controller.loadFromMember(Get.arguments['member'] as Member);
+    _loadMemberData();
+  }
+
+  Future<void> _loadMemberData() async {
+    try {
+      final tokenManager = Get.find<TokenManager>();
+      final memberId = tokenManager.memberId;
+      if (memberId == null) return;
+
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.getParsed<Member>(
+        '/api/v1/member/$memberId',
+        fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
+      );
+      
+      final member = response.dataOrNull?.data;
+      if (member != null) {
+        controller.loadFromMember(member);
+      }
+    } catch (e) {
+      // Ignore or log error
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -57,26 +83,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
         elevation: 0,
         centerTitle: false,
       ),
-      body: ResponsiveFormContainer(
-        padding: AppSpacing.pM,
-        child: Form(
-          key: controller.formKey,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-            children: [
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator()) 
+          : ResponsiveFormContainer(
+              padding: AppSpacing.pM,
+              child: Form(
+                key: controller.formKey,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                  children: [
               _buildProfilePhotoSection(),
               _buildSection(LK.personal.tr, Icons.person_outline, [
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.memberNoCtrl,
                     label: LK.memberNo.tr,
+                    readOnly: true,
                     prefixIcon: Icon(Icons.numbers),
                   ),
                   AppFormTextField(
                     controller: controller.firstNameCtrl,
                     label: LK.firstName.tr,
-                    isRequired: true,
                     prefixIcon: Icon(Icons.person),
                   ),
                 ),
@@ -89,33 +117,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   AppFormTextField(
                     controller: controller.lastNameCtrl,
                     label: LK.lastName.tr,
-                    isRequired: true,
                     prefixIcon: Icon(Icons.person),
                   ),
                 ),
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.firstNameEnCtrl,
-                    label: LK.firstNameEnglish.tr,
-                    isRequired: true,
-                    prefixIcon: Icon(Icons.language),
-                  ),
-                  AppFormTextField(
-                    controller: controller.lastNameEnCtrl,
-                    label: LK.lastNameEnglish.tr,
-                    isRequired: true,
-                    prefixIcon: Icon(Icons.language),
-                  ),
-                ),
+
                 AppFormDatePicker(
                   controller: controller.dobCtrl,
                   label: LK.birthDate.tr,
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
+                AppFormTimePicker(
                   controller: controller.tobCtrl,
-                  label: LK.timeOfBirth.tr,
-                  prefixIcon: Icon(Icons.access_time),
+                  label: LK.birthTime.tr,
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
@@ -126,9 +139,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             controller.gender.value,
                           )
                           ? controller.gender.value
-                          : (controller.genderList.isNotEmpty
-                                ? controller.genderList.first
-                                : controller.defaultGenders.first),
+                          : null,
                       items:
                           (controller.genderList.isEmpty
                                   ? controller.defaultGenders
@@ -151,9 +162,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             controller.maritalStatus.value,
                           )
                           ? controller.maritalStatus.value
-                          : (controller.maritalStatusList.isNotEmpty
-                                ? controller.maritalStatusList.first
-                                : controller.defaultMaritalStatuses.first),
+                          : null,
                       items:
                           (controller.maritalStatusList.isEmpty
                                   ? controller.defaultMaritalStatuses
@@ -178,9 +187,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             controller.bloodGroup.value,
                           )
                           ? controller.bloodGroup.value
-                          : (controller.bloodGroupList.isNotEmpty
-                                ? controller.bloodGroupList.first
-                                : controller.defaultBloodGroups.first),
+                          : null,
                       items:
                           (controller.bloodGroupList.isEmpty
                                   ? controller.defaultBloodGroups
@@ -198,9 +205,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     () => AppFormDropdown<String>(
                       value: controller.signList.contains(controller.sign.value)
                           ? controller.sign.value
-                          : (controller.signList.isNotEmpty
-                                ? controller.signList.first
-                                : controller.defaultSigns.first),
+                          : null,
                       items:
                           (controller.signList.isEmpty
                                   ? controller.defaultSigns
@@ -235,7 +240,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 AppFormTextField(
                   controller: controller.mobileCtrl,
                   label: LK.mobileNo.tr,
-                  isRequired: true,
+                  readOnly: true,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.phone),
                 ),
@@ -245,21 +250,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   label: LK.secondaryMobileLabel.tr,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.phone_android),
+                  validator: (v) {
+                    if (v == controller.currentMember?.secondaryMobile) return null;
+                    return AppValidators.optionalMobile(v);
+                  },
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.emailCtrl,
                   label: LK.email.tr,
-                  isRequired: true,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(Icons.email_outlined),
-                  validator: AppValidators.email,
+                  validator: (v) {
+                    if (v == controller.currentMember?.emailAddress) return null;
+                    return AppValidators.optionalEmail(v);
+                  },
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.entryPersonMobileCtrl,
                   label: LK.entryPersonMobile.tr,
                   prefixIcon: Icon(Icons.phone_callback),
+                  keyboardType: TextInputType.phone,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return null;
+                    return AppValidators.optionalMobile(v);
+                  },
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -273,6 +289,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   label: LK.emergencyContact.tr,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.emergency_outlined),
+                  validator: (v) {
+                    if (v == controller.currentMember?.emergencyContactNo) return null;
+                    return AppValidators.optionalMobile(v);
+                  },
                 ),
               ]),
 
@@ -289,9 +309,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             controller.relation.value,
                           )
                           ? controller.relation.value
-                          : (controller.relationList.isNotEmpty
-                                ? controller.relationList.first
-                                : controller.defaultRelations.first),
+                          : null,
                       items:
                           (controller.relationList.isEmpty
                                   ? controller.defaultRelations
@@ -319,9 +337,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       () => AppFormDropdown<String>(
                         value: controller.gotraList.contains(controller.gotra.value)
                             ? controller.gotra.value
-                            : (controller.gotraList.isNotEmpty
-                                ? controller.gotraList.first
-                                : null),
+              : null,
                         items: controller.gotraList
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
@@ -335,9 +351,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       () => AppFormDropdown<String>(
                         value: controller.mothersGotraList.contains(controller.mothersGotra.value)
                             ? controller.mothersGotra.value
-                            : (controller.mothersGotraList.isNotEmpty
-                                ? controller.mothersGotraList.first
-                                : null),
+              : null,
                         items: controller.mothersGotraList
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
@@ -358,13 +372,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.facebookCtrl,
                     label: LK.facebook.tr,
                     prefixIcon: Icon(Icons.facebook),
-                    validator: AppValidators.url,
+                    validator: (v) {
+                      if (v == controller.currentMember?.facebookUrl) return null;
+                      return AppValidators.url(v);
+                    },
                   ),
                   AppFormTextField(
                     controller: controller.whatsappCtrl,
                     label: LK.whatsapp.tr,
                     prefixIcon: Icon(Icons.chat),
-                    validator: AppValidators.url,
+                    validator: (v) {
+                      if (v == controller.currentMember?.whatsappUrl) return null;
+                      return AppValidators.url(v);
+                    },
                   ),
                 ),
                 _buildFieldPair(
@@ -372,13 +392,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.instagramCtrl,
                     label: LK.instagram.tr,
                     prefixIcon: Icon(Icons.camera_alt),
-                    validator: AppValidators.url,
+                    validator: (v) {
+                      if (v == controller.currentMember?.instagramUrl) return null;
+                      return AppValidators.url(v);
+                    },
                   ),
                   AppFormTextField(
                     controller: controller.twitterCtrl,
                     label: LK.twitterX.tr,
                     prefixIcon: Icon(Icons.close),
-                    validator: AppValidators.url,
+                    validator: (v) {
+                      if (v == controller.currentMember?.twitterUrl) return null;
+                      return AppValidators.url(v);
+                    },
                   ),
                 ),
               ]),
@@ -407,7 +433,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Obx(
           () => AppPrimaryButton(
             text: LK.saveChanges.tr,
-            onPressed: () => controller.submitForm(successMessage: LK.profileUpdated.tr),
+            onPressed: controller.hasChanges ? () => controller.submitForm(successMessage: LK.editProfileRequestSent.tr) : null,
             isLoading: controller.isFormLoading,
           ),
         ),
@@ -531,18 +557,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
           ),
-          Obx(() {
-            if (controller.uploadProgress.value > 0.0) {
-              return Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: LinearProgressIndicator(
-                  value: controller.uploadProgress.value,
-                  color: AppColors.primary,
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          }),
+
           Obx(() {
             if (controller.profileImage.value != null) {
               return Padding(
@@ -678,7 +693,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             return AppFormDropdown<String>(
               value: stateList.contains(addr.state)
                   ? addr.state
-                  : (stateList.isNotEmpty ? stateList.first : null),
+                  : null,
               items: stateList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -700,7 +715,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             return AppFormDropdown<String>(
               value: districtList.contains(addr.district)
                   ? addr.district
-                  : (districtList.isNotEmpty ? districtList.first : null),
+                  : null,
               items: districtList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -721,7 +736,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             return AppFormDropdown<String>(
               value: talukaList.contains(addr.taluka)
                   ? addr.taluka
-                  : (talukaList.isNotEmpty ? talukaList.first : null),
+                  : null,
               items: talukaList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -741,7 +756,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             return AppFormDropdown<String>(
               value: areaList.contains(addr.area)
                   ? addr.area
-                  : (areaList.isNotEmpty ? areaList.first : null),
+                  : null,
               items: areaList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -837,9 +852,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             () => AppFormDropdown<String>(
               value: controller.qualificationList.contains(edu.qualification)
                   ? edu.qualification
-                  : (controller.qualificationList.isNotEmpty
-                      ? controller.qualificationList.first
-                      : controller.defaultQualifications.first),
+                  : null,
               items: (controller.qualificationList.isEmpty
                       ? controller.defaultQualifications
                       : controller.qualificationList)
@@ -922,13 +935,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
         onChanged: (v) => controller.workAddressLine2.value = v,
       ),
       AppSpacing.vM,
+      _buildFieldPair(
+        AppFormTextField(
+          controller: controller.workLandmarkCtrl,
+          label: LK.landmarkLabel.tr,
+          prefixIcon: Icon(Icons.location_city_outlined),
+          onChanged: (v) => controller.workLandmark.value = v,
+        ),
+        AppFormTextField(
+          controller: controller.workPincodeCtrl,
+          label: LK.pincode.tr,
+          prefixIcon: Icon(Icons.pin_drop_outlined),
+          keyboardType: TextInputType.number,
+          onChanged: (v) => controller.workPincode.value = v,
+        ),
+      ),
+      AppSpacing.vM,
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workStateList.contains(controller.workState.value)
               ? controller.workState.value
-              : (controller.workStateList.isNotEmpty
-                  ? controller.workStateList.first
-                  : null),
+              : null,
           items: controller.workStateList
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
@@ -943,9 +970,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         () => AppFormDropdown<String>(
           value: controller.workDistrictList.contains(controller.workDistrict.value)
               ? controller.workDistrict.value
-              : (controller.workDistrictList.isNotEmpty
-                  ? controller.workDistrictList.first
-                  : null),
+              : null,
           items: controller.workDistrictList
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
@@ -960,9 +985,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         () => AppFormDropdown<String>(
           value: controller.workTalukaList.contains(controller.workTaluka.value)
               ? controller.workTaluka.value
-              : (controller.workTalukaList.isNotEmpty
-                  ? controller.workTalukaList.first
-                  : null),
+              : null,
           items: controller.workTalukaList
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
@@ -977,9 +1000,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         () => AppFormDropdown<String>(
           value: controller.workAreaList.contains(controller.workArea.value)
               ? controller.workArea.value
-              : (controller.workAreaList.isNotEmpty
-                  ? controller.workAreaList.first
-                  : null),
+              : null,
           items: controller.workAreaList
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),

@@ -22,9 +22,29 @@ class AppValidators {
     return null;
   }
 
+  static String? optionalMobile(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+    if (!_mobileRegex.hasMatch(value.trim())) {
+      return LK.pleaseEnterValidMobile.tr;
+    }
+    return null;
+  }
+
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) {
       return LK.pleaseEnterEmail.tr;
+    }
+    if (!_emailRegex.hasMatch(value.trim())) {
+      return LK.pleaseEnterValidEmail.tr;
+    }
+    return null;
+  }
+
+  static String? optionalEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
     }
     if (!_emailRegex.hasMatch(value.trim())) {
       return LK.pleaseEnterValidEmail.tr;
@@ -73,7 +93,8 @@ class AppValidators {
 
   static String? url(String? value) {
     if (value == null || value.trim().isEmpty) return null;
-    if (!Uri.parse(value.trim()).isAbsolute) {
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || !uri.isAbsolute || (uri.scheme != 'http' && uri.scheme != 'https')) {
       return LK.pleaseEnterValidURL.tr;
     }
     return null;

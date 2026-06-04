@@ -122,6 +122,7 @@ class LK {
   static String pleaseEnterValidOTP = 'Please enter a valid OTP';
   static String pleaseEnterValidURL = 'Please enter a valid URL';
   static String profileUpdated = 'Profile updated successfully!';
+  static String editProfileRequestSent = 'Edit profile request sent';
   static String profileUpdateFailed = 'Failed to update profile';
   static String unknownError = 'Unknown error occurred.';
   static String fromGreaterToError = 'From cannot be greater than To';
@@ -527,6 +528,7 @@ class LK {
     pleaseEnterValidOTP,
     pleaseEnterValidURL,
     profileUpdated,
+    editProfileRequestSent,
     profileUpdateFailed,
     unexpectedError,
     pleaseSelectPaymentType,

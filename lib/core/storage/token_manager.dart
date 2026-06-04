@@ -155,6 +155,21 @@ class TokenManager {
     return null;
   }
 
+  int? get samajId {
+    final token = authState.value.accessToken;
+    if (token == null || token.isEmpty) return null;
+    final payload = _decodeJwtPayload(token);
+    if (payload == null) return null;
+    
+    final id = payload['samajId'] ?? 
+               payload['SamajId'] ?? 
+               payload['samajid'];
+               
+    if (id is int) return id;
+    if (id is String) return int.tryParse(id);
+    return null;
+  }
+
   String? get userPhone {
     if (userPhoneRx.value.isNotEmpty) return userPhoneRx.value;
     final token = authState.value.accessToken;

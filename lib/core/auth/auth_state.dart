@@ -25,7 +25,9 @@ class AuthState {
     if (Get.isRegistered<SamajController>()) {
       Get.find<SamajController>().clear();
     }
-    Get.find<LocalizationService>().changeLocale('en', 'US');
+    final locService = Get.find<LocalizationService>();
+    locService.clearLanguages();
+    locService.changeLocale('en', 'US');
   }
 
   Future<void> _revokeTokenCall() async {
@@ -55,7 +57,9 @@ class AuthState {
       if (Get.isRegistered<SamajController>()) {
         Get.find<SamajController>().clear();
       }
-      await Get.find<LocalizationService>().changeLocale('en', 'US');
+      final locService = Get.find<LocalizationService>();
+      locService.clearLanguages();
+      await locService.changeLocale('en', 'US');
       if (Get.currentRoute != AppRouter.login) {
         await Get.offAllNamed<void>(AppRouter.login);
       }

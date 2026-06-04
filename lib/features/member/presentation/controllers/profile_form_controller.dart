@@ -11,6 +11,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
@@ -151,16 +154,111 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxString get workArea => workInfo.workArea;
   RxString get workAddressLine1 => workInfo.workAddressLine1;
   RxString get workAddressLine2 => workInfo.workAddressLine2;
+  RxString get workLandmark => workInfo.workLandmark;
+  RxString get workPincode => workInfo.workPincode;
   TextEditingController get companyNameCtrl => workInfo.companyNameCtrl;
   TextEditingController get businessNameCtrl => workInfo.businessNameCtrl;
   TextEditingController get workAddressLine1Ctrl => workInfo.workAddressLine1Ctrl;
   TextEditingController get workAddressLine2Ctrl => workInfo.workAddressLine2Ctrl;
+  TextEditingController get workLandmarkCtrl => workInfo.workLandmarkCtrl;
+  TextEditingController get workPincodeCtrl => workInfo.workPincodeCtrl;
   TextEditingController get jobPositionCtrl => workInfo.jobPositionCtrl;
 
   RxList<String> getAddressDistricts(String stateName) => workInfo.getAddressDistricts(stateName);
   RxList<String> getAddressTalukas(String districtName) => workInfo.getAddressTalukas(districtName);
   RxList<String> getAddressAreas(String talukaName) => workInfo.getAddressAreas(talukaName);
 
+  Member? get currentMember => _currentMember;
+
+  Map<String, dynamic> get changedFormData {
+    final formDataMap = <String, dynamic>{};
+    if (_currentMember == null) return formDataMap;
+    final m = _currentMember!;
+
+    void addIfChanged(String key, dynamic currentValue, dynamic originalValue) {
+      if (currentValue != originalValue) {
+        if (currentValue is String && currentValue.isEmpty && (originalValue == null || (originalValue is String && originalValue.isEmpty))) {
+          return;
+        }
+        formDataMap[key] = currentValue;
+      }
+    }
+
+    int? getId(String? name, Map<String, int> idMap) {
+      if (name == null || name.isEmpty) return null;
+      return idMap[name];
+    }
+
+    addIfChanged('FirstName', personalInfo.firstName.value, m.firstName);
+    addIfChanged('MiddleName', personalInfo.middleName.value, m.middleName ?? '');
+    addIfChanged('LastName', personalInfo.lastName.value, m.lastName);
+    
+    String? formatDob(String? d) {
+       if (d == null || d.isEmpty) return null;
+       try {
+         DateTime dt;
+         if (d.contains('-') && d.split('-')[0].length == 2) {
+           final parts = d.split('-');
+           dt = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+         } else {
+           dt = DateTime.parse(d);
+         }
+         return dt.toIso8601String();
+       } catch (_) {
+         return d;
+       }
+    }
+    addIfChanged('DateOfBirth', formatDob(personalInfo.dob.value), formatDob(m.dateOfBirth));
+    addIfChanged('DateOfBirthTime', personalInfo.tob.value, m.dateOfBirthTime ?? '');
+    
+    addIfChanged('Weight', double.tryParse(personalInfo.weight.value), m.weight?.toDouble());
+    addIfChanged('Height', double.tryParse(personalInfo.height.value), m.height?.toDouble());
+    addIfChanged('GenderId', getId(personalInfo.gender.value, personalInfo.genderIdMap), getId(m.genderName, personalInfo.genderIdMap));
+    addIfChanged('MaritalStatusId', getId(personalInfo.maritalStatus.value, personalInfo.maritalStatusIdMap), getId(m.maritalStatusName, personalInfo.maritalStatusIdMap));
+    addIfChanged('GotraId', getId(personalInfo.gotra.value, personalInfo.gotraIdMap), getId(m.gotraName, personalInfo.gotraIdMap));
+    addIfChanged('MotherGotraId', getId(personalInfo.mothersGotra.value, personalInfo.mothersGotraIdMap), getId(m.motherFatherName, personalInfo.mothersGotraIdMap)); 
+    addIfChanged('MotherFatherName', personalInfo.motherFatherName.value, m.motherFatherName ?? '');
+    addIfChanged('signId', getId(personalInfo.sign.value, personalInfo.signIdMap), getId(m.gotraName, personalInfo.signIdMap)); 
+    
+    addIfChanged('IsLookingforMarriage', personalInfo.openToMarriage.value, m.isLookingforMarriage ?? false);
+    
+    addIfChanged('SecondaryMobile', contactInfo.secondaryMobile.value, m.secondaryMobile ?? '');
+    addIfChanged('EmailAddress', contactInfo.email.value, m.emailAddress ?? '');
+    addIfChanged('EmergencyContactName', contactInfo.emergencyContactName.value, m.emergencyContactName ?? '');
+    addIfChanged('EmergencyContactNo', contactInfo.emergencyContactNo.value, m.emergencyContactNo ?? '');
+    addIfChanged('FacebookUrl', contactInfo.facebook.value, m.facebookUrl ?? '');
+    addIfChanged('WhatsappUrl', contactInfo.whatsapp.value, m.whatsappUrl ?? '');
+    addIfChanged('InstagramUrl', contactInfo.instagram.value, m.instagramUrl ?? '');
+    addIfChanged('TwitterUrl', contactInfo.twitter.value, m.twitterUrl ?? '');
+
+    addIfChanged('OccupationTypeId', getId(workInfo.occupationType.value, workInfo.occupationTypeIdMap), getId(m.occupationTypeName, workInfo.occupationTypeIdMap));
+    addIfChanged('OtherOccupation', workInfo.otherOccupation.value, m.otherOccupation ?? '');
+    addIfChanged('OtherJobPosition', workInfo.otherJobPosition.value, m.otherJobPosition ?? '');
+    addIfChanged('CompanyName', workInfo.companyName.value, m.companyName ?? '');
+    addIfChanged('BusinessName', workInfo.businessName.value, m.businessName ?? '');
+    addIfChanged('MonthlyIncome', double.tryParse(personalInfo.monthlyIncome.value), m.monthlyIncome?.toDouble());
+    addIfChanged('OccupationDescription', workInfo.occupationDescription.value, m.occupationDescription ?? '');
+    
+    addIfChanged('IsOwnLand', personalInfo.ownLand.value, m.isOwnLand ?? false);
+    addIfChanged('IsOwnHouse', personalInfo.ownHouse.value, m.isOwnHouse ?? false);
+    addIfChanged('HasTwoWheeler', personalInfo.twoWheeler.value, m.hasTwoWheeler ?? false);
+    addIfChanged('HasFourWheeler', personalInfo.fourWheeler.value, m.hasFourWheeler ?? false);
+    
+    addIfChanged('OccupationTalukaId', getId(workInfo.workTaluka.value, workInfo.globalTalukaIdMap), m.talukaId);
+    addIfChanged('OccupationAreaId', getId(workInfo.workArea.value, workInfo.workTalukaIdMap), m.areaId); 
+    addIfChanged('OccupationAddressLine1', workInfo.workAddressLine1.value, m.occupationAddressLine1 ?? '');
+    addIfChanged('OccupationAddressLine2', workInfo.workAddressLine2.value, m.occupationAddressLine2 ?? '');
+    addIfChanged('OccupationLandmark', workInfo.workLandmark.value, m.occupationLandmark ?? '');
+    addIfChanged('OccupationPincode', workInfo.workPincode.value, m.occupationPincode ?? '');
+
+    return formDataMap;
+  }
+
+  bool get hasChanges {
+    if (_currentMember == null) return true;
+    if (personalInfo.profileImage.value != null) return true;
+    return changedFormData.isNotEmpty;
+  }
 
   void loadFromMember(Member m) {
     _currentMember = m;
@@ -170,17 +268,21 @@ class ProfileFormController extends GetxController with FormStateMixin {
   }
 
   Future<void> loadAllDropdowns() async {
+    final tokenManager = Get.find<TokenManager>();
+    final samajId = tokenManager.samajId;
+    final gotraPath = samajId != null ? '/Gotra/dropdown?samajId=$samajId' : '/Gotra/dropdown';
+
     await Future.wait([
-      workInfo.fetchDropdown('/gender/dropdown', personalInfo.genderList, personalInfo.defaultGenders),
-      workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, personalInfo.defaultMaritalStatuses),
-      workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, personalInfo.defaultBloodGroups),
-      workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, personalInfo.defaultRelations),
+      workInfo.fetchDropdown('/gender/dropdown', personalInfo.genderList, personalInfo.defaultGenders, idMap: personalInfo.genderIdMap),
+      workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, personalInfo.defaultMaritalStatuses, idMap: personalInfo.maritalStatusIdMap),
+      workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, personalInfo.defaultBloodGroups, idMap: personalInfo.bloodGroupIdMap),
+      workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, personalInfo.defaultRelations, idMap: personalInfo.relationIdMap),
       workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, contactInfo.defaultAddressTypes),
       workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, contactInfo.defaultQualifications),
-      workInfo.fetchDropdown('/api/v1/Occupation/dropdown', workInfo.occupationTypeList, workInfo.defaultOccupationTypes),
-      workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, personalInfo.defaultSigns),
-      workInfo.fetchDropdown('/Gotra/dropdown', personalInfo.gotraList, []),
-      workInfo.fetchDropdown('/Gotra/dropdown', personalInfo.mothersGotraList, []),
+      workInfo.fetchDropdown('/api/v1/Occupation/dropdown', workInfo.occupationTypeList, workInfo.defaultOccupationTypes, idMap: workInfo.occupationTypeIdMap),
+      workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, personalInfo.defaultSigns, idMap: personalInfo.signIdMap),
+      workInfo.fetchDropdown(gotraPath, personalInfo.gotraList, [], idMap: personalInfo.gotraIdMap),
+      workInfo.fetchDropdown(gotraPath, personalInfo.mothersGotraList, [], idMap: personalInfo.mothersGotraIdMap),
       workInfo.fetchDropdown('/state/dropdown', workInfo.workStateList, [], idMap: workInfo.workStateIdMap),
     ]);
     
@@ -205,8 +307,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
-    if (list.isNotEmpty && !list.contains(selected.value)) {
-      selected.value = list.first;
+    if (selected.value.isNotEmpty && !list.contains(selected.value)) {
+      selected.value = '';
     }
   }
 
@@ -220,8 +322,28 @@ class ProfileFormController extends GetxController with FormStateMixin {
         
         try {
           final isEdit = _currentMember != null;
-          await Future<void>.delayed(const Duration(seconds: 1));
+          final formDataMap = <String, dynamic>{};
           
+          if (isEdit) {
+            final formDataChanges = changedFormData;
+            formDataMap.addAll(formDataChanges);
+
+            if (personalInfo.profileImage.value != null) {
+              final file = personalInfo.profileImage.value!;
+              final fileName = file.path.split('/').last;
+              formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(file.path, filename: fileName);
+            }
+          }
+
+          if (formDataMap.isNotEmpty) {
+            final formData = dio.FormData.fromMap(formDataMap);
+            final apiClient = Get.find<ApiClient>();
+            await apiClient.post(
+              '/api/v1/MemberUpdateRequest/create',
+              data: formData,
+            );
+          }
+
           Get.snackbar(
             LK.success.tr,
             successMessage ?? (isEdit ? LK.profileUpdated.tr : 'Member Added Successfully'),

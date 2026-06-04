@@ -85,5 +85,9 @@ class LocalizationService {
     await Get.updateLocale(locale);
     await _storage.write(_localeKey, '${langCode}_$countryCode');
   }
+
+  void clearLanguages() {
+    languages.clear();
+  }
 }
 

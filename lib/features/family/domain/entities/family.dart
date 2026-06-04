@@ -70,8 +70,16 @@ class Family {
       }
     }
 
+    String finalFamilyName = json['name'] as String? ?? '';
+    try {
+      final head = uniqueMembers.firstWhere((m) => m.isHead);
+      if (head.name.isNotEmpty) {
+        finalFamilyName = head.name;
+      }
+    } catch (_) {}
+
     return Family(
-      familyName: json['name'] as String? ?? '',
+      familyName: finalFamilyName,
       members: uniqueMembers,
     );
   }

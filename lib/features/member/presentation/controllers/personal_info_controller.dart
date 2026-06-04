@@ -6,6 +6,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:intl/intl.dart';
 
 class PersonalInfoController extends GetxController {
   final defaultGenders = ['Male', 'Female', 'Other'];
@@ -24,6 +25,14 @@ class PersonalInfoController extends GetxController {
   final signList = <String>[].obs;
   final gotraList = <String>[].obs;
   final mothersGotraList = <String>[].obs;
+
+  final genderIdMap = <String, int>{};
+  final maritalStatusIdMap = <String, int>{};
+  final bloodGroupIdMap = <String, int>{};
+  final relationIdMap = <String, int>{};
+  final signIdMap = <String, int>{};
+  final gotraIdMap = <String, int>{};
+  final mothersGotraIdMap = <String, int>{};
 
   final memberNo = ''.obs;
   final firstName = ''.obs;
@@ -116,11 +125,21 @@ class PersonalInfoController extends GetxController {
   }
 
   void loadFromMember(Member m) {
+    String formatDob(String? dobRaw) {
+      if (dobRaw == null || dobRaw.isEmpty) return '';
+      try {
+        final dt = DateTime.parse(dobRaw);
+        return DateFormat('dd-MM-yyyy').format(dt);
+      } catch (_) {
+        return dobRaw;
+      }
+    }
+
     memberNo.value = m.memberNo ?? '';
     firstName.value = m.firstName;
     middleName.value = m.middleName ?? '';
     lastName.value = m.lastName;
-    dob.value = m.dateOfBirth ?? '';
+    dob.value = formatDob(m.dateOfBirth);
     tob.value = m.dateOfBirthTime ?? '';
     weight.value = m.weight?.toString() ?? '';
     height.value = m.height?.toString() ?? '';

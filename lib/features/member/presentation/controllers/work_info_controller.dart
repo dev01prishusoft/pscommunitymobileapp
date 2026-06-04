@@ -12,6 +12,8 @@ class WorkInfoController extends GetxController {
   final workTalukaList = <String>[].obs;
   final workAreaList = <String>[].obs;
 
+  final occupationTypeIdMap = <String, int>{};
+
   final workStateIdMap = <String, int>{};
   final workDistrictIdMap = <String, int>{};
   final workTalukaIdMap = <String, int>{};
@@ -38,11 +40,15 @@ class WorkInfoController extends GetxController {
   final workArea = ''.obs;
   final workAddressLine1 = ''.obs;
   final workAddressLine2 = ''.obs;
+  final workLandmark = ''.obs;
+  final workPincode = ''.obs;
 
   late final TextEditingController companyNameCtrl;
   late final TextEditingController businessNameCtrl;
   late final TextEditingController workAddressLine1Ctrl;
   late final TextEditingController workAddressLine2Ctrl;
+  late final TextEditingController workLandmarkCtrl;
+  late final TextEditingController workPincodeCtrl;
   late final TextEditingController jobPositionCtrl;
 
   @override
@@ -52,12 +58,16 @@ class WorkInfoController extends GetxController {
     businessNameCtrl = TextEditingController();
     workAddressLine1Ctrl = TextEditingController();
     workAddressLine2Ctrl = TextEditingController();
+    workLandmarkCtrl = TextEditingController();
+    workPincodeCtrl = TextEditingController();
     jobPositionCtrl = TextEditingController();
 
     companyNameCtrl.addListener(() => companyName.value = companyNameCtrl.text);
     businessNameCtrl.addListener(() => businessName.value = businessNameCtrl.text);
     workAddressLine1Ctrl.addListener(() => workAddressLine1.value = workAddressLine1Ctrl.text);
     workAddressLine2Ctrl.addListener(() => workAddressLine2.value = workAddressLine2Ctrl.text);
+    workLandmarkCtrl.addListener(() => workLandmark.value = workLandmarkCtrl.text);
+    workPincodeCtrl.addListener(() => workPincode.value = workPincodeCtrl.text);
     jobPositionCtrl.addListener(() => jobPosition.value = jobPositionCtrl.text);
 
     ever(workState, (_) {
@@ -77,6 +87,8 @@ class WorkInfoController extends GetxController {
     businessNameCtrl.dispose();
     workAddressLine1Ctrl.dispose();
     workAddressLine2Ctrl.dispose();
+    workLandmarkCtrl.dispose();
+    workPincodeCtrl.dispose();
     jobPositionCtrl.dispose();
     super.onClose();
   }
@@ -96,14 +108,20 @@ class WorkInfoController extends GetxController {
     workArea.value = m.occupationAreaName ?? '';
     workAddressLine1.value = m.occupationAddressLine1 ?? '';
     workAddressLine2.value = m.occupationAddressLine2 ?? '';
+    workLandmark.value = m.occupationLandmark ?? '';
+    workPincode.value = m.occupationPincode ?? '';
 
     companyNameCtrl.text = companyName.value;
     businessNameCtrl.text = businessName.value;
+    workAddressLine1Ctrl.text = workAddressLine1.value;
+    workAddressLine2Ctrl.text = workAddressLine2.value;
+    workLandmarkCtrl.text = workLandmark.value;
+    workPincodeCtrl.text = workPincode.value;
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
-    if (list.isNotEmpty && !list.contains(selected.value)) {
-      selected.value = list.first;
+    if (selected.value.isNotEmpty && !list.contains(selected.value)) {
+      selected.value = '';
     }
   }
 

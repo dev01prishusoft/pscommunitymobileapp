@@ -417,5 +417,6 @@
   "Payment cancelled": "Payment cancelled",
   "Lakh": "Lakh",
   "Crore": "Crore",
-  "From cannot be greater than To": "From cannot be greater than To"
+  "From cannot be greater than To": "From cannot be greater than To",
+  "Edit profile request sent": "Edit profile request sent"
 }

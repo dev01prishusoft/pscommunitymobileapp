@@ -5,36 +5,54 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
-class AppFormTextField extends StatelessWidget {
-  const AppFormTextField({
+class AppFormTimePicker extends StatelessWidget {
+  const AppFormTimePicker({
     super.key,
-    this.controller,
-    this.initialValue,
+    required this.controller,
     required this.label,
     this.hint,
     this.isRequired = false,
-    this.readOnly = false,
-    this.keyboardType = TextInputType.text,
     this.validator,
-    this.maxLines = 1,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.obscureText = false,
-    this.onChanged,
   });
-  final TextEditingController? controller;
-  final String? initialValue;
+  final TextEditingController controller;
   final String label;
   final String? hint;
   final bool isRequired;
-  final bool readOnly;
-  final TextInputType keyboardType;
   final String? Function(String?)? validator;
-  final int maxLines;
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
-  final bool obscureText;
-  final void Function(String)? onChanged;
+
+  Future<void> _selectTime(BuildContext context) async {
+    TimeOfDay initialTime = TimeOfDay.now();
+    if (controller.text.isNotEmpty) {
+      try {
+        final parts = controller.text.split(':');
+        if (parts.length >= 2) {
+          initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }
+      } catch (_) {}
+    }
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initialTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: AppColors.white,
+              onSurface: AppColors.foreground,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      final String hour = picked.hour.toString().padLeft(2, '0');
+      final String minute = picked.minute.toString().padLeft(2, '0');
+      controller.text = '$hour:$minute:00';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,25 +79,21 @@ class AppFormTextField extends StatelessWidget {
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
-          initialValue: initialValue,
-          readOnly: readOnly,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          obscureText: obscureText,
-          onChanged: onChanged,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: readOnly ? AppColors.mutedForeground : AppColors.foreground,
-          ),
+          readOnly: true,
+          onTap: () => _selectTime(context),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.mutedForeground,
             ),
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon,
+            prefixIcon: Icon(
+              Icons.access_time,
+              color: AppColors.mutedForeground,
+              size: 20,
+            ),
             filled: true,
-            fillColor: readOnly ? AppColors.surfaceVariant : AppColors.white,
+            fillColor: AppColors.white,
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -95,18 +109,11 @@ class AppFormTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: readOnly ? AppColors.border.withValues(alpha: 0.5) : AppColors.primary, 
-                width: readOnly ? 1.0 : 1.5.w,
-              ),
+              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: AppColors.red),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.red, width: 1.5.w),
             ),
           ),
           validator: (value) {
@@ -123,4 +130,3 @@ class AppFormTextField extends StatelessWidget {
     );
   }
 }
-
