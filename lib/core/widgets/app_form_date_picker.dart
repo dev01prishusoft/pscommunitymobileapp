@@ -28,9 +28,18 @@ class AppFormDatePicker extends StatelessWidget {
   final DateTime? lastDate;
 
   Future<void> _selectDate(BuildContext context) async {
+    DateTime? parsedDate = initialDate;
+    if (parsedDate == null && controller.text.isNotEmpty) {
+      try {
+        parsedDate = DateFormat('dd-MM-yyyy').parse(controller.text);
+      } catch (_) {
+        // Ignore parse error
+      }
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate ?? DateTime.now(),
+      initialDate: parsedDate ?? DateTime.now(),
       firstDate: firstDate ?? DateTime(1900),
       lastDate: lastDate ?? DateTime(2101),
       builder: (context, child) {

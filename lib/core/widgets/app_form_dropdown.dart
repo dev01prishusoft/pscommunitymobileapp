@@ -15,6 +15,7 @@ class AppFormDropdown<T> extends StatelessWidget {
     this.hint,
     this.isRequired = false,
     this.validator,
+    this.requiredErrorMessage,
   });
   final T? value;
   final List<DropdownMenuItem<T>> items;
@@ -23,6 +24,7 @@ class AppFormDropdown<T> extends StatelessWidget {
   final String? hint;
   final bool isRequired;
   final String? Function(T?)? validator;
+  final String? requiredErrorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +86,10 @@ class AppFormDropdown<T> extends StatelessWidget {
           ),
           validator: (val) {
             if (isRequired && val == null) {
-              return LK.fieldRequired.tr;
+              return requiredErrorMessage ?? LK.fieldRequired.tr;
             }
             if (isRequired && val is String && val.trim().isEmpty) {
-              return LK.fieldRequired.tr;
+              return requiredErrorMessage ?? LK.fieldRequired.tr;
             }
             if (validator != null) {
               return validator!(val);

@@ -86,8 +86,10 @@ class ContactController extends GetxController {
     whatsapp.value = m.whatsappUrl ?? '';
     instagram.value = m.instagramUrl ?? '';
     twitter.value = m.twitterUrl ?? '';
+    entryPersonMobile.value = m.entryPersonMobileNo ?? '';
 
     mobileCtrl.text = mobileNo.value;
+    entryPersonMobileCtrl.text = entryPersonMobile.value;
     secondaryMobileCtrl.text = secondaryMobile.value;
     emailCtrl.text = email.value;
     emergencyNameCtrl.text = emergencyContactName.value;

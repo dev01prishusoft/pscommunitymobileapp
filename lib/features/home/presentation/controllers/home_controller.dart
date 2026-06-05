@@ -12,10 +12,6 @@ class MenuItem {
 }
 
 class HomeController extends GetxController {
-  static const Map<String, List<String>> localeMap = {
-    'EN': ['en', 'US'],
-    'GJ': ['gu', 'IN'],
-  };
 
   final List<MenuItem> menuItems = [
     MenuItem(icon: Icons.family_restroom, labelKey: LK.family, route: AppRouter.familyAreas),
@@ -36,11 +32,6 @@ class HomeController extends GetxController {
 
   void changeLocale(LocalizationService loc, String? code) {
     if (code == null) return;
-    final parts = localeMap[code];
-    if (parts != null) {
-      loc.changeLocale(parts[0], parts[1]);
-    } else {
-      loc.changeLocale(code.toLowerCase(), '');
-    }
+    loc.changeLocale(code.toLowerCase(), '');
   }
 }

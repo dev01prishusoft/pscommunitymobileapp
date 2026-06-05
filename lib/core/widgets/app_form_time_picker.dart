@@ -50,7 +50,7 @@ class AppFormTimePicker extends StatelessWidget {
     if (picked != null) {
       final String hour = picked.hour.toString().padLeft(2, '0');
       final String minute = picked.minute.toString().padLeft(2, '0');
-      controller.text = '$hour:$minute:00';
+      controller.text = '$hour:$minute';
     }
   }
 

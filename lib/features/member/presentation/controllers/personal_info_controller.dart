@@ -55,6 +55,7 @@ class PersonalInfoController extends GetxController {
   final gotra = ''.obs;
   final mothersGotra = ''.obs;
   final openToMarriage = false.obs;
+  final relatedToMemberName = ''.obs;
   final ownLand = false.obs;
   final ownHouse = false.obs;
   final twoWheeler = false.obs;
@@ -154,6 +155,8 @@ class PersonalInfoController extends GetxController {
     twoWheeler.value = m.hasTwoWheeler ?? false;
     fourWheeler.value = m.hasFourWheeler ?? false;
     monthlyIncome.value = m.monthlyIncome?.toString() ?? '';
+    isFamilyHead.value = m.isHead ?? false;
+    relatedToMemberName.value = m.relatedToMemberName ?? '';
 
     memberNoCtrl.text = memberNo.value;
     tobCtrl.text = tob.value;

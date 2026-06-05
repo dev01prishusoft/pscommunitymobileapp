@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class RelationMapper {
@@ -11,8 +10,9 @@ class RelationMapper {
       case 'wife':
         return LK.wife;
       default:
-        AppLogger.w('Unknown relation: $relation');
-        return null;
+        // Gracefully fallback to the raw relation string so the UI can display it
+        // and .tr can translate it if the key is added later.
+        return relation;
     }
   }
 }

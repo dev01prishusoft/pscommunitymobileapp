@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
 class AddFamilyMemberPage extends StatefulWidget {
@@ -29,6 +30,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     super.initState();
     controllerTag = UniqueKey().toString();
     controller = Get.put(ProfileFormController(), tag: controllerTag);
+    controller.markAsAddMode();
   }
 
   @override
@@ -60,18 +62,18 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             children: [
               _buildProfilePhotoSection(),
               _buildSection(LK.personal.tr, Icons.person_outline, [
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.memberNoCtrl,
-                    label: LK.memberNo.tr,
-                    prefixIcon: Icon(Icons.numbers),
-                  ),
-                  AppFormTextField(
-                    controller: controller.firstNameCtrl,
-                    label: LK.firstName.tr,
-                    isRequired: true,
-                    prefixIcon: Icon(Icons.person),
-                  ),
+                AppFormTextField(
+                  controller: controller.memberNoCtrl,
+                  label: LK.memberNo.tr,
+                  prefixIcon: Icon(Icons.numbers),
+                  readOnly: true,
+                ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.firstNameCtrl,
+                  label: LK.firstName.tr,
+                  isRequired: true,
+                  prefixIcon: Icon(Icons.person),
                 ),
                 _buildFieldPair(
                   AppFormTextField(
@@ -105,10 +107,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.birthDate.tr,
                 ),
                 SizedBox(height: 12.h),
-                AppFormTextField(
+                AppFormTimePicker(
                   controller: controller.tobCtrl,
                   label: LK.timeOfBirth.tr,
-                  prefixIcon: Icon(Icons.access_time),
                 ),
                 SizedBox(height: 12.h),
                 _buildFieldPair(
@@ -231,6 +232,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   isRequired: true,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.phone),
+                  validator: AppValidators.mobile,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
@@ -238,6 +240,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.secondaryMobileLabel.tr,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.phone_android),
+                  validator: AppValidators.optionalMobile,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
@@ -245,13 +248,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.email.tr,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(Icons.email_outlined),
-                  validator: AppValidators.email,
+                  validator: AppValidators.optionalEmail,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: controller.entryPersonMobileCtrl,
                   label: LK.entryPersonMobile.tr,
                   prefixIcon: Icon(Icons.phone_callback),
+                  validator: AppValidators.optionalMobile,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
@@ -265,6 +269,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.emergencyContact.tr,
                   keyboardType: TextInputType.phone,
                   prefixIcon: Icon(Icons.emergency_outlined),
+                  validator: AppValidators.optionalMobile,
                 ),
               ]),
 
@@ -272,8 +277,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 LK.familyParents.tr,
                 Icons.family_restroom_outlined,
                 [
-                  _buildCheckbox(LK.familyHead.tr, controller.isFamilyHead),
-                  SizedBox(height: 12.h),
                   Obx(
                     () => AppFormDropdown<String>(
                       value:
@@ -281,9 +284,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             controller.relation.value,
                           )
                           ? controller.relation.value
-                          : (controller.relationList.isNotEmpty
-                                ? controller.relationList.first
-                                : controller.defaultRelations.first),
+                          : null,
                       items:
                           (controller.relationList.isEmpty
                                   ? controller.defaultRelations
@@ -307,59 +308,68 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   SizedBox(height: 12.h),
                   _buildFieldPair(
-                    AppFormDropdown<String>(
-                      value: 'Parmar',
-                      items: ['Parmar', 'Chauhan', 'Solanki', 'Rathod']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (v) {},
-                      label: LK.gotraLabel.tr,
+                    Obx(
+                      () => AppFormDropdown<String>(
+                        value: controller.gotraList.contains(controller.gotra.value)
+                            ? controller.gotra.value
+                            : null,
+                        items: controller.gotraList
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) controller.gotra.value = v;
+                        },
+                        label: LK.gotraLabel.tr,
+                      ),
                     ),
-                    AppFormDropdown<String>(
-                      value: 'Parmar',
-                      items: ['Parmar', 'Chauhan', 'Solanki', 'Rathod']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                      onChanged: (v) {},
-                      label: LK.mothersGotra.tr,
+                    Obx(
+                      () => AppFormDropdown<String>(
+                        value: controller.mothersGotraList.contains(controller.mothersGotra.value)
+                            ? controller.mothersGotra.value
+                            : null,
+                        items: controller.mothersGotraList
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) controller.mothersGotra.value = v;
+                        },
+                        label: LK.mothersGotra.tr,
+                      ),
                     ),
                   ),
                   _buildCheckbox(LK.matrimonial.tr, controller.openToMarriage),
                 ],
               ),
 
+              _buildAssetsLifeSection(),
+
               _buildSection(LK.socialMedia.tr, Icons.share_outlined, [
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.facebookCtrl,
-                    label: LK.facebook.tr,
-                    prefixIcon: Icon(Icons.facebook),
-                    validator: AppValidators.url,
-                  ),
-                  AppFormTextField(
-                    controller: controller.whatsappCtrl,
-                    label: LK.whatsapp.tr,
-                    prefixIcon: Icon(Icons.chat),
-                    validator: AppValidators.url,
-                  ),
+                AppFormTextField(
+                  controller: controller.facebookCtrl,
+                  label: LK.facebook.tr,
+                  prefixIcon: Icon(Icons.facebook),
+                  validator: AppValidators.url,
                 ),
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.instagramCtrl,
-                    label: LK.instagram.tr,
-                    prefixIcon: Icon(Icons.camera_alt),
-                    validator: AppValidators.url,
-                  ),
-                  AppFormTextField(
-                    controller: controller.twitterCtrl,
-                    label: LK.twitterX.tr,
-                    prefixIcon: Icon(Icons.close),
-                    validator: AppValidators.url,
-                  ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.whatsappCtrl,
+                  label: LK.whatsapp.tr,
+                  prefixIcon: Icon(Icons.chat),
+                  validator: AppValidators.url,
+                ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.instagramCtrl,
+                  label: LK.instagram.tr,
+                  prefixIcon: Icon(Icons.camera_alt),
+                  validator: AppValidators.url,
+                ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: controller.twitterCtrl,
+                  label: LK.twitterX.tr,
+                  prefixIcon: Icon(Icons.close),
+                  validator: AppValidators.url,
                 ),
               ]),
 
@@ -387,7 +397,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         child: Obx(
           () => AppPrimaryButton(
             text: LK.saveChanges.tr,
-            onPressed: () => controller.submitForm(successMessage: 'Member Added Successfully'),
+            onPressed: () => controller.submitForm(successMessage: LK.memberAddedSuccessfully.tr),
             isLoading: controller.isFormLoading,
           ),
         ),
@@ -591,10 +601,32 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ],
         ),
         SizedBox(height: 8.h),
-        ...List.generate(
-          controller.addresses.length,
-          (index) => _buildAddressItem(index),
-        ),
+        if (controller.addresses.isEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: Column(
+                children: [
+                  Text(
+                    LK.noAddressesYet.tr,
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground),
+                  ),
+                  if (controller.showListErrors.value) ...[
+                    SizedBox(height: 4.h),
+                    Text(
+                      LK.addressRequiredError.tr,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.red),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          )
+        else
+          ...List.generate(
+            controller.addresses.length,
+            (index) => _buildAddressItem(index),
+          ),
       ]),
     );
   }
@@ -641,6 +673,27 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ],
           ),
           SizedBox(height: 12.h),
+          Obx(() {
+            final typeList = controller.addressTypeList;
+            return AppFormDropdown<String>(
+              value: typeList.contains(addr.type)
+                  ? addr.type
+                  : null,
+              items: typeList
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) {
+                  addr.type = v;
+                  controller.addresses.refresh();
+                }
+              },
+              label: LK.addressType.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.addressTypeRequired.tr,
+            );
+          }),
+          SizedBox(height: 12.h),
           AppFormTextField(
             initialValue: addr.line1,
             label: LK.addressLine1.tr,
@@ -658,7 +711,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             return AppFormDropdown<String>(
               value: stateList.contains(addr.state)
                   ? addr.state
-                  : (stateList.isNotEmpty ? stateList.first : null),
+                  : null,
               items: stateList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -672,6 +725,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 }
               },
               label: LK.state.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.stateRequired.tr,
             );
           }),
           SizedBox(height: 12.h),
@@ -680,7 +735,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             return AppFormDropdown<String>(
               value: districtList.contains(addr.district)
                   ? addr.district
-                  : (districtList.isNotEmpty ? districtList.first : null),
+                  : null,
               items: districtList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -693,6 +748,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 }
               },
               label: LK.district.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.districtRequired.tr,
             );
           }),
           SizedBox(height: 12.h),
@@ -701,7 +758,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             return AppFormDropdown<String>(
               value: talukaList.contains(addr.taluka)
                   ? addr.taluka
-                  : (talukaList.isNotEmpty ? talukaList.first : null),
+                  : null,
               items: talukaList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -713,6 +770,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 }
               },
               label: LK.taluka.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.talukaRequired.tr,
             );
           }),
           SizedBox(height: 12.h),
@@ -721,7 +780,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             return AppFormDropdown<String>(
               value: areaList.contains(addr.area)
                   ? addr.area
-                  : (areaList.isNotEmpty ? areaList.first : null),
+                  : null,
               items: areaList
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
@@ -732,20 +791,21 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 }
               },
               label: LK.area.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.areaRequired.tr,
             );
           }),
           SizedBox(height: 12.h),
-          _buildFieldPair(
-            AppFormTextField(
-              initialValue: addr.landmark,
-              label: LK.landmarkLabel.tr,
-              onChanged: (v) => addr.landmark = v,
-            ),
-            AppFormTextField(
-              initialValue: addr.pincode,
-              label: LK.pincode.tr,
-              onChanged: (v) => addr.pincode = v,
-            ),
+          AppFormTextField(
+            initialValue: addr.landmark,
+            label: LK.landmarkLabel.tr,
+            onChanged: (v) => addr.landmark = v,
+          ),
+          SizedBox(height: 12.h),
+          AppFormTextField(
+            initialValue: addr.pincode,
+            label: LK.pincode.tr,
+            onChanged: (v) => addr.pincode = v,
           ),
         ],
       ),
@@ -772,10 +832,32 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ],
         ),
         SizedBox(height: 8.h),
-        ...List.generate(
-          controller.educationList.length,
-          (index) => _buildEducationItem(index),
-        ),
+        if (controller.educationList.isEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: Column(
+                children: [
+                  Text(
+                    LK.noEducationRecordsYet.tr,
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground),
+                  ),
+                  if (controller.showListErrors.value) ...[
+                    SizedBox(height: 4.h),
+                    Text(
+                      LK.educationRequiredError.tr,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.red),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          )
+        else
+          ...List.generate(
+            controller.educationList.length,
+            (index) => _buildEducationItem(index),
+          ),
       ]),
     );
   }
@@ -817,9 +899,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             () => AppFormDropdown<String>(
               value: controller.qualificationList.contains(edu.qualification)
                   ? edu.qualification
-                  : (controller.qualificationList.isNotEmpty
-                      ? controller.qualificationList.first
-                      : controller.defaultQualifications.first),
+                  : null,
               items: (controller.qualificationList.isEmpty
                       ? controller.defaultQualifications
                       : controller.qualificationList)
@@ -832,6 +912,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 }
               },
               label: LK.qualificationLabel.tr,
+              isRequired: true,
+              requiredErrorMessage: LK.qualificationRequired.tr,
             ),
           ),
           SizedBox(height: 12.h),
@@ -858,8 +940,77 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     );
   }
 
+  Widget _buildAssetsLifeSection() {
+    return _buildSection(LK.assetsLife.tr, Icons.account_balance_wallet_outlined, [
+      _buildFieldPair(
+        _buildCheckbox('Own Land', controller.personalInfo.ownLand),
+        _buildCheckbox('Own House', controller.personalInfo.ownHouse),
+      ),
+      _buildFieldPair(
+        _buildCheckbox('Two Wheeler', controller.personalInfo.twoWheeler),
+        _buildCheckbox('Four Wheeler', controller.personalInfo.fourWheeler),
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.monthlyIncomeCtrl,
+        label: LK.monthlyIncomeLabel.tr,
+        prefixIcon: Icon(Icons.currency_rupee),
+        keyboardType: TextInputType.number,
+      ),
+    ]);
+  }
+
   Widget _buildWorkHistorySection() {
     return _buildSection(LK.workHistory.tr, Icons.work_outline, [
+      _buildFieldPair(
+        Obx(() {
+          final list = controller.workInfo.occupationTypeList;
+          return AppFormDropdown<String>(
+            value: list.contains(controller.workInfo.occupationType.value)
+                ? controller.workInfo.occupationType.value
+                : null,
+            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            onChanged: (v) {
+              if (v != null) controller.workInfo.occupationType.value = v;
+            },
+            label: LK.occupationType.tr,
+            isRequired: true,
+            requiredErrorMessage: LK.occupationTypeRequired.tr,
+          );
+        }),
+        Obx(() {
+          final list = controller.workInfo.occupationList;
+          return AppFormDropdown<String>(
+            value: list.contains(controller.workInfo.occupation.value)
+                ? controller.workInfo.occupation.value
+                : null,
+            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            onChanged: (v) {
+              if (v != null) controller.workInfo.occupation.value = v;
+            },
+            label: LK.occupation.tr,
+            isRequired: true,
+            requiredErrorMessage: LK.occupationRequired.tr,
+          );
+        }),
+      ),
+      SizedBox(height: 12.h),
+      Obx(() {
+        final list = controller.workInfo.jobPositionList;
+        return AppFormDropdown<String>(
+          value: list.contains(controller.workInfo.jobPosition.value)
+              ? controller.workInfo.jobPosition.value
+              : null,
+          items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          onChanged: (v) {
+            if (v != null) controller.workInfo.jobPosition.value = v;
+          },
+          label: LK.jobPositionLabel.tr,
+          isRequired: true,
+          requiredErrorMessage: LK.jobPositionRequired.tr,
+        );
+      }),
+      SizedBox(height: 12.h),
       AppFormTextField(
         controller: controller.companyNameCtrl,
         label: LK.companyNameLabel.tr,
@@ -869,23 +1020,29 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       SizedBox(height: 12.h),
       _buildFieldPair(
         AppFormTextField(
-          controller: controller.businessNameCtrl,
-          label: LK.businessName.tr,
-          prefixIcon: Icon(Icons.business_center),
-          onChanged: (v) => controller.businessName.value = v,
+          controller: controller.otherJobPositionCtrl,
+          label: LK.otherJobPositionLabel.tr,
+          onChanged: (v) => controller.workInfo.otherJobPosition.value = v,
         ),
         AppFormTextField(
-          controller: controller.monthlyIncomeCtrl,
-          label: LK.monthlyIncomeLabel.tr,
-          prefixIcon: Icon(Icons.currency_rupee),
+          controller: controller.otherJobPositionEnglishCtrl,
+          label: 'Other Job Position (English)',
+          onChanged: (v) => controller.workInfo.otherJobPositionEnglish.value = v,
         ),
       ),
       SizedBox(height: 12.h),
       AppFormTextField(
-        controller: controller.jobPositionCtrl,
-        label: LK.jobPositionLabel.tr,
-        prefixIcon: Icon(Icons.description_outlined),
-        onChanged: (v) => controller.jobPosition.value = v,
+        controller: controller.otherOccupationCtrl,
+        label: LK.otherOccupationLabel.tr,
+        onChanged: (v) => controller.workInfo.otherOccupation.value = v,
+      ),
+      SizedBox(height: 12.h),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.businessNameCtrl,
+        label: LK.businessName.tr,
+        prefixIcon: Icon(Icons.business_center),
+        onChanged: (v) => controller.businessName.value = v,
       ),
       SizedBox(height: 12.h),
       AppFormTextField(

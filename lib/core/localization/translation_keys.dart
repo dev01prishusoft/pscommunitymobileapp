@@ -139,6 +139,7 @@ class LK {
   static String paymentTimedOut = 'paymentTimedOut';
   static String retry = 'Retry';
   static String somethingWrong = 'Something went wrong';
+  static String memberAddedSuccessfully = 'Member Added Successfully';
   static String noResultsFound = 'No results found';
   static String noMembersFound = 'No members found';
   static String noMatchesFound = 'No matches found';
@@ -155,10 +156,27 @@ class LK {
   static String birthDate = 'Birth Date';
   static String na = 'N/A';
   static String occupationLabel = 'Occupation';
+  static String occupation = 'Occupation';
+  static String occupationType = 'Occupation Type';
   static String mobileNoLabel = 'Mobile No';
   static String emergencyContact = 'Emergency Contact';
   static String email = 'Email';
   static String memberAddresses = 'MEMBER ADDRESSES';
+  static String noAddressesYet = 'No addresses yet.';
+  static String addressRequiredError = 'At least one address is required.';
+  static String noEducationRecordsYet = 'No education records yet.';
+  static String educationRequiredError = 'At least one education record is required.';
+
+  static String addressTypeRequired = 'Address Type is required';
+  static String stateRequired = 'State is required';
+  static String districtRequired = 'District is required';
+  static String talukaRequired = 'Taluka is required';
+  static String areaRequired = 'Area is required';
+  static String qualificationRequired = 'Qualification is required';
+  static String occupationTypeRequired = 'Occupation Type is required';
+  static String occupationRequired = 'Occupation is required';
+  static String jobPositionRequired = 'Job Position is required';
+
   static String mobileColon = 'Mobile:';
   static String reportIssue = 'Report Issue';
   static String nameLabel = 'Name:';
@@ -420,6 +438,8 @@ class LK {
   static String son = 'Son';
   static String taurus = 'Taurus';
   static String virgo = 'Virgo';
+  static String lakh = 'Lakh';
+  static String crore = 'Crore';
 
   static List<String> allValues = [
     appTitle,
@@ -803,6 +823,57 @@ class LK {
     taurus,
     virgo,
     fromGreaterToError,
+    lakh,
+    crore,
+    'A+',
+    'A-',
+    'AB+',
+    'AB-',
+    'Agriculture',
+    'Aquarius',
+    'Are you sure you want to delete your account? This action cannot be undone.',
+    'Aries',
+    'B+',
+    'B-',
+    'Business',
+    'Cancer',
+    'Capricorn',
+    'Daughter',
+    'Father',
+    'Gemini',
+    'Graduate',
+    'HSC',
+    'Job',
+    'Join @samaj community! Download our app: @link',
+    'Leo',
+    'Libra',
+    'Payment gateway configuration missing.',
+    'Please enter a valid 10-digit mobile number',
+    'Please select valid type, category and amount (min ₹100)',
+    'Try selecting different filters',
+    'You have been logged out due to inactivity.',
+    'Password must contain at least one lowercase letter',
+    'Password must contain at least one uppercase letter',
+    r'Password must contain at least one special character (!@#$&*~)',
+    'Bank acount',
+    'Cash',
+    'Cheque',
+    'Online',
+    'Completed',
+    'Please fill all required fields correctly.',
+    'Your account has been deleted successfully.',
+    'Unknown error occurred.',
+    addressTypeRequired,
+    stateRequired,
+    districtRequired,
+    talukaRequired,
+    areaRequired,
+    qualificationRequired,
+    occupationTypeRequired,
+    occupationRequired,
+    jobPositionRequired,
+    occupationType,
+    memberAddedSuccessfully,
   ];
 }
 

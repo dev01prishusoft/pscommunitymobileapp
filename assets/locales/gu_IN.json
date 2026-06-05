@@ -207,6 +207,7 @@
   "Occupation Directory": "વ્યવસાય ડિરેક્ટરી",
   "Occupation Profile": "વ્યવસાય પ્રોફાઇલ",
   "Occupation Type:": "વ્યવસાયનો પ્રકાર:",
+  "Occupation Type": "વ્યવસાયનો પ્રકાર",
   "Occupation:": "વ્યવસાય:",
   "Office": "ઓફિસ",
   "Official Payment Receipt": "સત્તાવાર ચુકવણીની રસીદ",
@@ -418,5 +419,16 @@
   "Lakh": "લાખ",
   "Crore": "કરોડ",
   "From cannot be greater than To": "શરૂઆતની રકમ અંતિમ રકમ કરતાં વધુ ન હોઈ શકે.",
-  "Edit profile request sent": "Edit profile request sent"
+  "Edit profile request sent": "પ્રોફાઇલ સંપાદન વિનંતી મોકલાઈ ગઈ છે",
+  "Unknown error occurred.": "અજ્ઞાત ભૂલ આવી.",
+  "Member Added Successfully": "સભ્ય સફળતાપૂર્વક ઉમેરવામાં આવ્યા",
+  "Address Type is required": "સરનામાનો પ્રકાર જરૂરી છે",
+  "State is required": "રાજ્ય જરૂરી છે",
+  "District is required": "જિલ્લો જરૂરી છે",
+  "Taluka is required": "તાલુકો જરૂરી છે",
+  "Area is required": "વિસ્તાર જરૂરી છે",
+  "Qualification is required": "લાયકાત જરૂરી છે",
+  "Occupation Type is required": "વ્યવસાયનો પ્રકાર જરૂરી છે",
+  "Occupation is required": "વ્યવસાય જરૂરી છે",
+  "Job Position is required": "નોકરીની સ્થિતિ જરૂરી છે"
 }

@@ -418,5 +418,17 @@
   "Lakh": "Lakh",
   "Crore": "Crore",
   "From cannot be greater than To": "From cannot be greater than To",
-  "Edit profile request sent": "Edit profile request sent"
+  "Edit profile request sent": "Edit profile request sent",
+  "Unknown error occurred.": "Unknown error occurred.",
+  "Address Type is required": "Address Type is required",
+  "State is required": "State is required",
+  "District is required": "District is required",
+  "Taluka is required": "Taluka is required",
+  "Area is required": "Area is required",
+  "Qualification is required": "Qualification is required",
+  "Occupation Type is required": "Occupation Type is required",
+  "Occupation is required": "Occupation is required",
+  "Job Position is required": "Job Position is required",
+  "Occupation Type": "Occupation Type",
+  "Member Added Successfully": "Member Added Successfully"
 }

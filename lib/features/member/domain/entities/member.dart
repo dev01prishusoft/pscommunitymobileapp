@@ -29,6 +29,7 @@ class Member {
     this.hasFourWheeler,
     this.emergencyContactNo,
     this.emergencyContactName,
+    this.entryPersonMobileNo,
     this.facebookUrl,
     this.whatsappUrl,
     this.instagramUrl,
@@ -56,6 +57,11 @@ class Member {
     this.areaId,
     this.familyId,
     this.apiAge,
+    this.isHead,
+    this.relatedToMemberName,
+    this.relationTypeId,
+    this.gotraId,
+    this.motherGotraId,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -135,6 +141,7 @@ class Member {
       hasFourWheeler: json['hasFourWheeler'] as bool?,
       emergencyContactNo: getString('emergencyContactNo'),
       emergencyContactName: getString('emergencyContactName'),
+      entryPersonMobileNo: getString('entryPersonMobileNo'),
       facebookUrl: getString('facebookUrl'),
       whatsappUrl: getString('whatsappUrl'),
       instagramUrl: getString('instagramUrl'),
@@ -172,6 +179,11 @@ class Member {
       talukaId: json['talukaId'] as int?,
       areaId: json['areaId'] as int?,
       familyId: json['familyId'] as int?,
+      isHead: json['isHead'] as bool?,
+      relatedToMemberName: getString('relatedToMemberName'),
+      relationTypeId: json['relationTypeId'] as int?,
+      gotraId: json['gotraId'] as int?,
+      motherGotraId: json['motherGotraId'] as int?,
     );
   }
   final int memberId;
@@ -201,6 +213,7 @@ class Member {
   final bool? hasFourWheeler;
   final String? emergencyContactNo;
   final String? emergencyContactName;
+  final String? entryPersonMobileNo;
   final String? facebookUrl;
   final String? whatsappUrl;
   final String? instagramUrl;
@@ -228,6 +241,11 @@ class Member {
   final int? areaId;
   final int? familyId;
   final int? apiAge;
+  final bool? isHead;
+  final String? relatedToMemberName;
+  final int? relationTypeId;
+  final int? gotraId;
+  final int? motherGotraId;
 
   String get fullName =>
       '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();

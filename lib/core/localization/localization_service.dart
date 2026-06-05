@@ -72,6 +72,16 @@ class LocalizationService {
               .map(Language.fromJson)
               .toList(),
         );
+
+        if (languages.isNotEmpty) {
+          final currentCode = currentLocale.value.languageCode;
+          final isSupported = languages.any((lang) => lang.code.toLowerCase() == currentCode.toLowerCase());
+          
+          if (!isSupported) {
+            final fallback = languages.first;
+            await changeLocale(fallback.code.toLowerCase(), '');
+          }
+        }
       }
     } catch (_) {
     } finally {

@@ -240,17 +240,15 @@ class _LanguageDropdown extends GetView<LocalizationService> {
   Widget build(BuildContext context) {
 
     return Obx(() {
-      String currentCode = controller.currentLocale.value.languageCode.toUpperCase();
-      if (currentCode == 'GU') {
-        currentCode = 'GJ'; // Map standard 'gu' back to 'GJ' to match API data
-      }
+      final String currentCode = controller.currentLocale.value.languageCode.toUpperCase();
       final homeController = Get.find<HomeController>();
-      final List<String> codes = controller.languages.isNotEmpty
-          ? controller.languages.map((l) => l.code.toUpperCase()).toSet().toList()
-          : HomeController.localeMap.keys.toList();
-      if (!codes.contains(currentCode)) {
-        codes.add(currentCode);
-      }
+      
+      final List<String> codes = controller.languages
+          .map((l) => l.code.toUpperCase())
+          .toSet()
+          .toList();
+          
+      if (codes.isEmpty) return const SizedBox.shrink();
 
       final selectedCode = codes.contains(currentCode)
           ? currentCode

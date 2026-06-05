@@ -592,10 +592,10 @@ class MarriagePage extends GetView<MarriageController> {
     if (val == 'All') return LK.all.tr;
     if (val == 'Any') return LK.any.tr;
     if (val.contains('Lakh')) {
-      return val.replaceAll('Lakh', 'Lakh'.tr);
+      return val.replaceAll('Lakh', LK.lakh.tr);
     }
     if (val.contains('Crore')) {
-      return val.replaceAll('Crore', 'Crore'.tr);
+      return val.replaceAll('Crore', LK.crore.tr);
     }
     return val;
   }
