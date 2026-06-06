@@ -314,6 +314,7 @@ class MarriagePage extends GetView<MarriageController> {
                                 label: LK.ageRangeLabel.tr,
                                 fromRx: controller.selectedAgeFrom,
                                 toRx: controller.selectedAgeTo,
+                                errorRx: controller.ageError,
                                 staticItems: controller.ages,
                               ),
                               SizedBox(height: 12.h),
@@ -321,6 +322,7 @@ class MarriagePage extends GetView<MarriageController> {
                                 label: LK.heightRangeLabel.tr,
                                 fromRx: controller.selectedHeightFrom,
                                 toRx: controller.selectedHeightTo,
+                                errorRx: controller.heightError,
                                 staticItems: controller.heights,
                               ),
                               SizedBox(height: 12.h),
@@ -784,32 +786,50 @@ extension MarriagePageFilters on MarriagePage {
     required String label,
     required RxString fromRx,
     required RxString toRx,
+    required RxString errorRx,
     List<String>? staticItems,
     String Function(String)? mapper,
   }) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 80.w,
-          child: Text(label, style: AppTextStyles.bodySmall),
+        Row(
+          children: [
+            SizedBox(
+              width: 80.w,
+              child: Text(label, style: AppTextStyles.bodySmall),
+            ),
+            Expanded(
+              child: _buildDropdownField(
+                rxValue: fromRx,
+                staticItems: staticItems,
+                mapper: mapper,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Text(LK.to.tr),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: _buildDropdownField(
+                rxValue: toRx,
+                staticItems: staticItems,
+                mapper: mapper,
+              ),
+            ),
+          ],
         ),
-        Expanded(
-          child: _buildDropdownField(
-            rxValue: fromRx,
-            staticItems: staticItems,
-            mapper: mapper,
-          ),
-        ),
-        SizedBox(width: 8.w),
-        Text(LK.to.tr),
-        SizedBox(width: 8.w),
-        Expanded(
-          child: _buildDropdownField(
-            rxValue: toRx,
-            staticItems: staticItems,
-            mapper: mapper,
-          ),
-        ),
+        Obx(() {
+          if (errorRx.value.isNotEmpty) {
+            return Padding(
+              padding: EdgeInsets.only(top: 4),
+              child: Text(
+                errorRx.value,
+                style: TextStyle(color: Colors.red, fontSize: 12.sp),
+              ),
+            );
+          }
+          return SizedBox.shrink();
+        }),
       ],
     );
   }

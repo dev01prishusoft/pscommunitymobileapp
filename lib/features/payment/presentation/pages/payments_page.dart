@@ -37,9 +37,11 @@ class PaymentsPage extends GetView<PaymentController> {
         () => AppStateView(
           state: controller.dashboardState.value,
           onRetry: controller.loadDashboard,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
+          child: SafeArea(
+            bottom: true,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -101,8 +103,9 @@ class PaymentsPage extends GetView<PaymentController> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildQuickActionButton({
     required String label,

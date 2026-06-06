@@ -114,7 +114,15 @@ class PaymentRepositoryImpl implements PaymentRepository {
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
-      if (response.isFailure) throw response.failureOrNull!;
+      
+      AppLogger.i('CreateOrder Response Status: ${response.isFailure ? "Failure" : "Success"}');
+      
+      if (response.isFailure) {
+        AppLogger.e('CreateOrder Failed - Message: ${response.failureOrNull?.message}');
+        throw response.failureOrNull!;
+      }
+      
+      AppLogger.i('CreateOrder Success Data: ${response.dataOrNull?.data}');
       return response.dataOrNull!.data!;
     } catch (e, stack) {
       AppLogger.e('CreateOrder Error', e, stack);

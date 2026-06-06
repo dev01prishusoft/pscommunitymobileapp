@@ -68,8 +68,8 @@ class AppFormDatePicker extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: AppTextStyles.titleSmall.copyWith(
-              color: AppColors.secondary,
+            style: AppTextStyles.labelMedium.copyWith(
+              color: AppColors.mutedForeground,
             ),
             children: [
               if (isRequired)

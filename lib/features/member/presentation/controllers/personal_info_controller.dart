@@ -147,6 +147,7 @@ class PersonalInfoController extends GetxController {
     gender.value = m.genderName ?? '';
     maritalStatus.value = m.maritalStatusName ?? '';
     bloodGroup.value = m.bloodGroupName ?? '';
+    sign.value = m.signName ?? '';
     motherFatherName.value = m.motherFatherName ?? '';
     gotra.value = m.gotraName ?? '';
     openToMarriage.value = m.isLookingforMarriage ?? false;

@@ -62,6 +62,8 @@ class Member {
     this.relationTypeId,
     this.gotraId,
     this.motherGotraId,
+    this.signId,
+    this.signName,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -184,6 +186,8 @@ class Member {
       relationTypeId: json['relationTypeId'] as int?,
       gotraId: json['gotraId'] as int?,
       motherGotraId: json['motherGotraId'] as int?,
+      signId: (json['signId'] ?? json['SignId']) as int?,
+      signName: getString('signName', 'SignName'),
     );
   }
   final int memberId;
@@ -246,6 +250,8 @@ class Member {
   final int? relationTypeId;
   final int? gotraId;
   final int? motherGotraId;
+  final int? signId;
+  final String? signName;
 
   String get fullName =>
       '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();

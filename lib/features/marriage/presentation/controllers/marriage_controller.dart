@@ -57,6 +57,8 @@ class MarriageController extends GetxController {
   final TextEditingController incomeFromCtrl = TextEditingController();
   final TextEditingController incomeToCtrl = TextEditingController();
   final RxString incomeError = ''.obs;
+  final RxString ageError = ''.obs;
+  final RxString heightError = ''.obs;
 
   final TextEditingController searchTextController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -131,8 +133,15 @@ class MarriageController extends GetxController {
     });
 
     everAll(filterObservables, (_) {
+      _validateAge();
+      _validateHeight();
+      _validateIncome();
       _debounceTimer?.cancel();
-      _debounceTimer = Timer(Duration(milliseconds: 300), () => applyFilters());
+      _debounceTimer = Timer(Duration(milliseconds: 300), () {
+        if (ageError.value.isEmpty && heightError.value.isEmpty && incomeError.value.isEmpty) {
+          applyFilters();
+        }
+      });
     });
     
     scrollController.addListener(() {
@@ -154,6 +163,26 @@ class MarriageController extends GetxController {
       incomeError.value = LK.fromGreaterToError.tr;
     } else {
       incomeError.value = '';
+    }
+  }
+
+  void _validateAge() {
+    final fromVal = int.tryParse(selectedAgeFrom.value) ?? 0;
+    final toVal = int.tryParse(selectedAgeTo.value) ?? 1000;
+    if (fromVal > toVal) {
+      ageError.value = LK.fromGreaterToError.tr;
+    } else {
+      ageError.value = '';
+    }
+  }
+
+  void _validateHeight() {
+    final fromVal = double.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 0;
+    final toVal = double.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 1000;
+    if (fromVal > toVal) {
+      heightError.value = LK.fromGreaterToError.tr;
+    } else {
+      heightError.value = '';
     }
   }
 
@@ -382,13 +411,18 @@ class MarriageController extends GetxController {
     incomeFromCtrl.clear();
     incomeToCtrl.clear();
     incomeError.value = '';
+    ageError.value = '';
+    heightError.value = '';
     excludeSameGotra.value = false;
   }
 
   void closeAdvancedFilters() {
-    if (incomeError.value.isNotEmpty) {
+    if (incomeError.value.isNotEmpty || ageError.value.isNotEmpty || heightError.value.isNotEmpty) {
+      final errorMsg = [incomeError.value, ageError.value, heightError.value]
+          .where((e) => e.isNotEmpty)
+          .first;
       Get.rawSnackbar(
-        message: incomeError.value,
+        message: errorMsg,
         backgroundColor: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
       );

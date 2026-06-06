@@ -256,7 +256,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addDropdown('BloodGroupId', personalInfo.bloodGroup, personalInfo.bloodGroupIdMap, m.bloodGroupName);
     addDropdown('GotraId', personalInfo.gotra, personalInfo.gotraIdMap, m.gotraName, m.gotraId);
     addDropdown('MotherGotraId', personalInfo.mothersGotra, personalInfo.mothersGotraIdMap, null, m.motherGotraId);
-    addDropdown('signId', personalInfo.sign, personalInfo.signIdMap, null, null);
+    addDropdown('signId', personalInfo.sign, personalInfo.signIdMap, m.signName, m.signId);
     addDropdown('RelationTypeId', personalInfo.relation, personalInfo.relationIdMap, m.relatedToMemberName, m.relationTypeId);
     
     addIfChanged('MotherFatherName', personalInfo.motherFatherName.value, m.motherFatherName ?? '');
@@ -406,6 +406,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(personalInfo.sign, personalInfo.signList);
     
     if (_currentMember != null) {
+      if (_currentMember!.signId != null) {
+        final id = _currentMember!.signId;
+        for (final entry in personalInfo.signIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.sign.value = entry.key;
+            break;
+          }
+        }
+      }
       if (_currentMember!.gotraId != null) {
         final id = _currentMember!.gotraId;
         for (final entry in personalInfo.gotraIdMap.entries) {

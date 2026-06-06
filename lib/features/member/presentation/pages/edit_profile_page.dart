@@ -94,7 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: Column(
                   children: [
               _buildProfilePhotoSection(),
-              _buildSection(LK.personal.tr, Icons.person_outline, [
+              _buildSection(LK.personal.tr, Icons.person_outline, initiallyExpanded: true, [
                 AppFormTextField(
                   controller: controller.memberNoCtrl,
                   label: LK.memberNo.tr,
@@ -456,7 +456,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildSection(String title, IconData icon, List<Widget> children, {bool initiallyExpanded = false}) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s),
       decoration: BoxDecoration(
@@ -464,33 +464,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: AppSpacing.pL,
-            child: Row(
-              children: [
-                Icon(icon, size: 20, color: AppColors.primary),
-                AppSpacing.hM,
-                Text(
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
+          tilePadding: EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: 8),
+          childrenPadding: EdgeInsets.zero,
+          title: Row(
+            children: [
+              Icon(icon, size: 20, color: AppColors.primary),
+              AppSpacing.hM,
+              Expanded(
+                child: Text(
                   title,
                   style: AppTextStyles.headlineSmall.copyWith(
                     color: AppColors.secondary,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Divider(height: 1),
-          Padding(
-            padding: AppSpacing.pL,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
+          children: [
+            Divider(height: 1),
+            Padding(
+              padding: AppSpacing.pL,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

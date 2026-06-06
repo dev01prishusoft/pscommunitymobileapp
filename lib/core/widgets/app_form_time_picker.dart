@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
-class AppFormTimePicker extends StatelessWidget {
+class AppFormTimePicker extends StatefulWidget {
   const AppFormTimePicker({
     super.key,
     required this.controller,
@@ -14,19 +14,87 @@ class AppFormTimePicker extends StatelessWidget {
     this.isRequired = false,
     this.validator,
   });
+
   final TextEditingController controller;
   final String label;
   final String? hint;
   final bool isRequired;
   final String? Function(String?)? validator;
 
+  @override
+  State<AppFormTimePicker> createState() => _AppFormTimePickerState();
+}
+
+class _AppFormTimePickerState extends State<AppFormTimePicker> {
+  late final TextEditingController _displayController;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayController = TextEditingController();
+    _updateDisplay();
+    widget.controller.addListener(_updateDisplay);
+  }
+
+  @override
+  void didUpdateWidget(AppFormTimePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_updateDisplay);
+      widget.controller.addListener(_updateDisplay);
+      _updateDisplay();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_updateDisplay);
+    _displayController.dispose();
+    super.dispose();
+  }
+
+  void _updateDisplay() {
+    final text = widget.controller.text;
+    if (text.isEmpty) {
+      if (_displayController.text.isNotEmpty) _displayController.text = '';
+      return;
+    }
+    
+    // Parse 24h format from the main controller
+    try {
+      final parts = text.split(':');
+      if (parts.length >= 2) {
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        final time = TimeOfDay(hour: hour, minute: minute);
+        
+        final displayHour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+        final displayMinute = time.minute.toString().padLeft(2, '0');
+        final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+        final newDisplayText = '$displayHour:$displayMinute $period';
+        
+        if (_displayController.text != newDisplayText) {
+          _displayController.text = newDisplayText;
+        }
+      }
+    } catch (_) {
+      // If parsing fails (maybe it's already AM/PM somehow), just use it
+      if (_displayController.text != text) {
+        _displayController.text = text;
+      }
+    }
+  }
+
   Future<void> _selectTime(BuildContext context) async {
     TimeOfDay initialTime = TimeOfDay.now();
-    if (controller.text.isNotEmpty) {
+    if (widget.controller.text.isNotEmpty) {
       try {
-        final parts = controller.text.split(':');
+        final parts = widget.controller.text.split(':');
         if (parts.length >= 2) {
-          initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+          initialTime = TimeOfDay(
+            hour: int.parse(parts[0]),
+            minute: int.parse(parts[1]),
+          );
         }
       } catch (_) {}
     }
@@ -43,14 +111,20 @@ class AppFormTimePicker extends StatelessWidget {
               onSurface: AppColors.foreground,
             ),
           ),
-          child: child!,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+            child: child!,
+          ),
         );
       },
     );
+    
     if (picked != null) {
+      // Save 24h format to the underlying controller
       final String hour = picked.hour.toString().padLeft(2, '0');
       final String minute = picked.minute.toString().padLeft(2, '0');
-      controller.text = '$hour:$minute';
+      widget.controller.text = '$hour:$minute';
+      // _updateDisplay will be called automatically via the listener
     }
   }
 
@@ -61,12 +135,12 @@ class AppFormTimePicker extends StatelessWidget {
       children: [
         RichText(
           text: TextSpan(
-            text: label,
-            style: AppTextStyles.titleSmall.copyWith(
-              color: AppColors.secondary,
+            text: widget.label,
+            style: AppTextStyles.labelMedium.copyWith(
+              color: AppColors.mutedForeground,
             ),
             children: [
-              if (isRequired)
+              if (widget.isRequired)
                 TextSpan(
                   text: ' *',
                   style: AppTextStyles.bodyMedium.copyWith(
@@ -78,12 +152,12 @@ class AppFormTimePicker extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         TextFormField(
-          controller: controller,
+          controller: _displayController,
           readOnly: true,
           onTap: () => _selectTime(context),
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
-            hintText: hint,
+            hintText: widget.hint,
             hintStyle: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.mutedForeground,
             ),
@@ -117,11 +191,11 @@ class AppFormTimePicker extends StatelessWidget {
             ),
           ),
           validator: (value) {
-            if (isRequired && (value == null || value.trim().isEmpty)) {
+            if (widget.isRequired && (value == null || value.trim().isEmpty)) {
               return LK.fieldRequired.tr;
             }
-            if (validator != null) {
-              return validator!(value);
+            if (widget.validator != null) {
+              return widget.validator!(widget.controller.text);
             }
             return null;
           },
@@ -130,3 +204,4 @@ class AppFormTimePicker extends StatelessWidget {
     );
   }
 }
+
