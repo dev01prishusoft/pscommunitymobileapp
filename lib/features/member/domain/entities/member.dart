@@ -116,8 +116,8 @@ class Member {
       dateOfBirth: getString('dateOfBirth'),
       dateOfBirthTime: getString('dateOfBirthTime'),
       apiAge: fallbackAge,
-      weight: (json['weight'] as num?)?.toInt(),
-      height: (json['height'] as num?)?.toInt(),
+      weight: (json['weight'] as num?)?.toDouble(),
+      height: (json['height'] as num?)?.toDouble(),
       mobileNo: getString('mobileNo'),
       secondaryMobile: getString('secondaryMobile'),
       emailAddress: getString('emailAddress'),
@@ -127,7 +127,7 @@ class Member {
         'maritalStatus',
         'marritalStatus',
       ),
-      bloodGroupName: getString('bloodGroupName'),
+      bloodGroupName: getString('bloodGroupName', 'bloodGroup', 'BloodGroup'),
       isLookingforMarriage:
           (json['isLookingforMarriage'] ??
                   json['LookingforMarriage'] ??
@@ -198,8 +198,8 @@ class Member {
   final String? fullNameSearchText;
   final String? dateOfBirth;
   final String? dateOfBirthTime;
-  final int? weight;
-  final int? height;
+  final double? weight;
+  final double? height;
   final String? mobileNo;
   final String? secondaryMobile;
   final String? emailAddress;

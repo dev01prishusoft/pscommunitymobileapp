@@ -22,9 +22,12 @@ class WorkInfoController extends GetxController {
   final workStateIdMap = <String, int>{};
   final workDistrictIdMap = <String, int>{};
   final workTalukaIdMap = <String, int>{};
+  final workAreaIdMap = <String, int>{};
 
+  final globalStateIdMap = <String, int>{};
   final globalDistrictIdMap = <String, int>{};
   final globalTalukaIdMap = <String, int>{};
+  final globalAreaIdMap = <String, int>{};
 
   final addressDistrictCache = <String, RxList<String>>{};
   final addressTalukaCache = <String, RxList<String>>{};
@@ -175,9 +178,10 @@ class WorkInfoController extends GetxController {
   Future<void> fetchAreas() async {
     final talukaId = workTalukaIdMap[workTaluka.value];
     if (talukaId != null) {
-      await fetchDropdown('/Area/dropdown?talukaId=$talukaId', workAreaList, []);
+      await fetchDropdown('/Area/dropdown?talukaId=$talukaId', workAreaList, [], idMap: workAreaIdMap);
     } else {
       workAreaList.clear();
+      workAreaIdMap.clear();
       workArea.value = '';
     }
   }
@@ -230,7 +234,7 @@ class WorkInfoController extends GetxController {
     addressAreaCache[talukaName] = list;
     final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
     if (talukaId != null) {
-      fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, []);
+      fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap);
     }
     return list;
   }

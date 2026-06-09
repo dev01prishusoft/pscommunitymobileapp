@@ -21,6 +21,7 @@ class AppFormTextField extends StatelessWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.onChanged,
+    this.textAlign = TextAlign.start,
   });
   final TextEditingController? controller;
   final String? initialValue;
@@ -35,6 +36,7 @@ class AppFormTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final void Function(String)? onChanged;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,7 @@ class AppFormTextField extends StatelessWidget {
           maxLines: maxLines,
           obscureText: obscureText,
           onChanged: onChanged,
+          textAlign: textAlign,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           style: AppTextStyles.bodyMedium.copyWith(
             color: readOnly ? AppColors.mutedForeground : AppColors.foreground,

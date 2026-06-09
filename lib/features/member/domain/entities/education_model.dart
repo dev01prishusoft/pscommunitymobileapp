@@ -1,6 +1,7 @@
 class EducationModel {
   EducationModel({
     this.qualification = '',
+    this.qualificationId,
     this.institute = '',
     this.passingYear = '',
     this.percentage = '',
@@ -12,6 +13,7 @@ class EducationModel {
   factory EducationModel.fromJson(Map<String, dynamic> json) {
     return EducationModel(
       qualification: json['qualification'] as String? ?? '',
+      qualificationId: json['qualificationId'] as int?,
       institute: json['institute'] as String? ?? '',
       passingYear: json['passingYear'] as String? ?? '',
       percentage: json['percentage'] as String? ?? '',
@@ -21,6 +23,7 @@ class EducationModel {
     );
   }
   String qualification;
+  int? qualificationId;
   String institute;
   String passingYear;
   String percentage;
@@ -30,6 +33,7 @@ class EducationModel {
 
   EducationModel copyWith({
     String? qualification,
+    int? qualificationId,
     String? institute,
     String? passingYear,
     String? percentage,
@@ -39,6 +43,7 @@ class EducationModel {
   }) {
     return EducationModel(
       qualification: qualification ?? this.qualification,
+      qualificationId: qualificationId ?? this.qualificationId,
       institute: institute ?? this.institute,
       passingYear: passingYear ?? this.passingYear,
       percentage: percentage ?? this.percentage,
@@ -51,6 +56,7 @@ class EducationModel {
   Map<String, dynamic> toJson() {
     return {
       'qualification': qualification,
+      'qualificationId': qualificationId,
       'institute': institute,
       'passingYear': passingYear,
       'percentage': percentage,

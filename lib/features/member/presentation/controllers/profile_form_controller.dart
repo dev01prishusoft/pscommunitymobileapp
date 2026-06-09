@@ -328,6 +328,125 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
     isMemberLoaded = true;
     _checkAndTakeSnapshot();
+    
+    // Asynchronously fetch addresses and education for this member
+    loadAddresses(m.memberId);
+    loadEducation(m.memberId);
+  }
+
+  Future<void> loadEducation(int memberId) async {
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get('/api/v1/MemberEducation/member/$memberId');
+      if (response.data != null && response.data['succeeded'] == true) {
+        final data = response.data['data'] as List<dynamic>? ?? [];
+        final newEducation = data.map((e) {
+          final map = e as Map<String, dynamic>;
+          final qualName = map['educationalQualificationName']?.toString() ?? '';
+
+          if (qualName.isNotEmpty) {
+            final qualId = map['educationalQualificationId'] as int?;
+            if (qualId != null) {
+              contactInfo.educationIdMap[qualName] = qualId;
+            }
+            if (!contactInfo.qualificationList.contains(qualName)) {
+              contactInfo.qualificationList.add(qualName);
+            }
+          }
+
+          return EducationModel(
+            qualification: qualName,
+            qualificationId: map['educationalQualificationId'] as int?,
+            institute: map['institutionName']?.toString() ?? '',
+            passingYear: map['yearOfPassing']?.toString() ?? '',
+            percentage: map['percentage']?.toString() ?? '',
+            grade: map['grade']?.toString() ?? '',
+            description: map['description']?.toString() ?? '',
+            isHighest: map['isHighestQualification'] == true,
+          );
+        }).toList();
+
+        if (newEducation.isNotEmpty) {
+          contactInfo.educationList.value = newEducation;
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  Future<void> loadAddresses(int memberId) async {
+    try {
+      final ApiClient apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get('/api/v1/member-address/member/$memberId');
+      if (response.data != null && response.data['succeeded'] == true) {
+        final data = response.data['data'] as List<dynamic>? ?? [];
+        final newAddresses = data.map((e) {
+          final map = e as Map<String, dynamic>;
+          final stateName = map['stateName']?.toString() ?? '';
+          final districtName = map['districtName']?.toString() ?? '';
+          final talukaName = map['talukaName']?.toString() ?? '';
+          final areaName = map['areaName']?.toString() ?? '';
+
+          if (stateName.isNotEmpty) {
+            final stateId = map['stateId'] as int?;
+            if (stateId != null) workInfo.globalStateIdMap[stateName] = stateId;
+            if (!workInfo.workStateList.contains(stateName)) {
+              workInfo.workStateList.add(stateName);
+            }
+
+            if (districtName.isNotEmpty) {
+              final districtId = map['districtId'] as int?;
+              if (districtId != null) workInfo.globalDistrictIdMap[districtName] = districtId;
+              workInfo.addressDistrictCache.putIfAbsent(stateName, () => <String>[].obs);
+              if (!workInfo.addressDistrictCache[stateName]!.contains(districtName)) {
+                workInfo.addressDistrictCache[stateName]!.add(districtName);
+              }
+
+              if (talukaName.isNotEmpty) {
+                final talukaId = map['talukaId'] as int?;
+                if (talukaId != null) workInfo.globalTalukaIdMap[talukaName] = talukaId;
+                workInfo.addressTalukaCache.putIfAbsent(districtName, () => <String>[].obs);
+                if (!workInfo.addressTalukaCache[districtName]!.contains(talukaName)) {
+                  workInfo.addressTalukaCache[districtName]!.add(talukaName);
+                }
+
+                if (areaName.isNotEmpty) {
+                  final areaId = map['areaId'] as int?;
+                  if (areaId != null) workInfo.globalAreaIdMap[areaName] = areaId;
+                  workInfo.addressAreaCache.putIfAbsent(talukaName, () => <String>[].obs);
+                  if (!workInfo.addressAreaCache[talukaName]!.contains(areaName)) {
+                    workInfo.addressAreaCache[talukaName]!.add(areaName);
+                  }
+                }
+              }
+            }
+          }
+
+          return AddressModel(
+            type: map['addressTypeName']?.toString() ?? '',
+            state: stateName,
+            district: districtName,
+            taluka: talukaName,
+            area: areaName,
+            stateId: map['stateId'] as int?,
+            districtId: map['districtId'] as int?,
+            talukaId: map['talukaId'] as int?,
+            areaId: map['areaId'] as int?,
+            pincode: map['pincode']?.toString() ?? '',
+            line1: map['addressLine1']?.toString() ?? '',
+            line2: map['addressLine2']?.toString() ?? '',
+            landmark: map['landmark']?.toString() ?? '',
+            isPrimary: map['isPrimary'] == true,
+          );
+        }).toList();
+        if (newAddresses.isNotEmpty) {
+          contactInfo.addresses.value = newAddresses;
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
   }
 
   void markAsAddMode() {
@@ -346,7 +465,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, personalInfo.defaultMaritalStatuses, idMap: personalInfo.maritalStatusIdMap),
       workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, personalInfo.defaultBloodGroups, idMap: personalInfo.bloodGroupIdMap),
       workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, personalInfo.defaultRelations, idMap: personalInfo.relationIdMap),
-      workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, contactInfo.defaultAddressTypes),
+      workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, contactInfo.defaultAddressTypes, idMap: contactInfo.addressTypeIdMap),
       workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, contactInfo.defaultQualifications),
       workInfo.fetchDropdown('/occupation-type/dropdown', workInfo.occupationTypeList, workInfo.defaultOccupationTypes, idMap: workInfo.occupationTypeIdMap),
       workInfo.fetchDropdown('/JobPosition/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
@@ -525,7 +644,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['DateOfBirth'] = formatDob(personalInfo.dob.value);
             formDataMap['DateOfBirthTime'] = personalInfo.tob.value;
             formDataMap['Weight'] = double.tryParse(personalInfo.weightCtrl.text);
-            formDataMap['Height'] = double.tryParse(personalInfo.heightCtrl.text);
+            formDataMap['Height'] = double.tryParse(personalInfo.heightCtrl.text) ?? 999.99;
             formDataMap['GenderId'] = getId(personalInfo.gender.value, personalInfo.genderIdMap);
             formDataMap['MaritalStatusId'] = getId(personalInfo.maritalStatus.value, personalInfo.maritalStatusIdMap);
             formDataMap['BloodGroupId'] = getId(personalInfo.bloodGroup.value, personalInfo.bloodGroupIdMap);
@@ -567,6 +686,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['OccupationAddressLine2'] = workInfo.workAddressLine2Ctrl.text;
             formDataMap['OccupationLandmark'] = workInfo.workLandmarkCtrl.text;
             formDataMap['OccupationPincode'] = workInfo.workPincodeCtrl.text;
+
+            if (contactInfo.addresses.isNotEmpty) {
+              final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
+              formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? 0;
+              formDataMap['AddressLine1'] = addr.line1;
+              formDataMap['AddressLine2'] = addr.line2;
+              formDataMap['Landmark'] = addr.landmark;
+              formDataMap['Pincode'] = addr.pincode;
+              formDataMap['AreaId'] = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
+              formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
+            }
 
             formDataMap['IsHead'] = false;
             formDataMap['IsDemised'] = false;

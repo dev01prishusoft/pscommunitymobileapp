@@ -9,6 +9,8 @@ class ContactController extends GetxController {
   final defaultQualifications = ['Graduate', 'HSC', 'SSC', 'Post Graduate'];
   final addressTypeList = <String>[].obs;
   final qualificationList = <String>[].obs;
+  final addressTypeIdMap = <String, int>{};
+  final educationIdMap = <String, int>{};
 
   final mobileNo = ''.obs;
   final mobileVerified = false.obs;

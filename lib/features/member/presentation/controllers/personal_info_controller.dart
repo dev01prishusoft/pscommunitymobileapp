@@ -142,8 +142,8 @@ class PersonalInfoController extends GetxController {
     lastName.value = m.lastName;
     dob.value = formatDob(m.dateOfBirth);
     tob.value = m.dateOfBirthTime ?? '';
-    weight.value = m.weight?.toString() ?? '';
-    height.value = m.height?.toString() ?? '';
+    weight.value = m.weight?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
+    height.value = m.height?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
     gender.value = m.genderName ?? '';
     maritalStatus.value = m.maritalStatusName ?? '';
     bloodGroup.value = m.bloodGroupName ?? '';

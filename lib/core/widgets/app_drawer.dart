@@ -59,7 +59,7 @@ class AppDrawer extends StatelessWidget {
             accountName: Obx(
               () => Text(
                 samajController.samaj.value?.name ?? LK.samajName.tr,
-                style: AppTextStyles.titleLarge,
+                style: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
               ),
             ),
             accountEmail: Obx(
@@ -67,7 +67,7 @@ class AppDrawer extends StatelessWidget {
                 samajController.samaj.value?.descriptionEnglish ?? '',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.bodySmall,
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
               ),
             ),
           ),

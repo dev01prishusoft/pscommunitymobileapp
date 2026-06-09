@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 
 class AddFamilyMemberPage extends StatefulWidget {
   const AddFamilyMemberPage({super.key});
@@ -62,19 +63,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             children: [
               _buildProfilePhotoSection(),
               _buildSection(LK.personal.tr, Icons.person_outline, [
-                AppFormTextField(
-                  controller: controller.memberNoCtrl,
-                  label: LK.memberNo.tr,
-                  prefixIcon: Icon(Icons.numbers),
-                  readOnly: true,
-                ),
-                SizedBox(height: 12.h),
+
                 AppFormTextField(
                   controller: controller.firstNameCtrl,
                   label: LK.firstName.tr,
                   isRequired: true,
                   prefixIcon: Icon(Icons.person),
                 ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.middleNameCtrl,
@@ -88,6 +84,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: Icon(Icons.person),
                   ),
                 ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.firstNameEnCtrl,
@@ -102,16 +99,17 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: Icon(Icons.language),
                   ),
                 ),
-                AppFormDatePicker(
-                  controller: controller.dobCtrl,
-                  label: LK.birthDate.tr,
+                AppSpacing.vM,
+                _buildFieldPair(
+                  AppFormDatePicker(
+                    controller: controller.dobCtrl,
+                    label: LK.birthDate.tr,
+                  ),
+                  AppFormTimePicker(
+                    controller: controller.tobCtrl,
+                    label: LK.timeOfBirth.tr,
+                  ),
                 ),
-                SizedBox(height: 12.h),
-                AppFormTimePicker(
-                  controller: controller.tobCtrl,
-                  label: LK.timeOfBirth.tr,
-                ),
-                SizedBox(height: 12.h),
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
@@ -337,7 +335,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       ),
                     ),
                   ),
-                  _buildCheckbox(LK.matrimonial.tr, controller.openToMarriage),
+                  _buildCheckbox(LK.lookingForMarriage.tr, controller.openToMarriage),
                 ],
               ),
 
@@ -383,7 +381,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
         decoration: BoxDecoration(
           color: AppColors.white,
           boxShadow: [
@@ -394,11 +392,16 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
           ],
         ),
-        child: Obx(
-          () => AppPrimaryButton(
-            text: LK.saveChanges.tr,
-            onPressed: () => controller.submitForm(successMessage: LK.memberAddedSuccessfully.tr),
-            isLoading: controller.isFormLoading,
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 20.0),
+            child: Obx(
+              () => AppPrimaryButton(
+                text: LK.saveChanges.tr,
+                onPressed: () => controller.submitForm(successMessage: LK.memberAddedSuccessfully.tr),
+                isLoading: controller.isFormLoading,
+              ),
+            ),
           ),
         ),
       ),
@@ -550,6 +553,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             }
             return SizedBox.shrink();
           }),
+          SizedBox(height: 16.h),
+          AppFormTextField(
+            controller: controller.memberNoCtrl,
+            label: LK.memberNo.tr,
+            prefixIcon: Icon(Icons.numbers),
+            readOnly: true,
+          ),
         ],
       ),
     );

@@ -66,6 +66,7 @@ class DI {
           onAuthFailure: authState.logoutAndRedirect,
         );
         Get.put(apiClient, permanent: true);
+        unawaited(localization.fetchLanguageResources(localization.currentLocale.value.languageCode));
         final authRepository = AuthRepositoryImpl(apiClient, tokenManager);
         final loginUseCase = LoginUseCase(authRepository);
         Get.put(loginUseCase, permanent: true);

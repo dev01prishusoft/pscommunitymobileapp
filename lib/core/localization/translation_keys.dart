@@ -862,7 +862,7 @@ class LK {
     'Completed',
     'Please fill all required fields correctly.',
     'Your account has been deleted successfully.',
-    'Unknown error occurred.',
+    unknownError,
     addressTypeRequired,
     stateRequired,
     districtRequired,

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
@@ -89,11 +91,43 @@ class LocalizationService {
     }
   }
 
+  Future<void> fetchLanguageResources(String langCode) async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(ApiEndpoints.languageResources(langCode));
+      final json = response.data as Map<String, dynamic>?;
+      if (json != null && json['succeeded'] == true) {
+        final data = json['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          final remoteKeys = data.map((key, value) => MapEntry(key, value.toString()));
+          final localeKey = keys.keys.firstWhere(
+            (k) => k.startsWith(langCode), 
+            orElse: () => '${langCode}_US'
+          );
+          
+          if (!keys.containsKey(localeKey)) {
+             keys[localeKey] = {};
+          }
+          keys[localeKey]!.addAll(remoteKeys);
+          
+          Get.appendTranslations({
+            localeKey: remoteKeys
+          });
+          
+          AppLogger.d('Appended ${remoteKeys.length} translations for $langCode');
+        }
+      }
+    } catch (e, stack) {
+      AppLogger.e('Failed to fetch remote language resources for $langCode', e, stack);
+    }
+  }
+
   Future<void> changeLocale(String langCode, String countryCode) async {
     final locale = Locale(langCode, countryCode);
     currentLocale.value = locale;
     await Get.updateLocale(locale);
     await _storage.write(_localeKey, '${langCode}_$countryCode');
+    unawaited(fetchLanguageResources(langCode));
   }
 
   void clearLanguages() {
