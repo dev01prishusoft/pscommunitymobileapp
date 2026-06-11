@@ -68,12 +68,16 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               hint: LK.searchOccupation.tr,
               icon: Icons.search,
               onChanged: _controller.search,
-              suffixIcon: IconButton(
-                icon: Icon(Icons.close, size: 20),
-                onPressed: () {
-                  _searchController.clear();
-                  _controller.clearSearch();
-                },
+              suffixIcon: Obx(
+                () => _controller.searchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.close, size: 20),
+                        onPressed: () {
+                          _searchController.clear();
+                          _controller.clearSearch();
+                        },
+                      )
+                    : SizedBox.shrink(),
               ),
             ),
           ),
@@ -180,7 +184,10 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
     return InkWell(
       onTap: () => Get.toNamed<void>(
         AppRouter.occupationProfile,
-        arguments: {'occupationId': occ.id},
+        arguments: {
+          'occupationId': occ.id,
+          'occupationName': occ.name,
+        },
       ),
       child: Container(
         decoration: BoxDecoration(

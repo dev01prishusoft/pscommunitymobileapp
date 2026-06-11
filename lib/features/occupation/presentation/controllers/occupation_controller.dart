@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class OccupationController extends GetxController {
   OccupationController(this._repository);
@@ -16,8 +17,14 @@ class OccupationController extends GetxController {
   final RxList<OccupationItem> filteredOccupations = <OccupationItem>[].obs;
   final RxList<DropdownItem> occupationTypes = <DropdownItem>[].obs;
   final RxString searchQuery = ''.obs;
-  final Rxn<OccupationItem> selectedOccupation = Rxn<OccupationItem>();
   final Rxn<DropdownItem> selectedOccupationType = Rxn<DropdownItem>();
+
+  final Rx<AppState> membersState = AppState.loading.obs;
+  final RxList<Member> occupationMembers = <Member>[].obs;
+  int _membersPage = 1;
+  final int _membersPageSize = 20;
+  final RxBool hasMoreMembers = true.obs;
+  final RxBool isNextMembersPageLoading = false.obs;
 
   // Pagination
   int _currentPage = 1;
@@ -63,15 +70,39 @@ class OccupationController extends GetxController {
     loadOccupations(occupationTypeId: type?.id);
   }
 
-  Future<void> loadOccupationDetails(int id) async {
-    detailsState.value = AppState.loading;
+  Future<void> loadOccupationMembers(int occupationId, {bool refresh = true}) async {
+    if (refresh) {
+      _membersPage = 1;
+      hasMoreMembers.value = true;
+      membersState.value = AppState.loading;
+      occupationMembers.clear();
+    } else {
+      if (!hasMoreMembers.value || isNextMembersPageLoading.value) return;
+      isNextMembersPageLoading.value = true;
+    }
+
     try {
-      final details = await _repository.getOccupationDetails(id);
-      selectedOccupation.value = details;
-      detailsState.value = AppState.data;
+      final results = await _repository.getOccupationMembers(
+        occupationId: occupationId,
+        pageNumber: _membersPage,
+        pageSize: _membersPageSize,
+      );
+
+      if (results.isEmpty) {
+        hasMoreMembers.value = false;
+      } else {
+        occupationMembers.addAll(results);
+        _membersPage++;
+        if (results.length < _membersPageSize) {
+          hasMoreMembers.value = false;
+        }
+      }
+      membersState.value = occupationMembers.isEmpty ? AppState.empty : AppState.data;
     } catch (e, stack) {
-      AppLogger.e('Failed to load occupation details for id: $id', e, stack);
-      detailsState.value = AppState.error;
+      AppLogger.e('Failed to load occupation members', e, stack);
+      if (refresh) membersState.value = AppState.error;
+    } finally {
+      isNextMembersPageLoading.value = false;
     }
   }
 

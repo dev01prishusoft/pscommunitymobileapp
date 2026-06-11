@@ -5,8 +5,8 @@ void main() {
   final enFile = File('assets/locales/en_US.json');
   final guFile = File('assets/locales/gu_IN.json');
   
-  var enMap = jsonDecode(enFile.readAsStringSync());
-  var guMap = jsonDecode(guFile.readAsStringSync());
+  final enMap = jsonDecode(enFile.readAsStringSync());
+  final guMap = jsonDecode(guFile.readAsStringSync());
   
   // Add to English
   enMap['Edit profile request sent'] = 'Edit profile request sent';
@@ -16,6 +16,6 @@ void main() {
   
   enFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(enMap));
   guFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(guMap));
-  
+    // ignore: avoid_print
   print('Translations updated.');
 }

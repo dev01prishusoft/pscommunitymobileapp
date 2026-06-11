@@ -511,6 +511,7 @@ class MarriageController extends GetxController {
                 return '';
               })
               .where((s) => s.isNotEmpty)
+              .toSet()
               .toList();
 
           if (items.isNotEmpty) {

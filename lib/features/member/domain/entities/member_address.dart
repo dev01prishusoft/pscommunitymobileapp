@@ -59,4 +59,36 @@ class MemberAddress {
     ].where((e) => e.isNotEmpty).toList();
     return parts.join(', ');
   }
+
+  MemberAddress copyWith({
+    int? memberAddressId,
+    int? memberId,
+    int? addressTypeId,
+    String? addressTypeName,
+    String? stateName,
+    String? districtName,
+    String? talukaName,
+    String? areaName,
+    String? addressLine1,
+    String? addressLine2,
+    String? landmark,
+    String? pincode,
+    bool? isPrimary,
+  }) {
+    return MemberAddress(
+      memberAddressId: memberAddressId ?? this.memberAddressId,
+      memberId: memberId ?? this.memberId,
+      addressTypeId: addressTypeId ?? this.addressTypeId,
+      addressTypeName: addressTypeName ?? this.addressTypeName,
+      stateName: stateName ?? this.stateName,
+      districtName: districtName ?? this.districtName,
+      talukaName: talukaName ?? this.talukaName,
+      areaName: areaName ?? this.areaName,
+      addressLine1: addressLine1 ?? this.addressLine1,
+      addressLine2: addressLine2 ?? this.addressLine2,
+      landmark: landmark ?? this.landmark,
+      pincode: pincode ?? this.pincode,
+      isPrimary: isPrimary ?? this.isPrimary,
+    );
+  }
 }

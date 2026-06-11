@@ -5,8 +5,10 @@ class Member {
     required this.memberId,
     this.memberNo,
     required this.firstName,
+    this.firstNameEnglish,
     this.middleName,
     required this.lastName,
+    this.lastNameEnglish,
     this.fullNameSearchText,
     this.dateOfBirth,
     this.dateOfBirthTime,
@@ -15,8 +17,11 @@ class Member {
     this.mobileNo,
     this.secondaryMobile,
     this.emailAddress,
+    this.genderId,
     this.genderName,
+    this.maritalStatusId,
     this.maritalStatusName,
+    this.bloodGroupId,
     this.bloodGroupName,
     this.isLookingforMarriage,
     this.educationName,
@@ -37,6 +42,10 @@ class Member {
     this.profilePhotoFullUrl,
     this.gotraName,
     this.motherFatherName,
+    this.motherStateName,
+    this.motherDistrictName,
+    this.motherTalukaName,
+    this.motherAreaName,
     this.occupationTypeName,
     this.occupationName,
     this.otherOccupation,
@@ -55,6 +64,10 @@ class Member {
     this.districtId,
     this.talukaId,
     this.areaId,
+    this.occupationStateId,
+    this.occupationDistrictId,
+    this.occupationTalukaId,
+    this.occupationAreaId,
     this.familyId,
     this.apiAge,
     this.isHead,
@@ -62,6 +75,10 @@ class Member {
     this.relationTypeId,
     this.gotraId,
     this.motherGotraId,
+    this.motherStateId,
+    this.motherDistrictId,
+    this.motherTalukaId,
+    this.motherAreaId,
     this.signId,
     this.signName,
   });
@@ -110,8 +127,10 @@ class Member {
       memberId: (json['memberId'] ?? json['id']) as int? ?? 0,
       memberNo: getString('memberNo'),
       firstName: getString('firstName') ?? fallbackFirst,
+      firstNameEnglish: getString('firstNameEnglish'),
       middleName: getString('middleName'),
       lastName: getString('lastName') ?? fallbackLast,
+      lastNameEnglish: getString('lastNameEnglish'),
       fullNameSearchText: getString('fullNameSearchText'),
       dateOfBirth: getString('dateOfBirth'),
       dateOfBirthTime: getString('dateOfBirthTime'),
@@ -121,12 +140,15 @@ class Member {
       mobileNo: getString('mobileNo'),
       secondaryMobile: getString('secondaryMobile'),
       emailAddress: getString('emailAddress'),
+      genderId: (json['genderId'] ?? json['GenderId']) as int?,
       genderName: getString('genderName', 'gender'),
+      maritalStatusId: (json['maritalStatusId'] ?? json['MaritalStatusId']) as int?,
       maritalStatusName: getString(
         'maritalStatusName',
         'maritalStatus',
         'marritalStatus',
       ),
+      bloodGroupId: (json['bloodGroupId'] ?? json['BloodGroupId']) as int?,
       bloodGroupName: getString('bloodGroupName', 'bloodGroup', 'BloodGroup'),
       isLookingforMarriage:
           (json['isLookingforMarriage'] ??
@@ -150,7 +172,11 @@ class Member {
       twitterUrl: getString('twitterUrl'),
       profilePhotoFullUrl: fullProfileUrl,
       gotraName: getString('gotraName', 'gotra', 'gotra_name', 'Gotra'),
-      motherFatherName: getString('motherFatherName'),
+      motherFatherName: getString('motherFatherName', 'MotherFatherName'),
+      motherStateName: getString('motherStateName', 'MotherStateName'),
+      motherDistrictName: getString('motherDistrictName', 'MotherDistrictName'),
+      motherTalukaName: getString('motherTalukaName', 'MotherTalukaName'),
+      motherAreaName: getString('motherAreaName', 'MotherAreaName'),
       occupationTypeName: getString('occupationTypeName'),
       occupationName: getString('occupationName', 'occupation'),
       otherOccupation: getString('otherOccupation'),
@@ -180,12 +206,20 @@ class Member {
       districtId: json['districtId'] as int?,
       talukaId: json['talukaId'] as int?,
       areaId: json['areaId'] as int?,
+      occupationStateId: json['occupationStateId'] as int?,
+      occupationDistrictId: json['occupationDistrictId'] as int?,
+      occupationTalukaId: json['occupationTalukaId'] as int?,
+      occupationAreaId: json['occupationAreaId'] as int?,
       familyId: json['familyId'] as int?,
       isHead: json['isHead'] as bool?,
       relatedToMemberName: getString('relatedToMemberName'),
       relationTypeId: json['relationTypeId'] as int?,
       gotraId: json['gotraId'] as int?,
       motherGotraId: json['motherGotraId'] as int?,
+      motherStateId: (json['motherStateId'] ?? json['MotherStateId']) as int?,
+      motherDistrictId: (json['motherDistrictId'] ?? json['MotherDistrictId']) as int?,
+      motherTalukaId: (json['motherTalukaId'] ?? json['MotherTalukaId']) as int?,
+      motherAreaId: (json['motherAreaId'] ?? json['MotherAreaId']) as int?,
       signId: (json['signId'] ?? json['SignId']) as int?,
       signName: getString('signName', 'SignName'),
     );
@@ -193,8 +227,10 @@ class Member {
   final int memberId;
   final String? memberNo;
   final String firstName;
+  final String? firstNameEnglish;
   final String? middleName;
   final String lastName;
+  final String? lastNameEnglish;
   final String? fullNameSearchText;
   final String? dateOfBirth;
   final String? dateOfBirthTime;
@@ -203,8 +239,11 @@ class Member {
   final String? mobileNo;
   final String? secondaryMobile;
   final String? emailAddress;
+  final int? genderId;
   final String? genderName;
+  final int? maritalStatusId;
   final String? maritalStatusName;
+  final int? bloodGroupId;
   final String? bloodGroupName;
   final bool? isLookingforMarriage;
   final String? educationName;
@@ -225,6 +264,10 @@ class Member {
   final String? profilePhotoFullUrl;
   final String? gotraName;
   final String? motherFatherName;
+  final String? motherStateName;
+  final String? motherDistrictName;
+  final String? motherTalukaName;
+  final String? motherAreaName;
   final String? occupationTypeName;
   final String? occupationName;
   final String? otherOccupation;
@@ -243,6 +286,10 @@ class Member {
   final int? districtId;
   final int? talukaId;
   final int? areaId;
+  final int? occupationStateId;
+  final int? occupationDistrictId;
+  final int? occupationTalukaId;
+  final int? occupationAreaId;
   final int? familyId;
   final int? apiAge;
   final bool? isHead;
@@ -250,6 +297,10 @@ class Member {
   final int? relationTypeId;
   final int? gotraId;
   final int? motherGotraId;
+  final int? motherStateId;
+  final int? motherDistrictId;
+  final int? motherTalukaId;
+  final int? motherAreaId;
   final int? signId;
   final String? signName;
 

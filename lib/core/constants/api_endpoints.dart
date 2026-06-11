@@ -9,6 +9,7 @@ class ApiEndpoints {
   static String memberRevokeToken = '/api/v1/auth/member-revoke-token';
   static String members = '/api/v1/member/list';
   static String memberSearch = '/api/v1/member/MemberSearch';
+  static String memberUsingOccupation = '/api/v1/member/MemberUsingOccupation';
   static String familyAreas = '/api/v1/family/GetFamilyAreaForSamaj';
   static String getFamiliesByArea = '/api/v1/family/GetFamilyByArea';
   static String families = '/api/v1/Area/list';

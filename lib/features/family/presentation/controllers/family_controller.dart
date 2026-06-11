@@ -350,14 +350,30 @@ class FamilyController extends GetxController {
     String dobStr = '';
     try {
       final dob = DateTime.parse(member.dateOfBirth!);
-      dobStr = '${dob.year}/${dob.month.toString().padLeft(2, '0')}/${dob.day.toString().padLeft(2, '0')}';
+      dobStr = '${dob.day.toString().padLeft(2, '0')} / ${dob.month.toString().padLeft(2, '0')} / ${dob.year}';
     } catch (_) {
-      dobStr = member.dateOfBirth!.split('T')[0].replaceAll('-', '/');
+      final parts = member.dateOfBirth!.split('T')[0].split('-');
+      if (parts.length == 3) {
+        dobStr = '${parts[2]} / ${parts[1]} / ${parts[0]}';
+      } else {
+        dobStr = member.dateOfBirth!;
+      }
     }
     
     if (member.age > 0) {
       return '$dobStr (${member.age} yrs)';
     }
     return dobStr;
+  }
+
+  String getFormattedBirthTime(Member member) {
+    if (member.dateOfBirthTime == null || member.dateOfBirthTime!.isEmpty) {
+      return LK.na;
+    }
+    final parts = member.dateOfBirthTime!.split(':');
+    if (parts.length >= 2) {
+      return '${parts[0]}:${parts[1]}';
+    }
+    return member.dateOfBirthTime!;
   }
 }

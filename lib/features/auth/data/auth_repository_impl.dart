@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
@@ -44,9 +47,31 @@ class AuthRepositoryImpl implements AuthRepository {
     required String mobile,
     required String password,
   }) async {
+    String deviceType = 'unknown';
+    String deviceToken = '';
+    try {
+      if (kIsWeb) {
+        deviceType = 'web';
+      } else if (Platform.isAndroid) {
+        deviceType = 'android';
+      } else if (Platform.isIOS) {
+        deviceType = 'ios';
+      }
+      deviceToken = await FirebaseMessaging.instance.getToken() ?? '';
+      debugPrint('=== DEVICE TOKEN ===');
+      debugPrint(deviceToken);
+      debugPrint('====================');
+    } catch (_) {}
+
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,
-      data: {'mobileNo': mobile, 'password': password},
+      data: {
+        'mobileNo': mobile, 
+        'password': password,
+        'deviceToken': deviceToken,
+        'deviceType': deviceType,
+        'ipAddress': '',
+      },
       fromJsonT: (json) => _mapAuthResponseData(json as Map<String, dynamic>),
     );
     

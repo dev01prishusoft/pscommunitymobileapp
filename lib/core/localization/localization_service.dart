@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -22,6 +24,11 @@ class LocalizationService {
 
   late Map<String, Map<String, String>> keys;
 
+  Future<File> _getLocalFile(String localeKey) async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/cached_locales_$localeKey.json');
+  }
+
   Future<void> bootstrap() async {
     final results = await Future.wait([
       rootBundle.loadString('assets/locales/en_US.json'),
@@ -32,6 +39,23 @@ class LocalizationService {
       'en_US': Map<String, String>.from(jsonDecode(results[0]) as Map),
       'gu_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
     };
+    
+    // Load from local file cache if available
+    for (final localeKey in keys.keys) {
+      try {
+        final file = await _getLocalFile(localeKey);
+        if (await file.exists()) {
+          final content = await file.readAsString();
+          final cachedKeys = Map<String, String>.from(jsonDecode(content) as Map);
+          keys[localeKey]!.addAll(cachedKeys);
+        }
+      } catch (e) {
+        AppLogger.e('Failed to load cached locale file for $localeKey', e);
+      }
+    }
+    
+    // Fetch remote translations silently in background
+    unawaited(fetchLanguagesAndAllResources());
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {
       final parts = savedLocale.split('_');
@@ -56,6 +80,15 @@ class LocalizationService {
       final defaultLocale = const Locale('en', 'US');
       currentLocale.value = defaultLocale;
       await Get.updateLocale(defaultLocale);
+    }
+  }
+
+  Future<void> fetchLanguagesAndAllResources() async {
+    try {
+      await fetchLanguages();
+      await Future.wait(languages.map((l) => fetchLanguageResources(l.code)));
+    } catch (e, stack) {
+      AppLogger.e('Failed to fetch languages and all resources', e, stack);
     }
   }
 
@@ -110,11 +143,19 @@ class LocalizationService {
           }
           keys[localeKey]!.addAll(remoteKeys);
           
+          // Save to local cache
+          try {
+            final file = await _getLocalFile(localeKey);
+            await file.writeAsString(jsonEncode(keys[localeKey]));
+          } catch (e) {
+            AppLogger.e('Failed to save cached locale file for $localeKey', e);
+          }
+          
           Get.appendTranslations({
             localeKey: remoteKeys
           });
           
-          AppLogger.d('Appended ${remoteKeys.length} translations for $langCode');
+          AppLogger.d('Appended and cached ${remoteKeys.length} translations for $langCode');
         }
       }
     } catch (e, stack) {

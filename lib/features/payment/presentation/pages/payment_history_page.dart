@@ -284,7 +284,7 @@ class _PaymentCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      payment.status.displayName,
+                      payment.rawStatus,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: payment.status == PaymentStatus.success
                             ? AppColors.success

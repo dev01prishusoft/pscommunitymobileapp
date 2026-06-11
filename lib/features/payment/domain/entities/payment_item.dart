@@ -8,10 +8,14 @@ enum PaymentStatus {
     switch (val.toLowerCase()) {
       case 'success':
       case 'completed':
+      case 'paid':
         return PaymentStatus.success;
       case 'pending':
+      case 'unpaid':
+      case 'initiated':
         return PaymentStatus.pending;
       case 'failed':
+      case 'cancelled':
         return PaymentStatus.failed;
       default:
         return PaymentStatus.unknown;
@@ -40,6 +44,7 @@ class PaymentItem {
     required this.date,
     required this.method,
     required this.status,
+    required this.rawStatus,
     required this.type,
     this.notes = '',
   });
@@ -52,6 +57,7 @@ class PaymentItem {
       date: json['paymentDate'] as String? ?? json['date'] as String? ?? '',
       method: json['paymentModeName'] as String? ?? json['method'] as String? ?? '',
       status: PaymentStatus.fromString(json['paymentStatusName'] as String? ?? json['status'] as String? ?? ''),
+      rawStatus: json['paymentStatusName'] as String? ?? json['status'] as String? ?? 'Unknown',
       type: json['paymentTypeName'] as String? ?? json['type'] as String? ?? '',
       notes: json['notes'] as String? ?? '',
     );
@@ -62,6 +68,7 @@ class PaymentItem {
   final String date;
   final String method;
   final PaymentStatus status;
+  final String rawStatus;
   final String type;
   final String notes;
 }

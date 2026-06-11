@@ -152,15 +152,19 @@ class MarriagePage extends GetView<MarriageController> {
                               decoration: InputDecoration(
                                 hintText: LK.searchByFirstNameHint.tr,
                                 prefixIcon: Icon(Icons.search),
-                                suffixIcon: IconButton(
-                                  icon: Icon(Icons.close),
-                                  tooltip: LK.clearAll.tr,
-                                  onPressed: () {
-                                    controller.searchTextController.clear();
-                                    controller.searchQuery.value = '';
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  constraints: BoxConstraints(),
+                                suffixIcon: Obx(
+                                  () => controller.searchQuery.value.isNotEmpty
+                                      ? IconButton(
+                                          icon: Icon(Icons.close),
+                                          tooltip: LK.clearAll.tr,
+                                          onPressed: () {
+                                            controller.searchTextController.clear();
+                                            controller.searchQuery.value = '';
+                                          },
+                                          padding: EdgeInsets.zero,
+                                          constraints: BoxConstraints(),
+                                        )
+                                      : SizedBox.shrink(),
                                 ),
                                 contentPadding: EdgeInsets.symmetric(
                                   vertical: 0,
@@ -696,6 +700,7 @@ class _MarriageMemberCard extends StatelessWidget {
             MemberAvatar(
               imageUrl: member.profilePhotoFullUrl,
               gender: member.gender,
+              fallbackName: member.name,
               radius: 30.r,
             ),
             SizedBox(width: 16.w),

@@ -39,7 +39,8 @@ class AppPrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+          disabledForegroundColor: AppColors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -53,7 +54,10 @@ class AppPrimaryButton extends StatelessWidget {
               )
             : Text(
                 text,
-                style: AppTextStyles.titleLarge.copyWith(letterSpacing: 0.5),
+                style: AppTextStyles.titleLarge.copyWith(
+                  letterSpacing: 0.5,
+                  color: AppColors.white,
+                ),
               ),
       ),
     );

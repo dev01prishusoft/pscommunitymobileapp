@@ -1,10 +1,12 @@
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
+import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
@@ -69,6 +71,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.firstName.tr,
                   isRequired: true,
                   prefixIcon: Icon(Icons.person),
+                  maxLength: 100,
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
@@ -76,12 +79,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller: controller.middleNameCtrl,
                     label: LK.middleName.tr,
                     prefixIcon: Icon(Icons.person_outline),
+                    maxLength: 100,
                   ),
                   AppFormTextField(
                     controller: controller.lastNameCtrl,
                     label: LK.lastName.tr,
                     isRequired: true,
                     prefixIcon: Icon(Icons.person),
+                    maxLength: 100,
                   ),
                 ),
                 AppSpacing.vM,
@@ -91,12 +96,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     label: LK.firstNameEnglish.tr,
                     isRequired: true,
                     prefixIcon: Icon(Icons.language),
+                    maxLength: 100,
                   ),
                   AppFormTextField(
                     controller: controller.lastNameEnCtrl,
                     label: LK.lastNameEnglish.tr,
                     isRequired: true,
                     prefixIcon: Icon(Icons.language),
+                    maxLength: 100,
                   ),
                 ),
                 AppSpacing.vM,
@@ -118,9 +125,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             controller.gender.value,
                           )
                           ? controller.gender.value
-                          : (controller.genderList.isNotEmpty
-                                ? controller.genderList.first
-                                : controller.defaultGenders.first),
+                          : null,
                       items:
                           (controller.genderList.isEmpty
                                   ? controller.defaultGenders
@@ -143,9 +148,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             controller.maritalStatus.value,
                           )
                           ? controller.maritalStatus.value
-                          : (controller.maritalStatusList.isNotEmpty
-                                ? controller.maritalStatusList.first
-                                : controller.defaultMaritalStatuses.first),
+                          : null,
                       items:
                           (controller.maritalStatusList.isEmpty
                                   ? controller.defaultMaritalStatuses
@@ -170,16 +173,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             controller.bloodGroup.value,
                           )
                           ? controller.bloodGroup.value
-                          : (controller.bloodGroupList.isNotEmpty
-                                ? controller.bloodGroupList.first
-                                : controller.defaultBloodGroups.first),
+                          : null,
                       items:
                           (controller.bloodGroupList.isEmpty
                                   ? controller.defaultBloodGroups
                                   : controller.bloodGroupList)
                               .map(
                                 (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
+                                    DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)),
                               )
                               .toList(),
                       onChanged: (v) => controller.bloodGroup.value = v!,
@@ -190,16 +191,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     () => AppFormDropdown<String>(
                       value: controller.signList.contains(controller.sign.value)
                           ? controller.sign.value
-                          : (controller.signList.isNotEmpty
-                                ? controller.signList.first
-                                : controller.defaultSigns.first),
+                          : null,
                       items:
                           (controller.signList.isEmpty
                                   ? controller.defaultSigns
                                   : controller.signList)
                               .map(
                                 (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
+                                    DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)),
                               )
                               .toList(),
                       onChanged: (v) => controller.sign.value = v!,
@@ -211,14 +210,30 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   AppFormTextField(
                     controller: controller.weightCtrl,
                     label: LK.weightKg.tr,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [DecimalAutoInsertFormatter()],
                     prefixIcon: Icon(Icons.monitor_weight_outlined),
+                    maxLength: 6,
+                    validator: (val) {
+                      if (val != null && val.isNotEmpty && val.replaceAll('.', '').length > 5) {
+                        return 'Max 5 digits allowed';
+                      }
+                      return null;
+                    },
                   ),
                   AppFormTextField(
                     controller: controller.heightCtrl,
                     label: LK.heightCm.tr,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [DecimalAutoInsertFormatter()],
                     prefixIcon: Icon(Icons.height),
+                    maxLength: 6,
+                    validator: (val) {
+                      if (val != null && val.isNotEmpty && val.replaceAll('.', '').length > 5) {
+                        return 'Max 5 digits allowed';
+                      }
+                      return null;
+                    },
                   ),
                 ),
               ]),
@@ -228,16 +243,20 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.mobileCtrl,
                   label: LK.mobileNo.tr,
                   isRequired: true,
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   prefixIcon: Icon(Icons.phone),
+                  maxLength: 10,
                   validator: AppValidators.mobile,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: controller.secondaryMobileCtrl,
                   label: LK.secondaryMobileLabel.tr,
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   prefixIcon: Icon(Icons.phone_android),
+                  maxLength: 10,
                   validator: AppValidators.optionalMobile,
                 ),
                 SizedBox(height: 12.h),
@@ -246,6 +265,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.email.tr,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(Icons.email_outlined),
+                  maxLength: 200,
                   validator: AppValidators.optionalEmail,
                 ),
                 SizedBox(height: 12.h),
@@ -253,6 +273,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.entryPersonMobileCtrl,
                   label: LK.entryPersonMobile.tr,
                   prefixIcon: Icon(Icons.phone_callback),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 10,
                   validator: AppValidators.optionalMobile,
                 ),
                 SizedBox(height: 12.h),
@@ -260,13 +283,16 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.emergencyNameCtrl,
                   label: LK.emergencyContactNameLabel.tr,
                   prefixIcon: Icon(Icons.person_add_alt_1),
+                  maxLength: 100,
                 ),
                 SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: controller.emergencyNoCtrl,
                   label: LK.emergencyContact.tr,
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   prefixIcon: Icon(Icons.emergency_outlined),
+                  maxLength: 10,
                   validator: AppValidators.optionalMobile,
                 ),
               ]),
@@ -295,7 +321,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               )
                               .toList(),
                       onChanged: (v) => controller.relation.value = v!,
-                      label: LK.role.tr,
+                      label: LK.relation.tr,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -312,7 +338,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             ? controller.gotra.value
                             : null,
                         items: controller.gotraList
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                             .toList(),
                         onChanged: (v) {
                           if (v != null) controller.gotra.value = v;
@@ -326,7 +352,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             ? controller.mothersGotra.value
                             : null,
                         items: controller.mothersGotraList
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                             .toList(),
                         onChanged: (v) {
                           if (v != null) controller.mothersGotra.value = v;
@@ -346,6 +372,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.facebookCtrl,
                   label: LK.facebook.tr,
                   prefixIcon: Icon(Icons.facebook),
+                  maxLength: 300,
                   validator: AppValidators.url,
                 ),
                 SizedBox(height: 12.h),
@@ -353,6 +380,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.whatsappCtrl,
                   label: LK.whatsapp.tr,
                   prefixIcon: Icon(Icons.chat),
+                  maxLength: 300,
                   validator: AppValidators.url,
                 ),
                 SizedBox(height: 12.h),
@@ -360,6 +388,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.instagramCtrl,
                   label: LK.instagram.tr,
                   prefixIcon: Icon(Icons.camera_alt),
+                  maxLength: 300,
                   validator: AppValidators.url,
                 ),
                 SizedBox(height: 12.h),
@@ -367,6 +396,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.twitterCtrl,
                   label: LK.twitterX.tr,
                   prefixIcon: Icon(Icons.close),
+                  maxLength: 300,
                   validator: AppValidators.url,
                 ),
               ]),
@@ -554,11 +584,55 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             return SizedBox.shrink();
           }),
           SizedBox(height: 16.h),
-          AppFormTextField(
-            controller: controller.memberNoCtrl,
-            label: LK.memberNo.tr,
-            prefixIcon: Icon(Icons.numbers),
-            readOnly: true,
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller.memberNoCtrl,
+            builder: (context, value, child) {
+              if (value.text.isEmpty) return SizedBox.shrink();
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.badge_outlined, size: 20, color: AppColors.primary),
+                    ),
+                    SizedBox(width: 12.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          LK.memberNo.tr.toUpperCase(),
+                          style: TextStyle(
+                            color: AppColors.primary.withValues(alpha: 0.7),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            fontSize: 10,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          value.text,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -690,7 +764,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ? addr.type
                   : null,
               items: typeList
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -704,18 +778,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             );
           }),
           SizedBox(height: 12.h),
-          AppFormTextField(
-            initialValue: addr.line1,
-            label: LK.addressLine1.tr,
-            onChanged: (v) => addr.line1 = v,
-          ),
-          SizedBox(height: 12.h),
-          AppFormTextField(
-            initialValue: addr.line2,
-            label: LK.addressLine2.tr,
-            onChanged: (v) => addr.line2 = v,
-          ),
-          SizedBox(height: 12.h),
           Obx(() {
             final stateList = controller.workStateList;
             return AppFormDropdown<String>(
@@ -723,7 +785,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ? addr.state
                   : null,
               items: stateList
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -747,7 +809,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ? addr.district
                   : null,
               items: districtList
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -770,7 +832,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ? addr.taluka
                   : null,
               items: talukaList
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -792,7 +854,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ? addr.area
                   : null,
               items: areaList
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -807,15 +869,33 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           }),
           SizedBox(height: 12.h),
           AppFormTextField(
-            initialValue: addr.landmark,
-            label: LK.landmarkLabel.tr,
-            onChanged: (v) => addr.landmark = v,
+            initialValue: addr.pincode,
+            label: LK.pincode.tr,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            maxLength: 6,
+            onChanged: (v) => addr.pincode = v,
           ),
           SizedBox(height: 12.h),
           AppFormTextField(
-            initialValue: addr.pincode,
-            label: LK.pincode.tr,
-            onChanged: (v) => addr.pincode = v,
+            initialValue: addr.line1,
+            label: LK.addressLine1.tr,
+            maxLength: 200,
+            onChanged: (v) => addr.line1 = v,
+          ),
+          SizedBox(height: 12.h),
+          AppFormTextField(
+            initialValue: addr.line2,
+            label: LK.addressLine2.tr,
+            maxLength: 200,
+            onChanged: (v) => addr.line2 = v,
+          ),
+          SizedBox(height: 12.h),
+          AppFormTextField(
+            initialValue: addr.landmark,
+            label: LK.landmarkLabel.tr,
+            maxLength: 200,
+            onChanged: (v) => addr.landmark = v,
           ),
         ],
       ),
@@ -907,13 +987,16 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           SizedBox(height: 12.h),
           Obx(
             () => AppFormDropdown<String>(
-              value: controller.qualificationList.contains(edu.qualification)
+              value: (controller.qualificationList.isEmpty 
+                      ? controller.defaultQualifications 
+                      : controller.qualificationList).contains(edu.qualification)
                   ? edu.qualification
                   : null,
               items: (controller.qualificationList.isEmpty
                       ? controller.defaultQualifications
                       : controller.qualificationList)
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toSet()
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                   .toList(),
               onChanged: (v) {
                 if (v != null) {
@@ -930,6 +1013,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
+            maxLength: 200,
             onChanged: (v) => edu.institute = v,
           ),
           SizedBox(height: 12.h),
@@ -937,12 +1021,39 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 4,
+              validator: (v) {
+                if (v != null && v.isNotEmpty && v.length != 4) {
+                  return 'Must be 4 digits';
+                }
+                return null;
+              },
               onChanged: (v) => edu.passingYear = v,
             ),
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+              maxLength: 10,
               onChanged: (v) => edu.percentage = v,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          _buildFieldPair(
+            AppFormTextField(
+              initialValue: edu.grade,
+              label: 'Grade',
+              maxLength: 10,
+              onChanged: (v) => edu.grade = v,
+            ),
+            AppFormTextField(
+              initialValue: edu.description,
+              label: 'Description',
+              maxLength: 500,
+              onChanged: (v) => edu.description = v,
             ),
           ),
         ],
@@ -962,10 +1073,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       ),
       SizedBox(height: 12.h),
       AppFormTextField(
-        controller: controller.monthlyIncomeCtrl,
+        controller: controller.personalInfo.monthlyIncomeCtrl,
         label: LK.monthlyIncomeLabel.tr,
         prefixIcon: Icon(Icons.currency_rupee),
         keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        maxLength: 8,
       ),
     ]);
   }
@@ -979,7 +1092,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             value: list.contains(controller.workInfo.occupationType.value)
                 ? controller.workInfo.occupationType.value
                 : null,
-            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1))).toList(),
             onChanged: (v) {
               if (v != null) controller.workInfo.occupationType.value = v;
             },
@@ -994,7 +1107,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             value: list.contains(controller.workInfo.occupation.value)
                 ? controller.workInfo.occupation.value
                 : null,
-            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            items: list.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1))).toList(),
             onChanged: (v) {
               if (v != null) controller.workInfo.occupation.value = v;
             },
@@ -1011,7 +1124,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           value: list.contains(controller.workInfo.jobPosition.value)
               ? controller.workInfo.jobPosition.value
               : null,
-          items: list.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          items: list.map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1))).toList(),
           onChanged: (v) {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
@@ -1021,63 +1134,53 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         );
       }),
       SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.companyNameCtrl,
-        label: LK.companyNameLabel.tr,
-        prefixIcon: Icon(Icons.business),
-        onChanged: (v) => controller.companyName.value = v,
-      ),
-      SizedBox(height: 12.h),
       _buildFieldPair(
         AppFormTextField(
           controller: controller.otherJobPositionCtrl,
           label: LK.otherJobPositionLabel.tr,
+          maxLength: 100,
           onChanged: (v) => controller.workInfo.otherJobPosition.value = v,
         ),
         AppFormTextField(
-          controller: controller.otherJobPositionEnglishCtrl,
-          label: 'Other Job Position (English)',
-          onChanged: (v) => controller.workInfo.otherJobPositionEnglish.value = v,
+          controller: controller.otherOccupationCtrl,
+          label: LK.otherOccupationLabel.tr,
+          maxLength: 100,
+          onChanged: (v) => controller.workInfo.otherOccupation.value = v,
+        ),
+      ),
+      SizedBox(height: 12.h),
+      _buildFieldPair(
+        AppFormTextField(
+          controller: controller.companyNameCtrl,
+          label: LK.companyNameLabel.tr,
+          prefixIcon: Icon(Icons.business),
+          maxLength: 100,
+          onChanged: (v) => controller.companyName.value = v,
+        ),
+        AppFormTextField(
+          controller: controller.businessNameCtrl,
+          label: LK.businessName.tr,
+          prefixIcon: Icon(Icons.business_center),
+          maxLength: 100,
+          onChanged: (v) => controller.businessName.value = v,
         ),
       ),
       SizedBox(height: 12.h),
       AppFormTextField(
-        controller: controller.otherOccupationCtrl,
-        label: LK.otherOccupationLabel.tr,
-        onChanged: (v) => controller.workInfo.otherOccupation.value = v,
+        controller: controller.occupationDescriptionCtrl,
+        label: LK.occupationDescriptionLabel.tr,
+        maxLines: 3,
+        maxLength: 500,
       ),
       SizedBox(height: 12.h),
-      SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.businessNameCtrl,
-        label: LK.businessName.tr,
-        prefixIcon: Icon(Icons.business_center),
-        onChanged: (v) => controller.businessName.value = v,
-      ),
-      SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.workAddressLine1Ctrl,
-        label: LK.occupationAddressLine1Label.tr,
-        prefixIcon: Icon(Icons.location_on_outlined),
-        onChanged: (v) => controller.workAddressLine1.value = v,
-      ),
-      SizedBox(height: 12.h),
-      AppFormTextField(
-        controller: controller.workAddressLine2Ctrl,
-        label: LK.occupationAddressLine2Label.tr,
-        prefixIcon: Icon(Icons.location_on_outlined),
-        onChanged: (v) => controller.workAddressLine2.value = v,
-      ),
-      SizedBox(height: 12.h),
+
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workStateList.contains(controller.workState.value)
-              ? controller.workState.value
-              : (controller.workStateList.isNotEmpty
-                  ? controller.workStateList.first
-                  : null),
+                ? controller.workState.value
+                : null,
           items: controller.workStateList
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
               .toList(),
           onChanged: (v) {
             if (v != null) controller.workState.value = v;
@@ -1089,12 +1192,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workDistrictList.contains(controller.workDistrict.value)
-              ? controller.workDistrict.value
-              : (controller.workDistrictList.isNotEmpty
-                  ? controller.workDistrictList.first
-                  : null),
+                ? controller.workDistrict.value
+                : null,
           items: controller.workDistrictList
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
               .toList(),
           onChanged: (v) {
             if (v != null) controller.workDistrict.value = v;
@@ -1106,12 +1207,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workTalukaList.contains(controller.workTaluka.value)
-              ? controller.workTaluka.value
-              : (controller.workTalukaList.isNotEmpty
-                  ? controller.workTalukaList.first
-                  : null),
+                ? controller.workTaluka.value
+                : null,
           items: controller.workTalukaList
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
               .toList(),
           onChanged: (v) {
             if (v != null) controller.workTaluka.value = v;
@@ -1123,17 +1222,50 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       Obx(
         () => AppFormDropdown<String>(
           value: controller.workAreaList.contains(controller.workArea.value)
-              ? controller.workArea.value
-              : (controller.workAreaList.isNotEmpty
-                  ? controller.workAreaList.first
-                  : null),
+                ? controller.workArea.value
+                : null,
           items: controller.workAreaList
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
               .toList(),
           onChanged: (v) {
             if (v != null) controller.workArea.value = v;
           },
           label: LK.area.tr,
+        ),
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine1Ctrl,
+        label: LK.occupationAddressLine1Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        maxLength: 200,
+        onChanged: (v) => controller.workAddressLine1.value = v,
+      ),
+      SizedBox(height: 12.h),
+      AppFormTextField(
+        controller: controller.workAddressLine2Ctrl,
+        label: LK.occupationAddressLine2Label.tr,
+        prefixIcon: Icon(Icons.location_on_outlined),
+        maxLength: 200,
+        onChanged: (v) => controller.workAddressLine2.value = v,
+      ),
+      SizedBox(height: 12.h),
+      _buildFieldPair(
+        AppFormTextField(
+          controller: controller.workLandmarkCtrl,
+          label: LK.landmarkLabel.tr,
+          prefixIcon: Icon(Icons.location_city_outlined),
+          maxLength: 200,
+          onChanged: (v) => controller.workLandmark.value = v,
+        ),
+        AppFormTextField(
+          controller: controller.workPincodeCtrl,
+          label: LK.pincode.tr,
+          prefixIcon: Icon(Icons.pin_drop_outlined),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLength: 6,
+          onChanged: (v) => controller.workPincode.value = v,
         ),
       ),
     ]);

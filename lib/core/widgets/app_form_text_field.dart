@@ -2,6 +2,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
@@ -22,6 +23,8 @@ class AppFormTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.textAlign = TextAlign.start,
+    this.inputFormatters,
+    this.maxLength,
   });
   final TextEditingController? controller;
   final String? initialValue;
@@ -37,6 +40,8 @@ class AppFormTextField extends StatelessWidget {
   final bool obscureText;
   final void Function(String)? onChanged;
   final TextAlign textAlign;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +75,9 @@ class AppFormTextField extends StatelessWidget {
           obscureText: obscureText,
           onChanged: onChanged,
           textAlign: textAlign,
+          inputFormatters: inputFormatters,
+          maxLength: maxLength,
+          buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           style: AppTextStyles.bodyMedium.copyWith(
             color: readOnly ? AppColors.mutedForeground : AppColors.foreground,

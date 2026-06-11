@@ -105,7 +105,7 @@ class ContactController extends GetxController {
   void addAddress() {
     addresses.add(
       AddressModel(
-        type: addressTypeList.isNotEmpty ? addressTypeList.first : 'Home',
+        type: '',
         isPrimary: false,
       ),
     );
@@ -118,9 +118,7 @@ class ContactController extends GetxController {
   void addEducation() {
     educationList.add(
       EducationModel(
-        qualification: qualificationList.isNotEmpty
-            ? qualificationList.first
-            : 'Graduate',
+        qualification: '',
         isHighest: false,
       ),
     );

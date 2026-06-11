@@ -329,9 +329,11 @@ class PaymentsPage extends GetView<PaymentController> {
                     ),
                     SizedBox(width: 8.w),
                     Text(
-                      '${LK.paidLabel.tr} ${req.paidDate}',
+                      '${req.status.tr}: ${req.paidDate}',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.success,
+                        color: req.status.toLowerCase() == 'success' || req.status.toLowerCase() == 'completed'
+                            ? AppColors.success
+                            : AppColors.orange,
                       ),
                     ),
                   ],

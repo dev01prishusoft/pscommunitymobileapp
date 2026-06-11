@@ -133,7 +133,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       'status':
           ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
       'transactionId':
-          (data['transactionId'] ?? data['paymentTransactionId'])?.toString() ??
+          (data['transactionId'] ?? data['paymentTransactionId'] ?? data['TransactionId'] ?? data['transactionNo'] ?? data['referenceNo'] ?? data['bankTransactionId'])?.toString() ??
           'N/A',
       'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
     };

@@ -243,12 +243,12 @@ class _LanguageDropdown extends GetView<LocalizationService> {
       final String currentCode = controller.currentLocale.value.languageCode.toUpperCase();
       final homeController = Get.find<HomeController>();
       
-      final List<String> codes = controller.languages
+      List<String> codes = controller.languages
           .map((l) => l.code.toUpperCase())
           .toSet()
           .toList();
           
-      if (codes.isEmpty) return const SizedBox.shrink();
+      if (codes.isEmpty) codes = ['EN', 'GU'];
 
       final selectedCode = codes.contains(currentCode)
           ? currentCode

@@ -178,6 +178,7 @@ class _FindMemberCard extends StatelessWidget {
         leading: MemberAvatar(
           imageUrl: member.profilePhotoFullUrl,
           gender: member.gender,
+          fallbackName: member.name,
           radius: 30,
         ),
         title: Text(

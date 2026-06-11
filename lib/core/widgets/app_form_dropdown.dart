@@ -61,7 +61,7 @@ class AppFormDropdown<T> extends StatelessWidget {
               color: AppColors.mutedForeground,
             ),
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: onChanged == null ? AppColors.surfaceVariant : AppColors.white,
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

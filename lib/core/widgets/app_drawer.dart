@@ -62,14 +62,7 @@ class AppDrawer extends StatelessWidget {
                 style: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
               ),
             ),
-            accountEmail: Obx(
-              () => Text(
-                samajController.samaj.value?.descriptionEnglish ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
-              ),
-            ),
+            accountEmail: const SizedBox.shrink(),
           ),
           ListTile(
             leading: Icon(Icons.home_outlined, color: AppColors.primary),

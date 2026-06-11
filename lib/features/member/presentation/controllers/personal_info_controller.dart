@@ -44,16 +44,20 @@ class PersonalInfoController extends GetxController {
   final tob = ''.obs;
   final weight = ''.obs;
   final height = ''.obs;
-  final gender = 'Male'.obs;
-  final maritalStatus = 'Married'.obs;
-  final bloodGroup = 'A+'.obs;
-  final sign = 'Aries'.obs;
+  final gender = ''.obs;
+  final maritalStatus = ''.obs;
+  final bloodGroup = ''.obs;
+  final sign = ''.obs;
   final isActive = true.obs;
   final isFamilyHead = false.obs;
-  final relation = 'Self'.obs;
+  final relation = ''.obs;
   final motherFatherName = ''.obs;
   final gotra = ''.obs;
   final mothersGotra = ''.obs;
+  final motherState = ''.obs;
+  final motherDistrict = ''.obs;
+  final motherTaluka = ''.obs;
+  final motherArea = ''.obs;
   final openToMarriage = false.obs;
   final relatedToMemberName = ''.obs;
   final ownLand = false.obs;
@@ -138,8 +142,10 @@ class PersonalInfoController extends GetxController {
 
     memberNo.value = m.memberNo ?? '';
     firstName.value = m.firstName;
+    firstNameEn.value = m.firstNameEnglish ?? '';
     middleName.value = m.middleName ?? '';
     lastName.value = m.lastName;
+    lastNameEn.value = m.lastNameEnglish ?? '';
     dob.value = formatDob(m.dateOfBirth);
     tob.value = m.dateOfBirthTime ?? '';
     weight.value = m.weight?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
@@ -150,6 +156,10 @@ class PersonalInfoController extends GetxController {
     sign.value = m.signName ?? '';
     motherFatherName.value = m.motherFatherName ?? '';
     gotra.value = m.gotraName ?? '';
+    motherState.value = m.motherStateName ?? '';
+    motherDistrict.value = m.motherDistrictName ?? '';
+    motherTaluka.value = m.motherTalukaName ?? '';
+    motherArea.value = m.motherAreaName ?? '';
     openToMarriage.value = m.isLookingforMarriage ?? false;
     ownLand.value = m.isOwnLand ?? false;
     ownHouse.value = m.isOwnHouse ?? false;

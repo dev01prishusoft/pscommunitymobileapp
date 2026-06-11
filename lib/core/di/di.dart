@@ -57,16 +57,16 @@ class DI {
         final sessionManager = SessionManager(authState);
         Get.put(sessionManager, permanent: true);
         
-        final localization = LocalizationService(secureStorage);
-        await localization.bootstrap();
-        Get.put(localization, permanent: true);
         final apiClient = ApiClient(
           tokenManager: tokenManager,
           connectivity: connectivity,
           onAuthFailure: authState.logoutAndRedirect,
         );
         Get.put(apiClient, permanent: true);
-        unawaited(localization.fetchLanguageResources(localization.currentLocale.value.languageCode));
+
+        final localization = LocalizationService(secureStorage);
+        await localization.bootstrap();
+        Get.put(localization, permanent: true);
         final authRepository = AuthRepositoryImpl(apiClient, tokenManager);
         final loginUseCase = LoginUseCase(authRepository);
         Get.put(loginUseCase, permanent: true);

@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/features/committee/presentation/controllers
 import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -285,10 +286,10 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ),
                 Divider(height: 1),
                 AppSpacing.vXxl,
-                CircleAvatar(
+                MemberAvatar(
+                  imageUrl: null,
+                  fallbackName: member.name,
                   radius: 40,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Icon(Icons.person, size: 40, color: AppColors.primary),
                 ),
                 AppSpacing.vL,
                 Text(
@@ -442,13 +443,10 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   Widget _buildMemberTile(CommitteeMember member) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
-      leading: CircleAvatar(
+      leading: MemberAvatar(
+        imageUrl: null,
+        fallbackName: member.name,
         radius: 24,
-        backgroundColor: AppColors.slate,
-        child: Text(
-          member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
-        ),
       ),
       title: Text(
         member.name,

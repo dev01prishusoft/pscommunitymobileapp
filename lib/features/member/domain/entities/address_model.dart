@@ -5,6 +5,7 @@ class AddressModel {
     this.district = '',
     this.taluka = '',
     this.area = '',
+    this.typeId,
     this.stateId,
     this.districtId,
     this.talukaId,
@@ -19,6 +20,7 @@ class AddressModel {
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
       type: json['type'] as String? ?? '',
+      typeId: json['addressTypeId'] as int?,
       state: json['state'] as String? ?? '',
       district: json['district'] as String? ?? '',
       taluka: json['taluka'] as String? ?? '',
@@ -35,6 +37,7 @@ class AddressModel {
     );
   }
   String type;
+  int? typeId;
   String state;
   String district;
   String taluka;
@@ -51,6 +54,7 @@ class AddressModel {
 
   AddressModel copyWith({
     String? type,
+    int? typeId,
     String? state,
     String? district,
     String? taluka,
@@ -67,6 +71,7 @@ class AddressModel {
   }) {
     return AddressModel(
       type: type ?? this.type,
+      typeId: typeId ?? this.typeId,
       state: state ?? this.state,
       district: district ?? this.district,
       taluka: taluka ?? this.taluka,
@@ -86,6 +91,7 @@ class AddressModel {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
+      'addressTypeId': typeId,
       'state': state,
       'district': district,
       'taluka': taluka,

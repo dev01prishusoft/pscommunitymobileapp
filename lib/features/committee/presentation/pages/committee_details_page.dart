@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/committee/domain/entities/committe
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 
 class CommitteeDetailsPage extends StatefulWidget {
   const CommitteeDetailsPage({super.key});
@@ -306,10 +307,10 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
         padding: EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            CircleAvatar(
+            MemberAvatar(
+              imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+              fallbackName: name,
               radius: 28.r,
-              backgroundColor: AppColors.muted,
-              child: Icon(Icons.person, color: AppColors.mutedForeground),
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -353,14 +354,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         color: AppColors.mutedForeground,
                       ),
                       children: [
-                        TextSpan(text: '${LK.sinceColon.tr} '),
+                        TextSpan(text: 'Start: '),
                         TextSpan(text: since, style: AppTextStyles.labelLarge),
-                        TextSpan(text: '   |   '),
-                        TextSpan(text: '${LK.reportsToColon.tr} '),
-                        TextSpan(
-                          text: reportsTo,
-                          style: AppTextStyles.labelLarge,
-                        ),
                       ],
                     ),
                   ),

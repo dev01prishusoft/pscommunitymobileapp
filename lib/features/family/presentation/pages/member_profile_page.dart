@@ -268,7 +268,7 @@ class _MemberDetailsSection extends StatelessWidget {
             _buildGridItem(
               Icons.access_time,
               LK.birthTime.tr,
-              member.dateOfBirthTime ?? LK.na,
+              controller.getFormattedBirthTime(member),
             ),
             _buildGridItem(
               Icons.monitor_weight_outlined,
@@ -444,7 +444,7 @@ class _AddressSection extends StatelessWidget {
                     ],
                   ],
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 12.h),
                 Text(
                   addr.fullAddress,
                   style: TextStyle(
@@ -583,61 +583,45 @@ class _SocialMediaSection extends StatelessWidget {
       icon: Icons.share_outlined,
       child: Column(
         children: [
-          _buildSocialRow(
-            _buildSocialItem(
-              Icons.facebook,
-              LK.facebook.tr,
-              member.facebookUrl ?? LK.na,
-              AppColors.blue,
-              onTap: member.facebookUrl != null
-                  ? () => controller.launchSafeUrl(member.facebookUrl!)
-                  : null,
-            ),
-            _buildSocialItem(
-              Icons.camera_alt_outlined,
-              LK.instagram.tr,
-              member.instagramUrl ?? LK.na,
-              Colors.pink,
-              onTap: member.instagramUrl != null
-                  ? () => controller.launchSafeUrl(member.instagramUrl!)
-                  : null,
-            ),
+          _buildSocialItem(
+            Icons.facebook,
+            LK.facebook.tr,
+            member.facebookUrl ?? LK.na,
+            AppColors.blue,
+            onTap: member.facebookUrl != null
+                ? () => controller.launchSafeUrl(member.facebookUrl!)
+                : null,
           ),
-          _buildSocialRow(
-            _buildSocialItem(
-              Icons.chat_bubble_outline,
-              LK.whatsapp.tr,
-              member.whatsappUrl ?? LK.na,
-              AppColors.green,
-              onTap: member.whatsappUrl != null
-                  ? () => controller.launchSafeUrl(member.whatsappUrl!)
-                  : null,
-            ),
-            _buildSocialItem(
-              Icons.alternate_email,
-              LK.twitterX.tr,
-              member.twitterUrl ?? LK.na,
-              AppColors.black,
-              onTap: member.twitterUrl != null
-                  ? () => controller.launchSafeUrl(member.twitterUrl!)
-                  : null,
-            ),
-            isLast: true,
+          SizedBox(height: 16.0),
+          _buildSocialItem(
+            Icons.camera_alt_outlined,
+            LK.instagram.tr,
+            member.instagramUrl ?? LK.na,
+            Colors.pink,
+            onTap: member.instagramUrl != null
+                ? () => controller.launchSafeUrl(member.instagramUrl!)
+                : null,
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialRow(Widget item1, Widget item2, {bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: item1),
-          SizedBox(width: 12.w),
-          Expanded(child: item2),
+          SizedBox(height: 16.0),
+          _buildSocialItem(
+            Icons.chat_bubble_outline,
+            LK.whatsapp.tr,
+            member.whatsappUrl ?? LK.na,
+            AppColors.green,
+            onTap: member.whatsappUrl != null
+                ? () => controller.launchSafeUrl(member.whatsappUrl!)
+                : null,
+          ),
+          SizedBox(height: 16.0),
+          _buildSocialItem(
+            Icons.alternate_email,
+            LK.twitterX.tr,
+            member.twitterUrl ?? LK.na,
+            AppColors.black,
+            onTap: member.twitterUrl != null
+                ? () => controller.launchSafeUrl(member.twitterUrl!)
+                : null,
+          ),
         ],
       ),
     );
@@ -680,6 +664,8 @@ class _SocialMediaSection extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

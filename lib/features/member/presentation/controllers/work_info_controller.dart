@@ -62,6 +62,7 @@ class WorkInfoController extends GetxController {
   late final TextEditingController otherJobPositionCtrl;
   late final TextEditingController otherJobPositionEnglishCtrl;
   late final TextEditingController otherOccupationCtrl;
+  late final TextEditingController occupationDescriptionCtrl;
 
   @override
   void onInit() {
@@ -76,6 +77,7 @@ class WorkInfoController extends GetxController {
     otherJobPositionCtrl = TextEditingController();
     otherJobPositionEnglishCtrl = TextEditingController();
     otherOccupationCtrl = TextEditingController();
+    occupationDescriptionCtrl = TextEditingController();
 
     companyNameCtrl.addListener(() => companyName.value = companyNameCtrl.text);
     businessNameCtrl.addListener(() => businessName.value = businessNameCtrl.text);
@@ -87,6 +89,7 @@ class WorkInfoController extends GetxController {
     otherJobPositionCtrl.addListener(() => otherJobPosition.value = otherJobPositionCtrl.text);
     otherJobPositionEnglishCtrl.addListener(() => otherJobPositionEnglish.value = otherJobPositionEnglishCtrl.text);
     otherOccupationCtrl.addListener(() => otherOccupation.value = otherOccupationCtrl.text);
+    occupationDescriptionCtrl.addListener(() => occupationDescription.value = occupationDescriptionCtrl.text);
 
     ever(workState, (_) {
       fetchDistricts().then((_) => _ensureSelectionValue(workDistrict, workDistrictList));
@@ -114,6 +117,7 @@ class WorkInfoController extends GetxController {
     otherJobPositionCtrl.dispose();
     otherJobPositionEnglishCtrl.dispose();
     otherOccupationCtrl.dispose();
+    occupationDescriptionCtrl.dispose();
     super.onClose();
   }
 
@@ -145,11 +149,27 @@ class WorkInfoController extends GetxController {
     otherJobPositionCtrl.text = otherJobPosition.value;
     otherJobPositionEnglishCtrl.text = otherJobPositionEnglish.value;
     otherOccupationCtrl.text = otherOccupation.value;
+    occupationDescriptionCtrl.text = occupationDescription.value;
   }
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
     if (selected.value.isNotEmpty && !list.contains(selected.value)) {
-      selected.value = '';
+      if (list.isEmpty) return; // Wait for list to load before wiping out data
+      final query = selected.value.replaceAll(' ', '').toLowerCase();
+      
+      String? match;
+      for (final item in list) {
+        if (item.replaceAll(' ', '').toLowerCase() == query) {
+          match = item;
+          break;
+        }
+      }
+      
+      if (match != null) {
+        selected.value = match;
+      } else {
+        selected.value = '';
+      }
     }
   }
 
@@ -204,7 +224,7 @@ class WorkInfoController extends GetxController {
     }
     final list = <String>[].obs;
     addressDistrictCache[stateName] = list;
-    final stateId = workStateIdMap[stateName];
+    final stateId = globalStateIdMap[stateName] ?? workStateIdMap[stateName];
     if (stateId != null) {
       fetchDropdown('/district/dropdown?stateId=$stateId', list, [], idMap: globalDistrictIdMap);
     }
@@ -232,9 +252,9 @@ class WorkInfoController extends GetxController {
     }
     final list = <String>[].obs;
     addressAreaCache[talukaName] = list;
-    final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
+    final talukaId = globalTalukaIdMap[talukaName];
     if (talukaId != null) {
-      fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap);
+      fetchDropdown('/area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap);
     }
     return list;
   }
@@ -262,7 +282,13 @@ class WorkInfoController extends GetxController {
               .map((e) {
                 final map = e as Map<String, dynamic>;
                 String text = '';
-                final textKeys = ['text', 'Text', 'name', 'Name', 'value', 'Value', 'stateName', 'districtName', 'talukaName', 'areaName'];
+                final textKeys = [
+                  'text', 'Text', 'name', 'Name', 'value', 'Value',
+                  'bloodGroupName', 'genderName', 'maritalStatusName', 'signName',
+                  'relationTypeName', 'occupationTypeName', 'jobPositionName', 
+                  'educationName', 'gotraName',
+                  'stateName', 'districtName', 'talukaName', 'areaName'
+                ];
                 for (final key in textKeys) {
                   if (map.containsKey(key) && map[key] != null) {
                     text = map[key].toString().trim();
@@ -280,7 +306,13 @@ class WorkInfoController extends GetxController {
 
                 if (text.isNotEmpty && idMap != null) {
                   int? foundId;
-                  final idKeys = ['id', 'Id', 'value', 'Value', 'stateId', 'districtId', 'talukaId', 'areaId'];
+                  final idKeys = [
+                    'id', 'Id', 'value', 'Value', 
+                    'bloodGroupId', 'genderId', 'maritalStatusId', 'signId',
+                    'relationTypeId', 'occupationTypeId', 'jobPositionId', 
+                    'educationId', 'gotraId',
+                    'stateId', 'districtId', 'talukaId', 'areaId'
+                  ];
                   for (final key in idKeys) {
                     if (map.containsKey(key) && map[key] != null) {
                       foundId = int.tryParse(map[key].toString());
@@ -302,6 +334,7 @@ class WorkInfoController extends GetxController {
                 return text;
               })
               .where((s) => s.isNotEmpty)
+              .toSet()
               .toList();
 
           if (items.isNotEmpty) {

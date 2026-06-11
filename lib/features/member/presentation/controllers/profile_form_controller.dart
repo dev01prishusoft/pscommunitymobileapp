@@ -14,6 +14,7 @@ import 'package:pscommunitymobileapp/features/member/presentation/controllers/co
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
@@ -32,8 +33,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
     personalInfo = Get.put(PersonalInfoController(), tag: 'personal');
     contactInfo = Get.put(ContactController(), tag: 'contact');
     workInfo = Get.put(WorkInfoController(), tag: 'work');
-
-    personalInfo.memberNoCtrl.text = generateMemberNo();
 
     loadAllDropdowns();
   }
@@ -184,6 +183,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   TextEditingController get otherJobPositionCtrl => workInfo.otherJobPositionCtrl;
   TextEditingController get otherJobPositionEnglishCtrl => workInfo.otherJobPositionEnglishCtrl;
   TextEditingController get otherOccupationCtrl => workInfo.otherOccupationCtrl;
+  TextEditingController get occupationDescriptionCtrl => workInfo.occupationDescriptionCtrl;
 
   RxList<String> getAddressDistricts(String stateName) => workInfo.getAddressDistricts(stateName);
   RxList<String> getAddressTalukas(String districtName) => workInfo.getAddressTalukas(districtName);
@@ -211,8 +211,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
 
     addIfChanged('FirstName', personalInfo.firstName.value, m.firstName);
+    addIfChanged('FirstNameEnglish', personalInfo.firstNameEn.value, m.firstNameEnglish ?? '');
     addIfChanged('MiddleName', personalInfo.middleName.value, m.middleName ?? '');
     addIfChanged('LastName', personalInfo.lastName.value, m.lastName);
+    addIfChanged('LastNameEnglish', personalInfo.lastNameEn.value, m.lastNameEnglish ?? '');
     
     String? formatDob(String? d) {
        if (d == null || d.isEmpty) return null;
@@ -256,6 +258,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addDropdown('BloodGroupId', personalInfo.bloodGroup, personalInfo.bloodGroupIdMap, m.bloodGroupName);
     addDropdown('GotraId', personalInfo.gotra, personalInfo.gotraIdMap, m.gotraName, m.gotraId);
     addDropdown('MotherGotraId', personalInfo.mothersGotra, personalInfo.mothersGotraIdMap, null, m.motherGotraId);
+    addDropdown('MotherAreaId', personalInfo.motherArea, workInfo.globalAreaIdMap, m.motherAreaName, m.motherAreaId);
     addDropdown('signId', personalInfo.sign, personalInfo.signIdMap, m.signName, m.signId);
     addDropdown('RelationTypeId', personalInfo.relation, personalInfo.relationIdMap, m.relatedToMemberName, m.relationTypeId);
     
@@ -425,6 +428,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
           return AddressModel(
             type: map['addressTypeName']?.toString() ?? '',
+            typeId: map['addressTypeId'] as int?,
             state: stateName,
             district: districtName,
             taluka: talukaName,
@@ -440,6 +444,14 @@ class ProfileFormController extends GetxController with FormStateMixin {
             isPrimary: map['isPrimary'] == true,
           );
         }).toList();
+
+        // Sort addresses so the primary one is always first
+        newAddresses.sort((a, b) {
+          if (a.isPrimary && !b.isPrimary) return -1;
+          if (!a.isPrimary && b.isPrimary) return 1;
+          return 0;
+        });
+
         if (newAddresses.isNotEmpty) {
           contactInfo.addresses.value = newAddresses;
         }
@@ -451,6 +463,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   void markAsAddMode() {
     isAddMode = true;
+    personalInfo.memberNoCtrl.text = generateMemberNo();
     isMemberLoaded = true; // Pretend it's loaded so snapshot runs when dropdowns finish
     _checkAndTakeSnapshot();
   }
@@ -493,32 +506,70 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
   }
 
-  void takeSnapshot() {
+  Future<void> takeSnapshot() async {
     _ensureSelectionValue(personalInfo.gender, personalInfo.genderList);
     _ensureSelectionValue(personalInfo.maritalStatus, personalInfo.maritalStatusList);
     _ensureSelectionValue(personalInfo.bloodGroup, personalInfo.bloodGroupList);
-    if (_currentMember != null && _currentMember!.relationTypeId != null) {
-      final id = _currentMember!.relationTypeId;
-      for (final entry in personalInfo.relationIdMap.entries) {
-        if (entry.value == id) {
-          personalInfo.relation.value = entry.key;
-          break;
+    if (_currentMember != null) {
+      if (_currentMember!.genderId != null) {
+        final id = _currentMember!.genderId;
+        for (final entry in personalInfo.genderIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.gender.value = entry.key;
+            break;
+          }
         }
       }
-    }
-    if (_currentMember != null && _currentMember!.motherGotraId != null) {
-      final id = _currentMember!.motherGotraId;
-      for (final entry in personalInfo.mothersGotraIdMap.entries) {
-        if (entry.value == id) {
-          personalInfo.mothersGotra.value = entry.key;
-          break;
+      if (_currentMember!.maritalStatusId != null) {
+        final id = _currentMember!.maritalStatusId;
+        for (final entry in personalInfo.maritalStatusIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.maritalStatus.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.bloodGroupId != null) {
+        final id = _currentMember!.bloodGroupId;
+        for (final entry in personalInfo.bloodGroupIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.bloodGroup.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.relationTypeId != null) {
+        final id = _currentMember!.relationTypeId;
+        for (final entry in personalInfo.relationIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.relation.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.motherGotraId != null) {
+        final id = _currentMember!.motherGotraId;
+        for (final entry in personalInfo.mothersGotraIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.mothersGotra.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.motherStateId != null && personalInfo.motherState.value.isEmpty) {
+        await _resolveMotherLocations(_currentMember!);
+      }
+      if (_currentMember!.signId != null) {
+        final id = _currentMember!.signId;
+        for (final entry in personalInfo.signIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.sign.value = entry.key;
+            break;
+          }
         }
       }
     }
     _ensureSelectionValue(personalInfo.relation, personalInfo.relationList);
-    if (_currentMember == null && personalInfo.relation.value.isEmpty && personalInfo.relationList.isNotEmpty) {
-      personalInfo.relation.value = personalInfo.relationList.first;
-    }
     _ensureSelectionValue(workInfo.occupationType, workInfo.occupationTypeList);
     _ensureSelectionValue(workInfo.occupation, workInfo.occupationList);
     _ensureSelectionValue(workInfo.jobPosition, workInfo.jobPositionList);
@@ -552,6 +603,45 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
       }
+      if (_currentMember!.occupationStateId != null) {
+        final id = _currentMember!.occupationStateId;
+        for (final entry in workInfo.workStateIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.workState.value = entry.key;
+            await workInfo.fetchDistricts();
+            break;
+          }
+        }
+      }
+      if (_currentMember!.occupationDistrictId != null) {
+        final id = _currentMember!.occupationDistrictId;
+        for (final entry in workInfo.workDistrictIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.workDistrict.value = entry.key;
+            await workInfo.fetchTalukas();
+            break;
+          }
+        }
+      }
+      if (_currentMember!.occupationTalukaId != null) {
+        final id = _currentMember!.occupationTalukaId;
+        for (final entry in workInfo.workTalukaIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.workTaluka.value = entry.key;
+            await workInfo.fetchAreas();
+            break;
+          }
+        }
+      }
+      if (_currentMember!.occupationAreaId != null) {
+        final id = _currentMember!.occupationAreaId;
+        for (final entry in workInfo.workAreaIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.workArea.value = entry.key;
+            break;
+          }
+        }
+      }
     }
     _ensureSelectionValue(personalInfo.gotra, personalInfo.gotraList);
     _ensureSelectionValue(personalInfo.mothersGotra, personalInfo.mothersGotraList);
@@ -568,19 +658,130 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _initialDropdownValues['BloodGroupId'] = personalInfo.bloodGroup.value;
     _initialDropdownValues['GotraId'] = personalInfo.gotra.value;
     _initialDropdownValues['MotherGotraId'] = personalInfo.mothersGotra.value;
+    _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
+    _initialDropdownValues['MotherDistrictId'] = personalInfo.motherDistrict.value;
+    _initialDropdownValues['MotherTalukaId'] = personalInfo.motherTaluka.value;
+    _initialDropdownValues['MotherAreaId'] = personalInfo.motherArea.value;
     _initialDropdownValues['signId'] = personalInfo.sign.value;
     _initialDropdownValues['RelationTypeId'] = personalInfo.relation.value;
     _initialDropdownValues['OccupationTypeId'] = workInfo.occupationType.value;
     _initialDropdownValues['OccupationTalukaId'] = workInfo.workTaluka.value;
     _initialDropdownValues['OccupationAreaId'] = workInfo.workArea.value;
 
+    // Fix up addresses based on dropdown ID maps
+    for (final addr in contactInfo.addresses) {
+      if (addr.typeId != null) {
+        for (final entry in contactInfo.addressTypeIdMap.entries) {
+          if (entry.value == addr.typeId) {
+            addr.type = entry.key;
+            break;
+          }
+        }
+      }
+    }
+    contactInfo.addresses.refresh();
+
     // Trigger an update so Obx recalculates hasChanges now that snapshot is ready
     changedFormData; 
   }
 
+  Future<void> _resolveMotherLocations(Member m) async {
+    try {
+      if (m.motherStateId != null && personalInfo.motherState.value.isEmpty) {
+        String? stateName;
+        for (final entry in workInfo.globalStateIdMap.entries) {
+          if (entry.value == m.motherStateId) { stateName = entry.key; break; }
+        }
+        if (stateName == null) {
+          for (final entry in workInfo.workStateIdMap.entries) {
+            if (entry.value == m.motherStateId) { stateName = entry.key; break; }
+          }
+        }
+        if (stateName != null) personalInfo.motherState.value = stateName;
+      }
+      
+      if (personalInfo.motherState.value.isEmpty) return;
+
+      if (m.motherDistrictId != null && personalInfo.motherDistrict.value.isEmpty) {
+        final list = <String>[].obs;
+        await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap);
+        String? districtName;
+        for (final entry in workInfo.globalDistrictIdMap.entries) {
+          if (entry.value == m.motherDistrictId) { districtName = entry.key; break; }
+        }
+        if (districtName != null) {
+          personalInfo.motherDistrict.value = districtName;
+          workInfo.addressDistrictCache.putIfAbsent(personalInfo.motherState.value, () => <String>[].obs);
+          if (!workInfo.addressDistrictCache[personalInfo.motherState.value]!.contains(districtName)) {
+            workInfo.addressDistrictCache[personalInfo.motherState.value]!.add(districtName);
+          }
+        }
+      }
+
+      if (personalInfo.motherDistrict.value.isEmpty) return;
+
+      if (m.motherTalukaId != null && personalInfo.motherTaluka.value.isEmpty) {
+        final list = <String>[].obs;
+        await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap);
+        String? talukaName;
+        for (final entry in workInfo.globalTalukaIdMap.entries) {
+          if (entry.value == m.motherTalukaId) { talukaName = entry.key; break; }
+        }
+        if (talukaName != null) {
+          personalInfo.motherTaluka.value = talukaName;
+          workInfo.addressTalukaCache.putIfAbsent(personalInfo.motherDistrict.value, () => <String>[].obs);
+          if (!workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!.contains(talukaName)) {
+            workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!.add(talukaName);
+          }
+        }
+      }
+
+      if (personalInfo.motherTaluka.value.isEmpty) return;
+
+      if (m.motherAreaId != null && personalInfo.motherArea.value.isEmpty) {
+        final list = <String>[].obs;
+        await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap);
+        String? areaName;
+        for (final entry in workInfo.globalAreaIdMap.entries) {
+          if (entry.value == m.motherAreaId) { areaName = entry.key; break; }
+        }
+        if (areaName != null) {
+          personalInfo.motherArea.value = areaName;
+          workInfo.addressAreaCache.putIfAbsent(personalInfo.motherTaluka.value, () => <String>[].obs);
+          if (!workInfo.addressAreaCache[personalInfo.motherTaluka.value]!.contains(areaName)) {
+            workInfo.addressAreaCache[personalInfo.motherTaluka.value]!.add(areaName);
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore
+    } finally {
+      _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
+      _initialDropdownValues['MotherDistrictId'] = personalInfo.motherDistrict.value;
+      _initialDropdownValues['MotherTalukaId'] = personalInfo.motherTaluka.value;
+      _initialDropdownValues['MotherAreaId'] = personalInfo.motherArea.value;
+    }
+  }
+
+
   void _ensureSelectionValue(RxString selected, List<String> list) {
     if (selected.value.isNotEmpty && !list.contains(selected.value)) {
-      selected.value = '';
+      if (list.isEmpty) return; // Wait for list to load before wiping out data
+      final query = selected.value.replaceAll(' ', '').toLowerCase();
+      
+      String? match;
+      for (final item in list) {
+        if (item.replaceAll(' ', '').toLowerCase() == query) {
+          match = item;
+          break;
+        }
+      }
+      
+      if (match != null) {
+        selected.value = match;
+      } else {
+        selected.value = '';
+      }
     }
   }
 
@@ -608,6 +809,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (isEdit) {
             final formDataChanges = changedFormData;
             formDataMap.addAll(formDataChanges);
+            formDataMap['MemberId'] = _currentMember!.memberId;
 
             if (personalInfo.profileImage.value != null) {
               final file = personalInfo.profileImage.value!;
@@ -651,6 +853,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['RelationTypeId'] = getId(personalInfo.relation.value, personalInfo.relationIdMap);
             formDataMap['GotraId'] = getId(personalInfo.gotra.value, personalInfo.gotraIdMap);
             formDataMap['MotherGotraId'] = getId(personalInfo.mothersGotra.value, personalInfo.mothersGotraIdMap);
+            formDataMap['MotherStateId'] = getId(personalInfo.motherState.value, workInfo.globalStateIdMap);
+            formDataMap['MotherDistrictId'] = getId(personalInfo.motherDistrict.value, workInfo.globalDistrictIdMap);
+            formDataMap['MotherTalukaId'] = getId(personalInfo.motherTaluka.value, workInfo.globalTalukaIdMap);
+            formDataMap['MotherAreaId'] = getId(personalInfo.motherArea.value, workInfo.globalAreaIdMap);
             formDataMap['MotherFatherName'] = personalInfo.motherFatherNameCtrl.text;
             formDataMap['signId'] = getId(personalInfo.sign.value, personalInfo.signIdMap);
             formDataMap['IsLookingforMarriage'] = personalInfo.openToMarriage.value;
@@ -720,6 +926,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
 
           if (formDataMap.isNotEmpty) {
+            // Remove any internal dummy tracking keys before sending to API
+            formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
+
             AppLogger.d('--- API REQUEST ---');
             AppLogger.d('URL: ${isEdit ? '/api/v1/MemberUpdateRequest/create' : '/api/v1/member/mobile/upsert'}');
             final printableMap = formDataMap.map((key, value) {
@@ -728,7 +937,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               }
               return MapEntry(key, value);
             });
-            debugPrint('Payload: \n${JsonEncoder.withIndent('  ').convert(printableMap)}');
+            AppLogger.d('Payload: \n${JsonEncoder.withIndent('  ').convert(printableMap)}');
 
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
@@ -741,7 +950,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             AppLogger.d(response.data?.toString() ?? 'No Response Data');
           }
 
-          Get.back(result: true);
+          await Get.offAllNamed<void>(AppRouter.home);
           
           Future.delayed(const Duration(milliseconds: 300), () {
             Get.snackbar(
@@ -753,6 +962,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
           });
         } catch (e, stack) {
           AppLogger.e('Submit form error', e, stack);
+          if (e is dio.DioException) {
+            AppLogger.e('--- DIO ERROR DETAILS ---');
+            AppLogger.e('Status Code: ${e.response?.statusCode}');
+            AppLogger.e('Response Data: ${e.response?.data}');
+          }
           Get.snackbar(
             LK.error.tr,
             LK.unexpectedError.tr,

@@ -153,7 +153,7 @@ class LK {
   static String shareQR = 'Share QR';
   static String close = 'Close';
   static String gender = 'Gender';
-  static String birthDate = 'Birth Date';
+  static String birthDate = 'Date of Birth';
   static String na = 'N/A';
   static String occupationLabel = 'Occupation';
   static String occupation = 'Occupation';
@@ -199,6 +199,7 @@ class LK {
   static String companyNameLabel = 'Company Name:';
   static String businessAddressLabel = 'Business Address:';
   static String descriptionLabel = 'Description:';
+  static String occupationDescriptionLabel = 'Occupation Description';
 
   static String accountHolderNameLabel = 'Account Holder Name:';
   static String accountNumberLabel = 'Account Number:';
@@ -299,6 +300,7 @@ class LK {
   static String committees = 'Committees';
   static String samajSubtitle = 'A community for Patel families';
   static String committeeMembers = 'Committee Members';
+  static String relation = 'Relation';
   static String role = 'Role';
   static String memberDetails = 'Member Details';
   static String startDateLabel = 'Start Date';
@@ -311,8 +313,12 @@ class LK {
   static String youthActivitiesAndEvents = 'Youth activities and events';
   static String shreePatelEducationTrust = 'Shree Patel Education Trust';
   static String educationalScholarships = 'Educational scholarships';
-  static String birthTime = 'Birth Time';
-  static String motherFatherName = "Mother/Father's Name";
+  static String birthTime = 'Time of Birth';
+  static String motherFatherName = 'Mother\'s / Father\'s Name';
+  static String mothersState = 'Mother\'s State';
+  static String mothersDistrict = 'Mother\'s District';
+  static String mothersTaluka = 'Mother\'s Taluka';
+  static String mothersArea = 'Mother\'s Area';
   static String occupationArea = 'Occupation Area';
   static String ownHouse = 'Own House';
   static String ownLand = 'Own Land';
@@ -354,7 +360,7 @@ class LK {
   static String heightColon = 'Height:';
   static String weightColon = 'Weight:';
   static String bloodGroupColon = 'Blood Group:';
-  static String birthDateColon = 'Birth Date:';
+  static String birthDateColon = 'Date of Birth:';
   static String educationColon = 'Education:';
   static String incomeColon = 'Income:';
 
@@ -413,8 +419,8 @@ class LK {
   static String timeOfBirth = 'Time of Birth';
   static String bloodGroup = 'Blood Group';
   static String sign = 'Sign';
-  static String weightKg = 'Weight (Kg)';
-  static String heightCm = 'Height (Cm)';
+  static String weightKg = 'Weight (KG)';
+  static String heightCm = 'Height (CM)';
   static String memberIsActive = 'Member is active';
   static String profilePhoto = 'Profile Photo';
   static String chooseFile = 'Choose File';
@@ -602,6 +608,7 @@ class LK {
     companyNameLabel,
     businessAddressLabel,
     descriptionLabel,
+    occupationDescriptionLabel,
     accountHolderNameLabel,
     accountNumberLabel,
     accountTypeLabel,
@@ -671,6 +678,11 @@ class LK {
     ageRangeLabel,
     heightRangeLabel,
     gotraLabel,
+    mothersState,
+    mothersDistrict,
+    mothersTaluka,
+    mothersArea,
+    mothersGotra,
     excludeSameGotra,
     maritalStatusLabel,
     residenceLabel,
@@ -699,6 +711,7 @@ class LK {
     committees,
     samajSubtitle,
     committeeMembers,
+    relation,
     role,
     memberDetails,
     startDateLabel,
@@ -874,6 +887,10 @@ class LK {
     jobPositionRequired,
     occupationType,
     memberAddedSuccessfully,
+    noAddressesYet,
+    addressRequiredError,
+    noEducationRecordsYet,
+    educationRequiredError,
   ];
 }
 

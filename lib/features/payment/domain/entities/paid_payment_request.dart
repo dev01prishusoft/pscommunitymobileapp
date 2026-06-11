@@ -8,6 +8,7 @@ class PaidPaymentRequest {
     required this.amountFormatted,
     required this.paidDate,
     required this.receiptId,
+    required this.status,
   });
 
   factory PaidPaymentRequest.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class PaidPaymentRequest {
       amountFormatted: json['amountFormatted'] as String? ?? '',
       paidDate: json['paidDate'] as String? ?? '',
       receiptId: json['receiptId'] as int? ?? 0,
+      status: json['status'] as String? ?? json['paymentStatus'] as String? ?? 'Paid',
     );
   }
   final int id;
@@ -30,4 +32,5 @@ class PaidPaymentRequest {
   final String amountFormatted;
   final String paidDate;
   final int receiptId;
+  final String status;
 }
