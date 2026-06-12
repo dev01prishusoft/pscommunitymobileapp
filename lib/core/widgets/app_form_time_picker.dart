@@ -111,9 +111,13 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
               onSurface: AppColors.foreground,
             ),
           ),
-          child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-            child: child!,
+          child: Localizations.override(
+            context: context,
+            locale: const Locale('en', 'US'),
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+              child: child!,
+            ),
           ),
         );
       },

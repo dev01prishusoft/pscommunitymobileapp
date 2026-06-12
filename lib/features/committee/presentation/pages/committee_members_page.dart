@@ -41,21 +41,19 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         title: Text(LK.committeeMembers.tr, style: AppTextStyles.labelLarge),
       ),
       body: Obx(() {
-        final detail = controller.committeeDetail;
-        final groups = controller.getGroupedMembers(detail?.members ?? []);
         return AppStateView(
-          state: controller.detailState.value,
-          onRetry: () => controller.loadCommitteeDetail(node.id),
-          child: detail == null ? SizedBox.shrink() : _buildContent(groups),
+          state: controller.membersState.value,
+          onRetry: () => controller.init(controller.node),
+          child: _buildContent(
+            controller.getGroupedMembers(controller.membersList),
+          ),
         );
       }),
     );
   }
 
   Widget _buildContent(Map<String, List<CommitteeMember>> groups) {
-    final roles = controller.getRoles(
-      controller.committeeDetail?.members ?? [],
-    );
+    final roles = controller.getRoles(controller.membersList);
     return Column(
       children: [
         Padding(
@@ -361,7 +359,12 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             AppSpacing.vL,
                             _buildDetailRow(
                               LK.startDateLabel.tr,
-                              member.startDate?.split('T').first ?? '--',
+                              member.startDate?.split('T').first ?? '-',
+                            ),
+                            AppSpacing.vL,
+                            _buildDetailRow(
+                              LK.endDateLabel.tr,
+                              member.endDate?.split('T').first ?? '-',
                             ),
                           ],
                         ),

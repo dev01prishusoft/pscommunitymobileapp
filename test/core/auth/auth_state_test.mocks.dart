@@ -262,9 +262,36 @@ class MockLocalizationService extends _i1.Mock
           as _i4.Future<void>);
 
   @override
+  _i4.Future<void> restoreSavedLocale() =>
+      (super.noSuchMethod(
+            Invocation.method(#restoreSavedLocale, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> fetchLanguagesAndAllResources() =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchLanguagesAndAllResources, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
   _i4.Future<void> fetchLanguages() =>
       (super.noSuchMethod(
             Invocation.method(#fetchLanguages, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> fetchLanguageResources(String? langCode) =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchLanguageResources, [langCode]),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
@@ -278,4 +305,10 @@ class MockLocalizationService extends _i1.Mock
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  void clearLanguages() => super.noSuchMethod(
+    Invocation.method(#clearLanguages, []),
+    returnValueForMissingStub: null,
+  );
 }

@@ -14,7 +14,9 @@ import 'firebase_options.dart';
 
 void main() {
   runZonedGuarded(_bootstrap, (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    // Setting fatal to true will force the app to crash natively on Android.
+    // Async errors like Image 404s should NOT crash the app.
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
     debugPrint('UNCAUGHT ASYNC ERROR: $error\n$stack');
     AppLogger.e('Uncaught async error', error, stack);
   });

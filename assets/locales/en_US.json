@@ -96,7 +96,7 @@
   "Education:": "Education:",
   "Educational scholarships": "Educational scholarships",
   "Email": "Email",
-  "Emergency Contact": "Emergency Contact",
+  "Emergency Contact No": "Emergency Contact No",
   "Emergency Contact Name": "Emergency Contact Name",
   "End Date": "End Date",
   "Enter 10-digit mobile number": "Enter 10-digit mobile number",
@@ -182,7 +182,7 @@
   "Monthly Income": "Monthly Income",
   "Mother": "Mother",
   "Mother's Gotra": "Mother's Gotra",
-  "Mother/Father's Name": "Mother/Father's Name",
+  "Mother's Father Name": "Mother's Father Name",
   "N/A": "N/A",
   "Name:": "Name:",
   "Need help?": "Need help?",
@@ -274,6 +274,7 @@
   "Reset Password": "Reset Password",
   "Residence:": "Residence:",
   "Retry": "Retry",
+  "Setup Auto-Pay (Recurring)": "Setup Auto-Pay (Recurring)",
   "Relation": "Relation",
   "Role": "Role",
   "SSC": "SSC",
@@ -436,5 +437,9 @@
   "No addresses yet.": "No addresses yet.",
   "At least one address is required.": "At least one address is required.",
   "No education records yet.": "No education records yet.",
-  "At least one education record is required.": "At least one education record is required."
+  "At least one education record is required.": "At least one education record is required.",
+  "Mother's State": "Mother's State",
+  "Mother's District": "Mother's District",
+  "Mother's Taluka": "Mother's Taluka",
+  "Mother's Area": "Mother's Area"
 }

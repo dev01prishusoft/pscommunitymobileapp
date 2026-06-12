@@ -5,6 +5,7 @@ class PaymentCategory {
     required this.defaultAmount,
     required this.minAmount,
     required this.maxAmount,
+    this.isRecurring = false,
   });
 
   factory PaymentCategory.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,7 @@ class PaymentCategory {
       defaultAmount: (json['defaultAmount'] as num?)?.toDouble() ?? 0.0,
       minAmount: (json['minAmount'] as num?)?.toDouble() ?? 0.0,
       maxAmount: (json['maxAmount'] as num?)?.toDouble() ?? 50000.0,
+      isRecurring: json['isRecurring'] as bool? ?? false,
     );
   }
   final int id;
@@ -21,4 +23,5 @@ class PaymentCategory {
   final double defaultAmount;
   final double minAmount;
   final double maxAmount;
+  final bool isRecurring;
 }

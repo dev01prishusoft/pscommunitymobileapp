@@ -96,7 +96,7 @@
   "Education:": "શિક્ષણ:",
   "Educational scholarships": "શૈક્ષણિક શિષ્યવૃત્તિ",
   "Email": "ઈમેલ",
-  "Emergency Contact": "ઇમરજન્સી સંપર્ક",
+  "Emergency Contact No": "ઇમરજન્સી સંપર્ક નંબર",
   "Emergency Contact Name": "ઇમરજન્સી સંપર્ક વ્યક્તિ",
   "End Date": "અંતિમ તારીખ",
   "Enter 10-digit mobile number": "10-આંકડાનો મોબાઈલ નંબર દાખલ કરો",
@@ -182,7 +182,7 @@
   "Monthly Income": "માસિક આવક",
   "Mother": "માતા",
   "Mother's Gotra": "માતાનું ગોત્ર",
-  "Mother/Father's Name": "માતા/પિતાનું નામ",
+  "Mother's Father Name": "માતા પિતાનું નામ",
   "N/A": "N/A",
   "Name:": "નામ:",
   "Need help?": "મદદ જોઈએ છે?",
@@ -275,6 +275,7 @@
   "Reset Password": "પાસવર્ડ બદલો",
   "Residence:": "રહેઠાણ:",
   "Retry": "ફરીથી પ્રયાસ કરો",
+  "Setup Auto-Pay (Recurring)": "ઓટો-પે સેટ કરો (રિકરિંગ)",
   "Relation": "સંબંધ",
   "Role": "ભૂમિકા",
   "SSC": "SSC",
@@ -436,5 +437,9 @@
   "No addresses yet.": "હજુ સુધી કોઈ સરનામું નથી.",
   "At least one address is required.": "ઓછામાં ઓછું એક સરનામું જરૂરી છે.",
   "No education records yet.": "હજુ સુધી કોઈ શિક્ષણ રેકોર્ડ નથી.",
-  "At least one education record is required.": "ઓછામાં ઓછો એક શિક્ષણ રેકોર્ડ જરૂરી છે."
+  "At least one education record is required.": "ઓછામાં ઓછો એક શિક્ષણ રેકોર્ડ જરૂરી છે.",
+  "Mother's State": "માતાનું રાજ્ય",
+  "Mother's District": "માતાનો જિલ્લો",
+  "Mother's Taluka": "માતાનો તાલુકો",
+  "Mother's Area": "માતાનો વિસ્તાર"
 }

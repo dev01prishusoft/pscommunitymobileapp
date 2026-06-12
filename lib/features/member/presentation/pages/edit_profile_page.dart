@@ -1,6 +1,7 @@
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -401,9 +402,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ),
                               )
                               .toList(),
-                      onChanged: !controller.personalInfo.isFamilyHead.value 
-                          ? null 
-                          : (v) => controller.relation.value = v!,
+                      onChanged: null,
                       label: LK.relation.tr,
                     ),
                   ),
@@ -412,6 +411,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.motherFatherNameCtrl,
                     label: LK.motherFatherName.tr,
                     prefixIcon: Icon(Icons.people_outline),
+                    maxLength: 100,
                   ),
                   AppSpacing.vM,
                   _buildFieldPair(
@@ -708,6 +708,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Obx(() {
                   final file = controller.profileImage.value;
                   final profileUrl = controller.currentMember?.profilePhotoFullUrl;
+                  final isRemoved = controller.personalInfo.isPhotoRemoved.value;
+                  final showNetworkImage = !isRemoved && profileUrl != null && profileUrl.isNotEmpty;
 
                   return Container(
                     width: 120,
@@ -724,14 +726,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               image: FileImage(file),
                               fit: BoxFit.cover,
                             )
-                          : (profileUrl != null && profileUrl.isNotEmpty)
+                          : showNetworkImage
                               ? DecorationImage(
                                   image: NetworkImage(profileUrl),
                                   fit: BoxFit.cover,
                                 )
                               : null,
                     ),
-                    child: (file == null && (profileUrl == null || profileUrl.isEmpty))
+                    child: (file == null && !showNetworkImage)
                         ? Icon(
                             Icons.person,
                             size: 60,
@@ -760,23 +762,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
           ),
 
-          Obx(() {
-            if (controller.profileImage.value != null) {
-              return Padding(
-                padding: EdgeInsets.only(top: AppSpacing.l),
-                child: TextButton(
-                  onPressed: controller.removePhoto,
-                  child: Text(
-                    LK.removePhoto.tr,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.destructive,
-                    ),
-                  ),
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          }),
+
           AppSpacing.vM,
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: controller.memberNoCtrl,
@@ -890,37 +876,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildAddressItem(int index) {
     final addr = controller.addresses[index];
-    return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.l),
-      padding: AppSpacing.pM,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '${LK.address.tr} #${index + 1}',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          AppSpacing.vM,
-          Obx(() {
+    final bool isSameAsFamilyHead = controller.currentMember?.issameAddressasMyFamilyHeadAddress == true;
+    final bool isDisabled = !addr.isPrimary || isSameAsFamilyHead;
+
+    final fieldsWidget = IgnorePointer(
+      ignoring: isDisabled,
+      child: Opacity(
+        opacity: isDisabled ? 0.6 : 1.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppSpacing.vS,
+            Obx(() {
             final typeList = controller.contactInfo.addressTypeList;
             return AppFormDropdown<String>(
               value: typeList.contains(addr.type)
@@ -1133,11 +1100,68 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     AppSpacing.hS,
                     Text('Primary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
-                  ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!addr.isPrimary) {
+      return Container(
+        margin: EdgeInsets.only(bottom: AppSpacing.l),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Theme(
+          data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            title: Text(
+              '${LK.address.tr} #${index + 1}',
+              style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary),
+            ),
+            childrenPadding: EdgeInsets.all(AppSpacing.m).copyWith(top: 0),
+            children: [fieldsWidget],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacing.l),
+      padding: AppSpacing.pM,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${LK.address.tr} #${index + 1}',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
           ),
+          fieldsWidget,
         ],
       ),
     );
@@ -1168,27 +1192,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildEducationItem(int index) {
     final edu = controller.educationList[index];
+    final isHighest = edu.isHighest;
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.l),
-      padding: AppSpacing.pM,
       decoration: BoxDecoration(
         color: AppColors.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${LK.educationTab.tr} #${index + 1}',
-                style: AppTextStyles.labelMedium,
-              ),
-            ],
+      child: Theme(
+        data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: isHighest,
+          tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          title: Text(
+            '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (Highest)' : ''}',
+            style: AppTextStyles.labelMedium,
           ),
-          AppSpacing.vM,
+          children: [
           Obx(
             () => AppFormDropdown<String>(
               value: (controller.qualificationList.isEmpty 
@@ -1211,12 +1233,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       )
                   .toList(),
-              onChanged: (v) {
+              onChanged: isHighest ? (v) {
                 if (v != null) {
                   edu.qualification = v;
                   controller.educationList.refresh();
                 }
-              },
+              } : null,
               label: LK.qualificationLabel.tr,
             ),
           ),
@@ -1225,13 +1247,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
             maxLength: 200,
-            onChanged: (v) => edu.institute = v,
+            readOnly: !isHighest,
+            onChanged: isHighest ? (v) {
+              edu.institute = v;
+              controller.educationList.refresh();
+            } : null,
           ),
           AppSpacing.vM,
           _buildFieldPair(
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
+              hint: 'YYYY',
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 4,
@@ -1241,15 +1268,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
                 return null;
               },
-              onChanged: (v) => edu.passingYear = v,
+              readOnly: !isHighest,
+              onChanged: isHighest ? (v) {
+                edu.passingYear = v;
+                controller.educationList.refresh();
+              } : null,
             ),
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-              maxLength: 10,
-              onChanged: (v) => edu.percentage = v,
+              hint: '00',
+              suffixIcon: Padding(
+                padding: EdgeInsets.only(top: 14.h, right: 16.w),
+                child: Text('%', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              ],
+              maxLength: 20,
+              validator: (v) {
+                if (v != null && v.isNotEmpty) {
+                  final numVal = double.tryParse(v);
+                  if (numVal != null && numVal > 100) {
+                    return 'Cannot exceed 100';
+                  }
+                }
+                return null;
+              },
+              readOnly: !isHighest,
+              onChanged: isHighest ? (v) {
+                edu.percentage = v;
+                controller.educationList.refresh();
+              } : null,
             ),
           ),
           AppSpacing.vM,
@@ -1258,13 +1309,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
               initialValue: edu.grade,
               label: 'Grade',
               maxLength: 10,
-              onChanged: (v) => edu.grade = v,
+              readOnly: !isHighest,
+              onChanged: isHighest ? (v) {
+                edu.grade = v;
+                controller.educationList.refresh();
+              } : null,
             ),
             AppFormTextField(
               initialValue: edu.description,
               label: 'Description',
               maxLength: 500,
-              onChanged: (v) => edu.description = v,
+              readOnly: !isHighest,
+              onChanged: isHighest ? (v) {
+                edu.description = v;
+                controller.educationList.refresh();
+              } : null,
             ),
           ),
           AppSpacing.vM,
@@ -1311,6 +1370,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
         ],
+      ),
       ),
     );
   }

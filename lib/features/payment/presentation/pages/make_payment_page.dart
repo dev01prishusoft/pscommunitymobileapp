@@ -171,27 +171,56 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
             ),
             SizedBox(height: 40.h),
             Obx(
-              () => ElevatedButton(
-                onPressed: controller.isProcessingPayment.value
-                    ? null
-                    : () => controller.initiatePayment(),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 56),
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              () => Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: controller.isProcessingPayment.value
+                        ? null
+                        : () => controller.initiatePayment(),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 56),
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: controller.isProcessingPayment.value
+                        ? CircularProgressIndicator(color: AppColors.white)
+                        : Text(
+                            LK.payNow.tr,
+                            style: AppTextStyles.headlineSmall.copyWith(
+                              color: AppColors.white,
+                              letterSpacing: 1,
+                            ),
+                          ),
                   ),
-                  elevation: 0,
-                ),
-                child: controller.isProcessingPayment.value
-                    ? CircularProgressIndicator(color: AppColors.white)
-                    : Text(
-                        LK.payNow.tr,
+                  if (controller.selectedCategory.value?.isRecurring == true) ...[
+                    SizedBox(height: 16.h),
+                    ElevatedButton(
+                      onPressed: controller.isProcessingPayment.value
+                          ? null
+                          : () => controller.initiatePayment(isRecurring: true),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, 56),
+                        backgroundColor: AppColors.white,
+                        foregroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        LK.setupAutoPayRecurring.tr,
                         style: AppTextStyles.headlineSmall.copyWith(
-                          color: AppColors.white,
+                          color: AppColors.primary,
                           letterSpacing: 1,
                         ),
                       ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],

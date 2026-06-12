@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/features/auth/data/auth_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
@@ -102,6 +103,11 @@ class DI {
         );
         Get.lazyPut(() => HomeController(), fenix: true);
         Get.lazyPut(() => ShareController(), fenix: true);
+        
+        final pushNotificationService = PushNotificationService();
+        await pushNotificationService.init();
+        Get.put(pushNotificationService, permanent: true);
+
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
         }

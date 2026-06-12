@@ -33,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     final localizationService = Get.find<LocalizationService>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       localizationService.currentLocale.value = const Locale('en', 'US');
+      Get.updateLocale(const Locale('en', 'US'));
     });
   }
 

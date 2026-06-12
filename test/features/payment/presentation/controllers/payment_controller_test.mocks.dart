@@ -109,6 +109,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
     int? paymentStatusId = 0,
     int? paymentModeId = 0,
     String? description,
+    bool? isRecurring = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#createOrder, [], {
@@ -121,6 +122,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
               #paymentStatusId: paymentStatusId,
               #paymentModeId: paymentModeId,
               #description: description,
+              #isRecurring: isRecurring,
             }),
             returnValue: _i5.Future<_i3.RazorpayOrder>.value(
               _FakeRazorpayOrder_1(
@@ -135,6 +137,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
                   #paymentStatusId: paymentStatusId,
                   #paymentModeId: paymentModeId,
                   #description: description,
+                  #isRecurring: isRecurring,
                 }),
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:intl/intl.dart';
 
 class PersonalInfoController extends GetxController {
@@ -67,6 +68,7 @@ class PersonalInfoController extends GetxController {
   final monthlyIncome = ''.obs;
 
   final Rx<File?> profileImage = Rx<File?>(null);
+  final RxBool isPhotoRemoved = false.obs;
   final RxDouble uploadProgress = 0.0.obs;
 
   late final TextEditingController memberNoCtrl;
@@ -140,6 +142,7 @@ class PersonalInfoController extends GetxController {
       }
     }
 
+    isPhotoRemoved.value = false;
     memberNo.value = m.memberNo ?? '';
     firstName.value = m.firstName;
     firstNameEn.value = m.firstNameEnglish ?? '';
@@ -184,11 +187,82 @@ class PersonalInfoController extends GetxController {
   }
 
   Future<void> pickProfilePhoto() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      await _cropImage(pickedFile.path);
-    }
+    await Get.bottomSheet<void>(
+      Container(
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Get.back<void>(),
+                    ),
+                    Text(
+                      'Profile picture',
+                      style: AppTextStyles.titleMedium,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () {
+                        removePhoto();
+                        Get.back<void>();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined),
+                title: const Text('Camera'),
+                onTap: () async {
+                  Get.back<void>();
+                  final picker = ImagePicker();
+                  final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                  if (pickedFile != null) {
+                    await _cropImage(pickedFile.path);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Gallery'),
+                onTap: () async {
+                  Get.back<void>();
+                  final picker = ImagePicker();
+                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                  if (pickedFile != null) {
+                    await _cropImage(pickedFile.path);
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
   }
 
   Future<void> _cropImage(String path) async {
@@ -224,6 +298,7 @@ class PersonalInfoController extends GetxController {
 
       if (size <= 500 * 1024) {
         profileImage.value = file;
+        isPhotoRemoved.value = false;
         uploadProgress.value = 1.0;
         Future<void>.delayed(
           Duration(milliseconds: 500),
@@ -249,6 +324,7 @@ class PersonalInfoController extends GetxController {
         profileImage.value = file;
       }
 
+      isPhotoRemoved.value = false;
       uploadProgress.value = 1.0;
       Future<void>.delayed(
         Duration(milliseconds: 500),
@@ -256,11 +332,13 @@ class PersonalInfoController extends GetxController {
       );
     } catch (e) {
       profileImage.value = File(path);
+      isPhotoRemoved.value = false;
       uploadProgress.value = 0.0;
     }
   }
 
   void removePhoto() {
     profileImage.value = null;
+    isPhotoRemoved.value = true;
   }
 }

@@ -310,8 +310,8 @@ class FamilyController extends GetxController {
 
   String formatGender(Member member) => (member.genderName ?? LK.na).tr;
   String formatBloodGroup(Member member) => member.bloodGroupName ?? LK.na;
-  String formatHeight(Member member) => '${member.height ?? 0} cm';
-  String formatWeight(Member member) => '${member.weight ?? 0} kg';
+  String formatHeight(Member member) => '${member.height ?? 0} CM';
+  String formatWeight(Member member) => '${member.weight ?? 0} KG';
   String formatMotherFather(Member member) => member.motherFatherName ?? LK.na;
   String formatOccupation(Member member) =>
       member.occupationName ?? member.occupationTypeName ?? LK.na;
