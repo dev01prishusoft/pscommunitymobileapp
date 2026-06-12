@@ -39,4 +39,8 @@ class ApiEndpoints {
   static String talukaDropdown = '/api/v1/taluka/dropdown';
   static String occupationDropdown = '/api/v1/occupation-type/dropdown';
   static String areaDropdown = '/api/v1/Area/dropdown';
+  static String bankDetailsBySamaj =
+      '/api/v1/samaj-bank-account/mobile/getbanklistbysamaj';
+  static String customerSupport = '/api/v1/SamajSupportTeam/m_GetBySamaj';
+  static String appLinks = '/api/v1/application-link/getapplink';
 }

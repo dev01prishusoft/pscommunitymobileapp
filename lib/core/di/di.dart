@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/auth/session_manager.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
@@ -15,25 +17,27 @@ import 'package:pscommunitymobileapp/core/services/push_notification_service.dar
 import 'package:pscommunitymobileapp/features/auth/data/auth_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
-import 'package:pscommunitymobileapp/features/member/data/member_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
-import 'package:pscommunitymobileapp/features/marriage/data/marriage_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
-import 'package:pscommunitymobileapp/features/committee/data/committee_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
-import 'package:pscommunitymobileapp/features/occupation/data/occupation_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
-import 'package:pscommunitymobileapp/features/payment/data/payment_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
-import 'package:pscommunitymobileapp/features/family/data/family_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/business/data/business_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/business/presentation/controllers/business_controller.dart';
-import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/committee/data/committee_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
+import 'package:pscommunitymobileapp/features/family/data/family_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
+import 'package:pscommunitymobileapp/features/marriage/data/marriage_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
+import 'package:pscommunitymobileapp/features/member/data/member_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/controllers/find_member_controller.dart';
+import 'package:pscommunitymobileapp/features/occupation/data/occupation_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/occupation/presentation/controllers/occupation_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/data/payment_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
+import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/bank_account_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
 
 class DI {
   static Future<void> bootstrap() async {
@@ -101,7 +105,11 @@ class DI {
           SamajController(samajRepository),
           permanent: true,
         );
+        
+        Get.lazyPut(() => BankAccountController(samajRepository), fenix: true);
+        Get.lazyPut(() => SupportController(apiClient), fenix: true);
         Get.lazyPut(() => HomeController(), fenix: true);
+        Get.lazyPut(() => ShareController(apiClient), fenix: true);
         Get.lazyPut(() => ShareController(), fenix: true);
         
         final pushNotificationService = PushNotificationService();

@@ -1,31 +1,29 @@
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/auth_guard.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/pages/login_page.dart';
+import 'package:pscommunitymobileapp/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_details_page.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_members_page.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/pages/committees_page.dart';
+import 'package:pscommunitymobileapp/features/family/presentation/pages/family_areas_page.dart';
+import 'package:pscommunitymobileapp/features/family/presentation/pages/family_members_list_page.dart';
+import 'package:pscommunitymobileapp/features/family/presentation/pages/member_profile_page.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/pages/home_page.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/pages/share_app_page.dart';
+import 'package:pscommunitymobileapp/features/marriage/presentation/pages/marriage_page.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/pages/add_family_member_page.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/pages/edit_profile_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/find_member_page.dart';
+import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_directory_page.dart';
+import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_profile_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/make_payment_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payment_history_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payment_receipt_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payments_page.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/pages/samaj_profile_page.dart';
-
-import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_details_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_account_details_page.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_details_page.dart';
 import 'package:pscommunitymobileapp/features/splash/presentation/pages/community_welcome_splash_page.dart';
-import 'package:pscommunitymobileapp/features/auth/presentation/pages/reset_password_page.dart';
-import 'package:pscommunitymobileapp/features/family/presentation/pages/family_areas_page.dart';
-import 'package:pscommunitymobileapp/features/family/presentation/pages/family_members_list_page.dart';
-import 'package:pscommunitymobileapp/features/marriage/presentation/pages/marriage_page.dart';
-import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_directory_page.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_members_page.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_details_page.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/pages/committees_page.dart';
-import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_profile_page.dart';
-import 'package:pscommunitymobileapp/features/family/presentation/pages/member_profile_page.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/pages/edit_profile_page.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/pages/add_family_member_page.dart';
-
-import 'package:pscommunitymobileapp/app/auth_guard.dart';
-import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/features/support/presentation/pages/support_page.dart';
 
 class AppRouter {
   static String login = '/login';
@@ -36,8 +34,7 @@ class AppRouter {
   static String paymentHistory = '/payment-history';
   static String paymentReceipt = '/payment-receipt';
   static String payments = '/payments';
-  static String samajProfile = '/samaj-profile';
-
+  static String customerSupport = '/customer-support';
   static String bankDetails = '/bank-details';
   static String bankAccountDetails = '/bank-account-details';
   static String resetPassword = '/reset-password';
@@ -93,8 +90,8 @@ class AppRouter {
       middlewares: [AuthGuard()],
     ),
     GetPage<void>(
-      name: samajProfile,
-      page: () => SamajProfilePage(),
+      name: customerSupport,
+      page: () => SupportPage(),
       middlewares: [AuthGuard()],
     ),
 

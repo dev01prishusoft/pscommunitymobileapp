@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart' as pscommunitymobileapp_api_client;
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart' as pscommunitymobileapp_api_client;
 
 class AuthState {
   AuthState(this._tokenManager) {
