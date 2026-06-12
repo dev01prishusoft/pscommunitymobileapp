@@ -113,8 +113,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         context,
                         member.memberId,
                         member.name,
-                        member.startDate?.split('T').first ?? '',
-                        '--',
+                        member.startDate?.split('T').first ?? '-',
+                        member.endDate?.split('T').first ?? '-',
                         member.roleName,
                         '',
                       );
@@ -292,7 +292,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
     int memberId,
     String name,
     String since,
-    String reportsTo,
+    String endDate,
     String tag,
     String imageUrl,
   ) {
@@ -356,6 +356,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                       children: [
                         TextSpan(text: 'Start: '),
                         TextSpan(text: since, style: AppTextStyles.labelLarge),
+                        TextSpan(text: ' | End: '),
+                        TextSpan(text: endDate, style: AppTextStyles.labelLarge),
                       ],
                     ),
                   ),

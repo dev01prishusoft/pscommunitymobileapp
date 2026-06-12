@@ -333,7 +333,7 @@ class MarriagePage extends GetView<MarriageController> {
                               Row(
                                 children: [
                                   SizedBox(
-                                    width: 80.w,
+                                    width: 100.w,
                                     child: Text(
                                       LK.gotraLabel.tr,
                                       style: AppTextStyles.bodySmall,
@@ -369,7 +369,7 @@ class MarriagePage extends GetView<MarriageController> {
                               Row(
                                 children: [
                                   SizedBox(
-                                    width: 80.w,
+                                    width: 100.w,
                                     child: Text(
                                       LK.maritalStatusLabel.tr,
                                       style: AppTextStyles.bodySmall,
@@ -389,6 +389,7 @@ class MarriagePage extends GetView<MarriageController> {
                                       },
                                     ),
                                   ),
+                                  SizedBox(width: 100.w),
                                 ],
                               ),
                               SizedBox(height: 12.h),
@@ -396,7 +397,7 @@ class MarriagePage extends GetView<MarriageController> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    width: 80.w,
+                                    width: 100.w,
                                     child: Padding(
                                       padding: EdgeInsets.only(top: 8.0),
                                       child: Text(
@@ -410,9 +411,12 @@ class MarriagePage extends GetView<MarriageController> {
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              LK.stateLabel.tr,
-                                              style: AppTextStyles.bodySmall,
+                                            SizedBox(
+                                              width: 70.w,
+                                              child: Text(
+                                                LK.stateLabel.tr,
+                                                style: AppTextStyles.bodySmall,
+                                              ),
                                             ),
                                             SizedBox(width: 4.w),
                                             Expanded(
@@ -429,10 +433,17 @@ class MarriagePage extends GetView<MarriageController> {
                                                     .onStateChanged(val),
                                               ),
                                             ),
-                                            SizedBox(width: 8.w),
-                                            Text(
-                                              LK.districtLabel.tr,
-                                              style: AppTextStyles.bodySmall,
+                                          ],
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 70.w,
+                                              child: Text(
+                                                LK.districtLabel.tr,
+                                                style: AppTextStyles.bodySmall,
+                                              ),
                                             ),
                                             SizedBox(width: 4.w),
                                             Expanded(
@@ -454,9 +465,12 @@ class MarriagePage extends GetView<MarriageController> {
                                         SizedBox(height: 8.h),
                                         Row(
                                           children: [
-                                            Text(
-                                              LK.talukaLabel.tr,
-                                              style: AppTextStyles.bodySmall,
+                                            SizedBox(
+                                              width: 70.w,
+                                              child: Text(
+                                                LK.talukaLabel.tr,
+                                                style: AppTextStyles.bodySmall,
+                                              ),
                                             ),
                                             SizedBox(width: 4.w),
                                             Expanded(
@@ -473,10 +487,17 @@ class MarriagePage extends GetView<MarriageController> {
                                                     .onTalukaChanged(val),
                                               ),
                                             ),
-                                            SizedBox(width: 8.w),
-                                            Text(
-                                              LK.areaLabel.tr,
-                                              style: AppTextStyles.bodySmall,
+                                          ],
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 70.w,
+                                              child: Text(
+                                                LK.areaLabel.tr,
+                                                style: AppTextStyles.bodySmall,
+                                              ),
                                             ),
                                             SizedBox(width: 4.w),
                                             Expanded(
@@ -502,7 +523,7 @@ class MarriagePage extends GetView<MarriageController> {
                               Row(
                                 children: [
                                   SizedBox(
-                                    width: 80.w,
+                                    width: 100.w,
                                     child: Text(
                                       LK.educationLabel.tr,
                                       style: AppTextStyles.bodySmall,
@@ -521,7 +542,7 @@ class MarriagePage extends GetView<MarriageController> {
                               Row(
                                 children: [
                                   SizedBox(
-                                    width: 80.w,
+                                    width: 100.w,
                                     child: Text(
                                       LK.occupationLabel.tr,
                                       style: AppTextStyles.bodySmall,
@@ -801,7 +822,7 @@ extension MarriagePageFilters on MarriagePage {
         Row(
           children: [
             SizedBox(
-              width: 80.w,
+              width: 100.w,
               child: Text(label, style: AppTextStyles.bodySmall),
             ),
             Expanded(
@@ -812,7 +833,7 @@ extension MarriagePageFilters on MarriagePage {
               ),
             ),
             SizedBox(width: 8.w),
-            Text(LK.to.tr),
+            Text('To', style: AppTextStyles.bodySmall),
             SizedBox(width: 8.w),
             Expanded(
               child: _buildDropdownField(
@@ -910,14 +931,14 @@ extension MarriagePageFilters on MarriagePage {
     return Row(
       children: [
         SizedBox(
-          width: 80.w,
+          width: 100.w,
           child: Text(label, style: AppTextStyles.bodySmall),
         ),
         Expanded(
           child: _buildIncomeTextField(fromCtrl, '0'),
         ),
         SizedBox(width: 8.w),
-        Text(LK.to.tr),
+        Text('To', style: AppTextStyles.bodySmall),
         SizedBox(width: 8.w),
         Expanded(
           child: _buildIncomeTextField(toCtrl, '999999999'),

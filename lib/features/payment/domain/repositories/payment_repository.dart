@@ -21,6 +21,7 @@ abstract class PaymentRepository {
     int paymentStatusId = 0,
     int paymentModeId = 0,
     String? description,
+    bool isRecurring = false,
   });
   Future<Map<String, dynamic>> verifyPayment({
     required String razorpayOrderId,

@@ -62,4 +62,13 @@ class MockAuthState extends _i1.Mock implements _i3.AuthState {
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> deleteAccountAndRedirect() =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteAccountAndRedirect, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }

@@ -135,6 +135,7 @@ class PaymentController extends GetxController {
   Future<void> initiatePayment({
     int? adminPaymentRequestId,
     double? customAmount,
+    bool isRecurring = false,
   }) async {
     if (isProcessingPayment.value) return;
 
@@ -220,6 +221,7 @@ class PaymentController extends GetxController {
         paymentModeId: paymentModeId,
         paymentStatusId: paymentStatusId,
         description: LK.paymentForCommunity.tr,
+        isRecurring: isRecurring,
       );
 
       const envKey = String.fromEnvironment('RAZORPAY_KEY');
@@ -238,11 +240,10 @@ class PaymentController extends GetxController {
           ? Get.find<SamajController>().samaj.value?.logoUrl
           : null;
 
-      final options = {
+      final options = <String, dynamic>{
         'key': key,
         'amount': order.amountInPaise,
         'name': samajName,
-        'order_id': order.orderId,
         'description': LK.paymentForCommunity.tr,
         'timeout': 300,
         if (samajLogoUrl != null && samajLogoUrl.isNotEmpty) 'image': samajLogoUrl,
@@ -253,6 +254,12 @@ class PaymentController extends GetxController {
         'theme': {'color': '#1E3A8A'},
         'currency': 'INR',
       };
+
+      if (isRecurring && order.subscriptionId != null && order.subscriptionId!.isNotEmpty) {
+        options['subscription_id'] = order.subscriptionId!;
+      } else {
+        options['order_id'] = order.orderId;
+      }
 
       _razorpay.open(options);
     } catch (e) {

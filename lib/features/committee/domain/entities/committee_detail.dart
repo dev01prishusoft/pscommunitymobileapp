@@ -63,7 +63,7 @@ class CommitteeMember {
             (json['memberId'] ?? json['id'] ?? json['Id'] ?? 0).toString(),
           ) ??
           0,
-      name: json['name'] as String? ?? '',
+      name: json['name'] as String? ?? json['memberName'] as String? ?? '',
       roleName: json['committeeRoleName'] as String? ?? '',
       roleTypeName: json['committeeRoleTypeName'] as String? ?? '',
       startDate: json['startDate'] as String?,

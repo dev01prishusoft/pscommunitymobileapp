@@ -81,6 +81,7 @@ class Member {
     this.motherAreaId,
     this.signId,
     this.signName,
+    this.issameAddressasMyFamilyHeadAddress,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -222,6 +223,7 @@ class Member {
       motherAreaId: (json['motherAreaId'] ?? json['MotherAreaId']) as int?,
       signId: (json['signId'] ?? json['SignId']) as int?,
       signName: getString('signName', 'SignName'),
+      issameAddressasMyFamilyHeadAddress: json['issameAddressasMyFamilyHeadAddress'] as bool?,
     );
   }
   final int memberId;
@@ -303,6 +305,7 @@ class Member {
   final int? motherAreaId;
   final int? signId;
   final String? signName;
+  final bool? issameAddressasMyFamilyHeadAddress;
 
   String get fullName =>
       '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();

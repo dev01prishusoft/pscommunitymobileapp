@@ -21,7 +21,7 @@ class OccupationItem {
       memberId: json['memberId'] as int?,
       name: json['name'] as String? ?? '',
       logoUrl: json['logoUrl'] as String?,
-      count: json['count'] as int?,
+      count: json['memberCount'] as int? ?? json['count'] as int?,
       iconKey: json['iconKey'] as String?,
       memberName: json['memberName'] as String?,
       occupationType: json['occupationTypeName'] as String?,

@@ -244,6 +244,17 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (occ.count != null)
+              Padding(
+                padding: EdgeInsets.only(top: 4.h),
+                child: Text(
+                  '(${occ.count})',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.mutedForeground,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

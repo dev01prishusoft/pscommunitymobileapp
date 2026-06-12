@@ -93,6 +93,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     int paymentStatusId = 0,
     int paymentModeId = 0,
     String? description,
+    bool isRecurring = false,
   }) async {
     try {
       final payload = {
@@ -105,6 +106,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         'paymentStatusId': paymentStatusId,
         'paymentModeId': paymentModeId,
         'description': description ?? '',
+        'isRecurring': isRecurring,
       };
       AppLogger.i('CreateOrder Payload: $payload');
 

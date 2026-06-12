@@ -55,14 +55,23 @@ class LocalizationService {
     }
     
     // Fetch remote translations silently in background
-    unawaited(fetchLanguagesAndAllResources());
+    try {
+      unawaited(fetchLanguagesAndAllResources());
+    } catch (e, stack) {
+      AppLogger.e('Sync error in fetch', e, stack as StackTrace?);
+    }
+    
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {
       final parts = savedLocale.split('_');
       if (parts.length == 2) {
         final locale = Locale(parts[0], parts[1]);
         currentLocale.value = locale;
-        await Get.updateLocale(locale);
+        try {
+          await Get.updateLocale(locale);
+        } catch (e) {
+          AppLogger.e('Failed to update locale', e);
+        }
       }
     }
   }
@@ -74,12 +83,20 @@ class LocalizationService {
       if (parts.length == 2) {
         final locale = Locale(parts[0], parts[1]);
         currentLocale.value = locale;
-        await Get.updateLocale(locale);
+        try {
+          await Get.updateLocale(locale);
+        } catch (e) {
+          AppLogger.e('Failed to update locale', e);
+        }
       }
     } else {
       final defaultLocale = const Locale('en', 'US');
       currentLocale.value = defaultLocale;
-      await Get.updateLocale(defaultLocale);
+      try {
+        await Get.updateLocale(defaultLocale);
+      } catch (e) {
+        AppLogger.e('Failed to update default locale', e);
+      }
     }
   }
 
@@ -168,7 +185,11 @@ class LocalizationService {
     currentLocale.value = locale;
     await Get.updateLocale(locale);
     await _storage.write(_localeKey, '${langCode}_$countryCode');
-    unawaited(fetchLanguageResources(langCode));
+    try {
+      unawaited(fetchLanguageResources(langCode));
+    } catch (e, stack) {
+      AppLogger.e('Sync error in fetchLanguageResources', e, stack as StackTrace?);
+    }
   }
 
   void clearLanguages() {

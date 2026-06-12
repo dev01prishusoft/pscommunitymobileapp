@@ -139,6 +139,7 @@ class LK {
   static String couldNotDetermineMemberId = 'couldNotDetermineMemberId';
   static String paymentTimedOut = 'paymentTimedOut';
   static String retry = 'Retry';
+  static String setupAutoPayRecurring = 'Setup Auto-Pay (Recurring)';
   static String somethingWrong = 'Something went wrong';
   static String memberAddedSuccessfully = 'Member Added Successfully';
   static String noResultsFound = 'No results found';
@@ -160,7 +161,7 @@ class LK {
   static String occupation = 'Occupation';
   static String occupationType = 'Occupation Type';
   static String mobileNoLabel = 'Mobile No';
-  static String emergencyContact = 'Emergency Contact';
+  static String emergencyContact = 'Emergency Contact No';
   static String email = 'Email';
   static String memberAddresses = 'MEMBER ADDRESSES';
   static String noAddressesYet = 'No addresses yet.';
@@ -315,7 +316,7 @@ class LK {
   static String shreePatelEducationTrust = 'Shree Patel Education Trust';
   static String educationalScholarships = 'Educational scholarships';
   static String birthTime = 'Time of Birth';
-  static String motherFatherName = 'Mother\'s / Father\'s Name';
+  static String motherFatherName = 'Mother\'s Father Name';
   static String mothersState = 'Mother\'s State';
   static String mothersDistrict = 'Mother\'s District';
   static String mothersTaluka = 'Mother\'s Taluka';
@@ -567,6 +568,7 @@ class LK {
     couldNotDetermineMemberId,
     paymentTimedOut,
     retry,
+    setupAutoPayRecurring,
     somethingWrong,
     noResultsFound,
     noMembersFound,

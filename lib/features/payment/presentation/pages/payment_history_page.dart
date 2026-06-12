@@ -8,9 +8,35 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:intl/intl.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 
-class PaymentHistoryPage extends GetView<PaymentController> {
+class PaymentHistoryPage extends StatefulWidget {
   const PaymentHistoryPage({super.key});
+
+  @override
+  State<PaymentHistoryPage> createState() => _PaymentHistoryPageState();
+}
+
+class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
+  final controller = Get.find<PaymentController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshHistory();
+    });
+  }
+
+  void _refreshHistory() {
+    controller.loadHistory(
+      paymentTypeId: controller.historyFilterType.value?.id,
+      categoryId: controller.historyFilterCategory.value?.id,
+      year: int.tryParse(controller.selectedYear.value),
+      status: controller.selectedStatus.value,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +70,7 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                     Expanded(
                       child: Obx(
                         () => _buildFilterDropdown(
-                          label: '${LK.paymentTypeLabel.tr}:',
+                          label: LK.paymentTypeLabel.tr,
                           hint: LK.allTypes.tr,
                           value: controller.historyFilterType.value?.name,
                           items: controller.paymentTypes
@@ -66,7 +92,7 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                     Expanded(
                       child: Obx(
                         () => _buildFilterDropdown(
-                          label: '${LK.categoryLabel.tr}:',
+                          label: LK.categoryLabel.tr,
                           hint: LK.allCategories.tr,
                           value: controller.historyFilterCategory.value?.name,
                           items: controller.historyCategories
@@ -96,14 +122,16 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                 Row(
                   children: [
                     Expanded(
-                      child: Obx(
-                        () => _buildFilterDropdown(
-                          label: '${LK.yearLabel.tr}:',
-                          hint: '2025',
+                      child: Obx(() {
+                        final currentYear = DateTime.now().year;
+                        final years = List.generate(5, (index) => (currentYear - index + 1).toString());
+                        return _buildFilterDropdown(
+                          label: LK.yearLabel.tr,
+                          hint: currentYear.toString(),
                           value: controller.selectedYear.value.isEmpty
                               ? null
                               : controller.selectedYear.value,
-                          items: ['2025', '2024', '2023'],
+                          items: years,
                           onChanged: (val) {
                             controller.selectedYear.value = val ?? '';
                             controller.loadHistory(
@@ -113,17 +141,17 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                               status: controller.selectedStatus.value,
                             );
                           },
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                     SizedBox(width: 12.w),
                     Expanded(
                       child: Obx(
                         () => _buildFilterDropdown(
-                          label: '${LK.statusLabel.tr}:',
+                          label: LK.statusLabel.tr,
                           hint: LK.all.tr,
-                          value: controller.selectedStatus.value,
-                          items: ['All', 'Success', 'Pending', 'Failed'],
+                          value: controller.selectedStatus.value == 'All' ? null : controller.selectedStatus.value,
+                          items: ['Success', 'Pending', 'Failed'],
                           onChanged: (val) {
                             controller.selectedStatus.value = val ?? 'All';
                             controller.loadHistory(
@@ -147,7 +175,7 @@ class PaymentHistoryPage extends GetView<PaymentController> {
                 state: controller.historyState.value,
                 onRetry: () => controller.loadHistory(),
                 child: ListView.builder(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
                   itemCount: controller.payments.length,
                   itemBuilder: (context, index) {
                     final payment = controller.payments[index];
@@ -160,7 +188,10 @@ class PaymentHistoryPage extends GetView<PaymentController> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed<void>(AppRouter.makePayment),
+        onPressed: () async {
+          await Get.toNamed<void>(AppRouter.makePayment);
+          _refreshHistory();
+        },
         backgroundColor: AppColors.info,
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -181,7 +212,10 @@ class PaymentHistoryPage extends GetView<PaymentController> {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.grey,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         SizedBox(width: 6.w),
         Expanded(
@@ -233,8 +267,8 @@ class _PaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = _getIconColor(payment.title);
-    final iconData = _getIconData(payment.title);
+    final date = DateTime.tryParse(payment.date);
+    final formattedDate = date != null ? DateFormat('dd/MM/yyyy hh:mm a').format(date) : payment.date;
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -246,13 +280,10 @@ class _PaymentCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(iconData, color: iconColor, size: 24),
+          MemberAvatar(
+            imageUrl: null,
+            fallbackName: payment.title,
+            radius: 22,
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -267,9 +298,10 @@ class _PaymentCard extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  '₹${payment.amount}  |  ${payment.date}',
+                  '₹${payment.amount}   $formattedDate',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.grey,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -280,6 +312,7 @@ class _PaymentCard extends StatelessWidget {
                         '${payment.type}  |  ${payment.method}',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.grey,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -311,12 +344,20 @@ class _PaymentCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 16.w),
           OutlinedButton(
-            onPressed: () => Get.toNamed<void>(
-              AppRouter.paymentReceipt,
-              arguments: {'receiptId': payment.id},
-            ),
+            onPressed: () async {
+              await Get.toNamed<void>(
+                AppRouter.paymentReceipt,
+                arguments: {'receiptId': payment.id},
+              );
+              await Get.find<PaymentController>().loadHistory(
+                paymentTypeId: Get.find<PaymentController>().historyFilterType.value?.id,
+                categoryId: Get.find<PaymentController>().historyFilterCategory.value?.id,
+                year: int.tryParse(Get.find<PaymentController>().selectedYear.value),
+                status: Get.find<PaymentController>().selectedStatus.value,
+              );
+            },
             style: OutlinedButton.styleFrom(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               side: BorderSide(color: AppColors.info),
@@ -343,25 +384,4 @@ class _PaymentCard extends StatelessWidget {
     );
   }
 
-  IconData _getIconData(String title) {
-    if (title.toLowerCase().contains('life member')) return Icons.badge;
-    if (title.toLowerCase().contains('membership')) return Icons.assignment;
-    if (title.toLowerCase().contains('donation')) {
-      return Icons.volunteer_activism;
-    }
-    if (title.toLowerCase().contains('temple')) return Icons.account_balance;
-    return Icons.receipt;
-  }
-
-  Color _getIconColor(String title) {
-    if (title.toLowerCase().contains('life member')) {
-      return AppColors.orange.shade700;
-    }
-    if (title.toLowerCase().contains('membership')) {
-      return AppColors.blue.shade700;
-    }
-    if (title.toLowerCase().contains('donation')) return Colors.teal;
-    if (title.toLowerCase().contains('temple')) return AppColors.secondary;
-    return AppColors.grey.shade700;
-  }
 }

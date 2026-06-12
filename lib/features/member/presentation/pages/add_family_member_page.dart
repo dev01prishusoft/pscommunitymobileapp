@@ -329,6 +329,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller: controller.motherFatherNameCtrl,
                     label: LK.motherFatherName.tr,
                     prefixIcon: Icon(Icons.people_outline),
+                    maxLength: 100,
                   ),
                   SizedBox(height: 12.h),
                   _buildFieldPair(
@@ -554,28 +555,18 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ],
             ),
           ),
-          Obx(() {
-            if (controller.uploadProgress.value > 0.0) {
-              return Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: LinearProgressIndicator(
-                  value: controller.uploadProgress.value,
-                  color: AppColors.primary,
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          }),
+
           Obx(() {
             if (controller.profileImage.value != null) {
               return Padding(
                 padding: EdgeInsets.only(top: 16.h),
-                child: TextButton(
+                child: TextButton.icon(
                   onPressed: controller.removePhoto,
-                  child: Text(
+                  icon: Icon(Icons.delete_outline, size: 18, color: AppColors.mutedForeground),
+                  label: Text(
                     LK.removePhoto.tr,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.destructive,
+                      color: AppColors.mutedForeground,
                     ),
                   ),
                 ),
@@ -1021,6 +1012,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
+              hint: 'YYYY',
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 4,
@@ -1035,9 +1027,25 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-              maxLength: 10,
+              hint: '00',
+              suffixIcon: Padding(
+                padding: EdgeInsets.only(top: 14.h, right: 16.w),
+                child: Text('%', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              ],
+              maxLength: 20,
+              validator: (v) {
+                if (v != null && v.isNotEmpty) {
+                  final numVal = double.tryParse(v);
+                  if (numVal != null && numVal > 100) {
+                    return 'Cannot exceed 100';
+                  }
+                }
+                return null;
+              },
               onChanged: (v) => edu.percentage = v,
             ),
           ),

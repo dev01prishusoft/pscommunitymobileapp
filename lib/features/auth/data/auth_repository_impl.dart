@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.d
 import 'package:pscommunitymobileapp/features/auth/domain/repositories/auth_repository.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._apiClient, this._tokenManager);
@@ -58,10 +59,10 @@ class AuthRepositoryImpl implements AuthRepository {
         deviceType = 'ios';
       }
       deviceToken = await FirebaseMessaging.instance.getToken() ?? '';
-      debugPrint('=== DEVICE TOKEN ===');
-      debugPrint(deviceToken);
-      debugPrint('====================');
-    } catch (_) {}
+      AppLogger.i('=== DEVICE TOKEN (from Login) ===\n$deviceToken');
+    } catch (e, stack) {
+      AppLogger.e('Failed to get device token', e, stack);
+    }
 
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,

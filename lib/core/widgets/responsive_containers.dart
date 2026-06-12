@@ -50,7 +50,8 @@ class AdaptiveBottomSheet {
       enableDrag: enableDrag,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final content = Center(
+        final content = Align(
+          alignment: Alignment.bottomCenter,
           child: Container(
             constraints: BoxConstraints(
               maxWidth: maxWidth ?? (context.isTablet || context.isDesktop ? 600 : double.infinity),

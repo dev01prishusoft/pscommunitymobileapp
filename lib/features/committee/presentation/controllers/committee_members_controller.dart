@@ -2,22 +2,21 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
-
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 
 class CommitteeMembersController extends GetxController {
-  final CommitteeController _parentController = Get.find<CommitteeController>();
-  Rx<AppState> get detailState => _parentController.detailState;
-  Future<void> loadCommitteeDetail(int id) =>
-      _parentController.loadCommitteeDetail(id);
+  final ApiClient _apiClient = Get.find<ApiClient>();
+  
+  final Rx<AppState> membersState = AppState.empty.obs;
+  final RxList<CommitteeMember> membersList = <CommitteeMember>[].obs;
+
   final RxString selectedRole = 'All'.obs;
   final RxString searchQuery = ''.obs;
   final RxMap<String, bool> expandedGroups = <String, bool>{}.obs;
   late CommitteeNode node;
-  CommitteeDetail? get committeeDetail =>
-      _parentController.committeeDetail.value;
-      
   final _debouncer = Debouncer(milliseconds: 300);
 
   @override
@@ -28,11 +27,29 @@ class CommitteeMembersController extends GetxController {
 
   void init(CommitteeNode committeeNode) {
     node = committeeNode;
-    if (_parentController.committeeDetail.value == null ||
-        _parentController.committeeDetail.value?.name != node.name) {
-      _parentController.loadCommitteeDetail(node.id);
-    }
+    _fetchMembers(node.id);
     expandedGroups.clear();
+  }
+
+  Future<void> _fetchMembers(int id) async {
+    membersState.value = AppState.loading;
+    try {
+      final result = await _apiClient.getParsed<List<CommitteeMember>>(
+        '/api/v1/CommitteeMember/by-committee/$id',
+        fromJsonT: (json) => (json as List)
+            .map((e) => CommitteeMember.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      
+      if (result is Success<ApiResponse<List<CommitteeMember>>>) {
+        membersList.value = result.data.data ?? [];
+        membersState.value = membersList.isEmpty ? AppState.empty : AppState.data;
+      } else {
+        membersState.value = AppState.error;
+      }
+    } catch (e) {
+      membersState.value = AppState.error;
+    }
   }
 
   void onSearchChanged(String query) {

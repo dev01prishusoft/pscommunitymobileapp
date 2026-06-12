@@ -265,7 +265,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('MotherFatherName', personalInfo.motherFatherName.value, m.motherFatherName ?? '');
     addIfChanged('IsLookingforMarriage', personalInfo.openToMarriage.value, m.isLookingforMarriage ?? false);
     
-    addIfChanged('EntryPersonMobileNo', contactInfo.entryPersonMobile.value, m.entryPersonMobileNo ?? '');
+    formDataMap['EntryPersonMobileNo'] = contactInfo.entryPersonMobile.value;
     addIfChanged('MobileNo', contactInfo.mobileNo.value, m.mobileNo ?? '');
     addIfChanged('SecondaryMobile', contactInfo.secondaryMobile.value, m.secondaryMobile ?? '');
     addIfChanged('EmailAddress', contactInfo.email.value, m.emailAddress ?? '');
@@ -277,6 +277,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('TwitterUrl', contactInfo.twitter.value, m.twitterUrl ?? '');
 
     addDropdown('OccupationTypeId', workInfo.occupationType, workInfo.occupationTypeIdMap, m.occupationTypeName);
+    addDropdown('OccupationId', workInfo.occupation, workInfo.occupationIdMap, m.occupationName);
+    addDropdown('JobPositionId', workInfo.jobPosition, workInfo.jobPositionIdMap, m.jobPositionName);
     addIfChanged('OtherOccupation', workInfo.otherOccupation.value, m.otherOccupation ?? '');
     addIfChanged('OtherJobPosition', workInfo.otherJobPosition.value, m.otherJobPosition ?? '');
     addIfChanged('OtherJobPositionEnglish', workInfo.otherJobPositionEnglish.value, '');
@@ -290,12 +292,35 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('HasTwoWheeler', personalInfo.twoWheeler.value, m.hasTwoWheeler ?? false);
     addIfChanged('HasFourWheeler', personalInfo.fourWheeler.value, m.hasFourWheeler ?? false);
     
-    addDropdown('OccupationTalukaId', workInfo.workTaluka, workInfo.globalTalukaIdMap, m.occupationTalukaName);
-    addDropdown('OccupationAreaId', workInfo.workArea, workInfo.workTalukaIdMap, m.occupationAreaName);
+    addDropdown('OccupationStateId', workInfo.workState, workInfo.workStateIdMap, m.occupationStateName);
+    addDropdown('OccupationDistrictId', workInfo.workDistrict, workInfo.workDistrictIdMap, m.occupationDistrictName);
+    addDropdown('OccupationTalukaId', workInfo.workTaluka, workInfo.workTalukaIdMap, m.occupationTalukaName);
+    addDropdown('OccupationAreaId', workInfo.workArea, workInfo.workAreaIdMap, m.occupationAreaName);
     addIfChanged('OccupationAddressLine1', workInfo.workAddressLine1.value, m.occupationAddressLine1 ?? '');
     addIfChanged('OccupationAddressLine2', workInfo.workAddressLine2.value, m.occupationAddressLine2 ?? '');
     addIfChanged('OccupationLandmark', workInfo.workLandmark.value, m.occupationLandmark ?? '');
     addIfChanged('OccupationPincode', workInfo.workPincode.value, m.occupationPincode ?? '');
+    
+    final currentEduJson = jsonEncode(educationList.map((e) => e.toJson()).toList());
+    if (currentEduJson != _initialEducationJson) {
+      if (educationList.isNotEmpty) {
+        final edu = educationList.first;
+        final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
+        if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
+        formDataMap['InstituteName'] = edu.institute;
+        formDataMap['PassingYear'] = edu.passingYear;
+        formDataMap['Percentage'] = edu.percentage;
+        formDataMap['Grade'] = edu.grade;
+        formDataMap['Description'] = edu.description;
+      } else {
+        formDataMap['EducationalQualificationId'] = null;
+        formDataMap['InstituteName'] = null;
+        formDataMap['PassingYear'] = null;
+        formDataMap['Percentage'] = null;
+        formDataMap['Grade'] = null;
+        formDataMap['Description'] = null;
+      }
+    }
 
     return formDataMap;
   }
@@ -320,6 +345,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (isAddMode) return true;
     if (_currentMember == null) return false;
     if (personalInfo.profileImage.value != null) return true;
+    if (personalInfo.isPhotoRemoved.value) return true;
+    
+    final currentEduJson = jsonEncode(educationList.map((e) => e.toJson()).toList());
+    if (currentEduJson != _initialEducationJson) return true;
+    
     return changedFormData.isNotEmpty;
   }
 
@@ -337,12 +367,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
     loadEducation(m.memberId);
   }
 
+  String _initialEducationJson = '[]';
+
   Future<void> loadEducation(int memberId) async {
     try {
-      final ApiClient apiClient = Get.find<ApiClient>();
+      final apiClient = Get.find<ApiClient>();
       final response = await apiClient.get('/api/v1/MemberEducation/member/$memberId');
-      if (response.data != null && response.data['succeeded'] == true) {
-        final data = response.data['data'] as List<dynamic>? ?? [];
+      
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
         final newEducation = data.map((e) {
           final map = e as Map<String, dynamic>;
           final qualName = map['educationalQualificationName']?.toString() ?? '';
@@ -372,16 +405,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
         if (newEducation.isNotEmpty) {
           contactInfo.educationList.value = newEducation;
         }
+        _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
+        _checkAndTakeSnapshot();
       }
-    } catch (e) {
-      // Ignore
+    } catch (e, stack) {
+      AppLogger.e('Failed to load education for member $memberId', e, stack);
     }
   }
 
   Future<void> loadAddresses(int memberId) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get('/api/v1/member-address/member/$memberId');
+      final response = await apiClient.get('/api/v1/member-address/list?MemberId=$memberId&Page=1&PageSize=20');
       if (response.data != null && response.data['succeeded'] == true) {
         final data = response.data['data'] as List<dynamic>? ?? [];
         final newAddresses = data.map((e) {
@@ -665,6 +700,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _initialDropdownValues['signId'] = personalInfo.sign.value;
     _initialDropdownValues['RelationTypeId'] = personalInfo.relation.value;
     _initialDropdownValues['OccupationTypeId'] = workInfo.occupationType.value;
+    _initialDropdownValues['OccupationId'] = workInfo.occupation.value;
+    _initialDropdownValues['JobPositionId'] = workInfo.jobPosition.value;
+    _initialDropdownValues['OccupationStateId'] = workInfo.workState.value;
+    _initialDropdownValues['OccupationDistrictId'] = workInfo.workDistrict.value;
     _initialDropdownValues['OccupationTalukaId'] = workInfo.workTaluka.value;
     _initialDropdownValues['OccupationAreaId'] = workInfo.workArea.value;
 
@@ -815,6 +854,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
               final file = personalInfo.profileImage.value!;
               final fileName = file.path.split('/').last;
               formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(file.path, filename: fileName);
+            } else if (personalInfo.isPhotoRemoved.value) {
+              formDataMap['ProfileImage'] = null;
+              formDataMap['ProfilePhotoPath'] = null;
             }
           } else {
             int? getId(String? name, Map<String, int> idMap) {
@@ -904,6 +946,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
               formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
             }
 
+            if (contactInfo.educationList.isNotEmpty) {
+              final edu = contactInfo.educationList.first;
+              final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
+              if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
+              formDataMap['InstituteName'] = edu.institute;
+              formDataMap['PassingYear'] = edu.passingYear;
+              formDataMap['Percentage'] = edu.percentage;
+              formDataMap['Grade'] = edu.grade;
+              formDataMap['Description'] = edu.description;
+            }
+
             formDataMap['IsHead'] = false;
             formDataMap['IsDemised'] = false;
             formDataMap['IsActive'] = true;
@@ -922,6 +975,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
               final file = personalInfo.profileImage.value!;
               final fileName = file.path.split('/').last;
               formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(file.path, filename: fileName);
+            } else if (personalInfo.isPhotoRemoved.value) {
+              formDataMap['ProfileImage'] = null;
+              formDataMap['ProfilePhotoPath'] = null;
             }
           }
 
@@ -948,18 +1004,24 @@ class ProfileFormController extends GetxController with FormStateMixin {
             
             AppLogger.d('--- API RESPONSE ---');
             AppLogger.d(response.data?.toString() ?? 'No Response Data');
+            
+            if (response.data != null && response.data is Map<String, dynamic>) {
+              final msg = response.data['message'] as String?;
+              if (msg != null && msg.isNotEmpty) {
+                successMessage = msg.tr;
+              }
+            }
           }
 
-          await Get.offAllNamed<void>(AppRouter.home);
+          Get.snackbar(
+            LK.success.tr,
+            isEdit ? LK.editProfileRequestSent.tr : LK.memberAddedSuccessfully.tr,
+            backgroundColor: AppColors.green,
+            colorText: AppColors.white,
+          );
           
-          Future.delayed(const Duration(milliseconds: 300), () {
-            Get.snackbar(
-              LK.success.tr,
-              successMessage ?? (isEdit ? LK.profileUpdated.tr : 'Member Added Successfully'),
-              backgroundColor: AppColors.green,
-              colorText: AppColors.white,
-            );
-          });
+          await Future<void>.delayed(const Duration(milliseconds: 1500));
+          await Get.offAllNamed<void>(AppRouter.home);
         } catch (e, stack) {
           AppLogger.e('Submit form error', e, stack);
           if (e is dio.DioException) {

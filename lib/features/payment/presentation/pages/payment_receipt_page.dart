@@ -215,7 +215,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             _buildInfoRow(LK.amountLabel.tr, data['amount']!),
             _buildInfoRow(LK.modeLabel.tr, data['mode']!),
             _buildStatusRow(LK.statusLabel.tr, data['status']!),
-            _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']!),
+            if (data['transactionId'] != 'N/A' && data['transactionId']!.isNotEmpty)
+              _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']!),
           ]),
           SizedBox(height: 32.h),
           ElevatedButton.icon(
