@@ -42,6 +42,7 @@ class LK {
   static String support = 'Support';
   static String share = 'Share App';
   static String samajInfo = 'Samaj Profile';
+  static String customerSupport = 'Customer Support';
   static String locationFilters = 'Location Filters';
   static String marriage = 'Marriage';
   static String lookingForMarriage = 'Looking for Marriage';

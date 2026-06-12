@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:flutter/material.dart';
 
 class MenuItem {
   MenuItem({required this.icon, required this.labelKey, required this.route});
@@ -21,7 +21,16 @@ class HomeController extends GetxController {
     MenuItem(icon: Icons.work, labelKey: LK.occupationDirectory, route: AppRouter.occupationDirectory),
     MenuItem(icon: Icons.wc, labelKey: LK.matrimonial, route: AppRouter.marriage),
     MenuItem(icon: Icons.share, labelKey: LK.share, route: AppRouter.shareApp),
-    MenuItem(icon: Icons.info_outline, labelKey: LK.samajInfo, route: AppRouter.samajProfile),
+    MenuItem(
+      icon: Icons.info_outline,
+      labelKey: LK.samajInfo,
+      route: AppRouter.bankDetails,
+    ),
+    MenuItem(
+      icon: Icons.support_agent,
+      labelKey: LK.customerSupport,
+      route: AppRouter.customerSupport,
+    ),
   ];
 
   @override
