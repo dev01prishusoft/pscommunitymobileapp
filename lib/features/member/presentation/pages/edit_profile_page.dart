@@ -18,6 +18,8 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -99,52 +101,59 @@ class _EditProfilePageState extends State<EditProfilePage> {
               _buildProfilePhotoSection(),
               _buildSection(LK.personal.tr, Icons.person_outline, initiallyExpanded: true, [
 
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.firstNameCtrl,
                   label: LK.firstName.tr,
                   prefixIcon: Icon(Icons.person),
                   maxLength: 100,
-                ),
+                  updateStatus: controller.getUpdateStatus('FirstName'),
+                )),
                 AppSpacing.vM,
                 _buildFieldPair(
-                  AppFormTextField(
+                  Obx(() => AppFormTextField(
                     controller: controller.middleNameCtrl,
                     label: LK.middleName.tr,
                     prefixIcon: Icon(Icons.person_outline),
                     maxLength: 100,
-                  ),
-                  AppFormTextField(
+                    updateStatus: controller.getUpdateStatus('MiddleName'),
+                  )),
+                  Obx(() => AppFormTextField(
                     controller: controller.lastNameCtrl,
                     label: LK.lastName.tr,
                     prefixIcon: Icon(Icons.person),
                     maxLength: 100,
-                  ),
+                    updateStatus: controller.getUpdateStatus('LastName'),
+                  )),
                 ),
                 AppSpacing.vM,
                           _buildFieldPair(
-                            AppFormTextField(
+                            Obx(() => AppFormTextField(
                               controller: controller.firstNameEnCtrl,
                               label: LK.firstNameEnglish.tr,
                               prefixIcon: Icon(Icons.language),
                               maxLength: 100,
-                            ),
-                            AppFormTextField(
+                              updateStatus: controller.getUpdateStatus('FirstNameEnglish'),
+                            )),
+                            Obx(() => AppFormTextField(
                               controller: controller.lastNameEnCtrl,
                               label: LK.lastNameEnglish.tr,
                               prefixIcon: Icon(Icons.language),
                               maxLength: 100,
-                            ),
+                              updateStatus: controller.getUpdateStatus('LastNameEnglish'),
+                            )),
                           ),
                 AppSpacing.vM,
                           _buildFieldPair(
-                            AppFormDatePicker(
+                            Obx(() => AppFormDatePicker(
                               controller: controller.dobCtrl,
                               label: LK.birthDate.tr,
-                            ),
-                            AppFormTimePicker(
+                              updateStatus: controller.getUpdateStatus('DateOfBirth'),
+                            )),
+                            Obx(() => AppFormTimePicker(
                               controller: controller.tobCtrl,
                               label: LK.birthTime.tr,
-                            ),
+                              updateStatus: controller.getUpdateStatus('DateOfBirthTime'),
+                            )),
                           ),
                 AppSpacing.vM,
                 _buildFieldPair(
@@ -169,6 +178,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.gender.value = v!,
                       label: LK.gender.tr,
+                      updateStatus: controller.getUpdateStatus('GenderId', idMap: controller.personalInfo.genderIdMap),
                     ),
                   ),
                   Obx(
@@ -192,6 +202,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.maritalStatus.value = v!,
                       label: LK.maritalStatusLabel.tr,
+                      updateStatus: controller.getUpdateStatus('MaritalStatusId', idMap: controller.personalInfo.maritalStatusIdMap),
                     ),
                   ),
                 ),
@@ -222,6 +233,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.bloodGroup.value = v!,
                       label: LK.bloodGroup.tr,
+                      updateStatus: controller.getUpdateStatus('BloodGroupId', idMap: controller.personalInfo.bloodGroupIdMap),
                     ),
                   ),
                   Obx(
@@ -247,11 +259,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.sign.value = v!,
                       label: LK.sign.tr,
+                      updateStatus: controller.getUpdateStatus('signId', idMap: controller.personalInfo.signIdMap),
                     ),
                   ),
                 ),
                 _buildFieldPair(
-                  AppFormTextField(
+                  Obx(() => AppFormTextField(
                     controller: controller.weightCtrl,
                     label: LK.weightKg.tr,
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -266,8 +279,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 }
                                 return null;
                               },
-                  ),
-                  AppFormTextField(
+                    updateStatus: controller.getUpdateStatus('Weight'),
+                  )),
+                  Obx(() => AppFormTextField(
                     controller: controller.heightCtrl,
                     label: LK.heightCm.tr,
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -282,12 +296,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 }
                                 return null;
                               },
-                  ),
+                    updateStatus: controller.getUpdateStatus('Height'),
+                  )),
                 ),
               ]),
 
               _buildSection(LK.contactVerify.tr, Icons.contact_phone_outlined, [
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.mobileCtrl,
                   label: LK.mobileNo.tr,
                   readOnly: true,
@@ -295,65 +310,71 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   prefixIcon: Icon(Icons.phone),
                   maxLength: 10,
-                ),
+                  updateStatus: controller.getUpdateStatus('MobileNo'),
+                )),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.secondaryMobileCtrl,
-                  label: LK.secondaryMobileLabel.tr,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: Icon(Icons.phone_android),
-                  maxLength: 10,
-                  validator: (v) {
-                    if (v == controller.currentMember?.secondaryMobile) return null;
-                    return AppValidators.optionalMobile(v);
-                  },
-                ),
+                  Obx(() => AppFormTextField(
+                    controller: controller.secondaryMobileCtrl,
+                    label: LK.secondaryMobileLabel.tr,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    prefixIcon: Icon(Icons.phone_android),
+                    maxLength: 10,
+                    validator: (v) {
+                      if (v == controller.currentMember?.secondaryMobile) return null;
+                      return AppValidators.optionalMobile(v);
+                    },
+                    updateStatus: controller.getUpdateStatus('SecondaryMobile'),
+                  )),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emailCtrl,
-                  label: LK.email.tr,
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icon(Icons.email_outlined),
-                  maxLength: 200,
-                  validator: (v) {
-                    if (v == controller.currentMember?.emailAddress) return null;
-                    return AppValidators.optionalEmail(v);
-                  },
-                ),
+                  Obx(() => AppFormTextField(
+                    controller: controller.emailCtrl,
+                    label: LK.email.tr,
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: Icon(Icons.email_outlined),
+                    maxLength: 200,
+                    validator: (v) {
+                      if (v == controller.currentMember?.emailAddress) return null;
+                      return AppValidators.optionalEmail(v);
+                    },
+                    updateStatus: controller.getUpdateStatus('EmailAddress'),
+                  )),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.entryPersonMobileCtrl,
-                  label: LK.entryPersonMobile.tr,
-                  prefixIcon: Icon(Icons.phone_callback),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: 10,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return null;
-                    return AppValidators.optionalMobile(v);
-                  },
-                ),
+                  Obx(() => AppFormTextField(
+                    controller: controller.entryPersonMobileCtrl,
+                    label: LK.entryPersonMobile.tr,
+                    prefixIcon: Icon(Icons.phone_callback),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 10,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return null;
+                      return AppValidators.optionalMobile(v);
+                    },
+                    updateStatus: controller.getUpdateStatus('EntryPersonMobileNo'),
+                  )),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emergencyNameCtrl,
-                  label: LK.emergencyContactNameLabel.tr,
-                  prefixIcon: Icon(Icons.person_add_alt_1),
-                  maxLength: 100,
-                ),
+                  Obx(() => AppFormTextField(
+                    controller: controller.emergencyNameCtrl,
+                    label: LK.emergencyContactNameLabel.tr,
+                    prefixIcon: Icon(Icons.person_add_alt_1),
+                    maxLength: 100,
+                    updateStatus: controller.getUpdateStatus('EmergencyContactName'),
+                  )),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emergencyNoCtrl,
-                  label: LK.emergencyContact.tr,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: Icon(Icons.emergency_outlined),
-                  maxLength: 10,
-                  validator: (v) {
-                    if (v == controller.currentMember?.emergencyContactNo) return null;
-                    return AppValidators.optionalMobile(v);
-                  },
-                ),
+                  Obx(() => AppFormTextField(
+                    controller: controller.emergencyNoCtrl,
+                    label: LK.emergencyContact.tr,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    prefixIcon: Icon(Icons.emergency_outlined),
+                    maxLength: 10,
+                    validator: (v) {
+                      if (v == controller.currentMember?.emergencyContactNo) return null;
+                      return AppValidators.optionalMobile(v);
+                    },
+                    updateStatus: controller.getUpdateStatus('EmergencyContactNo'),
+                  )),
               ]),
 
               _buildSection(
@@ -404,15 +425,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: null,
                       label: LK.relation.tr,
+                      updateStatus: controller.getUpdateStatus('RelationTypeId', idMap: controller.personalInfo.relationIdMap),
                     ),
                   ),
                   AppSpacing.vM,
-                  AppFormTextField(
+                  Obx(() => AppFormTextField(
                     controller: controller.motherFatherNameCtrl,
                     label: LK.motherFatherName.tr,
                     prefixIcon: Icon(Icons.people_outline),
                     maxLength: 100,
-                  ),
+                    updateStatus: controller.getUpdateStatus('MotherFatherName'),
+                  )),
                   AppSpacing.vM,
                   _buildFieldPair(
                     Obx(
@@ -436,6 +459,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           if (v != null) controller.gotra.value = v;
                         },
                         label: LK.gotraLabel.tr,
+                        updateStatus: controller.getUpdateStatus('GotraId', idMap: controller.personalInfo.gotraIdMap),
                       ),
                     ),
                     Obx(
@@ -459,6 +483,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           if (v != null) controller.mothersGotra.value = v;
                         },
                         label: LK.mothersGotra.tr,
+                        updateStatus: controller.getUpdateStatus('MotherGotraId', idMap: controller.personalInfo.mothersGotraIdMap),
                       ),
                     ),
                   ),
@@ -481,6 +506,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         }
                       },
                       label: LK.mothersState.tr,
+                      updateStatus: controller.getUpdateStatus('MotherStateId', idMap: controller.workInfo.globalStateIdMap),
                     );
                   }),
                   AppSpacing.vM,
@@ -501,6 +527,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         }
                       },
                       label: LK.mothersDistrict.tr,
+                      updateStatus: controller.getUpdateStatus('MotherDistrictId', idMap: controller.workInfo.globalDistrictIdMap),
                     );
                   }),
                   AppSpacing.vM,
@@ -520,6 +547,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         }
                       },
                       label: LK.mothersTaluka.tr,
+                      updateStatus: controller.getUpdateStatus('MotherTalukaId', idMap: controller.workInfo.globalTalukaIdMap),
                     );
                   }),
                   AppSpacing.vM,
@@ -538,11 +566,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         }
                       },
                       label: LK.mothersArea.tr,
+                      updateStatus: controller.getUpdateStatus('MotherAreaId', idMap: controller.workInfo.globalAreaIdMap),
                     );
                   }),
                           _buildCheckbox(
                             LK.lookingForMarriage.tr,
                             controller.openToMarriage,
+                            updateStatus: controller.getUpdateStatus('IsLookingforMarriage'),
                           ),
                 ],
               ),
@@ -550,7 +580,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               _buildAssetsLifeSection(),
 
               _buildSection(LK.socialMedia.tr, Icons.share_outlined, [
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.facebookCtrl,
                   label: LK.facebook.tr,
                   prefixIcon: Icon(Icons.facebook),
@@ -559,9 +589,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (v == controller.currentMember?.facebookUrl) return null;
                     return AppValidators.url(v);
                   },
-                ),
+                  updateStatus: controller.getUpdateStatus('FacebookUrl'),
+                )),
                 AppSpacing.vM,
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.whatsappCtrl,
                   label: LK.whatsapp.tr,
                   prefixIcon: Icon(Icons.chat),
@@ -570,9 +601,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (v == controller.currentMember?.whatsappUrl) return null;
                     return AppValidators.url(v);
                   },
-                ),
+                  updateStatus: controller.getUpdateStatus('WhatsappUrl'),
+                )),
                 AppSpacing.vM,
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.instagramCtrl,
                   label: LK.instagram.tr,
                   prefixIcon: Icon(Icons.camera_alt),
@@ -581,9 +613,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (v == controller.currentMember?.instagramUrl) return null;
                     return AppValidators.url(v);
                   },
-                ),
+                  updateStatus: controller.getUpdateStatus('InstagramUrl'),
+                )),
                 AppSpacing.vM,
-                AppFormTextField(
+                Obx(() => AppFormTextField(
                   controller: controller.twitterCtrl,
                   label: LK.twitterX.tr,
                   prefixIcon: Icon(Icons.close),
@@ -592,12 +625,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     if (v == controller.currentMember?.twitterUrl) return null;
                     return AppValidators.url(v);
                   },
-                ),
+                  updateStatus: controller.getUpdateStatus('TwitterUrl'),
+                )),
               ]),
 
               _buildAddressesSection(),
               _buildEducationSection(),
               _buildWorkHistorySection(),
+              
+              _buildSection(LK.editRequestComment.tr, Icons.comment_outlined, [
+                AppFormTextField(
+                  controller: controller.editRequestCommentCtrl,
+                  label: LK.editRequestComment.tr,
+                  maxLines: 3,
+                  maxLength: 500,
+                ),
+              ]),
+              
               AppSpacing.vXxxl,
             ],
           ),
@@ -761,7 +805,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
           ),
-
+          Obx(() {
+            final status = controller.getUpdateStatus('ProfilePhotoPath');
+            if (status != null) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: ProfileUpdateStatusBadge(status: status),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
 
           AppSpacing.vM,
           ValueListenableBuilder<TextEditingValue>(
@@ -786,13 +839,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         color: AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.badge_outlined,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
+                      child: Icon(Icons.badge_outlined, size: 20, color: AppColors.primary),
                     ),
-                    SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -805,7 +854,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             fontSize: 10,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        SizedBox(height: 2.h),
                         Text(
                           value.text,
                           style: AppTextStyles.bodyMedium.copyWith(
@@ -825,28 +874,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget _buildCheckbox(String label, RxBool value) {
+  Widget _buildCheckbox(String label, RxBool value, {ProfileUpdateStatus? updateStatus}) {
+
     return Obx(
-      () => InkWell(
-        onTap: () => value.value = !value.value,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.s),
-          child: Row(
-            children: [
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: Checkbox(
-                  value: value.value,
-                  onChanged: (v) => value.value = v!,
-                  activeColor: AppColors.primary,
-                ),
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => value.value = !value.value,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.s),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: Checkbox(
+                      value: value.value,
+                      onChanged: (v) => value.value = v!,
+                      activeColor: AppColors.primary,
+                    ),
+                  ),
+                  AppSpacing.hS,
+                  Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
+                ],
               ),
-              AppSpacing.hS,
-              Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
-            ],
+            ),
           ),
-        ),
+          if (updateStatus != null)
+            ProfileUpdateStatusBadge(status: updateStatus),
+        ],
       ),
     );
   }
@@ -1378,12 +1435,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildAssetsLifeSection() {
     return _buildSection(LK.assetsLife.tr, Icons.account_balance_wallet_outlined, [
       _buildFieldPair(
-        _buildCheckbox('Own Land', controller.personalInfo.ownLand),
-        _buildCheckbox('Own House', controller.personalInfo.ownHouse),
+        _buildCheckbox('Own Land', controller.personalInfo.ownLand, updateStatus: controller.getUpdateStatus('IsOwnLand')),
+        _buildCheckbox('Own House', controller.personalInfo.ownHouse, updateStatus: controller.getUpdateStatus('IsOwnHouse')),
       ),
       _buildFieldPair(
-        _buildCheckbox('Two Wheeler', controller.personalInfo.twoWheeler),
-        _buildCheckbox('Four Wheeler', controller.personalInfo.fourWheeler),
+        _buildCheckbox('Two Wheeler', controller.personalInfo.twoWheeler, updateStatus: controller.getUpdateStatus('HasTwoWheeler')),
+        _buildCheckbox('Four Wheeler', controller.personalInfo.fourWheeler, updateStatus: controller.getUpdateStatus('HasFourWheeler')),
       ),
       AppSpacing.vM,
       AppFormTextField(
@@ -1417,6 +1474,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.occupationType.value = v;
           },
           label: LK.occupationType.tr,
+          updateStatus: controller.getUpdateStatus('OccupationTypeId', idMap: controller.workInfo.occupationTypeIdMap),
         );
       }),
       AppSpacing.vM,
@@ -1438,6 +1496,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.occupation.value = v;
           },
           label: LK.occupation.tr,
+          updateStatus: controller.getUpdateStatus('OccupationId', idMap: controller.workInfo.occupationIdMap),
         );
       }),
       AppSpacing.vM,
@@ -1463,56 +1522,63 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
+          updateStatus: controller.getUpdateStatus('JobPositionId', idMap: controller.workInfo.jobPositionIdMap),
         );
       }),
       AppSpacing.vM,
       _buildFieldPair(
-        AppFormTextField(
+        Obx(() => AppFormTextField(
           controller: controller.otherJobPositionCtrl,
           label: LK.otherJobPositionLabel.tr,
           maxLength: 100,
           onChanged: (v) => controller.workInfo.otherJobPosition.value = v,
-        ),
-        AppFormTextField(
+          updateStatus: controller.getUpdateStatus('OtherJobPosition'),
+        )),
+        Obx(() => AppFormTextField(
           controller: controller.otherOccupationCtrl,
           label: LK.otherOccupationLabel.tr,
           maxLength: 100,
           onChanged: (v) => controller.workInfo.otherOccupation.value = v,
-        ),
+          updateStatus: controller.getUpdateStatus('OtherOccupation'),
+        )),
       ),
       AppSpacing.vM,
       _buildFieldPair(
-        AppFormTextField(
+        Obx(() => AppFormTextField(
           controller: controller.companyNameCtrl,
           label: LK.companyNameLabel.tr,
           prefixIcon: Icon(Icons.business),
           maxLength: 100,
           onChanged: (v) => controller.companyName.value = v,
-        ),
-        AppFormTextField(
+          updateStatus: controller.getUpdateStatus('CompanyName'),
+        )),
+        Obx(() => AppFormTextField(
           controller: controller.businessNameCtrl,
           label: LK.businessName.tr,
           prefixIcon: Icon(Icons.business_center),
           maxLength: 100,
           onChanged: (v) => controller.businessName.value = v,
-        ),
+          updateStatus: controller.getUpdateStatus('BusinessName'),
+        )),
       ),
       AppSpacing.vM,
-      AppFormTextField(
+      Obx(() => AppFormTextField(
         controller: controller.monthlyIncomeCtrl,
         label: LK.monthlyIncomeLabel.tr,
         prefixIcon: Icon(Icons.currency_rupee),
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         maxLength: 8,
-      ),
+        updateStatus: controller.getUpdateStatus('MonthlyIncome'),
+      )),
       AppSpacing.vM,
-      AppFormTextField(
+      Obx(() => AppFormTextField(
         controller: controller.occupationDescriptionCtrl,
         label: LK.occupationDescriptionLabel.tr,
         maxLines: 3,
         maxLength: 500,
-      ),
+        updateStatus: controller.getUpdateStatus('OccupationDescription'),
+      )),
       AppSpacing.vM,
       Obx(
         () => AppFormDropdown<String>(
@@ -1531,6 +1597,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workState.value = v;
           },
           label: LK.state.tr,
+          updateStatus: controller.getUpdateStatus('OccupationStateId', idMap: controller.workInfo.workStateIdMap),
         ),
       ),
       AppSpacing.vM,
@@ -1554,6 +1621,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workDistrict.value = v;
           },
           label: LK.district.tr,
+          updateStatus: controller.getUpdateStatus('OccupationDistrictId', idMap: controller.workInfo.workDistrictIdMap),
         ),
       ),
       AppSpacing.vM,
@@ -1574,6 +1642,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workTaluka.value = v;
           },
           label: LK.taluka.tr,
+          updateStatus: controller.getUpdateStatus('OccupationTalukaId', idMap: controller.workInfo.workTalukaIdMap),
         ),
       ),
       AppSpacing.vM,
@@ -1594,34 +1663,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workArea.value = v;
           },
           label: LK.area.tr,
+          updateStatus: controller.getUpdateStatus('OccupationAreaId', idMap: controller.workInfo.workAreaIdMap),
         ),
       ),
       AppSpacing.vM,
-      AppFormTextField(
+      Obx(() => AppFormTextField(
         controller: controller.workAddressLine1Ctrl,
         label: LK.occupationAddressLine1Label.tr,
         prefixIcon: Icon(Icons.location_on_outlined),
         maxLength: 200,
         onChanged: (v) => controller.workAddressLine1.value = v,
-      ),
+        updateStatus: controller.getUpdateStatus('OccupationAddressLine1'),
+      )),
       AppSpacing.vM,
-      AppFormTextField(
+      Obx(() => AppFormTextField(
         controller: controller.workAddressLine2Ctrl,
         label: LK.occupationAddressLine2Label.tr,
         prefixIcon: Icon(Icons.location_on_outlined),
         maxLength: 200,
         onChanged: (v) => controller.workAddressLine2.value = v,
-      ),
+        updateStatus: controller.getUpdateStatus('OccupationAddressLine2'),
+      )),
       AppSpacing.vM,
       _buildFieldPair(
-        AppFormTextField(
+        Obx(() => AppFormTextField(
           controller: controller.workLandmarkCtrl,
           label: LK.landmarkLabel.tr,
           prefixIcon: Icon(Icons.location_city_outlined),
           maxLength: 200,
           onChanged: (v) => controller.workLandmark.value = v,
-        ),
-        AppFormTextField(
+          updateStatus: controller.getUpdateStatus('OccupationLandmark'),
+        )),
+        Obx(() => AppFormTextField(
           controller: controller.workPincodeCtrl,
           label: LK.pincode.tr,
           prefixIcon: Icon(Icons.pin_drop_outlined),
@@ -1629,7 +1702,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           maxLength: 6,
           onChanged: (v) => controller.workPincode.value = v,
-        ),
+          updateStatus: controller.getUpdateStatus('OccupationPincode'),
+        )),
       ),
     ]);
   }

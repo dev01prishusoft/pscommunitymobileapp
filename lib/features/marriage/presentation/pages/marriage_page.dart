@@ -784,16 +784,14 @@ class _MarriageMemberCard extends StatelessWidget {
                         ),
                       ),
                       Spacer(),
-                      OutlinedButton(
+                      IconButton(
                         onPressed: () => Get.toNamed<void>(
                           AppRouter.memberProfile,
                           arguments: {'memberId': member.memberId},
                         ),
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          side: BorderSide(color: AppColors.primary),
-                        ),
-                        child: Text(LK.view.tr, style: AppTextStyles.bodySmall),
+                        icon: Icon(Icons.arrow_forward, color: AppColors.primary),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
                       ),
                     ],
                   ),

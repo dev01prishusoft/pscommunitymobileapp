@@ -10,8 +10,8 @@ class CachedImg extends StatelessWidget {
     this.placeholder,
     this.errorWidget,
     this.imageBuilder,
-    this.memCacheHeight = 600,
-    this.memCacheWidth = 600,
+    this.memCacheHeight,
+    this.memCacheWidth,
     this.width,
     this.height,
     super.key,
@@ -21,8 +21,8 @@ class CachedImg extends StatelessWidget {
   final Widget Function(BuildContext, String)? placeholder;
   final Widget Function(BuildContext, String, dynamic)? errorWidget;
   final Widget Function(BuildContext, ImageProvider<Object>)? imageBuilder;
-  final int memCacheHeight;
-  final int memCacheWidth;
+  final int? memCacheHeight;
+  final int? memCacheWidth;
   final double? width;
   final double? height;
 

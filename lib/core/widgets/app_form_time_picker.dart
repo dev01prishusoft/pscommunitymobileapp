@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 
 class AppFormTimePicker extends StatefulWidget {
   const AppFormTimePicker({
@@ -13,6 +15,7 @@ class AppFormTimePicker extends StatefulWidget {
     this.hint,
     this.isRequired = false,
     this.validator,
+    this.updateStatus,
   });
 
   final TextEditingController controller;
@@ -20,6 +23,7 @@ class AppFormTimePicker extends StatefulWidget {
   final String? hint;
   final bool isRequired;
   final String? Function(String?)? validator;
+  final ProfileUpdateStatus? updateStatus;
 
   @override
   State<AppFormTimePicker> createState() => _AppFormTimePickerState();
@@ -204,6 +208,8 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
             return null;
           },
         ),
+        if (widget.updateStatus != null)
+          ProfileUpdateStatusBadge(status: widget.updateStatus!),
       ],
     );
   }

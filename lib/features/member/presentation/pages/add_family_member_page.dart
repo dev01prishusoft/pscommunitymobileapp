@@ -65,6 +65,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             children: [
               _buildProfilePhotoSection(),
               _buildSection(LK.personal.tr, Icons.person_outline, [
+                AppFormTextField(
+                  controller: controller.memberNoCtrl,
+                  label: LK.memberNo.tr,
+                  hint: 'Auto Generated Code',
+                  readOnly: true,
+                ),
+                AppSpacing.vM,
 
                 AppFormTextField(
                   controller: controller.firstNameCtrl,

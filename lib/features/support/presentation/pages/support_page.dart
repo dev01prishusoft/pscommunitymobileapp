@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -68,6 +69,12 @@ class SupportPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: ListTile(
+                            onTap: () {
+                              Get.toNamed<void>(
+                                AppRouter.memberProfile,
+                                arguments: {'memberId': member.memberId},
+                              );
+                            },
                             leading: CircleAvatar(
                               child: Text(
                                 member.displayName

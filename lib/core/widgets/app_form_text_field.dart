@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 
 class AppFormTextField extends StatelessWidget {
   const AppFormTextField({
@@ -25,6 +27,7 @@ class AppFormTextField extends StatelessWidget {
     this.textAlign = TextAlign.start,
     this.inputFormatters,
     this.maxLength,
+    this.updateStatus,
   });
   final TextEditingController? controller;
   final String? initialValue;
@@ -42,6 +45,7 @@ class AppFormTextField extends StatelessWidget {
   final TextAlign textAlign;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLength;
+  final ProfileUpdateStatus? updateStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +134,8 @@ class AppFormTextField extends StatelessWidget {
             return null;
           },
         ),
+        if (updateStatus != null)
+          ProfileUpdateStatusBadge(status: updateStatus!),
       ],
     );
   }

@@ -97,6 +97,7 @@ class LK {
   static String trySelectingDifferentFilters =
       'Try selecting different filters';
   static String logout = 'Logout';
+  static String addedMembers = 'Added Members';
   static String cancel = 'Cancel';
   static String logoutConfirm = 'Are you sure you want to logout?';
   static String deleteAccount = 'Delete Account';
@@ -448,6 +449,7 @@ class LK {
   static String virgo = 'Virgo';
   static String lakh = 'Lakh';
   static String crore = 'Crore';
+  static String editRequestComment = 'Edit Request Comment';
 
   static List<String> allValues = [
     appTitle,
@@ -798,6 +800,7 @@ class LK {
     passingYearLabel,
     percentageLabel,
     gradeLabel,
+    editRequestComment,
     markAsHighest,
     jobPositionLabel,
     otherJobPositionLabel,
@@ -894,6 +897,7 @@ class LK {
     addressRequiredError,
     noEducationRecordsYet,
     educationRequiredError,
+    addedMembers,
   ];
 }
 

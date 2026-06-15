@@ -111,11 +111,11 @@ class DI {
         
         final pushNotificationService = PushNotificationService();
         await pushNotificationService.init();
-        Get.put(pushNotificationService, permanent: true);
+        Get.put(pushNotificationService, permanent: true);   
 
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
-        }
+        }   
       }).timeout(const Duration(seconds: 15));
     } catch (e, stack) {
       AppLogger.e('Fatal crash during dependency injection bootstrap', e, stack);

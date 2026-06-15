@@ -16,6 +16,7 @@
   "Add Education": "Add Education",
   "Add Family Member": "Add Family Member",
   "Add Member": "Add Member",
+  "Added Members": "Added Members",
   "Address": "Address",
   "Address Line 1": "Address Line 1",
   "Address Line 2": "Address Line 2",
@@ -92,6 +93,7 @@
   "Divorced": "Divorced",
   "Due:": "Due:",
   "Edit Profile": "Edit Profile",
+  "Edit Request Comment": "Edit Request Comment",
   "Education": "Education",
   "Education:": "Education:",
   "Educational scholarships": "Educational scholarships",
@@ -441,5 +443,6 @@
   "Mother's State": "Mother's State",
   "Mother's District": "Mother's District",
   "Mother's Taluka": "Mother's Taluka",
-  "Mother's Area": "Mother's Area"
+  "Mother's Area": "Mother's Area",
+  "Edit Request Comment": "Edit Request Comment"
 }

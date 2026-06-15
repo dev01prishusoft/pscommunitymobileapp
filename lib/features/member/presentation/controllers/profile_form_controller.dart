@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
@@ -22,6 +23,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final showListErrors = false.obs;
   Member? _currentMember;
   final Map<String, String> _initialDropdownValues = {};
+  final RxMap<String, ProfileUpdateStatus> fieldStatuses = <String, ProfileUpdateStatus>{}.obs;
+  final TextEditingController editRequestCommentCtrl = TextEditingController();
+  final RxString editRequestComment = ''.obs;
 
   late final PersonalInfoController personalInfo;
   late final ContactController contactInfo;
@@ -34,6 +38,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
     contactInfo = Get.put(ContactController(), tag: 'contact');
     workInfo = Get.put(WorkInfoController(), tag: 'work');
 
+    editRequestCommentCtrl.addListener(() => editRequestComment.value = editRequestCommentCtrl.text);
+
     loadAllDropdowns();
   }
 
@@ -42,6 +48,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     Get.delete<PersonalInfoController>(tag: 'personal');
     Get.delete<ContactController>(tag: 'contact');
     Get.delete<WorkInfoController>(tag: 'work');
+    editRequestCommentCtrl.dispose();
     super.onClose();
   }
 
@@ -226,7 +233,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
          } else {
            dt = DateTime.parse(d);
          }
-         return dt.toIso8601String();
+         return dt.toIso8601String().replaceAll('Z', '');
        } catch (_) {
          return d;
        }
@@ -265,7 +272,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('MotherFatherName', personalInfo.motherFatherName.value, m.motherFatherName ?? '');
     addIfChanged('IsLookingforMarriage', personalInfo.openToMarriage.value, m.isLookingforMarriage ?? false);
     
-    formDataMap['EntryPersonMobileNo'] = contactInfo.entryPersonMobile.value;
+    addIfChanged('EntryPersonMobileNo', contactInfo.entryPersonMobile.value, m.entryPersonMobileNo ?? '');
     addIfChanged('MobileNo', contactInfo.mobileNo.value, m.mobileNo ?? '');
     addIfChanged('SecondaryMobile', contactInfo.secondaryMobile.value, m.secondaryMobile ?? '');
     addIfChanged('EmailAddress', contactInfo.email.value, m.emailAddress ?? '');
@@ -365,6 +372,66 @@ class ProfileFormController extends GetxController with FormStateMixin {
     // Asynchronously fetch addresses and education for this member
     loadAddresses(m.memberId);
     loadEducation(m.memberId);
+    fetchProfileUpdateStatus();
+  }
+
+  Future<void> fetchProfileUpdateStatus() async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get('/api/v1/MemberUpdateRequest/profile-status');
+      
+      if (response.statusCode == 200 && response.data != null && response.data['succeeded'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        final items = data['items'] as List<dynamic>? ?? [];
+        
+        final newStatuses = <String, ProfileUpdateStatus>{};
+        for (var item in items) {
+          final status = ProfileUpdateStatus.fromJson(item as Map<String, dynamic>);
+          newStatuses[status.keyName] = status;
+        }
+        
+        fieldStatuses.value = newStatuses;
+      }
+    } catch (e, stack) {
+      AppLogger.e('Failed to load profile update status', e, stack);
+    }
+  }
+
+  ProfileUpdateStatus? getUpdateStatus(String keyName, {Map<String, int>? idMap}) {
+    final status = fieldStatuses[keyName];
+    // Do not display "Approved" status as requested by user
+    if (status == null || status.isApproved) return null;
+    
+    if (idMap != null && status.newValue != null) {
+      final id = int.tryParse(status.newValue!);
+      if (id != null) {
+        for (final entry in idMap.entries) {
+          if (entry.value == id) {
+            return ProfileUpdateStatus(
+              approvalRequestId: status.approvalRequestId,
+              keyName: status.keyName,
+              oldValue: status.oldValue,
+              newValue: entry.key,
+              status: status.status,
+            );
+          }
+        }
+      }
+    }
+    
+    // For specific checkboxes
+    if (keyName == 'IsLookingforMarriage' || keyName == 'IsOwnLand' || keyName == 'IsOwnHouse' || keyName == 'HasTwoWheeler' || keyName == 'HasFourWheeler') {
+       final newValueStr = status.newValue?.toLowerCase() == 'true' ? LK.yes.tr : LK.no.tr;
+       return ProfileUpdateStatus(
+              approvalRequestId: status.approvalRequestId,
+              keyName: status.keyName,
+              oldValue: status.oldValue,
+              newValue: newValueStr,
+              status: status.status,
+            );
+    }
+    
+    return status;
   }
 
   String _initialEducationJson = '[]';
@@ -498,7 +565,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   void markAsAddMode() {
     isAddMode = true;
-    personalInfo.memberNoCtrl.text = generateMemberNo();
     isMemberLoaded = true; // Pretend it's loaded so snapshot runs when dropdowns finish
     _checkAndTakeSnapshot();
   }
@@ -962,6 +1028,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['IsActive'] = true;
             formDataMap['IsMobileVerified'] = contactInfo.mobileVerified.value;
             formDataMap['IssameAddressasMyFamilyHeadAddress'] = true;
+            personalInfo.memberNoCtrl.text = generateMemberNo();
             formDataMap['MemberNo'] = personalInfo.memberNoCtrl.text;
 
             formDataMap['ApproveStatus'] = null;
@@ -1010,6 +1077,35 @@ class ProfileFormController extends GetxController with FormStateMixin {
               if (msg != null && msg.isNotEmpty) {
                 successMessage = msg.tr;
               }
+            }
+
+            if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
+              try {
+                await apiClient.post(
+                  '/api/v1/MemberUpdateRequest/authorized-comment',
+                  data: {
+                    'memberId': _currentMember!.memberId,
+                    'profileUpdateComment': editRequestCommentCtrl.text.trim(),
+                    'rejectedReasonCommentByAdmin': null
+                  },
+                );
+              } catch (e, stack) {
+                AppLogger.e('Failed to send edit request comment', e, stack);
+              }
+            }
+          } else if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
+            final apiClient = Get.find<ApiClient>();
+            try {
+              await apiClient.post(
+                '/api/v1/MemberUpdateRequest/authorized-comment',
+                data: {
+                  'memberId': _currentMember!.memberId,
+                  'profileUpdateComment': editRequestCommentCtrl.text.trim(),
+                  'rejectedReasonCommentByAdmin': null
+                },
+              );
+            } catch (e, stack) {
+              AppLogger.e('Failed to send edit request comment', e, stack);
             }
           }
 

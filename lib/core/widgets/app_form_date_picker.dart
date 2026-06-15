@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 
 class AppFormDatePicker extends StatelessWidget {
   const AppFormDatePicker({
@@ -17,6 +19,7 @@ class AppFormDatePicker extends StatelessWidget {
     this.initialDate,
     this.firstDate,
     this.lastDate,
+    this.updateStatus,
   });
   final TextEditingController controller;
   final String label;
@@ -26,6 +29,7 @@ class AppFormDatePicker extends StatelessWidget {
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
+  final ProfileUpdateStatus? updateStatus;
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? parsedDate = initialDate;
@@ -132,6 +136,8 @@ class AppFormDatePicker extends StatelessWidget {
             return null;
           },
         ),
+        if (updateStatus != null)
+          ProfileUpdateStatusBadge(status: updateStatus!),
       ],
     );
   }

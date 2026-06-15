@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/features/home/presentation/pages/home_page.
 import 'package:pscommunitymobileapp/features/home/presentation/pages/share_app_page.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/pages/marriage_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/add_family_member_page.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/pages/added_members_list_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/edit_profile_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/find_member_page.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_directory_page.dart';
@@ -50,6 +51,7 @@ class AppRouter {
   static String memberProfile = '/member-profile';
   static String editProfile = '/edit-profile';
   static String addFamilyMember = '/add-family-member';
+  static String addedMembers = '/added-members';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -163,6 +165,11 @@ class AppRouter {
     GetPage<void>(
       name: addFamilyMember,
       page: () => AddFamilyMemberPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: addedMembers,
+      page: () => AddedMembersListPage(),
       middlewares: [AuthGuard()],
     ),
   ];
