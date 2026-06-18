@@ -49,19 +49,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.makePayment.tr,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.makePayment.tr)),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.0),
         child: Column(
@@ -163,6 +151,34 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                     ],
                   ),
                   SizedBox(height: 12.h),
+                  Obx(() {
+                    final cat = controller.selectedCategory.value;
+                    if (cat != null && !controller.isAmountFixed) {
+                      final min = cat.minAmount;
+                      final max = cat.maxAmount;
+                      if (min > 0 || max > 0) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 12.h),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (min > 0)
+                                Text(
+                                  '${LK.amountMustBeAtLeast.tr}${min.toInt()}',
+                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.mutedForeground),
+                                ),
+                              if (max > 0)
+                                Text(
+                                  '${LK.amountCannotExceed.tr}${max.toInt()}',
+                                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.mutedForeground),
+                                ),
+                            ],
+                          ),
+                        );
+                      }
+                    }
+                    return SizedBox.shrink();
+                  }),
                   Divider(),
                   SizedBox(height: 12.h),
 

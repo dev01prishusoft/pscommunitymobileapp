@@ -69,76 +69,81 @@ class AppDrawer extends StatelessWidget {
               ),
               accountEmail: const SizedBox.shrink(),
             ),
-            ListTile(
-              leading: Icon(Icons.home_outlined, color: AppColors.primary),
-              title: Text(LK.home.tr),
-              onTap: () => Get.back<void>(),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.person_search_outlined,
-                color: AppColors.primary,
-              ),
-              title: Text(LK.findMember.tr),
-              onTap: () => Get.toNamed<void>(AppRouter.findMember),
-            ),
-            ListTile(
-              leading: Icon(Icons.favorite_outline, color: AppColors.primary),
-              title: Text(LK.marriage.tr),
-              onTap: () => Get.toNamed<void>(AppRouter.marriage),
-            ),
-            ListTile(
-              leading: Icon(Icons.edit_outlined, color: AppColors.primary),
-              title: Text(LK.editProfile.tr),
-              onTap: () => Get.toNamed<void>(AppRouter.editProfile),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.person_add_alt_1_outlined,
-                color: AppColors.primary,
-              ),
-              title: Text(LK.addFamilyMember.tr),
-              onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.groups_outlined,
-                color: AppColors.primary,
-              ),
-              title: Text(LK.addedMembers.tr),
-              onTap: () => Get.toNamed<void>(AppRouter.addedMembers),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.privacy_tip_outlined,
-                color: AppColors.primary,
-              ),
-              title: Text(LK.privacyPolicy.tr),
-              onTap: () {
-                Get.back<void>();
-                Get.to<void>(
-                  () => AppWebViewPage(
-                    title: LK.privacyPolicy.tr,
-                    url: AppEnvironment.I.privacyPolicyUrl,
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.home_outlined, color: AppColors.primary),
+                    title: Text(LK.home.tr),
+                    onTap: () => Get.back<void>(),
                   ),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.gavel_outlined, color: AppColors.primary),
-              title: Text(LK.termsAndConditions.tr),
-              onTap: () {
-                Get.back<void>();
-                Get.to<void>(
-                  () => AppWebViewPage(
-                    title: LK.termsAndConditions.tr,
-                    url: AppEnvironment.I.termsAndConditionsUrl,
+                  ListTile(
+                    leading: Icon(
+                      Icons.person_search_outlined,
+                      color: AppColors.primary,
+                    ),
+                    title: Text(LK.findMember.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.findMember),
                   ),
-                );
-              },
+                  ListTile(
+                    leading: Icon(Icons.favorite_outline, color: AppColors.primary),
+                    title: Text(LK.marriage.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.marriage),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.edit_outlined, color: AppColors.primary),
+                    title: Text(LK.editProfile.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.editProfile),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.person_add_alt_1_outlined,
+                      color: AppColors.primary,
+                    ),
+                    title: Text(LK.addFamilyMember.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.groups_outlined,
+                      color: AppColors.primary,
+                    ),
+                    title: Text(LK.addedMembers.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.addedMembers),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.privacy_tip_outlined,
+                      color: AppColors.primary,
+                    ),
+                    title: Text(LK.privacyPolicy.tr),
+                    onTap: () {
+                      Get.back<void>();
+                      Get.to<void>(
+                        () => AppWebViewPage(
+                          title: LK.privacyPolicy.tr,
+                          url: AppEnvironment.I.privacyPolicyUrl,
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.gavel_outlined, color: AppColors.primary),
+                    title: Text(LK.termsAndConditions.tr),
+                    onTap: () {
+                      Get.back<void>();
+                      Get.to<void>(
+                        () => AppWebViewPage(
+                          title: LK.termsAndConditions.tr,
+                          url: AppEnvironment.I.termsAndConditionsUrl,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-
-            Spacer(),
             Divider(),
             ListTile(
               leading: Icon(

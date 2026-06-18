@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../model/support_model.dart';
@@ -52,45 +50,4 @@ class SupportController extends GetxController {
     await launchUrl(uri);
   }
 
-  Widget contactCard({
-    required bool isWhatsApp,
-    required String contactDetails,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: isWhatsApp
-            ? AppColors.chart2.withValues(alpha: 0.3)
-            : AppColors.chart5.withValues(alpha: 0.3),
-      ),
-      child: ListTile(
-        leading: Icon(
-          isWhatsApp ? Icons.chat : Icons.email,
-          color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
-        ),
-        title: Text(
-          contactDetails,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
-          ),
-        ),
-        subtitle: Text(
-          isWhatsApp ? 'WhatsApp Support' : 'Email Support',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
-          ),
-        ),
-        onTap: () {
-          if (contactDetails.isEmpty) return;
-          if (isWhatsApp) {
-            openWhatsApp(contactDetails);
-          } else {
-            openEmail(contactDetails);
-          }
-        },
-      ),
-    );
-  }
 }

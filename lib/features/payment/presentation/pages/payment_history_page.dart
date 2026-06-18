@@ -42,22 +42,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.paymentHistory.tr,
-          style: AppTextStyles.headlineMedium.copyWith(
-            color: AppColors.secondary,
-          ),
-        ),
-        titleSpacing: 0,
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.paymentHistory.tr)),
       body: Column(
         children: [
           Container(
@@ -267,7 +252,24 @@ class _PaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final date = DateTime.tryParse(payment.date);
+    DateTime? date;
+    final str = payment.date;
+    if (str.endsWith('Z') || str.contains(RegExp(r'[+-]\d{2}:\d{2}$'))) {
+      date = DateTime.tryParse(str)?.toLocal();
+    } else {
+      try {
+        if (str.contains('/')) {
+          date = DateFormat('dd/MM/yyyy hh:mm a').parse(str, true).toLocal();
+        } else if (str.contains(RegExp(r'^\d{2}-\d{2}-\d{4}'))) {
+          date = DateFormat('dd-MM-yyyy HH:mm:ss').parse(str, true).toLocal();
+        } else {
+          date = DateTime.parse(str + 'Z').toLocal();
+        }
+      } catch (_) {
+        date = DateTime.tryParse(str)?.toLocal();
+      }
+    }
+
     final formattedDate = date != null ? DateFormat('dd/MM/yyyy hh:mm a').format(date) : payment.date;
 
     return Container(
@@ -314,8 +316,11 @@ class _PaymentCard extends StatelessWidget {
                           color: AppColors.grey,
                           fontWeight: FontWeight.w600,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    SizedBox(width: 8.w),
                     Text(
                       payment.rawStatus,
                       style: AppTextStyles.bodySmall.copyWith(
@@ -329,6 +334,31 @@ class _PaymentCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (payment.isRecurring) ...[
+                  SizedBox(height: 6.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.autorenew, size: 12, color: AppColors.primary),
+                        SizedBox(width: 4.w),
+                        Text(
+                          payment.planName.isNotEmpty ? payment.planName : LK.recurring.tr,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 if (payment.notes.isNotEmpty) ...[
                   SizedBox(height: 6.h),
                   Text(

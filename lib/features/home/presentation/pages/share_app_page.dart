@@ -20,22 +20,7 @@ class ShareAppPage extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-              onPressed: () => Get.back<void>(),
-            ),
-            title: Text(
-              LK.share.tr,
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: false,
-          ),
+          appBar: AppBar(title: Text(LK.share.tr)),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Column(

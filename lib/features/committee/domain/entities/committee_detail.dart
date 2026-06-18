@@ -25,6 +25,22 @@ class CommitteeDetail {
   final String description;
   final List<CommitteeRole> roles;
   final List<CommitteeMember> members;
+
+  CommitteeDetail copyWith({
+    String? name,
+    String? parentName,
+    String? description,
+    List<CommitteeRole>? roles,
+    List<CommitteeMember>? members,
+  }) {
+    return CommitteeDetail(
+      name: name ?? this.name,
+      parentName: parentName ?? this.parentName,
+      description: description ?? this.description,
+      roles: roles ?? this.roles,
+      members: members ?? this.members,
+    );
+  }
 }
 
 class CommitteeRole {
@@ -52,6 +68,7 @@ class CommitteeMember {
     required this.name,
     required this.roleName,
     required this.roleTypeName,
+    this.committeeRoleId,
     this.startDate,
     this.endDate,
   });
@@ -66,6 +83,7 @@ class CommitteeMember {
       name: json['name'] as String? ?? json['memberName'] as String? ?? '',
       roleName: json['committeeRoleName'] as String? ?? '',
       roleTypeName: json['committeeRoleTypeName'] as String? ?? '',
+      committeeRoleId: json['committeeRoleId'] as int?,
       startDate: json['startDate'] as String?,
       endDate: json['endDate'] as String?,
     );
@@ -74,6 +92,7 @@ class CommitteeMember {
   final String name;
   final String roleName;
   final String roleTypeName;
+  final int? committeeRoleId;
   final String? startDate;
   final String? endDate;
 }

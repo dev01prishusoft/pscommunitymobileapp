@@ -52,19 +52,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          _occupationName,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(_occupationName)),
       body: Obx(
         () => AppStateView(
           state: controller.membersState.value,

@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:intl/intl.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -54,11 +55,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
         ),
-        title: Text(
-          LK.paymentReceipt.tr,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        centerTitle: false,
+        title: Text(LK.paymentReceipt.tr),
         actions: [
           IconButton(
             onPressed: () => _shareReceipt(),
@@ -89,14 +86,27 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   String _formatDate(dynamic dateStr) {
     if (dateStr == null) return 'N/A';
+    final str = dateStr.toString();
     try {
-      final dt = DateTime.parse(dateStr.toString());
-      final hours = dt.hour;
-      final isPM = hours >= 12;
-      final displayHour = hours > 12 ? hours - 12 : (hours == 0 ? 12 : hours);
-      return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} ${displayHour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} ${isPM ? 'PM' : 'AM'}';
+      DateTime dt;
+      if (str.endsWith('Z') || str.contains(RegExp(r'[+-]\d{2}:\d{2}$'))) {
+        dt = DateTime.parse(str).toLocal();
+      } else {
+        try {
+          if (str.contains('/')) {
+            dt = DateFormat('dd/MM/yyyy hh:mm a').parse(str, true).toLocal();
+          } else if (str.contains(RegExp(r'^\d{2}-\d{2}-\d{4}'))) {
+            dt = DateFormat('dd-MM-yyyy HH:mm:ss').parse(str, true).toLocal();
+          } else {
+            dt = DateTime.parse(str + 'Z').toLocal();
+          }
+        } catch (_) {
+          dt = DateTime.parse(str).toLocal();
+        }
+      }
+      return DateFormat('dd/MM/yyyy hh:mm a').format(dt);
     } catch (e) {
-      return dateStr.toString().split('.').first;
+      return str.split('.').first;
     }
   }
 
@@ -113,6 +123,12 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               ?.toString() ??
           'N/A',
       'memberNo': data['memberNo']?.toString() ?? 'N/A',
+      'planName': (data['planName'] ?? data['plan'])?.toString() ?? 'N/A',
+      'isRecurring': (data['isRecurring']?.toString() == 'true' || data['isRecurring'] == true) 
+          ? LK.yes.tr 
+          : (data['isRecurring']?.toString() == 'false' || data['isRecurring'] == false)
+              ? LK.no.tr
+              : 'N/A',
       'type':
           ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])
                       ?.toString() ??
@@ -210,6 +226,10 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
+            if (data['planName'] != 'N/A' && data['planName']!.isNotEmpty)
+              _buildInfoRow(LK.planNameLabel.tr, data['planName']!),
+            if (data['isRecurring'] != 'N/A')
+              _buildInfoRow('${LK.recurring.tr}:', data['isRecurring']!),
             _buildInfoRow(LK.typeLabel.tr, data['type']!),
             _buildInfoRow(LK.categoryLabel.tr, data['category']!),
             _buildInfoRow(LK.amountLabel.tr, data['amount']!),
@@ -384,6 +404,10 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Text('${LK.nameLabel.tr} ${data['name']}'),
               pw.Text('${LK.memberNoLabel.tr} ${data['memberNo']}'),
               pw.Divider(),
+              if (data['planName'] != 'N/A' && data['planName']!.isNotEmpty)
+                pw.Text('${LK.planNameLabel.tr} ${data['planName']}'),
+              if (data['isRecurring'] != 'N/A')
+                pw.Text('${LK.recurring.tr}: ${data['isRecurring']}'),
               pw.Text('${LK.typeLabel.tr} ${data['type']}'),
               pw.Text('${LK.categoryLabel.tr} ${data['category']}'),
               pw.Text('${LK.amountLabel.tr} ${data['amount']}'),

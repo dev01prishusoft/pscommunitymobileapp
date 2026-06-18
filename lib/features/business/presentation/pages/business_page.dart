@@ -29,23 +29,7 @@ class _BusinessPageState extends State<BusinessPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          LK.businessInfo.tr,
-          style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white),
-        ),
-        centerTitle: false,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.businessInfo.tr)),
       body: SafeArea(
         child: Obx(
           () => AppStateView(

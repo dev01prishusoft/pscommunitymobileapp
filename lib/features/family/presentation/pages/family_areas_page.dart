@@ -47,21 +47,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.secondary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.family.tr,
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: AppColors.secondary,
-          ),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.family.tr)),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Padding(

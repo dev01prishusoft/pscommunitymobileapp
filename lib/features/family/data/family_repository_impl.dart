@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/family/domain/entities/family_area
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 
 class FamilyRepositoryImpl implements FamilyRepository {
   FamilyRepositoryImpl(this._apiClient);
@@ -32,6 +33,28 @@ class FamilyRepositoryImpl implements FamilyRepository {
           .toList(),
     );
     return response.dataOrNull?.data ?? [];
+  }
+
+  @override
+  Future<List<EducationModel>> getMemberEducations(int memberId) async {
+    AppLogger.d('Member Education Request for ID: $memberId');
+    final response = await _apiClient.get('/api/v1/MemberEducation/member/$memberId');
+    
+    if (response.statusCode == 200 && response.data != null) {
+      final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
+      return data.map((e) {
+        final map = e as Map<String, dynamic>;
+        return EducationModel(
+          qualification: map['educationalQualificationName']?.toString() ?? '',
+          qualificationId: map['educationalQualificationId'] as int?,
+          institute: map['institutionName']?.toString() ?? '',
+          passingYear: map['yearOfPassing']?.toString() ?? '',
+          percentage: map['percentage']?.toString() ?? '',
+          grade: map['grade']?.toString() ?? '',
+        );
+      }).toList();
+    }
+    return [];
   }
 
   @override

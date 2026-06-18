@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/family/domain/entities/family_area
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 
 class FamilyController extends GetxController {
   FamilyController(this._repository);
@@ -22,6 +23,7 @@ class FamilyController extends GetxController {
   final Rx<AppState> memberDetailState = AppState.loading.obs;
   final Rxn<Member> selectedMember = Rxn<Member>();
   final RxList<MemberAddress> memberAddresses = <MemberAddress>[].obs;
+  final RxList<EducationModel> memberEducations = <EducationModel>[].obs;
 
   final RxBool filtersExpanded = true.obs;
   final RxBool isStatesLoading = false.obs;
@@ -39,11 +41,13 @@ class FamilyController extends GetxController {
     try {
       final detailFuture = _repository.getMemberDetails(memberId);
       final addressFuture = _repository.getMemberAddresses(memberId);
+      final educationFuture = _repository.getMemberEducations(memberId);
 
-      final results = await Future.wait([detailFuture, addressFuture]);
+      final results = await Future.wait([detailFuture, addressFuture, educationFuture]);
 
       selectedMember.value = results[0] as Member;
       memberAddresses.assignAll(results[1] as List<MemberAddress>);
+      memberEducations.assignAll(results[2] as List<EducationModel>);
 
       memberDetailState.value = AppState.data;
     } catch (e, stack) {
@@ -325,6 +329,7 @@ class FamilyController extends GetxController {
   String formatGotra(Member member) => member.gotraName ?? LK.na;
   String formatEmail(Member member) => member.emailAddress ?? LK.na;
   String formatIncome(Member member) => '₹${member.monthlyIncome ?? 0}';
+  String formatAge(Member member) => member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
 
   Future<void> launchSafeUrl(String urlString) async {
     try {
@@ -360,9 +365,6 @@ class FamilyController extends GetxController {
       }
     }
     
-    if (member.age > 0) {
-      return '$dobStr (${member.age} yrs)';
-    }
     return dobStr;
   }
 
@@ -372,7 +374,16 @@ class FamilyController extends GetxController {
     }
     final parts = member.dateOfBirthTime!.split(':');
     if (parts.length >= 2) {
-      return '${parts[0]}:${parts[1]}';
+      try {
+        final int hour = int.parse(parts[0]);
+        final int minute = int.parse(parts[1]);
+        final String amPm = hour >= 12 ? 'PM' : 'AM';
+        final int displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+        final String displayMinute = minute.toString().padLeft(2, '0');
+        return '$displayHour:$displayMinute $amPm';
+      } catch (_) {
+        return '${parts[0]}:${parts[1]}';
+      }
     }
     return member.dateOfBirthTime!;
   }

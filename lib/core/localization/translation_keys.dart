@@ -97,7 +97,7 @@ class LK {
   static String trySelectingDifferentFilters =
       'Try selecting different filters';
   static String logout = 'Logout';
-  static String addedMembers = 'Added Members';
+  static String addedMembers = 'My Member List';
   static String cancel = 'Cancel';
   static String logoutConfirm = 'Are you sure you want to logout?';
   static String deleteAccount = 'Delete Account';
@@ -141,6 +141,7 @@ class LK {
   static String paymentTimedOut = 'paymentTimedOut';
   static String retry = 'Retry';
   static String setupAutoPayRecurring = 'Setup Auto-Pay (Recurring)';
+  static String recurring = 'Recurring';
   static String somethingWrong = 'Something went wrong';
   static String memberAddedSuccessfully = 'Member Added Successfully';
   static String noResultsFound = 'No results found';
@@ -185,6 +186,7 @@ class LK {
   static String nameLabel = 'Name:';
   static String committeeLabel = 'Committee:';
   static String searchCommittees = 'Search committees...';
+  static String searchMember = 'Search member...';
   static String searchByNameHint = 'Search by name...';
   static String familyHead = 'Family Head';
   static String at = 'at';
@@ -239,6 +241,7 @@ class LK {
   static String memberDetailsLabel = 'MEMBER DETAILS';
   static String memberNoLabel = 'Member No:';
   static String paymentDetailsLabel = 'PAYMENT DETAILS';
+  static String planNameLabel = 'Plan Name:';
   static String typeLabel = 'Type:';
   static String categoryLabel = 'Category:';
   static String amountLabel = 'Amount:';
@@ -317,11 +320,11 @@ class LK {
   static String shreePatelEducationTrust = 'Shree Patel Education Trust';
   static String educationalScholarships = 'Educational scholarships';
   static String birthTime = 'Time of Birth';
-  static String motherFatherName = 'Mother\'s Father Name';
-  static String mothersState = 'Mother\'s State';
-  static String mothersDistrict = 'Mother\'s District';
-  static String mothersTaluka = 'Mother\'s Taluka';
-  static String mothersArea = 'Mother\'s Area';
+  static String motherFatherName = "Mother's Father Name";
+  static String mothersState = "Mother's State";
+  static String mothersDistrict = "Mother's District";
+  static String mothersTaluka = "Mother's Taluka";
+  static String mothersArea = "Mother's Area";
   static String occupationArea = 'Occupation Area';
   static String ownHouse = 'Own House';
   static String ownLand = 'Own Land';
@@ -431,6 +434,12 @@ class LK {
   static String removePhoto = 'Remove photo';
   static String saveChanges = 'Save Changes';
   static String addMember = 'Add Member';
+  static String educationDetails = 'Education Details';
+  static String passingYear = 'Passing Year';
+  static String percentage = 'Percentage';
+  static String grade = 'Grade';
+  static String institute = 'Institute';
+  static String qualification = 'Qualification';
   static String memberNoHint = 'PSC-2026-0512160358';
 
   static String mother = 'Mother';
@@ -450,6 +459,11 @@ class LK {
   static String lakh = 'Lakh';
   static String crore = 'Crore';
   static String editRequestComment = 'Edit Request Comment';
+
+  static String rejected = 'Rejected';
+  static String requested = 'Requested';
+  static String camera = 'Camera';
+  static String gallery = 'Gallery';
 
   static List<String> allValues = [
     appTitle,
@@ -571,6 +585,7 @@ class LK {
     paymentTimedOut,
     retry,
     setupAutoPayRecurring,
+    recurring,
     somethingWrong,
     noResultsFound,
     noMembersFound,
@@ -597,6 +612,7 @@ class LK {
     nameLabel,
     committeeLabel,
     searchCommittees,
+    searchMember,
     searchByNameHint,
     familyHead,
     at,
@@ -649,6 +665,7 @@ class LK {
     memberDetailsLabel,
     memberNoLabel,
     paymentDetailsLabel,
+    planNameLabel,
     typeLabel,
     categoryLabel,
     amountLabel,
@@ -898,6 +915,12 @@ class LK {
     noEducationRecordsYet,
     educationRequiredError,
     addedMembers,
+    educationDetails,
+    passingYear,
+    percentage,
+    grade,
+    institute,
+    qualification,
   ];
 }
 

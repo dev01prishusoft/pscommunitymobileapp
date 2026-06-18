@@ -47,6 +47,8 @@ class PaymentItem {
     required this.rawStatus,
     required this.type,
     this.notes = '',
+    this.isRecurring = false,
+    this.planName = '',
   });
 
   factory PaymentItem.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,8 @@ class PaymentItem {
       rawStatus: json['paymentStatusName'] as String? ?? json['status'] as String? ?? 'Unknown',
       type: json['paymentTypeName'] as String? ?? json['type'] as String? ?? '',
       notes: json['notes'] as String? ?? '',
+      isRecurring: json['isRecurring'] as bool? ?? false,
+      planName: json['planName'] as String? ?? '',
     );
   }
   final int id;
@@ -71,4 +75,6 @@ class PaymentItem {
   final String rawStatus;
   final String type;
   final String notes;
+  final bool isRecurring;
+  final String planName;
 }

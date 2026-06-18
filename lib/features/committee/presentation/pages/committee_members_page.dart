@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -25,21 +26,29 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     CommitteeMembersController(),
   );
   late CommitteeNode node;
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     node = Get.arguments as CommitteeNode;
     controller.init(node);
+    _searchController.text = controller.searchQuery.value;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        title: Text(LK.committeeMembers.tr, style: AppTextStyles.labelLarge),
-      ),
+      appBar: AppBar(title: Text(LK.committeeMembers.tr)),
       body: Obx(() {
         return AppStateView(
           state: controller.membersState.value,
@@ -61,14 +70,24 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           child: Column(
             children: [
               TextField(
-                controller: TextEditingController(
-                  text: controller.searchQuery.value,
-                ),
-                focusNode: FocusNode(),
+                controller: _searchController,
+                focusNode: _focusNode,
+                onTapOutside: (event) => _focusNode.unfocus(),
                 onChanged: controller.onSearchChanged,
                 decoration: InputDecoration(
-                  hintText: LK.searchCommittees.tr,
+                  hintText: LK.searchMember.tr,
                   prefixIcon: Icon(Icons.search),
+                  suffixIcon: Obx(() {
+                    return controller.searchQuery.value.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              _searchController.clear();
+                              controller.onSearchChanged('');
+                            },
+                          )
+                        : SizedBox.shrink();
+                  }),
                   filled: true,
                   fillColor: AppColors.white,
                   border: OutlineInputBorder(
@@ -86,7 +105,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       '${LK.role.tr}:',
                       controller.selectedRole.value,
                       roles,
-                      (val) => controller.selectRole(val),
+                      (DropdownItem? val) => controller.selectRole(val),
                     ),
                   ),
                 ],
@@ -132,9 +151,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
 
   Widget _buildFilterDropdown(
     String label,
-    String value,
-    List<String> options,
-    ValueChanged<String?> onChanged,
+    DropdownItem? value,
+    List<DropdownItem?> options,
+    ValueChanged<DropdownItem?> onChanged,
   ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12),
@@ -144,7 +163,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
+        child: DropdownButton<DropdownItem?>(
           value: value,
           isExpanded: true,
           itemHeight: 56,
@@ -155,8 +174,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           ),
           style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondary),
           onChanged: onChanged,
-          items: options.map<DropdownMenuItem<String>>((String val) {
-            return DropdownMenuItem<String>(
+          items: options.map<DropdownMenuItem<DropdownItem?>>((DropdownItem? val) {
+            final displayText = val?.text ?? 'All';
+            return DropdownMenuItem<DropdownItem?>(
               value: val,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -170,9 +190,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   ),
                   Builder(
                     builder: (context) {
-                      final valKey = RoleMapper.getLabelKey(val);
+                      final valKey = RoleMapper.getLabelKey(displayText);
                       return Text(
-                        valKey != null ? valKey.tr : (val == 'All' ? LK.all.tr : val),
+                        valKey != null ? valKey.tr : (displayText == 'All' ? LK.all.tr : displayText),
                         style: AppTextStyles.labelMedium,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -298,7 +318,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ),
                 AppSpacing.vXs,
                 Text(
-                  '${member.roleName} (${member.roleTypeName})',
+                  member.roleTypeName.trim().isEmpty 
+                    ? member.roleName
+                    : '${member.roleName} (${member.roleTypeName})',
                   style: AppTextStyles.titleSmall.copyWith(
                     color: AppColors.primary,
                   ),
@@ -461,8 +483,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         builder: (context) {
           final nameKey = RoleMapper.getLabelKey(member.roleName);
           final typeKey = RoleMapper.getLabelKey(member.roleTypeName);
+          final roleNameStr = nameKey != null ? nameKey.tr : member.roleName;
+          final roleTypeStr = typeKey != null ? typeKey.tr : member.roleTypeName;
+          
+          final text = roleTypeStr.trim().isEmpty 
+              ? '${LK.role.tr}: $roleNameStr'
+              : '${LK.role.tr}: $roleNameStr ($roleTypeStr)';
+
           return Text(
-            '${LK.role.tr}: ${nameKey != null ? nameKey.tr : member.roleName} (${typeKey != null ? typeKey.tr : member.roleTypeName})',
+            text,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.mutedForeground,
             ),

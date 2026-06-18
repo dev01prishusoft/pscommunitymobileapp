@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,15 +32,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        title: Text(LK.committees.tr, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.committees.tr)),
       body: Column(
         children: [
           Padding(

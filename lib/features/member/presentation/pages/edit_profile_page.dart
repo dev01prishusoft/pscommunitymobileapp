@@ -79,15 +79,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        title: Text(
-          LK.editProfile.tr,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.editProfile.tr)),
       body: _isLoading 
           ? const Center(child: CircularProgressIndicator()) 
           : ResponsiveFormContainer(
@@ -969,6 +961,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.addressType.tr,
+              updateStatus: controller.getUpdateStatus('AddressTypeId', idMap: controller.contactInfo.addressTypeIdMap),
             );
           }),
           AppSpacing.vM,
@@ -1000,6 +993,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.state.tr,
+              updateStatus: controller.getUpdateStatus('StateId', idMap: controller.workInfo.globalStateIdMap),
             );
           }),
           AppSpacing.vM,
@@ -1030,6 +1024,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.district.tr,
+              updateStatus: controller.getUpdateStatus('DistrictId', idMap: controller.workInfo.globalDistrictIdMap),
             );
           }),
           AppSpacing.vM,
@@ -1059,6 +1054,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.taluka.tr,
+              updateStatus: controller.getUpdateStatus('TalukaId', idMap: controller.workInfo.globalTalukaIdMap),
             );
           }),
           AppSpacing.vM,
@@ -1087,6 +1083,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.area.tr,
+              updateStatus: controller.getUpdateStatus('AreaId', idMap: controller.workInfo.globalAreaIdMap),
             );
           }),
           AppSpacing.vM,
@@ -1096,6 +1093,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 6,
+            updateStatus: controller.getUpdateStatus('Pincode'),
             onChanged: (v) => addr.pincode = v,
           ),
           AppSpacing.vM,
@@ -1103,6 +1101,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: addr.line1,
             label: LK.addressLine1.tr,
             maxLength: 200,
+            updateStatus: controller.getUpdateStatus('AddressLine1'),
             onChanged: (v) => addr.line1 = v,
           ),
           AppSpacing.vM,
@@ -1110,6 +1109,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: addr.line2,
             label: LK.addressLine2.tr,
             maxLength: 200,
+            updateStatus: controller.getUpdateStatus('AddressLine2'),
             onChanged: (v) => addr.line2 = v,
           ),
           AppSpacing.vM,
@@ -1117,6 +1117,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: addr.landmark,
             label: LK.landmarkLabel.tr,
             maxLength: 200,
+            updateStatus: controller.getUpdateStatus('Landmark'),
             onChanged: (v) => addr.landmark = v,
           ),
           AppSpacing.vM,
@@ -1297,12 +1298,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               } : null,
               label: LK.qualificationLabel.tr,
+              updateStatus: controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap),
             ),
           ),
           AppSpacing.vM,
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
+            updateStatus: controller.getUpdateStatus('InstituteName'),
             maxLength: 200,
             readOnly: !isHighest,
             onChanged: isHighest ? (v) {
@@ -1315,13 +1318,39 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
+              updateStatus: controller.getUpdateStatus('YearOfPassing'),
               hint: 'YYYY',
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 4,
               validator: (v) {
-                if (v != null && v.isNotEmpty && v.length != 4) {
-                  return 'Must be 4 digits';
+                if (v == null || v.isEmpty) return null;
+                if (v.length != 4) {
+                  return 'Passing Year must be exactly 4 digits';
+                }
+                final year = int.tryParse(v);
+                if (year != null) {
+                  final currentYear = DateTime.now().year;
+                  if (year > currentYear) {
+                    return 'Passing Year cannot be greater than the current year';
+                  }
+                  
+                  final dobStr = controller.dobCtrl.text;
+                  if (dobStr.isNotEmpty) {
+                    try {
+                      DateTime? dobDate;
+                      if (dobStr.contains('-') && dobStr.split('-')[0].length == 2) {
+                        final parts = dobStr.split('-');
+                        dobDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+                      } else {
+                        dobDate = DateTime.tryParse(dobStr);
+                      }
+                      
+                      if (dobDate != null && year < dobDate.year) {
+                        return 'Passing Year cannot be before year of birth';
+                      }
+                    } catch (_) {}
+                  }
                 }
                 return null;
               },
@@ -1334,6 +1363,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
+              updateStatus: controller.getUpdateStatus('Percentage'),
               hint: '00',
               suffixIcon: Padding(
                 padding: EdgeInsets.only(top: 14.h, right: 16.w),
@@ -1365,6 +1395,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.grade,
               label: 'Grade',
+              updateStatus: controller.getUpdateStatus('Grade'),
               maxLength: 10,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {
@@ -1375,6 +1406,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.description,
               label: 'Description',
+              updateStatus: controller.getUpdateStatus('Description'),
               maxLength: 500,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {
@@ -1434,23 +1466,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildAssetsLifeSection() {
     return _buildSection(LK.assetsLife.tr, Icons.account_balance_wallet_outlined, [
-      _buildFieldPair(
-        _buildCheckbox('Own Land', controller.personalInfo.ownLand, updateStatus: controller.getUpdateStatus('IsOwnLand')),
-        _buildCheckbox('Own House', controller.personalInfo.ownHouse, updateStatus: controller.getUpdateStatus('IsOwnHouse')),
-      ),
-      _buildFieldPair(
-        _buildCheckbox('Two Wheeler', controller.personalInfo.twoWheeler, updateStatus: controller.getUpdateStatus('HasTwoWheeler')),
-        _buildCheckbox('Four Wheeler', controller.personalInfo.fourWheeler, updateStatus: controller.getUpdateStatus('HasFourWheeler')),
-      ),
+      Obx(() => _buildFieldPair(
+        _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand, updateStatus: controller.getUpdateStatus('IsOwnLand')),
+        _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse, updateStatus: controller.getUpdateStatus('IsOwnHouse')),
+      )),
+      Obx(() => _buildFieldPair(
+        _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler, updateStatus: controller.getUpdateStatus('HasTwoWheeler')),
+        _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler, updateStatus: controller.getUpdateStatus('HasFourWheeler')),
+      )),
       AppSpacing.vM,
-      AppFormTextField(
+      Obx(() => AppFormTextField(
         controller: controller.personalInfo.monthlyIncomeCtrl,
         label: LK.monthlyIncomeLabel.tr,
         prefixIcon: Icon(Icons.currency_rupee),
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         maxLength: 8,
-      ),
+        updateStatus: controller.getUpdateStatus('MonthlyIncome'),
+      )),
     ]);
   }
 

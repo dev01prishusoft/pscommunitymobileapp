@@ -6,8 +6,10 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_bank_details_model.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/bank_account_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class BankDetailsPage extends StatelessWidget {
   const BankDetailsPage({super.key});
@@ -23,21 +25,7 @@ class BankDetailsPage extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           backgroundColor: AppColors.surfaceVariant,
-          appBar: AppBar(
-            backgroundColor: AppColors.white,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: AppColors.primary),
-              onPressed: () => Get.back<void>(),
-            ),
-            title: Text(
-              LK.bankAccounts.tr,
-              style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.secondary,
-              ),
-            ),
-            centerTitle: false,
-          ),
+          appBar: AppBar(title: Text(LK.samajInfo.tr)),
           body: Obx(() {
             if (controller.isLoading.value) {
               return AppStateView(
@@ -58,20 +46,52 @@ class BankDetailsPage extends StatelessWidget {
             final accounts = controller.bankAccountDetails;
 
             if (accounts.isEmpty) {
-              return AppStateView(
-                state: AppState.empty,
-                emptyMessage: LK.noBankAccountsFound.tr,
-                onRetry: controller.fetchBankAccountDetail,
-                child: SizedBox.shrink(),
+              return ListView(
+                padding: EdgeInsets.all(20),
+                children: [
+                  _buildSamajCard(),
+                  SizedBox(height: 24.h),
+                  Text(
+                    LK.bankAccounts.tr,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  AppStateView(
+                    state: AppState.empty,
+                    emptyMessage: LK.noBankAccountsFound.tr,
+                    onRetry: controller.fetchBankAccountDetail,
+                    child: SizedBox.shrink(),
+                  ),
+                ],
               );
             }
 
             return ListView.separated(
               padding: EdgeInsets.all(20),
-              itemCount: accounts.length,
+              itemCount: accounts.length + 1,
               separatorBuilder: (context, index) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
-                final bank = accounts[index];
+                if (index == 0) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSamajCard(),
+                      SizedBox(height: 24.h),
+                      Text(
+                        LK.bankAccounts.tr,
+                        style: AppTextStyles.titleLarge.copyWith(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                    ],
+                  );
+                }
+                final bank = accounts[index - 1];
                 return _buildBankCard(context, bank);
               },
             );
@@ -198,6 +218,75 @@ class BankDetailsPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSamajCard() {
+    return GetX<SamajController>(
+      builder: (controller) {
+        final samaj = controller.samaj.value;
+        if (samaj == null) return const SizedBox.shrink();
+
+        return Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (samaj.logoUrl.isNotEmpty)
+                    Container(
+                      width: 60.w,
+                      height: 60.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: ClipOval(
+                        child: CachedImg(
+                          url: samaj.logoUrl,
+                          fit: BoxFit.contain,
+                          errorWidget: (_, __, ___) => Image.asset('assets/images/prishusoft_logo.png'),
+                        ),
+                      ),
+                    ),
+                  if (samaj.logoUrl.isNotEmpty) SizedBox(width: 16.w),
+                  Expanded(
+                    child: Text(
+                      samaj.name,
+                      style: AppTextStyles.headlineSmall.copyWith(
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (samaj.description.isNotEmpty) ...[
+                SizedBox(height: 12.h),
+                Text(
+                  samaj.description,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.mutedForeground,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }

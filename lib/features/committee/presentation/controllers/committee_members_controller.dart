@@ -6,18 +6,21 @@ import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
-
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 class CommitteeMembersController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
   
   final Rx<AppState> membersState = AppState.empty.obs;
   final RxList<CommitteeMember> membersList = <CommitteeMember>[].obs;
 
-  final RxString selectedRole = 'All'.obs;
+  final Rx<DropdownItem?> selectedRole = Rx<DropdownItem?>(null);
   final RxString searchQuery = ''.obs;
   final RxMap<String, bool> expandedGroups = <String, bool>{}.obs;
   late CommitteeNode node;
   final _debouncer = Debouncer(milliseconds: 300);
+  final RxList<DropdownItem> availableRoles = <DropdownItem>[].obs;
 
   @override
   void onClose() {
@@ -28,7 +31,24 @@ class CommitteeMembersController extends GetxController {
   void init(CommitteeNode committeeNode) {
     node = committeeNode;
     _fetchMembers(node.id);
+    _fetchRoles();
     expandedGroups.clear();
+  }
+
+  Future<void> _fetchRoles() async {
+    try {
+      final result = await _apiClient.getParsed<List<DropdownItem>>(
+        ApiEndpoints.committeeRoleDropdown,
+        fromJsonT: (json) => (json as List)
+            .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      if (result is Success<ApiResponse<List<DropdownItem>>>) {
+        availableRoles.value = result.data.data ?? [];
+      }
+    } catch (e) {
+      // Ignore or log error
+    }
   }
 
   Future<void> _fetchMembers(int id) async {
@@ -42,7 +62,8 @@ class CommitteeMembersController extends GetxController {
       );
       
       if (result is Success<ApiResponse<List<CommitteeMember>>>) {
-        membersList.value = result.data.data ?? [];
+        final allMembers = result.data.data ?? [];
+        membersList.value = allMembers.where((m) => !isDateInPast(m.endDate)).toList();
         membersState.value = membersList.isEmpty ? AppState.empty : AppState.data;
       } else {
         membersState.value = AppState.error;
@@ -57,8 +78,8 @@ class CommitteeMembersController extends GetxController {
     _debouncer.run(() => _applyFilters());
   }
 
-  void selectRole(String? role) {
-    if (role != null) selectedRole.value = role;
+  void selectRole(DropdownItem? role) {
+    selectedRole.value = role;
   }
 
   void toggleGroup(String role) {
@@ -66,21 +87,31 @@ class CommitteeMembersController extends GetxController {
     expandedGroups[role] = !current;
   }
 
-  List<String> getRoles(List<CommitteeMember> members) {
+  List<DropdownItem?> getRoles(List<CommitteeMember> members) {
+    if (availableRoles.isNotEmpty) {
+      return [null, ...availableRoles];
+    }
     final roles = members.map((m) => m.roleName).toSet();
-    return ['All', ...roles.where((r) => r != 'All')];
+    return [null, ...roles.map((r) => DropdownItem(id: 0, text: r))];
   }
 
   Map<String, List<CommitteeMember>> getGroupedMembers(
     List<CommitteeMember> members,
   ) {
     final roles = getRoles(members);
-    if (!roles.contains(selectedRole.value)) {
-      selectedRole.value = 'All';
+    if (selectedRole.value != null && !roles.any((r) => r?.id == selectedRole.value?.id && r?.text == selectedRole.value?.text)) {
+      selectedRole.value = null;
     }
     final filtered = members.where((m) {
-      final matchesRole =
-          selectedRole.value == 'All' || m.roleName == selectedRole.value;
+      final role = selectedRole.value;
+      bool matchesRole = true;
+      if (role != null) {
+        if (role.id > 0 && m.committeeRoleId != null) {
+          matchesRole = m.committeeRoleId == role.id;
+        } else {
+          matchesRole = m.roleName == role.text;
+        }
+      }
       final matchesSearch =
           searchQuery.value.isEmpty ||
           m.name.toLowerCase().contains(searchQuery.value.toLowerCase()) ||

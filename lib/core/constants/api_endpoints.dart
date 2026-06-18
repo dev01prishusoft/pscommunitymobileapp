@@ -15,8 +15,9 @@ class ApiEndpoints {
   static String families = '/api/v1/Area/list';
   static String committees = '/api/v1/committee/list';
   static String committeeDetail = '/api/v1/committee';
+  static String committeeRoleDropdown = '/api/v1/CommitteeRole/dropdown';
   static String payments = '/api/v1/PaymentMode/list';
-  static String occupations = '/api/v1/Occupation/list';
+  static String occupations = '/api/v1/Occupation/list-by-samaj';
   static String occupationDetail = '/api/v1/Occupation';
   static String business = '/api/v1/AddressType/list';
   static String marriage = '/api/v1/marriage/list';
@@ -32,6 +33,7 @@ class ApiEndpoints {
   static String paymentCategories = '/api/v1/payment-category/dropdown';
   static String createOrder = '/api/v1/payment/create-order';
   static String verifyPayment = '/api/v1/payment/verify';
+  static String verifySubscription = '/api/v1/Payment/verify-subscription';
   static String paymentHistory = '/api/v1/payment/history';
   static String paymentReceipt = '/api/v1/payment/receipt';
   static String stateDropdown = '/api/v1/state/dropdown';

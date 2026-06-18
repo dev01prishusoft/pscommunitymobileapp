@@ -153,6 +153,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
     required int? paymentTypeId,
     required int? paymentCategoryId,
     int? adminPaymentRequestId,
+    bool? isRecurring = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#verifyPayment, [], {
@@ -163,6 +164,7 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
               #paymentTypeId: paymentTypeId,
               #paymentCategoryId: paymentCategoryId,
               #adminPaymentRequestId: adminPaymentRequestId,
+              #isRecurring: isRecurring,
             }),
             returnValue: _i5.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},

@@ -7,6 +7,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:intl/intl.dart';
 
 class PersonalInfoController extends GetxController {
@@ -234,7 +235,7 @@ class PersonalInfoController extends GetxController {
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined),
-                title: const Text('Camera'),
+                title: Text(LK.camera.tr),
                 onTap: () async {
                   Get.back<void>();
                   final picker = ImagePicker();
@@ -246,7 +247,7 @@ class PersonalInfoController extends GetxController {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('Gallery'),
+                title: Text(LK.gallery.tr),
                 onTap: () async {
                   Get.back<void>();
                   final picker = ImagePicker();

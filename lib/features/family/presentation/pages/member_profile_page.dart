@@ -37,22 +37,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        title: Text(
-          LK.memberDetails.tr,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.secondary,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: AppColors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.memberDetails.tr)),
       body: SafeArea(
         child: Obx(
           () => AppStateView(

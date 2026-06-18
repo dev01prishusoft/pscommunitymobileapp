@@ -21,20 +21,33 @@ class OccupationRepositoryImpl implements OccupationRepository {
     final queryParameters = <String, dynamic>{
       if (occupationTypeId != null && occupationTypeId != 0)
         'occupationTypeId': occupationTypeId,
-      if (search != null && search.isNotEmpty) 'search': search,
-      'pageNumber': pageNumber,
-      'pageSize': pageSize,
     };
 
     try {
       final response = await _apiClient.getPaginated<OccupationItem>(
         ApiEndpoints.occupations,
         queryParameters: queryParameters,
-        listKey: 'occupations',
+        listKey: 'data',
         fromJsonT: (json) =>
             OccupationItem.fromJson(json as Map<String, dynamic>),
       );
-      return response.dataOrNull?.data ?? [];
+      
+      var data = response.dataOrNull?.data ?? [];
+
+      if (search != null && search.isNotEmpty) {
+        final query = search.toLowerCase();
+        data = data.where((e) => e.name.toLowerCase().contains(query)).toList();
+      }
+
+      final startIndex = (pageNumber - 1) * pageSize;
+      if (startIndex >= data.length) {
+        return [];
+      }
+      final endIndex = startIndex + pageSize;
+      return data.sublist(
+        startIndex,
+        endIndex > data.length ? data.length : endIndex,
+      );
     } catch (e, stack) {
       AppLogger.e('GetOccupations Error', e, stack);
       return [];

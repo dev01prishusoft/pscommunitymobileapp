@@ -40,14 +40,16 @@ class SupportPage extends StatelessWidget {
 
                       SizedBox(height: 24.h),
 
-                      controller.contactCard(
+                      _contactCard(
+                        controller: controller,
                         isWhatsApp: false,
                         contactDetails: support.contactEmail ?? '-',
                       ),
 
                       SizedBox(height: 12.h),
 
-                      controller.contactCard(
+                      _contactCard(
+                        controller: controller,
                         isWhatsApp: true,
                         contactDetails: support.whatsAppNumber ?? '-',
                       ),
@@ -91,6 +93,49 @@ class SupportPage extends StatelessWidget {
                 ),
         );
       },
+    );
+  }
+
+  Widget _contactCard({
+    required SupportController controller,
+    required bool isWhatsApp,
+    required String contactDetails,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: isWhatsApp
+            ? AppColors.chart2.withValues(alpha: 0.3)
+            : AppColors.chart5.withValues(alpha: 0.3),
+      ),
+      child: ListTile(
+        leading: Icon(
+          isWhatsApp ? Icons.chat : Icons.email,
+          color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
+        ),
+        title: Text(
+          contactDetails,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
+          ),
+        ),
+        subtitle: Text(
+          isWhatsApp ? 'WhatsApp Support' : 'Email Support',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
+          ),
+        ),
+        onTap: () {
+          if (contactDetails.isEmpty) return;
+          if (isWhatsApp) {
+            controller.openWhatsApp(contactDetails);
+          } else {
+            controller.openEmail(contactDetails);
+          }
+        },
+      ),
     );
   }
 }

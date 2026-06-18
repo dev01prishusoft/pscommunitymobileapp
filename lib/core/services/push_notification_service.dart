@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 @pragma('vm:entry-point')
@@ -24,7 +25,7 @@ class PushNotificationService {
 
       // Log the FCM token on startup for testing
       final token = await _firebaseMessaging.getToken();
-      AppLogger.i('=== DEVICE TOKEN (on Startup) ===\n$token');
+      AppLogger.d('=== DEVICE TOKEN (on Startup) ===\n$token');
 
       // Request permissions for iOS and Android 13+
       await _firebaseMessaging.requestPermission(
@@ -143,11 +144,14 @@ class PushNotificationService {
   }
 
   void _handleMessageTap(RemoteMessage message) {
-    // Handle navigation based on message.data
-    // For example:
-    // if (message.data['type'] == 'announcement') {
-    //   Get.toNamed('/announcement', arguments: message.data['id']);
-    // }
     AppLogger.i('Tapped notification data: ${message.data}');
+    
+    // Handle navigation based on message.data route and arguments
+    if (message.data.containsKey('route')) {
+      final route = message.data['route'] as String;
+      final arguments = message.data['arguments'];
+      
+      Get.toNamed<void>(route, arguments: arguments);
+    }
   }
 }

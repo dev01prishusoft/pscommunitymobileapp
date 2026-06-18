@@ -31,6 +31,7 @@ abstract class PaymentRepository {
     required int paymentTypeId,
     required int paymentCategoryId,
     int? adminPaymentRequestId,
+    bool isRecurring = false,
   });
   Future<List<PaymentItem>> getHistory({
     int? paymentTypeId,

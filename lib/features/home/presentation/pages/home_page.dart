@@ -164,7 +164,7 @@ class _HomeMenuGrid extends StatelessWidget {
               ),
               itemBuilder: (context, index) {
                 final item = controller.menuItems[index];
-                return _MenuCard(item: item);
+                return _MenuCard(item: item); 
               },
             );
           },

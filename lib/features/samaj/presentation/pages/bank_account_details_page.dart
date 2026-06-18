@@ -16,19 +16,7 @@ class BankAccountDetailsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.bankAccountDetails.tr,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.bankAccountDetails.tr)),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(10.0),
         child: Column(

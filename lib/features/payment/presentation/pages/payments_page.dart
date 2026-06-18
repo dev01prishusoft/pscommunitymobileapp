@@ -17,22 +17,7 @@ class PaymentsPage extends GetView<PaymentController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.payments.tr,
-          style: AppTextStyles.headlineMedium.copyWith(
-            color: AppColors.secondary,
-          ),
-        ),
-        titleSpacing: 0,
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.payments.tr)),
       body: Obx(
         () => AppStateView(
           state: controller.dashboardState.value,

@@ -34,17 +34,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(LK.findMember.tr, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.findMember.tr)),
       body: Column(
         children: [
           Container(

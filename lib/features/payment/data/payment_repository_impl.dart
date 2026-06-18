@@ -141,11 +141,21 @@ class PaymentRepositoryImpl implements PaymentRepository {
     required int paymentTypeId,
     required int paymentCategoryId,
     int? adminPaymentRequestId,
+    bool isRecurring = false,
   }) async {
     try {
-      final response = await _apiClient.postParsed<Map<String, dynamic>>(
-        ApiEndpoints.verifyPayment,
-        data: {
+      final endpoint = isRecurring ? ApiEndpoints.verifySubscription : ApiEndpoints.verifyPayment;
+      
+      final Map<String, dynamic> payload;
+      if (isRecurring) {
+        payload = {
+          'paymentId': adminPaymentRequestId ?? 0,
+          'razorpayPaymentId': razorpayPaymentId,
+          'razorpaySubscriptionId': razorpayOrderId,
+          'razorpaySignature': razorpaySignature,
+        };
+      } else {
+        payload = {
           'razorpayOrderId': razorpayOrderId,
           'razorpayPaymentId': razorpayPaymentId,
           'razorpaySignature': razorpaySignature,
@@ -154,10 +164,26 @@ class PaymentRepositoryImpl implements PaymentRepository {
           'paymentCategoryId': paymentCategoryId,
           if (adminPaymentRequestId != null)
             'adminPaymentRequestId': adminPaymentRequestId,
-        },
+        };
+      }
+
+      AppLogger.i('VerifyPayment API Endpoint: $endpoint');
+      AppLogger.i('VerifyPayment API Payload: $payload');
+
+      final response = await _apiClient.postParsed<Map<String, dynamic>>(
+        endpoint,
+        data: payload,
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
-      if (response.isFailure) throw response.failureOrNull!;
+      
+      AppLogger.i('VerifyPayment API Raw Status: ${response.isSuccess ? 'Success' : 'Failure'}');
+
+      if (response.isFailure) {
+        AppLogger.e('VerifyPayment API Failed - Message: ${response.failureOrNull?.message}');
+        throw response.failureOrNull!;
+      }
+      
+      AppLogger.i('VerifyPayment API Success Response: ${response.dataOrNull?.data}');
       return response.dataOrNull?.data ?? {};
     } catch (e, stack) {
       AppLogger.e('VerifyPayment Error', e, stack);

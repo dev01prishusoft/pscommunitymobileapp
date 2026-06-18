@@ -50,15 +50,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: Text(LK.occupationDirectory.tr, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.occupationDirectory.tr)),
       body: Column(
         children: [
           Padding(

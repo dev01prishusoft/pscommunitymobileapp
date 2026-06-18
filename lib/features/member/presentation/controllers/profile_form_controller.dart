@@ -17,7 +17,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
   final showListErrors = false.obs;
@@ -241,8 +241,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('DateOfBirth', formatDob(personalInfo.dob.value), formatDob(m.dateOfBirth));
     addIfChanged('DateOfBirthTime', personalInfo.tob.value, m.dateOfBirthTime ?? '');
     
-    addIfChanged('Weight', double.tryParse(personalInfo.weight.value), m.weight?.toDouble());
-    addIfChanged('Height', double.tryParse(personalInfo.height.value), m.height?.toDouble());
+    double? normDouble(double? v) => (v == null || v == 0.0) ? null : v;
+    
+    addIfChanged('Weight', normDouble(double.tryParse(personalInfo.weight.value)), normDouble(m.weight?.toDouble()));
+    addIfChanged('Height', normDouble(double.tryParse(personalInfo.height.value)), normDouble(m.height?.toDouble()));
     void addDropdown(String key, RxString rxStr, Map<String, int> idMap, String? originalName, [int? originalId]) {
       final currentStr = rxStr.value; // Read early so Obx registers the dependency
       
@@ -291,7 +293,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('OtherJobPositionEnglish', workInfo.otherJobPositionEnglish.value, '');
     addIfChanged('CompanyName', workInfo.companyName.value, m.companyName ?? '');
     addIfChanged('BusinessName', workInfo.businessName.value, m.businessName ?? '');
-    addIfChanged('MonthlyIncome', double.tryParse(personalInfo.monthlyIncome.value), m.monthlyIncome?.toDouble());
+    addIfChanged('MonthlyIncome', normDouble(double.tryParse(personalInfo.monthlyIncome.value)), normDouble(m.monthlyIncome?.toDouble()));
     addIfChanged('OccupationDescription', workInfo.occupationDescription.value, m.occupationDescription ?? '');
     
     addIfChanged('IsOwnLand', personalInfo.ownLand.value, m.isOwnLand ?? false);
@@ -315,17 +317,43 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
         if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
         formDataMap['InstituteName'] = edu.institute;
-        formDataMap['PassingYear'] = edu.passingYear;
+        formDataMap['YearOfPassing'] = edu.passingYear;
         formDataMap['Percentage'] = edu.percentage;
         formDataMap['Grade'] = edu.grade;
         formDataMap['Description'] = edu.description;
       } else {
         formDataMap['EducationalQualificationId'] = null;
         formDataMap['InstituteName'] = null;
-        formDataMap['PassingYear'] = null;
+        formDataMap['YearOfPassing'] = null;
         formDataMap['Percentage'] = null;
         formDataMap['Grade'] = null;
         formDataMap['Description'] = null;
+      }
+    }
+
+    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    if (currentAddrJson != _initialAddressesJson) {
+      if (contactInfo.addresses.isNotEmpty) {
+        final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
+        formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
+        formDataMap['AddressLine1'] = addr.line1;
+        formDataMap['AddressLine2'] = addr.line2;
+        formDataMap['Landmark'] = addr.landmark;
+        formDataMap['Pincode'] = addr.pincode;
+        formDataMap['AreaId'] = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
+        formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
+        formDataMap['DistrictId'] = getId(addr.district, workInfo.globalDistrictIdMap) ?? addr.districtId ?? 0;
+        formDataMap['StateId'] = getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
+      } else {
+        formDataMap['AddressTypeId'] = null;
+        formDataMap['AddressLine1'] = null;
+        formDataMap['AddressLine2'] = null;
+        formDataMap['Landmark'] = null;
+        formDataMap['Pincode'] = null;
+        formDataMap['AreaId'] = null;
+        formDataMap['TalukaId'] = null;
+        formDataMap['DistrictId'] = null;
+        formDataMap['StateId'] = null;
       }
     }
 
@@ -355,9 +383,20 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (personalInfo.isPhotoRemoved.value) return true;
     
     final currentEduJson = jsonEncode(educationList.map((e) => e.toJson()).toList());
-    if (currentEduJson != _initialEducationJson) return true;
+    if (currentEduJson != _initialEducationJson) {
+      return true;
+    }
     
-    return changedFormData.isNotEmpty;
+    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    if (currentAddrJson != _initialAddressesJson) {
+      return true;
+    }
+    
+    final map = changedFormData;
+    if (map.isNotEmpty) {
+      return true;
+    }
+    return false;
   }
 
   void loadFromMember(Member m) {
@@ -398,7 +437,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
   }
 
   ProfileUpdateStatus? getUpdateStatus(String keyName, {Map<String, int>? idMap}) {
-    final status = fieldStatuses[keyName];
+    // Trigger Obx reactivity correctly for the map
+    // ignore: unused_local_variable
+    final _ = fieldStatuses.keys.toList();
+
+    ProfileUpdateStatus? status;
+    for (final entry in fieldStatuses.entries) {
+      if (entry.key.toLowerCase() == keyName.toLowerCase()) {
+        status = entry.value;
+        break;
+      }
+    }
+    
     // Do not display "Approved" status as requested by user
     if (status == null || status.isApproved) return null;
     
@@ -416,11 +466,33 @@ class ProfileFormController extends GetxController with FormStateMixin {
             );
           }
         }
+        
+        // Fallback to global maps to find the ID text if missing from the specific dropdown map
+        final List<Map<String, int>> globalMaps = [];
+        if (keyName.contains('State')) globalMaps.add(workInfo.globalStateIdMap);
+        if (keyName.contains('District')) globalMaps.add(workInfo.globalDistrictIdMap);
+        if (keyName.contains('Taluka')) globalMaps.add(workInfo.globalTalukaIdMap);
+        if (keyName.contains('Area')) globalMaps.add(workInfo.globalAreaIdMap);
+        
+        for (final gMap in globalMaps) {
+          for (final entry in gMap.entries) {
+            if (entry.value == id) {
+              return ProfileUpdateStatus(
+                approvalRequestId: status.approvalRequestId,
+                keyName: status.keyName,
+                oldValue: status.oldValue,
+                newValue: entry.key,
+                status: status.status,
+              );
+            }
+          }
+        }
       }
     }
     
     // For specific checkboxes
-    if (keyName == 'IsLookingforMarriage' || keyName == 'IsOwnLand' || keyName == 'IsOwnHouse' || keyName == 'HasTwoWheeler' || keyName == 'HasFourWheeler') {
+    final lowerKey = keyName.toLowerCase();
+    if (lowerKey == 'islookingformarriage' || lowerKey == 'isownland' || lowerKey == 'isownhouse' || lowerKey == 'hastwowheeler' || lowerKey == 'hasfourwheeler') {
        final newValueStr = status.newValue?.toLowerCase() == 'true' ? LK.yes.tr : LK.no.tr;
        return ProfileUpdateStatus(
               approvalRequestId: status.approvalRequestId,
@@ -431,10 +503,48 @@ class ProfileFormController extends GetxController with FormStateMixin {
             );
     }
     
+    if (keyName == 'DateOfBirth' && status.newValue != null) {
+      try {
+        final dt = DateTime.parse(status.newValue!);
+        final formatted = '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
+        return ProfileUpdateStatus(
+          approvalRequestId: status.approvalRequestId,
+          keyName: status.keyName,
+          oldValue: status.oldValue,
+          newValue: formatted,
+          status: status.status,
+        );
+      } catch (_) {}
+    }
+    if (keyName == 'DateOfBirthTime' && status.newValue != null) {
+      try {
+        final parts = status.newValue!.split(':');
+        if (parts.length >= 2) {
+          int hour = int.parse(parts[0]);
+          final int minute = int.parse(parts[1]);
+          final period = hour >= 12 ? 'PM' : 'AM';
+          if (hour == 0) {
+            hour = 12;
+          } else if (hour > 12) {
+            hour -= 12;
+          }
+          final formattedTime = '$hour:${minute.toString().padLeft(2, '0')} $period';
+          return ProfileUpdateStatus(
+            approvalRequestId: status.approvalRequestId,
+            keyName: status.keyName,
+            oldValue: status.oldValue,
+            newValue: formattedTime,
+            status: status.status,
+          );
+        }
+      } catch (_) {}
+    }
+    
     return status;
   }
 
   String _initialEducationJson = '[]';
+  String _initialAddressesJson = '[]';
 
   Future<void> loadEducation(int memberId) async {
     try {
@@ -461,8 +571,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             qualification: qualName,
             qualificationId: map['educationalQualificationId'] as int?,
             institute: map['institutionName']?.toString() ?? '',
-            passingYear: map['yearOfPassing']?.toString() ?? '',
-            percentage: map['percentage']?.toString() ?? '',
+            passingYear: (map['yearOfPassing']?.toString() == '0' || map['yearOfPassing']?.toString() == '0.0') ? '' : (map['yearOfPassing']?.toString() ?? ''),
+            percentage: (map['percentage']?.toString() == '0' || map['percentage']?.toString() == '0.0') ? '' : (map['percentage']?.toString() ?? ''),
             grade: map['grade']?.toString() ?? '',
             description: map['description']?.toString() ?? '',
             isHighest: map['isHighestQualification'] == true,
@@ -470,6 +580,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }).toList();
 
         if (newEducation.isNotEmpty) {
+          newEducation.sort((a, b) {
+            if (a.isHighest && !b.isHighest) return -1;
+            if (!a.isHighest && b.isHighest) return 1;
+            return 0;
+          });
           contactInfo.educationList.value = newEducation;
         }
         _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
@@ -557,6 +672,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         if (newAddresses.isNotEmpty) {
           contactInfo.addresses.value = newAddresses;
         }
+        _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+        _checkAndTakeSnapshot();
       }
     } catch (e) {
       // Ignore
@@ -580,7 +697,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, personalInfo.defaultBloodGroups, idMap: personalInfo.bloodGroupIdMap),
       workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, personalInfo.defaultRelations, idMap: personalInfo.relationIdMap),
       workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, contactInfo.defaultAddressTypes, idMap: contactInfo.addressTypeIdMap),
-      workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, contactInfo.defaultQualifications),
+      workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, contactInfo.defaultQualifications, idMap: contactInfo.educationIdMap),
       workInfo.fetchDropdown('/occupation-type/dropdown', workInfo.occupationTypeList, workInfo.defaultOccupationTypes, idMap: workInfo.occupationTypeIdMap),
       workInfo.fetchDropdown('/JobPosition/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
       workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, personalInfo.defaultSigns, idMap: personalInfo.signIdMap),
@@ -895,7 +1012,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     bool hasListErrors = false;
     
     if (!isEdit) {
-      if (addresses.isEmpty || educationList.isEmpty) {
+      if (addresses.isEmpty) {
         hasListErrors = true;
       }
     }
@@ -1017,7 +1134,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
               if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
               formDataMap['InstituteName'] = edu.institute;
-              formDataMap['PassingYear'] = edu.passingYear;
+              formDataMap['YearOfPassing'] = edu.passingYear;
               formDataMap['Percentage'] = edu.percentage;
               formDataMap['Grade'] = edu.grade;
               formDataMap['Description'] = edu.description;
@@ -1120,14 +1237,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
           await Get.offAllNamed<void>(AppRouter.home);
         } catch (e, stack) {
           AppLogger.e('Submit form error', e, stack);
-          if (e is dio.DioException) {
+          String errorMessage = LK.unexpectedError.tr;
+          if (e is Failure) {
+            errorMessage = e.message;
+          } else if (e is dio.DioException) {
             AppLogger.e('--- DIO ERROR DETAILS ---');
             AppLogger.e('Status Code: ${e.response?.statusCode}');
             AppLogger.e('Response Data: ${e.response?.data}');
           }
           Get.snackbar(
             LK.error.tr,
-            LK.unexpectedError.tr,
+            errorMessage,
             backgroundColor: AppColors.red,
             colorText: AppColors.white,
           );

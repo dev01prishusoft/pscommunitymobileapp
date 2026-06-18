@@ -20,13 +20,7 @@ class MarriagePage extends GetView<MarriageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(LK.marriage.tr),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.marriage.tr)),
       body: Stack(
         children: [
           CustomScrollView(

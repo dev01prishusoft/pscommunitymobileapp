@@ -8,7 +8,7 @@ import 'package:pscommunitymobileapp/features/committee/domain/entities/committe
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:dio/dio.dart';
-
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 class CommitteeRepositoryImpl implements CommitteeRepository {
   CommitteeRepositoryImpl(this._apiClient);
 
@@ -65,7 +65,26 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     );
 
     if (result is Success<ApiResponse<CommitteeDetail>>) {
-      return Success(result.data.data);
+      final detail = result.data.data;
+      if (detail != null) {
+        try {
+          final membersResult = await _apiClient.getParsed<List<CommitteeMember>>(
+            '/api/v1/CommitteeMember/by-committee/$id',
+            cancelToken: cancelToken,
+            fromJsonT: (json) => (json as List)
+                .map((e) => CommitteeMember.fromJson(e as Map<String, dynamic>))
+                .toList(),
+          );
+          if (membersResult is Success<ApiResponse<List<CommitteeMember>>>) {
+            final fetchedMembers = membersResult.data.data ?? [];
+            final activeMembers = fetchedMembers.where((m) => !isDateInPast(m.endDate)).toList();
+            return Success(detail.copyWith(members: activeMembers));
+          }
+        } catch (e) {
+          AppLogger.e('Failed to fetch committee members', e);
+        }
+      }
+      return Success(detail);
     } else {
       return Error((result as Error).failure);
     }

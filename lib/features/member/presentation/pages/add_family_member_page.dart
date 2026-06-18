@@ -47,15 +47,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        title: Text(
-          LK.addFamilyMember.tr,
-          style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        ),
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: false,
-      ),
+      appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
       body: Form(
         key: controller.formKey,
         child: SingleChildScrollView(
@@ -146,6 +138,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               .toList(),
                       onChanged: (v) => controller.gender.value = v!,
                       label: LK.gender.tr,
+                      isRequired: true,
                     ),
                   ),
                   Obx(
@@ -169,6 +162,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               .toList(),
                       onChanged: (v) => controller.maritalStatus.value = v!,
                       label: LK.maritalStatusLabel.tr,
+                      isRequired: true,
                     ),
                   ),
                 ),
@@ -878,6 +872,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           AppFormTextField(
             initialValue: addr.line1,
             label: LK.addressLine1.tr,
+            isRequired: true,
             maxLength: 200,
             onChanged: (v) => addr.line1 = v,
           ),
@@ -885,6 +880,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           AppFormTextField(
             initialValue: addr.line2,
             label: LK.addressLine2.tr,
+            isRequired: true,
             maxLength: 200,
             onChanged: (v) => addr.line2 = v,
           ),
@@ -1024,8 +1020,33 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               maxLength: 4,
               validator: (v) {
-                if (v != null && v.isNotEmpty && v.length != 4) {
-                  return 'Must be 4 digits';
+                if (v == null || v.isEmpty) return null;
+                if (v.length != 4) {
+                  return 'Passing Year must be exactly 4 digits';
+                }
+                final year = int.tryParse(v);
+                if (year != null) {
+                  final currentYear = DateTime.now().year;
+                  if (year > currentYear) {
+                    return 'Passing Year cannot be greater than the current year';
+                  }
+                  
+                  final dobStr = controller.dobCtrl.text;
+                  if (dobStr.isNotEmpty) {
+                    try {
+                      DateTime? dobDate;
+                      if (dobStr.contains('-') && dobStr.split('-')[0].length == 2) {
+                        final parts = dobStr.split('-');
+                        dobDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+                      } else {
+                        dobDate = DateTime.tryParse(dobStr);
+                      }
+                      
+                      if (dobDate != null && year < dobDate.year) {
+                        return 'Passing Year cannot be before year of birth';
+                      }
+                    } catch (_) {}
+                  }
                 }
                 return null;
               },

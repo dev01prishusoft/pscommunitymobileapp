@@ -284,10 +284,10 @@ class WorkInfoController extends GetxController {
                 String text = '';
                 final textKeys = [
                   'text', 'Text', 'name', 'Name', 'value', 'Value',
-                  'bloodGroupName', 'genderName', 'maritalStatusName', 'signName',
-                  'relationTypeName', 'occupationTypeName', 'jobPositionName', 
-                  'educationName', 'gotraName',
-                  'stateName', 'districtName', 'talukaName', 'areaName'
+                  'bloodGroupName', 'BloodGroupName', 'genderName', 'GenderName', 'maritalStatusName', 'MaritalStatusName', 'signName', 'SignName',
+                  'relationTypeName', 'RelationTypeName', 'occupationTypeName', 'OccupationTypeName', 'jobPositionName', 'JobPositionName', 
+                  'educationName', 'EducationName', 'EducationalQualificationName', 'gotraName', 'GotraName',
+                  'stateName', 'StateName', 'districtName', 'DistrictName', 'talukaName', 'TalukaName', 'areaName', 'AreaName'
                 ];
                 for (final key in textKeys) {
                   if (map.containsKey(key) && map[key] != null) {
@@ -308,10 +308,10 @@ class WorkInfoController extends GetxController {
                   int? foundId;
                   final idKeys = [
                     'id', 'Id', 'value', 'Value', 
-                    'bloodGroupId', 'genderId', 'maritalStatusId', 'signId',
-                    'relationTypeId', 'occupationTypeId', 'jobPositionId', 
-                    'educationId', 'gotraId',
-                    'stateId', 'districtId', 'talukaId', 'areaId'
+                    'bloodGroupId', 'BloodGroupId', 'genderId', 'GenderId', 'maritalStatusId', 'MaritalStatusId', 'signId', 'SignId',
+                    'relationTypeId', 'RelationTypeId', 'occupationTypeId', 'OccupationTypeId', 'jobPositionId', 'JobPositionId',
+                    'educationId', 'EducationId', 'EducationalQualificationId', 'gotraId', 'GotraId',
+                    'stateId', 'StateId', 'districtId', 'DistrictId', 'talukaId', 'TalukaId', 'areaId', 'AreaId'
                   ];
                   for (final key in idKeys) {
                     if (map.containsKey(key) && map[key] != null) {

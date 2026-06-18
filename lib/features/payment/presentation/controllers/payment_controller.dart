@@ -45,6 +45,7 @@ class PaymentController extends GetxController {
   final Rxn<PaymentCategory> historyFilterCategory = Rxn<PaymentCategory>();
   late Razorpay _razorpay;
   int? _pendingAdminRequestId;
+  bool _isCurrentPaymentRecurring = false;
 
   @override
   void onInit() {
@@ -197,6 +198,7 @@ class PaymentController extends GetxController {
 
     isProcessingPayment.value = true;
     _pendingAdminRequestId = adminPaymentRequestId;
+    _isCurrentPaymentRecurring = isRecurring;
 
     try {
       final tokenManager = Get.find<TokenManager>();
@@ -275,7 +277,7 @@ class PaymentController extends GetxController {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    AppLogger.i('Payment Success: ${response.paymentId}');
+    AppLogger.i('Payment Success: paymentId=${response.paymentId}, orderId=${response.orderId}, data=${response.data}');
 
     try {
       unawaited(
@@ -285,14 +287,17 @@ class PaymentController extends GetxController {
         ),
       );
 
+      final orderIdToUse = response.orderId ?? response.data?['razorpay_subscription_id']?.toString() ?? '';
+
       final result = await _repository.verifyPayment(
-        razorpayOrderId: response.orderId!,
-        razorpayPaymentId: response.paymentId!,
-        razorpaySignature: response.signature!,
+        razorpayOrderId: orderIdToUse,
+        razorpayPaymentId: response.paymentId ?? '',
+        razorpaySignature: response.signature ?? '',
         amount: enteredAmount.value,
         paymentTypeId: selectedType.value?.id ?? 0,
         paymentCategoryId: selectedCategory.value?.id ?? 0,
         adminPaymentRequestId: _pendingAdminRequestId,
+        isRecurring: _isCurrentPaymentRecurring,
       );
 
       Get.back<void>();
@@ -314,7 +319,8 @@ class PaymentController extends GetxController {
         resetPaymentForm();
         Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      AppLogger.e('Payment Verification Exception', e, stack);
       if (Get.isDialogOpen ?? false) Get.back<void>();
       Get.snackbar(LK.error.tr, LK.verificationFailed.tr);
     } finally {

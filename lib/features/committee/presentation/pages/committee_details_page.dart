@@ -33,11 +33,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        title: Text(node.name, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
-      ),
+      appBar: AppBar(title: Text(node.name)),
       body: Obx(
         () => AppStateView(
           state: controller.detailState.value,
@@ -120,33 +116,35 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                       );
                     },
                   ),
-                SizedBox(height: 8.h),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRouter.committeeMembers,
-                      arguments: node,
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        LK.showMore.tr,
-                        style: AppTextStyles.labelLarge.copyWith(
+                if (detail.members.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRouter.committeeMembers,
+                        arguments: node,
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          LK.showMore.tr,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 16,
                           color: AppColors.primary,
                         ),
-                      ),
-                      SizedBox(width: 4.w),
-                      Icon(
-                        Icons.arrow_forward,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

@@ -41,20 +41,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        centerTitle: false,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Get.back<void>(),
-        ),
-        title: Text(
-          LK.addedMembers.tr,
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-        ),
-      ),
+      appBar: AppBar(title: Text(LK.addedMembers.tr)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

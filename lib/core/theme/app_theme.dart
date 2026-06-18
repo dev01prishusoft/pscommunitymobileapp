@@ -142,10 +142,17 @@ class AppTheme {
       thickness: 1,
       space: 1,
     ),
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.background,
-      foregroundColor: AppColors.foreground,
+      foregroundColor: AppColors.secondary,
       elevation: 0,
+      centerTitle: false,
+      iconTheme: IconThemeData(color: AppColors.primary),
+      titleTextStyle: TextStyle(
+        color: AppColors.secondary,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
     ),
     splashColor: AppColors.primary.withValues(alpha: 0.1),
     highlightColor: AppColors.primary.withValues(alpha: 0.05),
