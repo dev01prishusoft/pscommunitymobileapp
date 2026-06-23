@@ -278,7 +278,7 @@ class _LanguageDropdown extends GetView<LocalizationService> {
                 .map(
                   (code) =>
                       DropdownMenuItem(value: code, child: Text(' $code')),
-                )
+                )  
                 .toList(),
             onChanged: (code) => homeController.changeLocale(controller, code),
           ),

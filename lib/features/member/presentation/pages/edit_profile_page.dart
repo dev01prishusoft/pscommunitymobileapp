@@ -139,6 +139,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Obx(() => AppFormDatePicker(
                               controller: controller.dobCtrl,
                               label: LK.birthDate.tr,
+                              lastDate: DateTime.now(),
                               updateStatus: controller.getUpdateStatus('DateOfBirth'),
                             )),
                             Obx(() => AppFormTimePicker(
@@ -834,27 +835,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Icon(Icons.badge_outlined, size: 20, color: AppColors.primary),
                     ),
                     SizedBox(width: 12.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          LK.memberNo.tr.toUpperCase(),
-                          style: TextStyle(
-                            color: AppColors.primary.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                            fontSize: 10,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            LK.memberNo.tr.toUpperCase(),
+                            style: TextStyle(
+                              color: AppColors.primary.withValues(alpha: 0.7),
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                              fontSize: 10,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          value.text,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
+                          SizedBox(height: 2.h),
+                          Text(
+                            value.text,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -1157,7 +1160,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                     ),
                     AppSpacing.hS,
-                    Text('Primary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                    Expanded(
+                      child: Text('Primary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                    ),
                     ],
                   ),
                 ),
@@ -1372,6 +1377,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                TextInputFormatter.withFunction((oldValue, newValue) {
+                  if (newValue.text.isEmpty) return newValue;
+                  final numVal = double.tryParse(newValue.text);
+                  if (numVal != null && numVal > 100) return oldValue;
+                  return newValue;
+                }),
               ],
               maxLength: 20,
               validator: (v) {
@@ -1452,7 +1463,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                     ),
                     AppSpacing.hS,
-                    Text(LK.markAsHighest.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                    Expanded(
+                      child: Text(LK.markAsHighest.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                    ),
                   ],
                 ),
               ),
@@ -1529,6 +1542,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.occupation.value = v;
           },
           label: LK.occupation.tr,
+          validator: (v) {
+            final initialType = controller.getInitialDropdownValue('OccupationTypeId');
+            final currentType = controller.workInfo.occupationType.value;
+            if (initialType != currentType && currentType.isNotEmpty && (v == null || v.isEmpty)) {
+              return LK.fieldRequired.tr;
+            }
+            return null;
+          },
           updateStatus: controller.getUpdateStatus('OccupationId', idMap: controller.workInfo.occupationIdMap),
         );
       }),
@@ -1555,6 +1576,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
+          validator: (v) {
+            final initialOccupation = controller.getInitialDropdownValue('OccupationId');
+            final currentOccupation = controller.workInfo.occupation.value;
+            if (initialOccupation != currentOccupation && currentOccupation.isNotEmpty && (v == null || v.isEmpty)) {
+              return LK.fieldRequired.tr;
+            }
+            return null;
+          },
           updateStatus: controller.getUpdateStatus('JobPositionId', idMap: controller.workInfo.jobPositionIdMap),
         );
       }),

@@ -10,6 +10,7 @@ class AuthTokens {
     this.middleName,
     this.lastName,
     this.email,
+    this.deviceUniqueId,
   });
   final String accessToken;
   final String refreshToken;
@@ -21,4 +22,5 @@ class AuthTokens {
   final String? middleName;
   final String? lastName;
   final String? email;
+  final String? deviceUniqueId;
 }

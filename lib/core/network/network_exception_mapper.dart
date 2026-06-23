@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'dart:io';
 
+import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+
 class NetworkExceptionMapper {
   static Failure map(dynamic error) {
     if (error is Failure) return error;
@@ -17,6 +19,9 @@ class NetworkExceptionMapper {
           final response = error.response;
           if (response != null) {
             final statusCode = response.statusCode;
+            AppLogger.e(
+              'RAW API ERROR BODY (Status $statusCode): ${response.data}',
+            );
             final parsedMessage = ApiErrorParser.parseMessage(response.data);
 
             if (statusCode == 401) {

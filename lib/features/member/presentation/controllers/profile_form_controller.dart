@@ -376,6 +376,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   bool isAddMode = false;
 
+  String? getInitialDropdownValue(String key) => _initialDropdownValues[key];
+
   bool get hasChanges {
     if (isAddMode) return true;
     if (_currentMember == null) return false;
@@ -1098,6 +1100,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['TwitterUrl'] = contactInfo.twitterCtrl.text;
             
             formDataMap['OccupationTypeId'] = getId(workInfo.occupationType.value, workInfo.occupationTypeIdMap);
+            formDataMap['OccupationId'] = getId(workInfo.occupation.value, workInfo.occupationIdMap);
+            formDataMap['JobPositionId'] = getId(workInfo.jobPosition.value, workInfo.jobPositionIdMap);
             formDataMap['OtherOccupation'] = workInfo.otherOccupation.value;
             formDataMap['OtherJobPosition'] = workInfo.otherJobPosition.value;
             formDataMap['OtherJobPositionEnglish'] = workInfo.otherJobPositionEnglish.value;
@@ -1144,7 +1148,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['IsDemised'] = false;
             formDataMap['IsActive'] = true;
             formDataMap['IsMobileVerified'] = contactInfo.mobileVerified.value;
-            formDataMap['IssameAddressasMyFamilyHeadAddress'] = true;
+            formDataMap['IssameAddressasMyFamilyHeadAddress'] = false;
             personalInfo.memberNoCtrl.text = generateMemberNo();
             formDataMap['MemberNo'] = personalInfo.memberNoCtrl.text;
 
@@ -1193,6 +1197,72 @@ class ProfileFormController extends GetxController with FormStateMixin {
               final msg = response.data['message'] as String?;
               if (msg != null && msg.isNotEmpty) {
                 successMessage = msg.tr;
+              }
+            }
+
+            if (!isEdit && response.data != null && response.data is Map<String, dynamic>) {
+              int? newMemberId;
+              final resData = response.data['data'];
+              if (resData is int) {
+                newMemberId = resData;
+              } else if (resData is Map<String, dynamic>) {
+                newMemberId = resData['memberId'] as int? ?? resData['id'] as int?;
+              }
+
+              if (newMemberId != null) {
+                int? safeGetId(String? name, Map<String, int> idMap) {
+                  if (name == null || name.isEmpty) return null;
+                  return idMap[name];
+                }
+
+                try {
+                  final addressesPayload = {
+                    "memberId": newMemberId,
+                    "addresses": contactInfo.addresses.map((addr) {
+                      return {
+                        "memberAddressId": 0,
+                        "memberId": newMemberId,
+                        "addressTypeId": safeGetId(addr.type, contactInfo.addressTypeIdMap) ?? 0,
+                        "stateId": safeGetId(addr.state, workInfo.globalStateIdMap) ?? 0,
+                        "districtId": safeGetId(addr.district, workInfo.globalDistrictIdMap) ?? 0,
+                        "talukaId": safeGetId(addr.taluka, workInfo.globalTalukaIdMap) ?? 0,
+                        "areaId": safeGetId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0,
+                        "addressLine1": addr.line1,
+                        "addressLine2": addr.line2,
+                        "landmark": addr.landmark,
+                        "pincode": addr.pincode,
+                        "isPrimary": addr.isPrimary,
+                        "isActive": true
+                      };
+                    }).toList()
+                  };
+                  await apiClient.post('/api/v1/member-address/upsert', data: addressesPayload);
+                } catch (e) {
+                  AppLogger.e('Failed to upsert addresses', e);
+                }
+
+                try {
+                  final educationsPayload = {
+                    "memberId": newMemberId,
+                    "educations": contactInfo.educationList.map((edu) {
+                      return {
+                        "memberEducationId": 0,
+                        "memberId": newMemberId,
+                        "educationalQualificationId": contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId ?? 0,
+                        "description": edu.description,
+                        "institutionName": edu.institute,
+                        "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
+                        "percentage": double.tryParse(edu.percentage) ?? 0,
+                        "grade": edu.grade,
+                        "isHighestQualification": edu.isHighest,
+                        "isActive": true
+                      };
+                    }).toList()
+                  };
+                  await apiClient.post('/api/v1/MemberEducation/upsert', data: educationsPayload);
+                } catch (e) {
+                  AppLogger.e('Failed to upsert educations', e);
+                }
               }
             }
 

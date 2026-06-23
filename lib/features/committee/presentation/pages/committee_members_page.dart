@@ -13,6 +13,7 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -381,12 +382,12 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             AppSpacing.vL,
                             _buildDetailRow(
                               LK.startDateLabel.tr,
-                              member.startDate?.split('T').first ?? '-',
+                              formatDateString(member.startDate, fallback: '-'),
                             ),
                             AppSpacing.vL,
                             _buildDetailRow(
                               LK.endDateLabel.tr,
-                              member.endDate?.split('T').first ?? '-',
+                              formatDateString(member.endDate, fallback: '-'),
                             ),
                           ],
                         ),

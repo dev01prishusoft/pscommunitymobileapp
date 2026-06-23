@@ -24,7 +24,10 @@ class AuthInterceptor extends Interceptor {
   @override
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final path = options.path;
-    if (!path.contains('/login') && !path.contains('/member-login') && !path.contains('/refresh-token')) {
+    if (!path.contains('/login') && 
+        !path.contains('/member-login') && 
+        !path.contains('/refresh-token') &&
+        !path.contains('/language')) {
       if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenNearExpiry) {
         try {
           await _refreshSingleFlight(_tokenManager.refreshToken!);
@@ -48,7 +51,9 @@ class AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
     final path = err.requestOptions.path;
-    if (path.contains('/login') || path.contains('/member-login')) {
+    if (path.contains('/login') || 
+        path.contains('/member-login') || 
+        path.contains('/language')) {
       return handler.next(err);
     }
     if (path.contains('/refresh-token')) {

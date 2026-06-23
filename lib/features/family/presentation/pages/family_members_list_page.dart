@@ -61,7 +61,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
         centerTitle: false,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () => Get.back<void>(),
         ),
         title: Column(

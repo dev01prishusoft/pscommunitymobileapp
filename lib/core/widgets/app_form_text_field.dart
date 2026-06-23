@@ -126,7 +126,7 @@ class AppFormTextField extends StatelessWidget {
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
-              return LK.fieldRequired.tr;
+              return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
             }
             if (validator != null) {
               return validator!(value);

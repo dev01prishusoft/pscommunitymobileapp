@@ -135,6 +135,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         title: Text(widget.title, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
+        iconTheme: const IconThemeData(color: AppColors.white),
         elevation: 0,
       ),
       body: Stack(

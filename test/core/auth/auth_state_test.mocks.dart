@@ -171,12 +171,17 @@ class MockTokenManager extends _i1.Mock implements _i3.TokenManager {
     String? refresh, {
     bool? isDefaultPassword = false,
     String? mobile,
+    String? deviceUniqueId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
               #saveTokens,
               [access, refresh],
-              {#isDefaultPassword: isDefaultPassword, #mobile: mobile},
+              {
+                #isDefaultPassword: isDefaultPassword,
+                #mobile: mobile,
+                #deviceUniqueId: deviceUniqueId,
+              },
             ),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),

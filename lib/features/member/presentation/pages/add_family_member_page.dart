@@ -110,6 +110,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   AppFormDatePicker(
                     controller: controller.dobCtrl,
                     label: LK.birthDate.tr,
+                    isRequired: true,
+                    lastDate: DateTime.now(),
                   ),
                   AppFormTimePicker(
                     controller: controller.tobCtrl,
@@ -323,6 +325,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               .toList(),
                       onChanged: (v) => controller.relation.value = v!,
                       label: LK.relation.tr,
+                      isRequired: true,
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -363,7 +366,91 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       ),
                     ),
                   ),
-                  _buildCheckbox(LK.lookingForMarriage.tr, controller.openToMarriage),
+                  SizedBox(height: 12.h),
+                  Obx(() {
+                    final stateList = controller.workStateList;
+                    return AppFormDropdown<String>(
+                      value: stateList.contains(controller.personalInfo.motherState.value)
+                          ? controller.personalInfo.motherState.value
+                          : null,
+                      items: stateList
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          controller.personalInfo.motherState.value = v;
+                          controller.personalInfo.motherDistrict.value = '';
+                          controller.personalInfo.motherTaluka.value = '';
+                          controller.personalInfo.motherArea.value = '';
+                        }
+                      },
+                      label: LK.mothersState.tr,
+                    );
+                  }),
+                  SizedBox(height: 12.h),
+                  Obx(() {
+                    final districtList = controller.getAddressDistricts(controller.personalInfo.motherState.value);
+                    return AppFormDropdown<String>(
+                      value: districtList.contains(controller.personalInfo.motherDistrict.value)
+                          ? controller.personalInfo.motherDistrict.value
+                          : null,
+                      items: districtList
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          controller.personalInfo.motherDistrict.value = v;
+                          controller.personalInfo.motherTaluka.value = '';
+                          controller.personalInfo.motherArea.value = '';
+                        }
+                      },
+                      label: LK.mothersDistrict.tr,
+                    );
+                  }),
+                  SizedBox(height: 12.h),
+                  Obx(() {
+                    final talukaList = controller.getAddressTalukas(controller.personalInfo.motherDistrict.value);
+                    return AppFormDropdown<String>(
+                      value: talukaList.contains(controller.personalInfo.motherTaluka.value)
+                          ? controller.personalInfo.motherTaluka.value
+                          : null,
+                      items: talukaList
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          controller.personalInfo.motherTaluka.value = v;
+                          controller.personalInfo.motherArea.value = '';
+                        }
+                      },
+                      label: LK.mothersTaluka.tr,
+                    );
+                  }),
+                  SizedBox(height: 12.h),
+                  Obx(() {
+                    final areaList = controller.getAddressAreas(controller.personalInfo.motherTaluka.value);
+                    return AppFormDropdown<String>(
+                      value: areaList.contains(controller.personalInfo.motherArea.value)
+                          ? controller.personalInfo.motherArea.value
+                          : null,
+                      items: areaList
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          controller.personalInfo.motherArea.value = v;
+                        }
+                      },
+                      label: LK.mothersArea.tr,
+                    );
+                  }),
+                  Obx(() {
+                    final status = controller.maritalStatus.value;
+                    if (status == 'Married' || status == 'Divorced') {
+                      return SizedBox.shrink();
+                    }
+                    return _buildCheckbox(LK.lookingForMarriage.tr, controller.openToMarriage);
+                  }),
                 ],
               ),
 
@@ -557,24 +644,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
           ),
 
-          Obx(() {
-            if (controller.profileImage.value != null) {
-              return Padding(
-                padding: EdgeInsets.only(top: 16.h),
-                child: TextButton.icon(
-                  onPressed: controller.removePhoto,
-                  icon: Icon(Icons.delete_outline, size: 18, color: AppColors.mutedForeground),
-                  label: Text(
-                    LK.removePhoto.tr,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.mutedForeground,
-                    ),
-                  ),
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          }),
+
           SizedBox(height: 16.h),
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: controller.memberNoCtrl,
@@ -891,6 +961,34 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             maxLength: 200,
             onChanged: (v) => addr.landmark = v,
           ),
+          SizedBox(height: 12.h),
+          InkWell(
+            onTap: () {
+              addr.isPrimary = !addr.isPrimary;
+              controller.addresses.refresh();
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 24.h,
+                    width: 24.w,
+                    child: Checkbox(
+                      value: addr.isPrimary,
+                      onChanged: (v) {
+                        addr.isPrimary = v ?? false;
+                        controller.addresses.refresh();
+                      },
+                      activeColor: AppColors.primary,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(LK.isPrimary.tr, style: AppTextStyles.titleSmall),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1063,6 +1161,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                TextInputFormatter.withFunction((oldValue, newValue) {
+                  if (newValue.text.isEmpty) return newValue;
+                  final numVal = double.tryParse(newValue.text);
+                  if (numVal != null && numVal > 100) return oldValue;
+                  return newValue;
+                }),
               ],
               maxLength: 20,
               validator: (v) {
@@ -1090,6 +1194,34 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               label: 'Description',
               maxLength: 500,
               onChanged: (v) => edu.description = v,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          InkWell(
+            onTap: () {
+              edu.isHighest = !edu.isHighest;
+              controller.educationList.refresh();
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 24.h,
+                    width: 24.w,
+                    child: Checkbox(
+                      value: edu.isHighest,
+                      onChanged: (v) {
+                        edu.isHighest = v ?? false;
+                        controller.educationList.refresh();
+                      },
+                      activeColor: AppColors.primary,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(LK.isHighestQualification.tr, style: AppTextStyles.titleSmall),
+                ],
+              ),
             ),
           ),
         ],

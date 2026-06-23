@@ -90,6 +90,7 @@ class AppFormDatePicker extends StatelessWidget {
         TextFormField(
           controller: controller,
           readOnly: true,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           onTap: () => _selectDate(context),
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
@@ -128,7 +129,7 @@ class AppFormDatePicker extends StatelessWidget {
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
-              return LK.fieldRequired.tr;
+              return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
             }
             if (validator != null) {
               return validator!(value);

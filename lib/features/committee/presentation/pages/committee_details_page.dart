@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 
 class CommitteeDetailsPage extends StatefulWidget {
   const CommitteeDetailsPage({super.key});
@@ -109,8 +110,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         context,
                         member.memberId,
                         member.name,
-                        member.startDate?.split('T').first ?? '-',
-                        member.endDate?.split('T').first ?? '-',
+                        formatDateString(member.startDate, fallback: '-'),
+                        formatDateString(member.endDate, fallback: '-'),
                         member.roleName,
                         '',
                       );
@@ -353,9 +354,9 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                       ),
                       children: [
                         TextSpan(text: 'Start: '),
-                        TextSpan(text: since, style: AppTextStyles.labelLarge),
+                        TextSpan(text: since, style: AppTextStyles.labelSmall),
                         TextSpan(text: ' | End: '),
-                        TextSpan(text: endDate, style: AppTextStyles.labelLarge),
+                        TextSpan(text: endDate, style: AppTextStyles.labelSmall),
                       ],
                     ),
                   ),

@@ -200,10 +200,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }) async {
     try {
       final queryParameters = <String, dynamic>{
-        if (paymentTypeId != null) 'PaymentTypeId': paymentTypeId,
-        if (categoryId != null) 'CategoryId': categoryId,
-        if (year != null) 'Year': year,
-        if (status != null && status != 'All') 'Status': status,
+        if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
+        if (categoryId != null) 'paymentCategoryId': categoryId,
+        if (year != null) 'year': year,
+        if (status != null && status != 'All') 'paymentStatus': status,
       };
 
       final response = await _apiClient.getParsed<List<PaymentItem>>(

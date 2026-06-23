@@ -112,7 +112,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         final years = List.generate(5, (index) => (currentYear - index + 1).toString());
                         return _buildFilterDropdown(
                           label: LK.yearLabel.tr,
-                          hint: currentYear.toString(),
+                          hint: LK.all.tr,
                           value: controller.selectedYear.value.isEmpty
                               ? null
                               : controller.selectedYear.value,
@@ -263,7 +263,7 @@ class _PaymentCard extends StatelessWidget {
         } else if (str.contains(RegExp(r'^\d{2}-\d{2}-\d{4}'))) {
           date = DateFormat('dd-MM-yyyy HH:mm:ss').parse(str, true).toLocal();
         } else {
-          date = DateTime.parse(str + 'Z').toLocal();
+          date = DateTime.parse('${str}Z').toLocal();
         }
       } catch (_) {
         date = DateTime.tryParse(str)?.toLocal();

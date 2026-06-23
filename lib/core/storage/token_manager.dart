@@ -7,9 +7,10 @@ import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
-  TokenPair({this.accessToken, this.refreshToken, this.isDefaultPassword = false});
+  TokenPair({this.accessToken, this.refreshToken, this.deviceUniqueId, this.isDefaultPassword = false});
   final String? accessToken;
   final String? refreshToken;
+  final String? deviceUniqueId;
   final bool isDefaultPassword;
 }
 
@@ -23,6 +24,7 @@ class TokenManager {
 
   static final _accessKey = 'access_token';
   static final _refreshKey = 'refresh_token';
+  static final _deviceUniqueKey = 'device_unique_id';
   static final _defaultPwdKey = 'is_default_pwd';
   static final _mobileKey = 'user_mobile';
 
@@ -33,11 +35,13 @@ class TokenManager {
         _storage.read(_refreshKey),
         _storage.read(_defaultPwdKey),
         _storage.read(_mobileKey),
+        _storage.read(_deviceUniqueKey),
       ]);
       authState.value = TokenPair(
         accessToken: results[0],
         refreshToken: results[1],
         isDefaultPassword: results[2] == 'true',
+        deviceUniqueId: results[4],
       );
       userPhoneRx.value = results[3] ?? '';
     } catch (e) {
@@ -46,7 +50,7 @@ class TokenManager {
     }
   }
 
-  Future<void> saveTokens(String access, String refresh, {bool isDefaultPassword = false, String? mobile}) async {
+  Future<void> saveTokens(String access, String refresh, {bool isDefaultPassword = false, String? mobile, String? deviceUniqueId}) async {
     try {
       final futures = <Future<void>>[
         _storage.write(_accessKey, access),
@@ -57,12 +61,16 @@ class TokenManager {
         futures.add(_storage.write(_mobileKey, mobile));
         userPhoneRx.value = mobile;
       }
+      if (deviceUniqueId != null) {
+        futures.add(_storage.write(_deviceUniqueKey, deviceUniqueId));
+      }
       await Future.wait(futures);
 
       authState.value = TokenPair(
         accessToken: access, 
         refreshToken: refresh,
         isDefaultPassword: isDefaultPassword,
+        deviceUniqueId: deviceUniqueId ?? authState.value.deviceUniqueId,
       );
     } catch (e) {
       if (kDebugMode) {}
@@ -77,6 +85,7 @@ class TokenManager {
         _storage.delete(_refreshKey),
         _storage.delete(_defaultPwdKey),
         _storage.delete(_mobileKey),
+        _storage.delete(_deviceUniqueKey),
       ]);
       authState.value = TokenPair();
       userPhoneRx.value = '';

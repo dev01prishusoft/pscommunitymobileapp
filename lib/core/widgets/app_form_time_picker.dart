@@ -200,7 +200,7 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
           ),
           validator: (value) {
             if (widget.isRequired && (value == null || value.trim().isEmpty)) {
-              return LK.fieldRequired.tr;
+              return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
             }
             if (widget.validator != null) {
               return widget.validator!(widget.controller.text);

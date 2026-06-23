@@ -56,8 +56,18 @@ class AppFormDropdown<T> extends StatelessWidget {
         DropdownButtonFormField<T>(
           initialValue: value,
           items: items,
+          selectedItemBuilder: (BuildContext context) {
+            return items.map<Widget>((DropdownMenuItem<T> item) {
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: item.child,
+              );
+            }).toList();
+          },
           onChanged: onChanged,
           isExpanded: true,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: hint,
@@ -90,10 +100,10 @@ class AppFormDropdown<T> extends StatelessWidget {
           ),
           validator: (val) {
             if (isRequired && val == null) {
-              return requiredErrorMessage ?? LK.fieldRequired.tr;
+              return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
             }
             if (isRequired && val is String && val.trim().isEmpty) {
-              return requiredErrorMessage ?? LK.fieldRequired.tr;
+              return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
             }
             if (validator != null) {
               return validator!(val);

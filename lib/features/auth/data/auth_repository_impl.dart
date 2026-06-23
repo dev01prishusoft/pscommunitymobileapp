@@ -36,6 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
         tokens.refreshToken,
         isDefaultPassword: tokens.isDefaultPassword,
         mobile: mobile,
+        deviceUniqueId: tokens.deviceUniqueId,
       );
       return Success(tokens);
     } else {
@@ -86,6 +87,7 @@ class AuthRepositoryImpl implements AuthRepository {
         tokens.refreshToken,
         isDefaultPassword: tokens.isDefaultPassword,
         mobile: mobile,
+        deviceUniqueId: tokens.deviceUniqueId,
       );
       return Success(tokens);
     } else {
@@ -141,9 +143,14 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<void>> memberRevokeToken({required String refreshToken}) async {
+    final deviceUniqueId = _tokenManager.authState.value.deviceUniqueId;
+    final queryParams = deviceUniqueId != null && deviceUniqueId.isNotEmpty 
+        ? '?tokenUniqueId=$deviceUniqueId' 
+        : '';
+        
     final result = await _apiClient.postParsed<void>(
-      ApiEndpoints.memberRevokeToken,
-      data: {'refreshToken': refreshToken},
+      '${ApiEndpoints.memberRevokeToken}$queryParams',
+      data: '"$refreshToken"',
     );
     
     if (result is Success<ApiResponse<void>>) {
@@ -173,6 +180,7 @@ class AuthRepositoryImpl implements AuthRepository {
       middleName: authData['middleName']?.toString(),
       lastName: authData['lastName']?.toString(),
       email: authData['email']?.toString(),
+      deviceUniqueId: authData['deviceUniqueId']?.toString(),
     );
   }
 }

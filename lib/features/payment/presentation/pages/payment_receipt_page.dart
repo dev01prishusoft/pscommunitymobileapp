@@ -98,7 +98,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           } else if (str.contains(RegExp(r'^\d{2}-\d{2}-\d{4}'))) {
             dt = DateFormat('dd-MM-yyyy HH:mm:ss').parse(str, true).toLocal();
           } else {
-            dt = DateTime.parse(str + 'Z').toLocal();
+            dt = DateTime.parse('${str}Z').toLocal();
           }
         } catch (_) {
           dt = DateTime.parse(str).toLocal();
@@ -129,6 +129,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           : (data['isRecurring']?.toString() == 'false' || data['isRecurring'] == false)
               ? LK.no.tr
               : 'N/A',
+      'recurringPaymentType': (data['recurringPaymentType'] ?? data['recurringType'] ?? data['recurringTypeName'] ?? data['recurringPaymentTypeName'])?.toString() ?? 'N/A',
       'type':
           ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])
                       ?.toString() ??
@@ -408,6 +409,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                 pw.Text('${LK.planNameLabel.tr} ${data['planName']}'),
               if (data['isRecurring'] != 'N/A')
                 pw.Text('${LK.recurring.tr}: ${data['isRecurring']}'),
+              if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
+                pw.Text('${LK.recurringTypeLabel.tr} ${data['recurringPaymentType']!.tr}'),
               pw.Text('${LK.typeLabel.tr} ${data['type']}'),
               pw.Text('${LK.categoryLabel.tr} ${data['category']}'),
               pw.Text('${LK.amountLabel.tr} ${data['amount']}'),

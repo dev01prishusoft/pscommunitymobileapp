@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/models/language.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart' as pscommunitymobileapp_token_manager;
 
 class LocalizationService {
   LocalizationService(this._storage);
@@ -111,6 +112,13 @@ class LocalizationService {
 
   Future<void> fetchLanguages() async {
     if (_isFetchingLanguages || languages.isNotEmpty) return;
+    
+    final tokenManager = Get.find<pscommunitymobileapp_token_manager.TokenManager>();
+    if (tokenManager.accessToken == null || tokenManager.accessToken!.isEmpty) {
+      // Don't attempt to fetch languages if we aren't logged in.
+      return;
+    }
+
     _isFetchingLanguages = true;
     try {
       final apiClient = Get.find<ApiClient>();
@@ -143,6 +151,12 @@ class LocalizationService {
 
   Future<void> fetchLanguageResources(String langCode) async {
     try {
+      final tokenManager = Get.find<pscommunitymobileapp_token_manager.TokenManager>();
+      if (tokenManager.accessToken == null || tokenManager.accessToken!.isEmpty) {
+        // Don't attempt to fetch remote resources if we aren't logged in.
+        return;
+      }
+      
       final apiClient = Get.find<ApiClient>();
       final response = await apiClient.get(ApiEndpoints.languageResources(langCode));
       final json = response.data as Map<String, dynamic>?;

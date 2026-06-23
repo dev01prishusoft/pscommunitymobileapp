@@ -23,8 +23,12 @@ import 'package:pscommunitymobileapp/features/payment/presentation/pages/payment
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/payments_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_account_details_page.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/pages/bank_details_page.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/pages/samaj_sanstha_page.dart';
 import 'package:pscommunitymobileapp/features/splash/presentation/pages/community_welcome_splash_page.dart';
 import 'package:pscommunitymobileapp/features/support/presentation/pages/support_page.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_sanstha_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 
 class AppRouter {
   static String login = '/login';
@@ -52,6 +56,7 @@ class AppRouter {
   static String editProfile = '/edit-profile';
   static String addFamilyMember = '/add-family-member';
   static String addedMembers = '/added-members';
+  static String samajSansthas = '/samaj-sansthas';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -170,6 +175,14 @@ class AppRouter {
     GetPage<void>(
       name: addedMembers,
       page: () => AddedMembersListPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: samajSansthas,
+      page: () => SamajSansthaPage(),
+      binding: BindingsBuilder<dynamic>(() {
+        Get.lazyPut<SamajSansthaController>(() => SamajSansthaController(SamajRepositoryImpl(Get.find<ApiClient>())));
+      }),
       middlewares: [AuthGuard()],
     ),
   ];

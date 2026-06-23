@@ -42,7 +42,9 @@ class LK {
   static String support = 'Support';
   static String share = 'Share App';
   static String samajInfo = 'Samaj Profile';
-  static String customerSupport = 'Customer Support';
+  static const String customerSupport = 'customer_support';
+  static const String aboutSamaj = 'about_samaj';
+  static const String samajSansthas = 'samaj_sansthas';
   static String locationFilters = 'Location Filters';
   static String marriage = 'Marriage';
   static String lookingForMarriage = 'Looking for Marriage';
@@ -107,6 +109,8 @@ class LK {
   static String accountDeletedBody =
       'Your account has been deleted successfully.';
   static String fieldRequired = 'This field is required';
+  static String isRequired = 'is required';
+  static String isHighestQualification = 'Mark as highest';
   static String sessionExpired = 'Session Expired';
   static String sessionExpiredBody =
       'You have been logged out due to inactivity.';
@@ -251,6 +255,8 @@ class LK {
   static String downloadPdf = 'DOWNLOAD PDF';
   static String comingSoon = 'Coming Soon';
   static String paymentTypeLabel = 'Payment Type:';
+  static String recurringTypeLabel = 'Recurring Type:';
+  static String isPrimary = 'Primary';
   static String allTypes = 'All Types';
   static String allCategories = 'All Categories';
   static String yearLabel = 'Year:';
@@ -563,6 +569,8 @@ class LK {
     deleteAccount,
     accountDeleted,
     fieldRequired,
+    isRequired,
+    isHighestQualification,
     sessionExpired,
     pleaseEnterEmail,
     pleaseEnterValidEmail,
@@ -675,6 +683,7 @@ class LK {
     downloadPdf,
     comingSoon,
     paymentTypeLabel,
+    recurringTypeLabel,
     allTypes,
     allCategories,
     yearLabel,

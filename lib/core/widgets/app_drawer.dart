@@ -97,6 +97,14 @@ class AppDrawer extends StatelessWidget {
                     onTap: () => Get.toNamed<void>(AppRouter.editProfile),
                   ),
                   ListTile(
+                    leading: Icon(Icons.corporate_fare_outlined, color: AppColors.primary),
+                    title: Text(LK.samajSansthas.tr),
+                    onTap: () {
+                      Get.back<void>();
+                      Get.toNamed<void>(AppRouter.samajSansthas);
+                    },
+                  ),
+                  ListTile(
                     leading: Icon(
                       Icons.person_add_alt_1_outlined,
                       color: AppColors.primary,

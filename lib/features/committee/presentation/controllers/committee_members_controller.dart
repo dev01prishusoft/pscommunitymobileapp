@@ -126,12 +126,7 @@ class CommitteeMembersController extends GetxController {
   }
 
   String formatDate(String? isoDate) {
-    if (isoDate == null) return '--';
-    try {
-      return isoDate.split('T').first;
-    } catch (_) {
-      return isoDate;
-    }
+    return formatDateString(isoDate, fallback: '--');
   }
 
   void _applyFilters() {}
