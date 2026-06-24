@@ -169,7 +169,7 @@ class PersonalInfoController extends GetxController {
     ownHouse.value = m.isOwnHouse ?? false;
     twoWheeler.value = m.hasTwoWheeler ?? false;
     fourWheeler.value = m.hasFourWheeler ?? false;
-    monthlyIncome.value = m.monthlyIncome?.toString() ?? '';
+    monthlyIncome.value = m.monthlyIncome?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
     isFamilyHead.value = m.isHead ?? false;
     relatedToMemberName.value = m.relatedToMemberName ?? '';
 

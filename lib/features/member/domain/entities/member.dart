@@ -159,7 +159,7 @@ class Member {
       educationName: getString('educationName', 'educationalQualification', 'education'),
       jobPositionName: getString('jobPositionName'),
       otherJobPosition: getString('otherJobPosition'),
-      monthlyIncome: (json['monthlyIncome'] as num?)?.toInt(),
+      monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble(),
       isOwnLand: json['isOwnLand'] as bool?,
       isOwnHouse: json['isOwnHouse'] as bool?,
       hasTwoWheeler: json['hasTwoWheeler'] as bool?,
@@ -251,7 +251,7 @@ class Member {
   final String? educationName;
   final String? jobPositionName;
   final String? otherJobPosition;
-  final int? monthlyIncome;
+  final double? monthlyIncome;
   final bool? isOwnLand;
   final bool? isOwnHouse;
   final bool? hasTwoWheeler;

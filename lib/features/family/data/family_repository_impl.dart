@@ -38,7 +38,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
   @override
   Future<List<EducationModel>> getMemberEducations(int memberId) async {
     AppLogger.d('Member Education Request for ID: $memberId');
-    final response = await _apiClient.get('/api/v1/MemberEducation/member/$memberId');
+    final response = await _apiClient.get('/api/v1/MemberEducation/list?MemberId=$memberId');
     
     if (response.statusCode == 200 && response.data != null) {
       final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
@@ -51,6 +51,8 @@ class FamilyRepositoryImpl implements FamilyRepository {
           passingYear: map['yearOfPassing']?.toString() ?? '',
           percentage: map['percentage']?.toString() ?? '',
           grade: map['grade']?.toString() ?? '',
+          description: map['description']?.toString() ?? '',
+          isHighest: map['isHighestQualification'] as bool? ?? false,
         );
       }).toList();
     }

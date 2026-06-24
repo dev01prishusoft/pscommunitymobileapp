@@ -312,10 +312,16 @@ class FamilyController extends GetxController {
     await loadAreas();
   }
 
+  String _formatDouble(double? value) {
+    if (value == null) return '0';
+    if (value == value.toInt()) return value.toInt().toString();
+    return value.toString();
+  }
+
   String formatGender(Member member) => (member.genderName ?? LK.na).tr;
   String formatBloodGroup(Member member) => member.bloodGroupName ?? LK.na;
-  String formatHeight(Member member) => '${member.height ?? 0} CM';
-  String formatWeight(Member member) => '${member.weight ?? 0} KG';
+  String formatHeight(Member member) => '${_formatDouble(member.height)} cm';
+  String formatWeight(Member member) => '${_formatDouble(member.weight)} kg';
   String formatMotherFather(Member member) => member.motherFatherName ?? LK.na;
   String formatOccupation(Member member) =>
       member.occupationName ?? member.occupationTypeName ?? LK.na;
@@ -328,7 +334,7 @@ class FamilyController extends GetxController {
       member.emergencyContactNo ?? LK.na;
   String formatGotra(Member member) => member.gotraName ?? LK.na;
   String formatEmail(Member member) => member.emailAddress ?? LK.na;
-  String formatIncome(Member member) => '₹${member.monthlyIncome ?? 0}';
+  String formatIncome(Member member) => '₹${_formatDouble(member.monthlyIncome)}';
   String formatAge(Member member) => member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
 
   Future<void> launchSafeUrl(String urlString) async {
