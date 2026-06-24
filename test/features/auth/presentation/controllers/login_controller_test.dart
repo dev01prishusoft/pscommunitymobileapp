@@ -1,12 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
-import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
+import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
+import 'package:pscommunitymobileapp/features/auth/presentation/controllers/login_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class MockLoginUseCase implements LoginUseCase {
   bool shouldThrow = false;
@@ -70,9 +69,6 @@ void main() {
     expect(controller.isFormLoading, false);
 
     controller.submit(
-      formKey: GlobalKey<FormState>(),
-      mobile: '123',
-      password: 'password',
     );
     expect(controller.isFormLoading, false);
   });
@@ -81,9 +77,6 @@ void main() {
     mockUseCase.shouldThrow = true;
 
     controller.submit(
-      formKey: GlobalKey<FormState>(),
-      mobile: '123',
-      password: 'wrong',
     );
 
     expect(controller.isFormLoading, false);

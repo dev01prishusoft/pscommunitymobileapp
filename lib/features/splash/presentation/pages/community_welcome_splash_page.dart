@@ -1,57 +1,22 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/splash/presentation/controllers/splash_controller.dart';
+import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 
-class CommunityWelcomeSplashPage extends StatefulWidget {
+class CommunityWelcomeSplashPage extends GetView<SplashController> {
   const CommunityWelcomeSplashPage({super.key});
 
   @override
-  State<CommunityWelcomeSplashPage> createState() =>
-      _CommunityWelcomeSplashPageState();
-}
-
-class _CommunityWelcomeSplashPageState extends State<CommunityWelcomeSplashPage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _scaleAnim;
-  late final Animation<double> _fadeAnim;
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1500),
-    );
-    _scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
-    );
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animController,
-        curve: Interval(0.5, 1.0, curve: Curves.easeIn),
-      ),
-    );
-    _animController.forward();
-    Get.put(SplashController());
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    Get.put(SplashController());
+
     return AppUpdateGate(
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -60,7 +25,7 @@ class _CommunityWelcomeSplashPageState extends State<CommunityWelcomeSplashPage>
             _BackgroundGradient(),
             _DecorativeCircle(top: -80, left: -80, size: 200),
             _DecorativeCircle(bottom: -100, right: -100, size: 250),
-            _SplashContent(scaleAnim: _scaleAnim, fadeAnim: _fadeAnim),
+            _SplashContent(),
           ],
         ),
       ),
@@ -118,31 +83,37 @@ class _DecorativeCircle extends StatelessWidget {
 }
 
 class _SplashContent extends GetView<SamajController> {
-  const _SplashContent({required this.scaleAnim, required this.fadeAnim});
-
-  final Animation<double> scaleAnim;
-  final Animation<double> fadeAnim;
+  const _SplashContent();
 
   @override
   Widget build(BuildContext context) {
+    final splashController = Get.find<SplashController>();
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Obx(() => _AnimatedLogo(scaleAnim: scaleAnim, samaj: controller.samaj.value)),
+          Obx(
+            () => _AnimatedLogo(
+              scaleAnim: splashController.scaleAnim,
+              samaj: controller.samaj.value,
+            ),
+          ),
           SizedBox(height: 32.h),
           Obx(() {
             final samaj = controller.samaj.value;
             if (samaj == null) {
-              return SizedBox(height: 116.h); // Maintain spacing when hidden
+              return SizedBox(height: 116.h);
             }
             return Column(
               children: [
-                _AnimatedSamajName(fadeAnim: fadeAnim, samaj: samaj),
+                _AnimatedSamajName(
+                  fadeAnim: splashController.fadeAnim,
+                  samaj: samaj,
+                ),
                 SizedBox(height: 8.h),
-                _AnimatedDivider(fadeAnim: fadeAnim),
+                _AnimatedDivider(fadeAnim: splashController.fadeAnim),
                 SizedBox(height: 16.h),
-                _AnimatedWelcomeText(fadeAnim: fadeAnim),
+                _AnimatedWelcomeText(fadeAnim: splashController.fadeAnim),
               ],
             );
           }),
