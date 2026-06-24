@@ -24,7 +24,7 @@ class ApiEndpoints {
   static String unmarriedCount = '/api/v1/metrimonial/UnMarriedCount';
   static String languageDropdown = '/api/v1/member/language-dropdown';
   static String languageResources(String languageCode) => '/api/v1/language-resource/get-resources/$languageCode';
-  static String memberDetail = '/api/v1/member';
+  static String memberDetail = '/api/v1/member/mobile/member';
   static String memberAddress = '/api/v1/member-address/member';
   static String samajDetail = '/api/v1/member/samaj-detail';
   static String paymentDashboard = '/api/v1/Payment/dashboard';
