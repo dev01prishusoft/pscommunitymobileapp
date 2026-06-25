@@ -25,6 +25,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   final samajController = Get.find<SamajController>();
   late Future<Map<String, dynamic>> _receiptFuture;
   int? _receiptId;
+  bool _isRecurringArg = false;
+  String _planNameArg = '';
   Map<String, dynamic>? _latestData;
 
   @override
@@ -32,6 +34,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     super.initState();
     final args = Get.arguments as Map<String, dynamic>?;
     _receiptId = args?['receiptId'] as int?;
+    _isRecurringArg = args?['isRecurring'] as bool? ?? false;
+    _planNameArg = args?['planName'] as String? ?? '';
+    
     if (_receiptId != null) {
       _receiptFuture = controller.getReceipt(_receiptId!);
     }
@@ -123,8 +128,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               ?.toString() ??
           'N/A',
       'memberNo': data['memberNo']?.toString() ?? 'N/A',
-      'planName': (data['planName'] ?? data['plan'])?.toString() ?? 'N/A',
-      'isRecurring': (data['isRecurring']?.toString() == 'true' || data['isRecurring'] == true) 
+      'planName': (data['planName'] ?? data['plan'])?.toString() ?? (_planNameArg.isNotEmpty ? _planNameArg : 'N/A'),
+      'isRecurring': (data['isRecurring']?.toString() == 'true' || data['isRecurring'] == true || _isRecurringArg) 
           ? LK.yes.tr 
           : (data['isRecurring']?.toString() == 'false' || data['isRecurring'] == false)
               ? LK.no.tr

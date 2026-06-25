@@ -379,7 +379,11 @@ class _PaymentCard extends StatelessWidget {
             onPressed: () async {
               await Get.toNamed<void>(
                 AppRouter.paymentReceipt,
-                arguments: {'receiptId': payment.id},
+                arguments: {
+                  'receiptId': payment.id,
+                  'isRecurring': payment.isRecurring,
+                  'planName': payment.planName,
+                },
               );
               await Get.find<PaymentController>().loadHistory(
                 paymentTypeId: Get.find<PaymentController>().historyFilterType.value?.id,

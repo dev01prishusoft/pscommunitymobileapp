@@ -52,12 +52,6 @@ class PaymentsPage extends GetView<PaymentController> {
                   ],
                 ),
                 SizedBox(height: 24.h),
-                if (controller.dashboard.value != null) ...[
-                  _buildSectionHeader(LK.dueSummary.tr),
-                  SizedBox(height: 12.h),
-                  _buildDueSummaryCard(),
-                  SizedBox(height: 24.h),
-                ],
                 if (controller.dashboard.value?.pendingPayments.isNotEmpty ??
                     false) ...[
                   _buildSectionHeader(
@@ -323,6 +317,31 @@ class PaymentsPage extends GetView<PaymentController> {
                     ),
                   ],
                 ),
+                if (req.recurringType.isNotEmpty) ...[
+                  SizedBox(height: 6.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.autorenew, size: 12, color: AppColors.primary),
+                        SizedBox(width: 4.w),
+                        Text(
+                          req.recurringType.tr,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
