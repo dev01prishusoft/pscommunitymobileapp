@@ -110,6 +110,13 @@ class _ProfileContent extends GetView<FamilyController> {
           _MemberDetailsSection(member: member, controller: controller),
           if (controller.memberAddresses.isNotEmpty)
             _AddressSection(controller: controller),
+          Obx(() {
+            if (controller.memberEducations.isNotEmpty) {
+              return _EducationSection(controller: controller);
+            }
+            return SizedBox.shrink();
+          }),
+          _OccupationSection(member: member),
           _AssetLifeSection(member: member, controller: controller),
           _SocialMediaSection(member: member, controller: controller),
           SizedBox(height: 100.h),
@@ -246,7 +253,7 @@ class _MemberDetailsSection extends StatelessWidget {
             _buildGridItem(
               Icons.height,
               LK.heightColon.tr,
-              '${member.height ?? 0} cm',
+              controller.formatHeight(member),
             ),
           ),
           _buildDetailRow(
@@ -258,7 +265,7 @@ class _MemberDetailsSection extends StatelessWidget {
             _buildGridItem(
               Icons.monitor_weight_outlined,
               LK.weightColon.tr,
-              '${member.weight ?? 0} kg',
+              controller.formatWeight(member),
             ),
           ),
           _buildDetailRow(
@@ -466,7 +473,7 @@ class _AssetLifeSection extends StatelessWidget {
         children: [
           _buildAssetRow(
             LK.incomeColon.tr,
-            '₹${member.monthlyIncome ?? 0}',
+            controller.formatIncome(member),
             LK.ownHouse.tr,
             member.isOwnHouse ?? false,
           ),
@@ -702,6 +709,229 @@ class _SectionContainer extends StatelessWidget {
           child,
         ],
       ),
+    );
+  }
+}
+
+class _EducationSection extends StatelessWidget {
+  const _EducationSection({required this.controller});
+  final FamilyController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SectionContainer(
+      title: LK.educationDetails.tr,
+      icon: Icons.school_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: controller.memberEducations.asMap().entries.map((entry) {
+          final index = entry.key;
+          final edu = entry.value;
+          return Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        edu.qualification,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    if (edu.isHighest) ...[
+                      SizedBox(width: 8.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: AppColors.success),
+                        ),
+                        child: Text(
+                          LK.highest.tr,
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                if (edu.institute.isNotEmpty)
+                  _buildRowItem(LK.instituteNameLabel.tr, edu.institute),
+                if (edu.description.isNotEmpty)
+                  _buildRowItem(LK.description.tr, edu.description),
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    if (edu.passingYear.isNotEmpty)
+                      Expanded(child: _buildColumnItem(LK.passingYear.tr, edu.passingYear)),
+                    if (edu.percentage.isNotEmpty)
+                      Expanded(child: _buildColumnItem(LK.percentage.tr, '${edu.percentage}%')),
+                    if (edu.grade.isNotEmpty)
+                      Expanded(child: _buildColumnItem(LK.grade.tr, edu.grade)),
+                  ],
+                ),
+                if (index != controller.memberEducations.length - 1)
+                  Padding(
+                    padding: EdgeInsets.only(top: 12.0),
+                    child: Divider(height: 1.h),
+                  ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildRowItem(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4.0),
+      child: RichText(
+        text: TextSpan(
+          text: '$label: ',
+          style: TextStyle(
+            fontSize: 12.sp,
+            color: AppColors.mutedForeground,
+          ),
+          children: [
+            TextSpan(
+              text: value,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColumnItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.sp,
+            color: AppColors.mutedForeground,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OccupationSection extends StatelessWidget {
+  const _OccupationSection({required this.member});
+  final Member member;
+
+  @override
+  Widget build(BuildContext context) {
+    final fields = <Widget>[];
+
+    void addField(String label, String? value) {
+      if (value != null && value.isNotEmpty && value != LK.na.tr && value != 'null') {
+        fields.add(_buildColumnItem(label, value));
+      }
+    }
+
+    addField(LK.occupationTypeLabel.tr, member.occupationTypeName);
+    addField(LK.occupationColon.tr, member.occupationName);
+    addField(LK.jobPositionLabel.tr, member.jobPositionName);
+    addField(LK.otherJobPositionLabel.tr, member.otherJobPosition);
+    addField(LK.otherOccupationLabel.tr, member.otherOccupation);
+    addField(LK.companyNameLabel.tr, member.companyName);
+    addField(LK.businessName.tr, member.businessName);
+    addField(LK.occupationDescriptionLabel.tr, member.occupationDescription);
+    addField(LK.state.tr, member.occupationStateName);
+    addField(LK.district.tr, member.occupationDistrictName);
+    addField(LK.taluka.tr, member.occupationTalukaName);
+    addField(LK.area.tr, member.occupationAreaName);
+    addField(LK.occupationAddressLine1Label.tr, member.occupationAddressLine1);
+    addField(LK.occupationAddressLine2Label.tr, member.occupationAddressLine2);
+    addField(LK.landmarkLabel.tr, member.occupationLandmark);
+    addField(LK.pincode.tr, member.occupationPincode);
+
+    if (fields.isEmpty) return SizedBox.shrink();
+
+    final rows = <Widget>[];
+    for (int i = 0; i < fields.length; i += 2) {
+      final item1 = fields[i];
+      final item2 = (i + 1 < fields.length) ? fields[i + 1] : SizedBox();
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: item1),
+              SizedBox(width: 12.w),
+              Expanded(child: item2),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return _SectionContainer(
+      title: LK.occupationProfile.tr,
+      icon: Icons.business_center_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: rows,
+      ),
+    );
+  }
+
+  Widget _buildColumnItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.replaceAll(':', ''),
+          style: TextStyle(
+            fontSize: 11.sp,
+            color: AppColors.mutedForeground,
+          ),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondary,
+          ),
+        ),
+      ],
     );
   }
 }

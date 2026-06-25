@@ -409,6 +409,8 @@ class LK {
   static String percentageLabel = 'Percentage';
   static String gradeLabel = 'Grade';
   static String markAsHighest = 'Mark as highest';
+  static String highest = 'Highest';
+  static String description = 'Description';
   static String jobPositionLabel = 'Job Position';
   static String otherJobPositionLabel = 'Other Job Position';
   static String otherOccupationLabel = 'Other Occupation';
