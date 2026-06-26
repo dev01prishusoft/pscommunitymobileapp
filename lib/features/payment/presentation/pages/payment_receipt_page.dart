@@ -236,6 +236,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               _buildInfoRow(LK.planNameLabel.tr, data['planName']!),
             if (data['isRecurring'] != 'N/A')
               _buildInfoRow('${LK.recurring.tr}:', data['isRecurring']!),
+            if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
+              _buildInfoRow(LK.recurringTypeLabel.tr, data['recurringPaymentType']!.tr),
             _buildInfoRow(LK.typeLabel.tr, data['type']!),
             _buildInfoRow(LK.categoryLabel.tr, data['category']!),
             _buildInfoRow(LK.amountLabel.tr, data['amount']!),
