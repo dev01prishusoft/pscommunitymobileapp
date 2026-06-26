@@ -83,6 +83,7 @@ class Member {
     this.signId,
     this.signName,
     this.issameAddressasMyFamilyHeadAddress,
+    this.approveStatus,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -226,6 +227,7 @@ class Member {
       signId: (json['signId'] ?? json['SignId']) as int?,
       signName: getString('signName', 'SignName'),
       issameAddressasMyFamilyHeadAddress: json['issameAddressasMyFamilyHeadAddress'] as bool?,
+      approveStatus: getString('approveStatus', 'ApproveStatus'),
     );
   }
   final int memberId;
@@ -250,6 +252,7 @@ class Member {
   final int? bloodGroupId;
   final String? bloodGroupName;
   final bool? isLookingforMarriage;
+  final String? approveStatus;
   final String? educationName;
   final String? jobPositionName;
   final String? otherJobPosition;

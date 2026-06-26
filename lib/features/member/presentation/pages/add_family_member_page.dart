@@ -48,8 +48,11 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     return Scaffold(
       backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
-      body: Form(
+      body: Obx(() => Form(
         key: controller.formKey,
+        autovalidateMode: controller.showListErrors.value 
+            ? AutovalidateMode.always 
+            : AutovalidateMode.disabled,
         child: SingleChildScrollView(
           controller: _scrollController,
           padding: EdgeInsets.symmetric(vertical: 16),
@@ -162,7 +165,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                                 ),
                               )
                               .toList(),
-                      onChanged: (v) => controller.maritalStatus.value = v!,
+                      onChanged: (v) {
+                        controller.maritalStatus.value = v!;
+                        if (controller.shouldHideLookingForMarriage) {
+                          controller.openToMarriage.value = false;
+                        }
+                      },
                       label: LK.maritalStatusLabel.tr,
                       isRequired: true,
                     ),
@@ -445,8 +453,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     );
                   }),
                   Obx(() {
-                    final status = controller.maritalStatus.value;
-                    if (status == 'Married' || status == 'Divorced') {
+                    if (controller.shouldHideLookingForMarriage) {
                       return SizedBox.shrink();
                     }
                     return _buildCheckbox(LK.lookingForMarriage.tr, controller.openToMarriage);
@@ -498,7 +505,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ],
           ),
         ),
-      ),
+      )),
       bottomNavigationBar: Container(
         padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0),
         decoration: BoxDecoration(
@@ -964,7 +971,11 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           SizedBox(height: 12.h),
           InkWell(
             onTap: () {
-              addr.isPrimary = !addr.isPrimary;
+              if (addr.isPrimary) return;
+              for (var a in controller.addresses) {
+                a.isPrimary = false;
+              }
+              addr.isPrimary = true;
               controller.addresses.refresh();
             },
             child: Padding(
@@ -977,7 +988,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     child: Checkbox(
                       value: addr.isPrimary,
                       onChanged: (v) {
-                        addr.isPrimary = v ?? false;
+                        final newValue = v ?? false;
+                        if (!newValue) return;
+                        for (var a in controller.addresses) {
+                          a.isPrimary = false;
+                        }
+                        addr.isPrimary = true;
                         controller.addresses.refresh();
                       },
                       activeColor: AppColors.primary,
@@ -1199,7 +1215,11 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           SizedBox(height: 12.h),
           InkWell(
             onTap: () {
-              edu.isHighest = !edu.isHighest;
+              if (edu.isHighest) return;
+              for (var e in controller.educationList) {
+                e.isHighest = false;
+              }
+              edu.isHighest = true;
               controller.educationList.refresh();
             },
             child: Padding(
@@ -1212,7 +1232,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     child: Checkbox(
                       value: edu.isHighest,
                       onChanged: (v) {
-                        edu.isHighest = v ?? false;
+                        final newValue = v ?? false;
+                        if (!newValue) return;
+                        for (var e in controller.educationList) {
+                          e.isHighest = false;
+                        }
+                        edu.isHighest = true;
                         controller.educationList.refresh();
                       },
                       activeColor: AppColors.primary,

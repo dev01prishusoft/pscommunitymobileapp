@@ -171,9 +171,9 @@ class LK {
   static String email = 'Email';
   static String memberAddresses = 'MEMBER ADDRESSES';
   static String noAddressesYet = 'No addresses yet.';
-  static String addressRequiredError = 'At least one address is required.';
+  static String addressRequiredError = 'Please add at least one address.';
   static String noEducationRecordsYet = 'No education records yet.';
-  static String educationRequiredError = 'At least one education record is required.';
+  static String educationRequiredError = 'Please add at least one education record.';
 
   static String addressTypeRequired = 'Address Type is required';
   static String stateRequired = 'State is required';

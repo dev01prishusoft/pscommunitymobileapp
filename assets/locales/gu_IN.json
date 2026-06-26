@@ -448,9 +448,9 @@
   "Job Position is required": "નોકરીની સ્થિતિ જરૂરી છે",
   "Occupation Description": "વ્યવસાયનું વર્ણન",
   "No addresses yet.": "હજુ સુધી કોઈ સરનામું નથી.",
-  "At least one address is required.": "ઓછામાં ઓછું એક સરનામું જરૂરી છે.",
+  "Please add at least one address.": "ઓછામાં ઓછું એક સરનામું જરૂરી છે.",
   "No education records yet.": "હજુ સુધી કોઈ શિક્ષણ રેકોર્ડ નથી.",
-  "At least one education record is required.": "ઓછામાં ઓછો એક શિક્ષણ રેકોર્ડ જરૂરી છે.",
+  "Please add at least one education record.": "ઓછામાં ઓછો એક શિક્ષણ રેકોર્ડ જરૂરી છે.",
   "Mother's State": "માતાનું રાજ્ય",
   "Mother's District": "માતાનો જિલ્લો",
   "Mother's Taluka": "માતાનો તાલુકો",
@@ -461,5 +461,6 @@
   "Gallery": "ગેલેરી",
   "Customer Support": "ગ્રાહક સહાય",
   "Description": "વર્ણન",
-  "Highest": "સૌથી ઉચ્ચ"
+  "Highest": "સૌથી ઉચ્ચ",
+  "Approved": "મંજૂર"
 }

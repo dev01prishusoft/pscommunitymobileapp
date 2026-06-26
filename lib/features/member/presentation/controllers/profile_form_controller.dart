@@ -88,6 +88,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxString get height => personalInfo.height;
   RxString get gender => personalInfo.gender;
   RxString get maritalStatus => personalInfo.maritalStatus;
+  
+  bool get shouldHideLookingForMarriage {
+    final s = maritalStatus.value.trim().toLowerCase();
+    bool isUnmarried = s.contains('unmarried') || s.contains('અપરિણીત') || s.contains('single') || s.contains('સિંગલ');
+    if (isUnmarried) return false;
+    
+    bool isMarried = s.contains('married') || s.contains('પરિણીત');
+    bool isDivorced = s.contains('divorced') || s.contains('છૂટાછેડા');
+    
+    return isMarried || isDivorced;
+  }
+
   RxString get bloodGroup => personalInfo.bloodGroup;
   RxString get sign => personalInfo.sign;
   RxBool get isActive => personalInfo.isActive;
@@ -1213,7 +1225,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['HasFourWheeler'] = personalInfo.fourWheeler.value;
             
             formDataMap['OccupationTalukaId'] = getId(workInfo.workTaluka.value, workInfo.globalTalukaIdMap);
-            formDataMap['OccupationAreaId'] = getId(workInfo.workArea.value, workInfo.workTalukaIdMap);
+            formDataMap['OccupationAreaId'] = getId(workInfo.workArea.value, workInfo.workAreaIdMap);
             formDataMap['OccupationAddressLine1'] = workInfo.workAddressLine1Ctrl.text;
             formDataMap['OccupationAddressLine2'] = workInfo.workAddressLine2Ctrl.text;
             formDataMap['OccupationLandmark'] = workInfo.workLandmarkCtrl.text;
@@ -1423,6 +1435,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       });
     } else {
+      showListErrors.value = true;
       Get.snackbar(
         LK.errorValidation.tr,
         LK.pleaseFillRequiredFields.tr,

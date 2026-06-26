@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
+import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';    
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
@@ -205,7 +205,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ),
                               )
                               .toList(),
-                      onChanged: (v) => controller.maritalStatus.value = v!,
+                                onChanged: (v) {
+                                  controller.maritalStatus.value = v!;
+                                  if (controller.shouldHideLookingForMarriage) {
+                                    controller.openToMarriage.value = false;
+                                  }
+                                },
                       label: LK.maritalStatusLabel.tr,
                       isRequired: true,
                       originalValue: controller.currentMember?.maritalStatusName ?? '',
@@ -580,13 +585,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       updateStatus: controller.getUpdateStatus('MotherAreaId', idMap: controller.workInfo.globalAreaIdMap),
                     );
                   }),
-                          Obx(() => _buildCheckbox(
-                            LK.lookingForMarriage.tr,
-                            controller.openToMarriage,
-                            updateStatus: controller.getUpdateStatus('IsLookingforMarriage') ??
-                                          controller.getUpdateStatus('LookingforMarriage') ??
-                                          controller.getUpdateStatus('IsLookingForMarriage'),
-                          )),
+                          Obx(() {
+                            if (controller.shouldHideLookingForMarriage) {
+                              return SizedBox.shrink();
+                            }
+                            return _buildCheckbox(
+                              LK.lookingForMarriage.tr,
+                              controller.openToMarriage,
+                              updateStatus:
+                                  controller.getUpdateStatus(
+                                    'IsLookingforMarriage',
+                                  ) ??
+                                  controller.getUpdateStatus(
+                                    'LookingforMarriage',
+                                  ) ??
+                                  controller.getUpdateStatus(
+                                    'IsLookingForMarriage',
+                                  ),
+                            );
+                          }),
                 ],
               ),
 
