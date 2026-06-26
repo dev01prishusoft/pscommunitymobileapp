@@ -562,11 +562,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       updateStatus: controller.getUpdateStatus('MotherAreaId', idMap: controller.workInfo.globalAreaIdMap),
                     );
                   }),
-                          _buildCheckbox(
+                          Obx(() => _buildCheckbox(
                             LK.lookingForMarriage.tr,
                             controller.openToMarriage,
-                            updateStatus: controller.getUpdateStatus('IsLookingforMarriage'),
-                          ),
+                            updateStatus: controller.getUpdateStatus('IsLookingforMarriage') ??
+                                          controller.getUpdateStatus('LookingforMarriage') ??
+                                          controller.getUpdateStatus('IsLookingForMarriage'),
+                          )),
                 ],
               ),
 
@@ -1097,7 +1099,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 6,
             updateStatus: controller.getUpdateStatus('Pincode'),
-            onChanged: (v) => addr.pincode = v,
+            onChanged: (v) {
+              addr.pincode = v;
+              controller.addresses.refresh();
+            },
           ),
           AppSpacing.vM,
           AppFormTextField(
@@ -1105,7 +1110,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             label: LK.addressLine1.tr,
             maxLength: 200,
             updateStatus: controller.getUpdateStatus('AddressLine1'),
-            onChanged: (v) => addr.line1 = v,
+            onChanged: (v) {
+              addr.line1 = v;
+              controller.addresses.refresh();
+            },
           ),
           AppSpacing.vM,
           AppFormTextField( 
@@ -1113,7 +1121,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             label: LK.addressLine2.tr,
             maxLength: 200,
             updateStatus: controller.getUpdateStatus('AddressLine2'),
-            onChanged: (v) => addr.line2 = v,
+            onChanged: (v) {
+              addr.line2 = v;
+              controller.addresses.refresh();
+            },
           ),
           AppSpacing.vM,
           AppFormTextField(
@@ -1121,7 +1132,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             label: LK.landmarkLabel.tr,
             maxLength: 200,
             updateStatus: controller.getUpdateStatus('Landmark'),
-            onChanged: (v) => addr.landmark = v,
+            onChanged: (v) {
+              addr.landmark = v;
+              controller.addresses.refresh();
+            },
           ),
           AppSpacing.vM,
           Column(
@@ -1480,12 +1494,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildAssetsLifeSection() {
     return _buildSection(LK.assetsLife.tr, Icons.account_balance_wallet_outlined, [
       Obx(() => _buildFieldPair(
-        _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand, updateStatus: controller.getUpdateStatus('IsOwnLand')),
-        _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse, updateStatus: controller.getUpdateStatus('IsOwnHouse')),
+        _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand, updateStatus: controller.getUpdateStatus('IsOwnLand') ?? controller.getUpdateStatus('OwnLand')),
+        _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse, updateStatus: controller.getUpdateStatus('IsOwnHouse') ?? controller.getUpdateStatus('OwnHouse')),
       )),
       Obx(() => _buildFieldPair(
-        _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler, updateStatus: controller.getUpdateStatus('HasTwoWheeler')),
-        _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler, updateStatus: controller.getUpdateStatus('HasFourWheeler')),
+        _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler, updateStatus: controller.getUpdateStatus('HasTwoWheeler') ?? controller.getUpdateStatus('TwoWheeler')),
+        _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler, updateStatus: controller.getUpdateStatus('HasFourWheeler') ?? controller.getUpdateStatus('FourWheeler')),
       )),
       AppSpacing.vM,
       Obx(() => AppFormTextField(

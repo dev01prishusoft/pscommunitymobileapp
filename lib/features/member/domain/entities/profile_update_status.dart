@@ -5,6 +5,7 @@ class ProfileUpdateStatus {
     this.oldValue,
     this.newValue,
     required this.status,
+    this.rawJson = '',
   });
 
   factory ProfileUpdateStatus.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,7 @@ class ProfileUpdateStatus {
       oldValue: json['oldValue']?.toString(),
       newValue: json['newValue']?.toString(),
       status: json['status'] as String? ?? '',
+      rawJson: json.toString(),
     );
   }
 
@@ -22,6 +24,7 @@ class ProfileUpdateStatus {
   final String? oldValue;
   final String? newValue;
   final String status;
+  final String rawJson;
 
   bool get isRequested => status == 'Requested';
   bool get isRejected => status == 'Rejected';

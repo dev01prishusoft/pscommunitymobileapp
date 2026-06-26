@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -15,19 +16,19 @@ class WorkInfoController extends GetxController {
   final workTalukaList = <String>[].obs;
   final workAreaList = <String>[].obs;
 
-  final occupationTypeIdMap = <String, int>{};
-  final occupationIdMap = <String, int>{};
-  final jobPositionIdMap = <String, int>{};
+  final occupationTypeIdMap = <String, int>{}.obs;
+  final occupationIdMap = <String, int>{}.obs;
+  final jobPositionIdMap = <String, int>{}.obs;
 
-  final workStateIdMap = <String, int>{};
-  final workDistrictIdMap = <String, int>{};
-  final workTalukaIdMap = <String, int>{};
-  final workAreaIdMap = <String, int>{};
+  final workStateIdMap = <String, int>{}.obs;
+  final workDistrictIdMap = <String, int>{}.obs;
+  final workTalukaIdMap = <String, int>{}.obs;
+  final workAreaIdMap = <String, int>{}.obs;
 
-  final globalStateIdMap = <String, int>{};
-  final globalDistrictIdMap = <String, int>{};
-  final globalTalukaIdMap = <String, int>{};
-  final globalAreaIdMap = <String, int>{};
+  final globalStateIdMap = <String, int>{}.obs;
+  final globalDistrictIdMap = <String, int>{}.obs;
+  final globalTalukaIdMap = <String, int>{}.obs;
+  final globalAreaIdMap = <String, int>{}.obs;
 
   final addressDistrictCache = <String, RxList<String>>{};
   final addressTalukaCache = <String, RxList<String>>{};
@@ -217,44 +218,53 @@ class WorkInfoController extends GetxController {
     }
   }
 
+  final _fetchedStatesForDistricts = <String>{};
   RxList<String> getAddressDistricts(String stateName) {
     if (stateName.isEmpty) return <String>[].obs;
-    if (addressDistrictCache.containsKey(stateName)) {
-      return addressDistrictCache[stateName]!;
+    if (!addressDistrictCache.containsKey(stateName)) {
+      addressDistrictCache[stateName] = <String>[].obs;
     }
-    final list = <String>[].obs;
-    addressDistrictCache[stateName] = list;
-    final stateId = globalStateIdMap[stateName] ?? workStateIdMap[stateName];
-    if (stateId != null) {
-      fetchDropdown('/district/dropdown?stateId=$stateId', list, [], idMap: globalDistrictIdMap);
+    final list = addressDistrictCache[stateName]!;
+    if (!_fetchedStatesForDistricts.contains(stateName)) {
+      _fetchedStatesForDistricts.add(stateName);
+      final stateId = globalStateIdMap[stateName] ?? workStateIdMap[stateName];
+      if (stateId != null) {
+        fetchDropdown('/district/dropdown?stateId=$stateId', list, list.toList(), idMap: globalDistrictIdMap, clearMap: false);
+      }
     }
     return list;
   }
 
+  final _fetchedDistrictsForTalukas = <String>{};
   RxList<String> getAddressTalukas(String districtName) {
     if (districtName.isEmpty) return <String>[].obs;
-    if (addressTalukaCache.containsKey(districtName)) {
-      return addressTalukaCache[districtName]!;
+    if (!addressTalukaCache.containsKey(districtName)) {
+      addressTalukaCache[districtName] = <String>[].obs;
     }
-    final list = <String>[].obs;
-    addressTalukaCache[districtName] = list;
-    final districtId = globalDistrictIdMap[districtName] ?? workDistrictIdMap[districtName];
-    if (districtId != null) {
-      fetchDropdown('/taluka/dropdown?districtId=$districtId', list, [], idMap: globalTalukaIdMap);
+    final list = addressTalukaCache[districtName]!;
+    if (!_fetchedDistrictsForTalukas.contains(districtName)) {
+      _fetchedDistrictsForTalukas.add(districtName);
+      final districtId = globalDistrictIdMap[districtName] ?? workDistrictIdMap[districtName];
+      if (districtId != null) {
+        fetchDropdown('/taluka/dropdown?districtId=$districtId', list, list.toList(), idMap: globalTalukaIdMap, clearMap: false);
+      }
     }
     return list;
   }
 
+  final _fetchedTalukasForAreas = <String>{};
   RxList<String> getAddressAreas(String talukaName) {
     if (talukaName.isEmpty) return <String>[].obs;
-    if (addressAreaCache.containsKey(talukaName)) {
-      return addressAreaCache[talukaName]!;
+    if (!addressAreaCache.containsKey(talukaName)) {
+      addressAreaCache[talukaName] = <String>[].obs;
     }
-    final list = <String>[].obs;
-    addressAreaCache[talukaName] = list;
-    final talukaId = globalTalukaIdMap[talukaName];
-    if (talukaId != null) {
-      fetchDropdown('/area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap);
+    final list = addressAreaCache[talukaName]!;
+    if (!_fetchedTalukasForAreas.contains(talukaName)) {
+      _fetchedTalukasForAreas.add(talukaName);
+      final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
+      if (talukaId != null) {
+        fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, list.toList(), idMap: globalAreaIdMap, clearMap: false);
+      }
     }
     return list;
   }
@@ -263,7 +273,7 @@ class WorkInfoController extends GetxController {
     String path,
     RxList<String> targetList,
     List<String> fallbacks,
-    {Map<String, int>? idMap}
+    {Map<String, int>? idMap, bool clearMap = true}
   ) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
@@ -271,6 +281,10 @@ class WorkInfoController extends GetxController {
       if (response.data != null) {
         final json = response.data as Map<String, dynamic>;
         if (json['succeeded'] == true) {
+          if (path.toLowerCase().contains('taluka') || path.toLowerCase().contains('area')) {
+            print('--- DROPDOWN RESPONSE FOR $path ---');
+            print(jsonEncode(json));
+          }
           final rawData = json['data'];
           List<dynamic> list = [];
           if (rawData is List) {
@@ -278,6 +292,9 @@ class WorkInfoController extends GetxController {
           } else if (rawData is Map<String, dynamic>) {
             list = (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ?? [];
           }
+          targetList.clear();
+          if (idMap != null && clearMap) idMap.clear();
+
           final items = list
               .map((e) {
                 final map = e as Map<String, dynamic>;
@@ -337,10 +354,15 @@ class WorkInfoController extends GetxController {
               .toSet()
               .toList();
 
-          if (items.isNotEmpty) {
-            targetList.assignAll(items);
-            return;
+          for (final e in items) {
+            targetList.add(e);
           }
+          for (final f in fallbacks) {
+            if (!targetList.contains(f) && f.isNotEmpty) {
+              targetList.add(f);
+            }
+          }
+          return;
         }
       }
     } catch (e) {

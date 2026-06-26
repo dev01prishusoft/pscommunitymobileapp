@@ -34,7 +34,7 @@ class CommitteeCard extends StatelessWidget {
   ) {
     final isExpanded = controller.nodeExpansion[currentNode.id] ?? true;
     final hasChildren = currentNode.children.isNotEmpty;
-
+   
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

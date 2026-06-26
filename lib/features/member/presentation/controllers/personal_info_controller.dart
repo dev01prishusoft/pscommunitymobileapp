@@ -28,13 +28,13 @@ class PersonalInfoController extends GetxController {
   final gotraList = <String>[].obs;
   final mothersGotraList = <String>[].obs;
 
-  final genderIdMap = <String, int>{};
-  final maritalStatusIdMap = <String, int>{};
-  final bloodGroupIdMap = <String, int>{};
-  final relationIdMap = <String, int>{};
-  final signIdMap = <String, int>{};
-  final gotraIdMap = <String, int>{};
-  final mothersGotraIdMap = <String, int>{};
+  final genderIdMap = <String, int>{}.obs;
+  final maritalStatusIdMap = <String, int>{}.obs;
+  final bloodGroupIdMap = <String, int>{}.obs;
+  final relationIdMap = <String, int>{}.obs;
+  final signIdMap = <String, int>{}.obs;
+  final gotraIdMap = <String, int>{}.obs;
+  final mothersGotraIdMap = <String, int>{}.obs;
 
   final memberNo = ''.obs;
   final firstName = ''.obs;

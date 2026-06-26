@@ -384,12 +384,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (personalInfo.profileImage.value != null) return true;
     if (personalInfo.isPhotoRemoved.value) return true;
     
-    final currentEduJson = jsonEncode(educationList.map((e) => e.toJson()).toList());
+    // Force Obx dependency registration
+    // ignore: unused_local_variable
+    final _edu = educationList.toList();
+    // ignore: unused_local_variable
+    final _addr = contactInfo.addresses.toList();
+    
+    final currentEduJson = jsonEncode(_edu.map((e) => e.toJson()).toList());
     if (currentEduJson != _initialEducationJson) {
       return true;
     }
     
-    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    final currentAddrJson = jsonEncode(_addr.map((e) => e.toJson()).toList());
     if (currentAddrJson != _initialAddressesJson) {
       return true;
     }
@@ -465,6 +471,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               oldValue: status.oldValue,
               newValue: entry.key,
               status: status.status,
+              rawJson: status.rawJson,
             );
           }
         }
@@ -473,8 +480,14 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final List<Map<String, int>> globalMaps = [];
         if (keyName.contains('State')) globalMaps.add(workInfo.globalStateIdMap);
         if (keyName.contains('District')) globalMaps.add(workInfo.globalDistrictIdMap);
-        if (keyName.contains('Taluka')) globalMaps.add(workInfo.globalTalukaIdMap);
-        if (keyName.contains('Area')) globalMaps.add(workInfo.globalAreaIdMap);
+        if (keyName.contains('Taluka')) {
+          globalMaps.add(workInfo.globalTalukaIdMap);
+          globalMaps.add(workInfo.workTalukaIdMap);
+        }
+        if (keyName.contains('Area')) {
+          globalMaps.add(workInfo.globalAreaIdMap);
+          globalMaps.add(workInfo.workAreaIdMap);
+        }
         
         for (final gMap in globalMaps) {
           for (final entry in gMap.entries) {
@@ -485,6 +498,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 oldValue: status.oldValue,
                 newValue: entry.key,
                 status: status.status,
+                rawJson: status.rawJson,
               );
             }
           }
@@ -502,6 +516,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               oldValue: status.oldValue,
               newValue: newValueStr,
               status: status.status,
+              rawJson: status.rawJson,
             );
     }
     
@@ -515,6 +530,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           oldValue: status.oldValue,
           newValue: formatted,
           status: status.status,
+          rawJson: status.rawJson,
         );
       } catch (_) {}
     }
@@ -537,6 +553,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             oldValue: status.oldValue,
             newValue: formattedTime,
             status: status.status,
+            rawJson: status.rawJson,
           );
         }
       } catch (_) {}
@@ -904,9 +921,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
     contactInfo.addresses.refresh();
+    _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
 
     // Trigger an update so Obx recalculates hasChanges now that snapshot is ready
     changedFormData; 
+    fieldStatuses.refresh();
   }
 
   Future<void> _resolveMotherLocations(Member m) async {
