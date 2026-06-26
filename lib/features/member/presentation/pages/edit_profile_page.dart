@@ -96,6 +96,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Obx(() => AppFormTextField(
                   controller: controller.firstNameCtrl,
                   label: LK.firstName.tr,
+                  isRequired: true,
+                  originalValue: controller.currentMember?.firstName ?? '',
                   prefixIcon: Icon(Icons.person),
                   maxLength: 100,
                   updateStatus: controller.getUpdateStatus('FirstName'),
@@ -112,6 +114,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Obx(() => AppFormTextField(
                     controller: controller.lastNameCtrl,
                     label: LK.lastName.tr,
+                    isRequired: true,
+                    originalValue: controller.currentMember?.lastName ?? '',
                     prefixIcon: Icon(Icons.person),
                     maxLength: 100,
                     updateStatus: controller.getUpdateStatus('LastName'),
@@ -122,6 +126,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Obx(() => AppFormTextField(
                               controller: controller.firstNameEnCtrl,
                               label: LK.firstNameEnglish.tr,
+                              isRequired: true,
+                              originalValue: controller.currentMember?.firstNameEnglish ?? '',
                               prefixIcon: Icon(Icons.language),
                               maxLength: 100,
                               updateStatus: controller.getUpdateStatus('FirstNameEnglish'),
@@ -129,6 +135,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Obx(() => AppFormTextField(
                               controller: controller.lastNameEnCtrl,
                               label: LK.lastNameEnglish.tr,
+                              isRequired: true,
+                              originalValue: controller.currentMember?.lastNameEnglish ?? '',
                               prefixIcon: Icon(Icons.language),
                               maxLength: 100,
                               updateStatus: controller.getUpdateStatus('LastNameEnglish'),
@@ -139,6 +147,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Obx(() => AppFormDatePicker(
                               controller: controller.dobCtrl,
                               label: LK.birthDate.tr,
+                              isRequired: true,
+                              originalValue: controller.currentMember?.dateOfBirth ?? '',
                               lastDate: DateTime.now(),
                               updateStatus: controller.getUpdateStatus('DateOfBirth'),
                             )),
@@ -171,6 +181,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.gender.value = v!,
                       label: LK.gender.tr,
+                      isRequired: true,
+                      originalValue: controller.currentMember?.genderName ?? '',
                       updateStatus: controller.getUpdateStatus('GenderId', idMap: controller.personalInfo.genderIdMap),
                     ),
                   ),
@@ -195,6 +207,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               .toList(),
                       onChanged: (v) => controller.maritalStatus.value = v!,
                       label: LK.maritalStatusLabel.tr,
+                      isRequired: true,
+                      originalValue: controller.currentMember?.maritalStatusName ?? '',
                       updateStatus: controller.getUpdateStatus('MaritalStatusId', idMap: controller.personalInfo.maritalStatusIdMap),
                     ),
                   ),
@@ -298,6 +312,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Obx(() => AppFormTextField(
                   controller: controller.mobileCtrl,
                   label: LK.mobileNo.tr,
+                  isRequired: true,
+                  originalValue: controller.currentMember?.mobileNo ?? '',
                   readOnly: true,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -966,6 +982,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.addressType.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('AddressTypeId', idMap: controller.contactInfo.addressTypeIdMap),
             );
           }),
@@ -998,6 +1015,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.state.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('StateId', idMap: controller.workInfo.globalStateIdMap),
             );
           }),
@@ -1029,6 +1047,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.district.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('DistrictId', idMap: controller.workInfo.globalDistrictIdMap),
             );
           }),
@@ -1059,6 +1078,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.taluka.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('TalukaId', idMap: controller.workInfo.globalTalukaIdMap),
             );
           }),
@@ -1088,6 +1108,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               label: LK.area.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('AreaId', idMap: controller.workInfo.globalAreaIdMap),
             );
           }),
@@ -1108,6 +1129,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           AppFormTextField(
             initialValue: addr.line1,
             label: LK.addressLine1.tr,
+            isRequired: true,
             maxLength: 200,
             updateStatus: controller.getUpdateStatus('AddressLine1'),
             onChanged: (v) {
@@ -1119,6 +1141,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           AppFormTextField( 
             initialValue: addr.line2,
             label: LK.addressLine2.tr,
+            isRequired: true,
             maxLength: 200,
             updateStatus: controller.getUpdateStatus('AddressLine2'),
             onChanged: (v) {
@@ -1317,6 +1340,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               } : null,
               label: LK.qualificationLabel.tr,
+              isRequired: true,
               updateStatus: controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap),
             ),
           ),
@@ -1324,7 +1348,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
-            updateStatus: controller.getUpdateStatus('InstituteName'),
+            updateStatus: controller.getUpdateStatus('InstitutionName'),
             maxLength: 200,
             readOnly: !isHighest,
             onChanged: isHighest ? (v) {
@@ -1534,6 +1558,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.occupationType.value = v;
           },
           label: LK.occupationType.tr,
+          isRequired: true,
+          originalValue: controller.currentMember?.occupationTypeName ?? '',
           updateStatus: controller.getUpdateStatus('OccupationTypeId', idMap: controller.workInfo.occupationTypeIdMap),
         );
       }),
@@ -1556,6 +1582,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.occupation.value = v;
           },
           label: LK.occupation.tr,
+          isRequired: true,
+          originalValue: controller.currentMember?.occupationName ?? '',
           validator: (v) {
             final initialType = controller.getInitialDropdownValue('OccupationTypeId');
             final currentType = controller.workInfo.occupationType.value;
@@ -1590,6 +1618,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
+          isRequired: true,
+          originalValue: controller.currentMember?.jobPositionName ?? '',
           validator: (v) {
             final initialOccupation = controller.getInitialDropdownValue('OccupationId');
             final currentOccupation = controller.workInfo.occupation.value;

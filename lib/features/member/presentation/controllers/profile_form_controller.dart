@@ -256,6 +256,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final currentId = getId(currentStr, idMap);
         if (currentId != null) {
           formDataMap[key] = currentId;
+        } else if (currentStr.isEmpty && initialStr != null && initialStr.isNotEmpty) {
+          formDataMap[key] = null;
         } else {
           formDataMap['_dummy_$key'] = true; // Trigger hasChanges
         }
@@ -314,16 +316,33 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (currentEduJson != _initialEducationJson) {
       if (educationList.isNotEmpty) {
         final edu = educationList.first;
+        Map<String, dynamic>? initialEdu;
+        if (_initialEducationJson.isNotEmpty && _initialEducationJson != '[]') {
+          final decoded = jsonDecode(_initialEducationJson) as List<dynamic>;
+          if (decoded.isNotEmpty) initialEdu = decoded.first as Map<String, dynamic>;
+        }
+        
         final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
-        if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
-        formDataMap['InstituteName'] = edu.institute;
-        formDataMap['YearOfPassing'] = edu.passingYear;
-        formDataMap['Percentage'] = edu.percentage;
-        formDataMap['Grade'] = edu.grade;
-        formDataMap['Description'] = edu.description;
+        final initialQualId = initialEdu?['qualificationId'] as int?;
+        if (qualId != initialQualId) formDataMap['EducationalQualificationId'] = qualId;
+
+        void addEdu(String key, String current, String? initial) {
+          if (current != (initial ?? '')) {
+            formDataMap[key] = current.isEmpty ? null : current;
+          }
+        }
+        
+        addEdu('InstitutionName', edu.institute, initialEdu?['institute'] as String?);
+        addEdu('YearOfPassing', edu.passingYear, initialEdu?['passingYear'] as String?);
+        addEdu('Grade', edu.grade, initialEdu?['grade'] as String?);
+        addEdu('Description', edu.description, initialEdu?['description'] as String?);
+        
+        if (edu.percentage != (initialEdu?['percentage'] as String? ?? '')) {
+          formDataMap['Percentage'] = edu.percentage;
+        }
       } else {
         formDataMap['EducationalQualificationId'] = null;
-        formDataMap['InstituteName'] = null;
+        formDataMap['InstitutionName'] = null;
         formDataMap['YearOfPassing'] = null;
         formDataMap['Percentage'] = null;
         formDataMap['Grade'] = null;
@@ -335,15 +354,44 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (currentAddrJson != _initialAddressesJson) {
       if (contactInfo.addresses.isNotEmpty) {
         final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
-        formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
-        formDataMap['AddressLine1'] = addr.line1;
-        formDataMap['AddressLine2'] = addr.line2;
-        formDataMap['Landmark'] = addr.landmark;
-        formDataMap['Pincode'] = addr.pincode;
-        formDataMap['AreaId'] = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
-        formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
-        formDataMap['DistrictId'] = getId(addr.district, workInfo.globalDistrictIdMap) ?? addr.districtId ?? 0;
-        formDataMap['StateId'] = getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
+        Map<String, dynamic>? initialAddr;
+        if (_initialAddressesJson.isNotEmpty && _initialAddressesJson != '[]') {
+          final decoded = jsonDecode(_initialAddressesJson) as List<dynamic>;
+          if (decoded.isNotEmpty) {
+            final maps = decoded.cast<Map<String, dynamic>>();
+            initialAddr = maps.firstWhere((a) => a['isPrimary'] == true, orElse: () => maps.first);
+          }
+        }
+
+        final typeId = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
+        final initialTypeId = initialAddr?['typeId'] as int?;
+        if (typeId != initialTypeId && typeId != 0) formDataMap['AddressTypeId'] = typeId;
+
+        void addAddr(String key, String current, String? initial) {
+          if (current != (initial ?? '')) {
+            formDataMap[key] = current.isEmpty ? null : current;
+          }
+        }
+        addAddr('AddressLine1', addr.line1, initialAddr?['line1'] as String?);
+        addAddr('AddressLine2', addr.line2, initialAddr?['line2'] as String?);
+        addAddr('Landmark', addr.landmark, initialAddr?['landmark'] as String?);
+        addAddr('Pincode', addr.pincode, initialAddr?['pincode'] as String?);
+
+        final areaId = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
+        final initialAreaId = initialAddr?['areaId'] as int?;
+        if (areaId != initialAreaId && areaId != 0) formDataMap['AreaId'] = areaId;
+
+        final talukaId = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
+        final initialTalukaId = initialAddr?['talukaId'] as int?;
+        if (talukaId != initialTalukaId && talukaId != 0) formDataMap['TalukaId'] = talukaId;
+
+        final districtId = getId(addr.district, workInfo.globalDistrictIdMap) ?? addr.districtId ?? 0;
+        final initialDistrictId = initialAddr?['districtId'] as int?;
+        if (districtId != initialDistrictId && districtId != 0) formDataMap['DistrictId'] = districtId;
+
+        final stateId = getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
+        final initialStateId = initialAddr?['stateId'] as int?;
+        if (stateId != initialStateId && stateId != 0) formDataMap['StateId'] = stateId;
       } else {
         formDataMap['AddressTypeId'] = null;
         formDataMap['AddressLine1'] = null;
@@ -416,8 +464,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
     isMemberLoaded = true;
     _checkAndTakeSnapshot();
     
+    int addressMemberId = m.memberId;
+    if (m.issameAddressasMyFamilyHeadAddress == true) {
+      if (m.relatedToMemberId != null && m.relatedToMemberId! > 0) {
+        addressMemberId = m.relatedToMemberId!;
+      } else if (m.familyId != null && m.familyId! > 0) {
+        addressMemberId = m.familyId!;
+      }
+    }
+    
     // Asynchronously fetch addresses and education for this member
-    loadAddresses(m.memberId);
+    loadAddresses(addressMemberId);
     loadEducation(m.memberId);
     fetchProfileUpdateStatus();
   }
@@ -1053,7 +1110,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (isEdit) {
             final formDataChanges = changedFormData;
             formDataMap.addAll(formDataChanges);
-            formDataMap['MemberId'] = _currentMember!.memberId;
 
             if (personalInfo.profileImage.value != null) {
               final file = personalInfo.profileImage.value!;
@@ -1144,11 +1200,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
             if (contactInfo.addresses.isNotEmpty) {
               final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
-              formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? 0;
-              formDataMap['AddressLine1'] = addr.line1;
-              formDataMap['AddressLine2'] = addr.line2;
-              formDataMap['Landmark'] = addr.landmark;
-              formDataMap['Pincode'] = addr.pincode;
+              formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
+              formDataMap['AddressLine1'] = addr.line1.isEmpty ? null : addr.line1;
+              formDataMap['AddressLine2'] = addr.line2.isEmpty ? null : addr.line2;
+              formDataMap['Landmark'] = addr.landmark.isEmpty ? null : addr.landmark;
+              formDataMap['Pincode'] = addr.pincode.isEmpty ? null : addr.pincode;
               formDataMap['AreaId'] = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
               formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
             }
@@ -1157,11 +1213,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
               final edu = contactInfo.educationList.first;
               final qualId = contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId;
               if (qualId != null) formDataMap['EducationalQualificationId'] = qualId;
-              formDataMap['InstituteName'] = edu.institute;
-              formDataMap['YearOfPassing'] = edu.passingYear;
+              formDataMap['InstitutionName'] = edu.institute.isEmpty ? null : edu.institute;
+              formDataMap['YearOfPassing'] = edu.passingYear.isEmpty ? null : edu.passingYear;
               formDataMap['Percentage'] = edu.percentage;
-              formDataMap['Grade'] = edu.grade;
-              formDataMap['Description'] = edu.description;
+              formDataMap['Grade'] = edu.grade.isEmpty ? null : edu.grade;
+              formDataMap['Description'] = edu.description.isEmpty ? null : edu.description;
             }
 
             formDataMap['IsHead'] = false;

@@ -72,6 +72,7 @@ class Member {
     this.apiAge,
     this.isHead,
     this.relatedToMemberName,
+    this.relatedToMemberId,
     this.relationTypeId,
     this.gotraId,
     this.motherGotraId,
@@ -214,6 +215,7 @@ class Member {
       familyId: json['familyId'] as int?,
       isHead: json['isHead'] as bool?,
       relatedToMemberName: getString('relatedToMemberName'),
+      relatedToMemberId: json['relatedToMemberId'] as int?,
       relationTypeId: json['relationTypeId'] as int?,
       gotraId: json['gotraId'] as int?,
       motherGotraId: json['motherGotraId'] as int?,
@@ -296,6 +298,7 @@ class Member {
   final int? apiAge;
   final bool? isHead;
   final String? relatedToMemberName;
+  final int? relatedToMemberId;
   final int? relationTypeId;
   final int? gotraId;
   final int? motherGotraId;

@@ -28,6 +28,7 @@ class AppFormTextField extends StatelessWidget {
     this.inputFormatters,
     this.maxLength,
     this.updateStatus,
+    this.originalValue,
   });
   final TextEditingController? controller;
   final String? initialValue;
@@ -46,6 +47,7 @@ class AppFormTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLength;
   final ProfileUpdateStatus? updateStatus;
+  final String? originalValue;
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +128,11 @@ class AppFormTextField extends StatelessWidget {
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
-              return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              if (originalValue != null && originalValue!.trim().isEmpty) {
+                // allow it since it was originally empty
+              } else {
+                return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
             }
             if (validator != null) {
               return validator!(value);
