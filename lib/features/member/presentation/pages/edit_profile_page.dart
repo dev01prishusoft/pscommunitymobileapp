@@ -1097,8 +1097,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   controller.addresses.refresh();
                 }
               },
-              label: LK.taluka.tr,
-              isRequired: true,
+                label: LK.taluka.tr,
               updateStatus: controller.getUpdateStatus('TalukaId', idMap: controller.workInfo.globalTalukaIdMap),
             );
           }),
@@ -1128,8 +1127,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   controller.addresses.refresh();
                 }
               },
-              label: LK.area.tr,
-              isRequired: true,
+                label: LK.area.tr,
               updateStatus: controller.getUpdateStatus('AreaId', idMap: controller.workInfo.globalAreaIdMap),
             );
           }),
