@@ -407,6 +407,27 @@ class ProfileFormController extends GetxController with FormStateMixin {
     return false;
   }
 
+  bool get hasMotherAddressChanged {
+    if (_currentMember == null) return true;
+    return personalInfo.motherState.value != (_currentMember!.motherStateName ?? '') ||
+           personalInfo.motherDistrict.value != (_currentMember!.motherDistrictName ?? '') ||
+           personalInfo.motherTaluka.value != (_currentMember!.motherTalukaName ?? '') ||
+           personalInfo.motherArea.value != (_currentMember!.motherAreaName ?? '');
+  }
+
+  bool get hasWorkAddressChanged {
+    if (_currentMember == null) return true;
+    return workInfo.workState.value != (_currentMember!.occupationStateName ?? '') ||
+           workInfo.workDistrict.value != (_currentMember!.occupationDistrictName ?? '') ||
+           workInfo.workTaluka.value != (_currentMember!.occupationTalukaName ?? '') ||
+           workInfo.workArea.value != (_currentMember!.occupationAreaName ?? '');
+  }
+
+  bool get hasContactAddressChanged {
+    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    return currentAddrJson != _initialAddressesJson;
+  }
+
   void loadFromMember(Member m) {
     _currentMember = m;
     personalInfo.loadFromMember(m);

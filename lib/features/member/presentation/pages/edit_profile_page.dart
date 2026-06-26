@@ -530,6 +530,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       value: talukaList.contains(controller.personalInfo.motherTaluka.value)
                           ? controller.personalInfo.motherTaluka.value
                           : null,
+                      isRequired: controller.hasMotherAddressChanged && controller.personalInfo.motherDistrict.value.isNotEmpty,
                       items: talukaList
                           .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                           .toList(),
@@ -550,6 +551,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       value: areaList.contains(controller.personalInfo.motherArea.value)
                           ? controller.personalInfo.motherArea.value
                           : null,
+                      isRequired: controller.hasMotherAddressChanged && controller.personalInfo.motherTaluka.value.isNotEmpty,
                       items: areaList
                           .map((e) => DropdownMenuItem(value: e, child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1)))
                           .toList(),
@@ -1039,6 +1041,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               value: talukaList.contains(addr.taluka)
                   ? addr.taluka
                   : null,
+              isRequired: controller.hasContactAddressChanged && addr.district.isNotEmpty,
               items: talukaList
                   .map(
                     (e) => DropdownMenuItem(
@@ -1069,6 +1072,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               value: areaList.contains(addr.area)
                   ? addr.area
                   : null,
+              isRequired: controller.hasContactAddressChanged && addr.taluka.isNotEmpty,
               items: areaList
                   .map(
                     (e) => DropdownMenuItem(
@@ -1706,6 +1710,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           value: controller.workTalukaList.contains(controller.workTaluka.value)
               ? controller.workTaluka.value
               : null,
+          isRequired: controller.hasWorkAddressChanged && controller.workDistrict.value.isNotEmpty,
           items: controller.workTalukaList
               .map(
                 (e) => DropdownMenuItem(
@@ -1727,6 +1732,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           value: controller.workAreaList.contains(controller.workArea.value)
               ? controller.workArea.value
               : null,
+          isRequired: controller.hasWorkAddressChanged && controller.workTaluka.value.isNotEmpty,
           items: controller.workAreaList
               .map(
                 (e) => DropdownMenuItem(
