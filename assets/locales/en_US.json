@@ -449,9 +449,9 @@
   "Member Added Successfully": "Member Added Successfully",
   "Occupation Description": "Occupation Description",
   "No addresses yet.": "No addresses yet.",
-  "At least one address is required.": "At least one address is required.",
+  "Please add at least one address.": "Please add at least one address.",
   "No education records yet.": "No education records yet.",
-  "At least one education record is required.": "At least one education record is required.",
+  "Please add at least one education record.": "Please add at least one education record.",
   "Mother's State": "Mother's State",
   "Mother's District": "Mother's District",
   "Mother's Taluka": "Mother's Taluka",
@@ -463,5 +463,6 @@
   "Gallery": "Gallery",
   "Customer Support": "Customer Support",
   "Description": "Description",
-  "Highest": "Highest"
+  "Highest": "Highest",
+  "Approved": "Approved"
 }

@@ -91,10 +91,14 @@ class AppValidators {
     return null;
   }
 
+  static final RegExp _urlRegex = RegExp(
+    r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*(\?[\/\w\.~%&=#+?\-]*)?(\#[\/\w\.~%&=#+?\-]*)?\/?$',
+    caseSensitive: false,
+  );
+
   static String? url(String? value) {
     if (value == null || value.trim().isEmpty) return null;
-    final uri = Uri.tryParse(value.trim());
-    if (uri == null || !uri.isAbsolute || (uri.scheme != 'http' && uri.scheme != 'https')) {
+    if (!_urlRegex.hasMatch(value.trim())) {
       return LK.pleaseEnterValidURL.tr;
     }
     return null;

@@ -44,14 +44,24 @@ class AddedMemberCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _getFullName(),
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _getFullName(),
+                            style: AppTextStyles.titleMedium.copyWith(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (member.approveStatus != null && member.approveStatus!.isNotEmpty) ...[
+                          SizedBox(width: 8.w),
+                          _buildStatusChip(member.approveStatus!),
+                        ],
+                      ],
                     ),
                     SizedBox(height: 4.h),
                     _buildSubtitle(),
@@ -157,6 +167,38 @@ class AddedMemberCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStatusChip(String status) {
+    Color bgColor;
+    Color textColor;
+
+    final lowerStatus = status.toLowerCase();
+    if (lowerStatus == 'approved') {
+      bgColor = Colors.green.withValues(alpha: 0.1);
+      textColor = Colors.green;
+    } else if (lowerStatus == 'rejected') {
+      bgColor = Colors.red.withValues(alpha: 0.1);
+      textColor = Colors.red;
+    } else {
+      bgColor = Colors.orange.withValues(alpha: 0.1);
+      textColor = Colors.orange;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Text(
+        status.tr,
+        style: AppTextStyles.labelSmall.copyWith(
+          color: textColor,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
