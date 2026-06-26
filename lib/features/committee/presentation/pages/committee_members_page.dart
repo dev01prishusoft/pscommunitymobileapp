@@ -137,7 +137,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 )
               : ListView.separated(
                   itemCount: groups.length,
-                  padding: AppSpacing.pHXl,
+                  padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.section),
                   separatorBuilder: (context, index) => AppSpacing.vL,
                   itemBuilder: (context, index) {
                     final role = groups.keys.elementAt(index);
