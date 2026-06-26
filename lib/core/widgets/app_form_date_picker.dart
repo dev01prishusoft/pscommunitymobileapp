@@ -20,6 +20,7 @@ class AppFormDatePicker extends StatelessWidget {
     this.firstDate,
     this.lastDate,
     this.updateStatus,
+    this.originalValue,
   });
   final TextEditingController controller;
   final String label;
@@ -30,6 +31,7 @@ class AppFormDatePicker extends StatelessWidget {
   final DateTime? firstDate;
   final DateTime? lastDate;
   final ProfileUpdateStatus? updateStatus;
+  final String? originalValue;
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime? parsedDate = initialDate;
@@ -129,7 +131,11 @@ class AppFormDatePicker extends StatelessWidget {
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
-              return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              if (originalValue != null && originalValue!.trim().isEmpty) {
+                // allow since originally empty
+              } else {
+                return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
             }
             if (validator != null) {
               return validator!(value);

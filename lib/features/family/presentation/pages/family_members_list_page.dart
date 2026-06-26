@@ -69,12 +69,20 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
           children: [
             Text(
               _areaName,
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18.sp, 
+                fontWeight: FontWeight.bold,
+                color: AppColors.white,
+              ),
             ),
             SizedBox(height: 2.h),
             Text(
               '$_membersCount ${LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.normal),
+              style: TextStyle(
+                fontSize: 12.sp, 
+                fontWeight: FontWeight.normal,
+                color: AppColors.white,
+              ),
             ),
           ],
         ),

@@ -19,6 +19,7 @@ class AppFormDropdown<T> extends StatelessWidget {
     this.validator,
     this.requiredErrorMessage,
     this.updateStatus,
+    this.originalValue,
   });
   final T? value;
   final List<DropdownMenuItem<T>> items;
@@ -29,6 +30,7 @@ class AppFormDropdown<T> extends StatelessWidget {
   final String? Function(T?)? validator;
   final String? requiredErrorMessage;
   final ProfileUpdateStatus? updateStatus;
+  final T? originalValue;
 
   @override
   Widget build(BuildContext context) {
@@ -100,10 +102,16 @@ class AppFormDropdown<T> extends StatelessWidget {
           ),
           validator: (val) {
             if (isRequired && val == null) {
-              return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              if (originalValue == null) {
+                 return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
             }
             if (isRequired && val is String && val.trim().isEmpty) {
-              return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              if (originalValue != null && originalValue is String && (originalValue as String).trim().isEmpty) {
+                // allow it since it was originally empty
+              } else {
+                return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
             }
             if (validator != null) {
               return validator!(val);
