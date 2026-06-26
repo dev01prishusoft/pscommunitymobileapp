@@ -30,10 +30,17 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
     
     amountController = TextEditingController();
     _amountListener = ever(controller.enteredAmount, (double val) {
-      if (val > 0) {
-        amountController.text = val.toStringAsFixed(0);
-      } else {
-        amountController.clear();
+      final currentVal = double.tryParse(amountController.text);
+      if (currentVal != val) {
+        if (val > 0) {
+          if (val == val.toInt()) {
+            amountController.text = val.toInt().toString();
+          } else {
+            amountController.text = val.toString();
+          }
+        } else {
+          amountController.text = '';
+        }
       }
     });
   }
@@ -121,12 +128,13 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                           return TextField(
                             controller: amountController,
                             readOnly: isFixed,
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                               LengthLimitingTextInputFormatter(8),
                               TextInputFormatter.withFunction((oldValue, newValue) {
                                 if (newValue.text.isEmpty) return newValue;
+                                if (newValue.text == '.') return newValue;
                                 final val = double.tryParse(newValue.text);
                                 if (val == null) return oldValue;
                                 final maxAmount = controller.selectedCategory.value?.maxAmount ?? 0;

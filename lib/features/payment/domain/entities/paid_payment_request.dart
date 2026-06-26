@@ -9,6 +9,7 @@ class PaidPaymentRequest {
     required this.paidDate,
     required this.receiptId,
     required this.status,
+    this.recurringType = '',
   });
 
   factory PaidPaymentRequest.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class PaidPaymentRequest {
       paidDate: json['paidDate'] as String? ?? '',
       receiptId: json['receiptId'] as int? ?? 0,
       status: json['status'] as String? ?? json['paymentStatus'] as String? ?? 'Paid',
+      recurringType: json['recurringType'] as String? ?? '',
     );
   }
   final int id;
@@ -33,4 +35,5 @@ class PaidPaymentRequest {
   final String paidDate;
   final int receiptId;
   final String status;
+  final String recurringType;
 }
