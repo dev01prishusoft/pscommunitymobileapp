@@ -61,26 +61,12 @@ class Family {
               .map((i) => FamilyMember.fromJson(i as Map<String, dynamic>))
               .toList()
         : <FamilyMember>[];
-    final Set<String> seenIds = {};
-    final List<FamilyMember> uniqueMembers = [];
-    for (var member in rawMembers) {
-      if (!seenIds.contains(member.id)) {
-        seenIds.add(member.id);
-        uniqueMembers.add(member);
-      }
-    }
 
-    String finalFamilyName = json['name'] as String? ?? '';
-    try {
-      final head = uniqueMembers.firstWhere((m) => m.isHead);
-      if (head.name.isNotEmpty) {
-        finalFamilyName = head.name;
-      }
-    } catch (_) {}
+    final String finalFamilyName = json['name'] as String? ?? '';
 
     return Family(
       familyName: finalFamilyName,
-      members: uniqueMembers,
+      members: rawMembers,
     );
   }
   final String familyName;
