@@ -29,6 +29,9 @@ import 'package:pscommunitymobileapp/features/support/presentation/pages/support
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_sanstha_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/notification/presentation/pages/notifications_page.dart';
+import 'package:pscommunitymobileapp/features/notification/presentation/controllers/notification_controller.dart';
+import 'package:pscommunitymobileapp/features/notification/data/repositories/notification_repository_impl.dart';
 
 class AppRouter {
   static String login = '/login';
@@ -57,6 +60,7 @@ class AppRouter {
   static String addFamilyMember = '/add-family-member';
   static String addedMembers = '/added-members';
   static String samajSansthas = '/samaj-sansthas';
+  static String notifications = '/notifications';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -182,6 +186,14 @@ class AppRouter {
       page: () => SamajSansthaPage(),
       binding: BindingsBuilder<dynamic>(() {
         Get.lazyPut<SamajSansthaController>(() => SamajSansthaController(SamajRepositoryImpl(Get.find<ApiClient>())));
+      }),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: notifications,
+      page: () => NotificationsPage(),
+      binding: BindingsBuilder<dynamic>(() {
+        Get.lazyPut<NotificationController>(() => NotificationController(NotificationRepositoryImpl(Get.find<ApiClient>())));
       }),
       middlewares: [AuthGuard()],
     ),

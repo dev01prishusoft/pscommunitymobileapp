@@ -1154,7 +1154,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             onChanged: (v) {
               addr.line1 = v;
               controller.addresses.refresh();
-            },
+              },  
           ),
           AppSpacing.vM,
           AppFormTextField( 
