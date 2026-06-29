@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_it
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   const PaymentHistoryPage({super.key});
@@ -159,13 +160,32 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               () => AppStateView(
                 state: controller.historyState.value,
                 onRetry: () => controller.loadHistory(),
-                child: ListView.builder(
-                  padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
-                  itemCount: controller.payments.length,
-                  itemBuilder: (context, index) {
-                    final payment = controller.payments[index];
-                    return _PaymentCard(payment: payment);
-                  },
+                child: RefreshIndicator(
+                  onRefresh: () async => _refreshHistory(),
+                  color: AppColors.primary,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+                        controller.fetchMoreHistory();
+                      }
+                      return false;
+                    },
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
+                      itemCount: controller.payments.length + (controller.isLoadingMore.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == controller.payments.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: AppLoadingIndicator(size: 24)),
+                          );
+                        }
+                        final payment = controller.payments[index];
+                        return _PaymentCard(payment: payment);
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),

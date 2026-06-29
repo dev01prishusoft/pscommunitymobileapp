@@ -43,6 +43,11 @@ class PaymentController extends GetxController {
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
   final RxList<PaymentCategory> historyCategories = <PaymentCategory>[].obs;
   final Rxn<PaymentCategory> historyFilterCategory = Rxn<PaymentCategory>();
+
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  bool _hasMoreData = true;
+  final RxBool isLoadingMore = false.obs;
   late Razorpay _razorpay;
   int? _pendingAdminRequestId;
   bool _isCurrentPaymentRecurring = false;
@@ -384,19 +389,61 @@ class PaymentController extends GetxController {
     int? year,
     String? status,
   }) async {
+    _currentPage = 1;
+    _hasMoreData = true;
     historyState.value = AppState.loading;
     try {
-      final results = await _repository.getHistory(
+      final result = await _repository.getHistory(
+        page: _currentPage,
+        pageSize: _pageSize,
         paymentTypeId: paymentTypeId,
         categoryId: categoryId,
         year: year,
         status: status,
       );
-      payments.assignAll(results);
-      historyState.value = results.isEmpty ? AppState.empty : AppState.data;
+      if (result.isFailure) {
+        historyState.value = AppState.error;
+      } else {
+        final response = result.dataOrNull!;
+        payments.assignAll(response.data);
+        if (response.data.length < _pageSize) {
+          _hasMoreData = false;
+        }
+        historyState.value = payments.isEmpty ? AppState.empty : AppState.data;
+      }
     } catch (e) {
       historyState.value = AppState.error;
     }
+  }
+
+  Future<void> fetchMoreHistory() async {
+    if (!_hasMoreData || isLoadingMore.value) return;
+
+    isLoadingMore.value = true;
+    _currentPage++;
+
+    try {
+      final result = await _repository.getHistory(
+        page: _currentPage,
+        pageSize: _pageSize,
+        paymentTypeId: historyFilterType.value?.id,
+        year: int.tryParse(selectedYear.value),
+        status: selectedStatus.value,
+      );
+      if (result.isFailure) {
+        _currentPage--;
+      } else {
+        final response = result.dataOrNull!;
+        payments.addAll(response.data);
+        if (response.data.length < _pageSize) {
+          _hasMoreData = false;
+        }
+      }
+    } catch (e) {
+      _currentPage--;
+    }
+
+    isLoadingMore.value = false;
   }
 
   Future<Map<String, dynamic>> getReceipt(int receiptId) async {

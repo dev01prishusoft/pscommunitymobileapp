@@ -6,12 +6,15 @@
 import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i12;
+import 'package:pscommunitymobileapp/core/errors/failures.dart' as _i9;
+import 'package:pscommunitymobileapp/core/network/api_response.dart' as _i10;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart'
     as _i8;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart'
     as _i2;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart'
-    as _i9;
+    as _i11;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart'
     as _i6;
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart'
@@ -173,7 +176,9 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
           as _i5.Future<Map<String, dynamic>>);
 
   @override
-  _i5.Future<List<_i9.PaymentItem>> getHistory({
+  _i5.Future<_i9.Result<_i10.PaginatedResponse<_i11.PaymentItem>>> getHistory({
+    int? page = 1,
+    int? pageSize = 20,
     int? paymentTypeId,
     int? categoryId,
     int? year,
@@ -181,16 +186,33 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getHistory, [], {
+              #page: page,
+              #pageSize: pageSize,
               #paymentTypeId: paymentTypeId,
               #categoryId: categoryId,
               #year: year,
               #status: status,
             }),
-            returnValue: _i5.Future<List<_i9.PaymentItem>>.value(
-              <_i9.PaymentItem>[],
-            ),
+            returnValue:
+                _i5.Future<
+                  _i9.Result<_i10.PaginatedResponse<_i11.PaymentItem>>
+                >.value(
+                  _i12.dummyValue<
+                    _i9.Result<_i10.PaginatedResponse<_i11.PaymentItem>>
+                  >(
+                    this,
+                    Invocation.method(#getHistory, [], {
+                      #page: page,
+                      #pageSize: pageSize,
+                      #paymentTypeId: paymentTypeId,
+                      #categoryId: categoryId,
+                      #year: year,
+                      #status: status,
+                    }),
+                  ),
+                ),
           )
-          as _i5.Future<List<_i9.PaymentItem>>);
+          as _i5.Future<_i9.Result<_i10.PaginatedResponse<_i11.PaymentItem>>>);
 
   @override
   _i5.Future<Map<String, dynamic>> getReceipt(int? receiptId) =>
