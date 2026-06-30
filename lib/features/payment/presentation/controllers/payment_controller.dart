@@ -39,7 +39,8 @@ class PaymentController extends GetxController {
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
   final RxString selectedYear = ''.obs;
-  final RxString selectedStatus = 'All'.obs;
+  final RxList<Map<String, dynamic>> paymentStatuses = <Map<String, dynamic>>[].obs;
+  final Rxn<Map<String, dynamic>> selectedStatus = Rxn<Map<String, dynamic>>();
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
   final RxList<PaymentCategory> historyCategories = <PaymentCategory>[].obs;
   final Rxn<PaymentCategory> historyFilterCategory = Rxn<PaymentCategory>();
@@ -64,6 +65,7 @@ class PaymentController extends GetxController {
       loadDashboard(),
       loadPaymentTypes(),
       loadPaymentModes(),
+      loadPaymentStatuses(),
       loadHistory(),
     ]);
   }
@@ -362,6 +364,14 @@ class PaymentController extends GetxController {
     Get.snackbar(LK.info.tr, LK.externalWalletSelected.tr);
   }
 
+  void resetHistoryFilters() {
+    selectedYear.value = '';
+    selectedStatus.value = null;
+    historyFilterType.value = null;
+    historyFilterCategory.value = null;
+    historyCategories.clear();
+  }
+
   Future<void> onHistoryTypeChanged(PaymentType? type) async {
     historyFilterType.value = type;
     historyFilterCategory.value = null;
@@ -379,7 +389,7 @@ class PaymentController extends GetxController {
     await loadHistory(
       paymentTypeId: type?.id,
       year: int.tryParse(selectedYear.value),
-      status: selectedStatus.value,
+      status: selectedStatus.value?['name'] as String?,
     );
   }
 
@@ -428,7 +438,7 @@ class PaymentController extends GetxController {
         pageSize: _pageSize,
         paymentTypeId: historyFilterType.value?.id,
         year: int.tryParse(selectedYear.value),
-        status: selectedStatus.value,
+        status: selectedStatus.value?['name'] as String?,
       );
       if (result.isFailure) {
         _currentPage--;
@@ -452,6 +462,15 @@ class PaymentController extends GetxController {
     } catch (e) {
       AppLogger.e('Failed to load receipt', e);
       rethrow;
+    }
+  }
+
+  Future<void> loadPaymentStatuses() async {
+    try {
+      final statuses = await _repository.getPaymentStatuses();
+      paymentStatuses.assignAll(statuses);
+    } catch (e) {
+      AppLogger.e('Failed to load payment statuses', e);
     }
   }
 

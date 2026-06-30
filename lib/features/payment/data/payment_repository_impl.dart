@@ -17,6 +17,23 @@ class PaymentRepositoryImpl implements PaymentRepository {
   final ApiClient _apiClient;
 
   @override
+  Future<List<Map<String, dynamic>>> getPaymentStatuses() async {
+    try {
+      final response = await _apiClient.getParsed<List<dynamic>>(
+        '/api/v1/PaymentStatus/dropdown',
+        fromJsonT: (json) => json as List<dynamic>,
+      );
+      if (response.isSuccess && response.dataOrNull?.data != null) {
+        final dataList = response.dataOrNull!.data!;
+        return dataList.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
   Future<PaymentDashboard> getDashboard() async {
     try {
       final response = await _apiClient.getParsed<PaymentDashboard>(
@@ -206,10 +223,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
       final queryParameters = <String, dynamic>{
         'Page': page,
         'PageSize': pageSize,
-        if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
-        if (categoryId != null) 'paymentCategoryId': categoryId,
-        if (year != null) 'year': year,
-        if (status != null && status != 'All') 'paymentStatus': status,
+        if (paymentTypeId != null) 'PaymentTypeId': paymentTypeId,
+        if (categoryId != null) 'CategoryId': categoryId,
+        if (year != null) 'Year': year,
+        if (status != null && status.isNotEmpty) 'Status': status,
       };
 
       return await _apiClient.getPaginated<PaymentItem>(

@@ -59,6 +59,16 @@ class MockPaymentRepository extends _i1.Mock implements _i4.PaymentRepository {
   }
 
   @override
+  _i5.Future<List<Map<String, dynamic>>> getPaymentStatuses() =>
+      (super.noSuchMethod(
+            Invocation.method(#getPaymentStatuses, []),
+            returnValue: _i5.Future<List<Map<String, dynamic>>>.value(
+              <Map<String, dynamic>>[],
+            ),
+          )
+          as _i5.Future<List<Map<String, dynamic>>>);
+
+  @override
   _i5.Future<_i2.PaymentDashboard> getDashboard() =>
       (super.noSuchMethod(
             Invocation.method(#getDashboard, []),

@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 abstract class PaymentRepository {
+  Future<List<Map<String, dynamic>>> getPaymentStatuses();
   Future<PaymentDashboard> getDashboard();
   Future<List<PaymentMode>> getPaymentModes();
   Future<List<PaymentType>> getPaymentTypes();

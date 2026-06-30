@@ -25,6 +25,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   @override
   void initState() {
     super.initState();
+    controller.resetHistoryFilters();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshHistory();
     });
@@ -35,7 +36,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       paymentTypeId: controller.historyFilterType.value?.id,
       categoryId: controller.historyFilterCategory.value?.id,
       year: int.tryParse(controller.selectedYear.value),
-      status: controller.selectedStatus.value,
+      status: controller.selectedStatus.value?['name'] as String?,
     );
   }
 
@@ -96,7 +97,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(controller.selectedYear.value),
-                              status: controller.selectedStatus.value,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         ),
@@ -124,7 +125,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(val ?? ''),
-                              status: controller.selectedStatus.value,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         );
@@ -136,15 +137,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         () => _buildFilterDropdown(
                           label: LK.statusLabel.tr,
                           hint: LK.all.tr,
-                          value: controller.selectedStatus.value == 'All' ? null : controller.selectedStatus.value,
-                          items: ['Success', 'Pending', 'Failed'],
+                          value: controller.selectedStatus.value?['name'] as String?,
+                          items: controller.paymentStatuses.map((s) => s['name'] as String).toList(),
                           onChanged: (val) {
-                            controller.selectedStatus.value = val ?? 'All';
+                            if (val == null) {
+                              controller.selectedStatus.value = null;
+                            } else {
+                              controller.selectedStatus.value = controller.paymentStatuses.firstWhere((s) => s['name'] == val);
+                            }
                             controller.loadHistory(
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(controller.selectedYear.value),
-                              status: val,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         ),
@@ -409,7 +414,7 @@ class _PaymentCard extends StatelessWidget {
                 paymentTypeId: Get.find<PaymentController>().historyFilterType.value?.id,
                 categoryId: Get.find<PaymentController>().historyFilterCategory.value?.id,
                 year: int.tryParse(Get.find<PaymentController>().selectedYear.value),
-                status: Get.find<PaymentController>().selectedStatus.value,
+                status: Get.find<PaymentController>().selectedStatus.value?['name'] as String?,
               );
             },
             style: OutlinedButton.styleFrom(
