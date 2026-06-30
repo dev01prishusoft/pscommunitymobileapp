@@ -32,6 +32,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/notification/presentation/pages/notifications_page.dart';
 import 'package:pscommunitymobileapp/features/notification/presentation/controllers/notification_controller.dart';
 import 'package:pscommunitymobileapp/features/notification/data/repositories/notification_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/notification/presentation/services/notification_navigation_service.dart';
 
 class AppRouter {
   static String login = '/login';
@@ -193,7 +194,8 @@ class AppRouter {
       name: notifications,
       page: () => NotificationsPage(),
       binding: BindingsBuilder<dynamic>(() {
-        Get.lazyPut<NotificationController>(() => NotificationController(NotificationRepositoryImpl(Get.find<ApiClient>())));
+        Get.lazyPut<NotificationNavigationService>(() => NotificationNavigationService());
+        Get.lazyPut<NotificationController>(() => NotificationController(NotificationRepositoryImpl(Get.find<ApiClient>()), Get.find<NotificationNavigationService>()));
       }),
       middlewares: [AuthGuard()],
     ),

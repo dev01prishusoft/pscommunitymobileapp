@@ -91,11 +91,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
   
   bool get shouldHideLookingForMarriage {
     final s = maritalStatus.value.trim().toLowerCase();
-    bool isUnmarried = s.contains('unmarried') || s.contains('અપરિણીત') || s.contains('single') || s.contains('સિંગલ');
+    final isUnmarried = s.contains('unmarried') || s.contains('અપરિણીત') || s.contains('single') || s.contains('સિંગલ');
     if (isUnmarried) return false;
     
-    bool isMarried = s.contains('married') || s.contains('પરિણીત');
-    bool isDivorced = s.contains('divorced') || s.contains('છૂટાછેડા');
+    final isMarried = s.contains('married') || s.contains('પરિણીત');
+    final isDivorced = s.contains('divorced') || s.contains('છૂટાછેડા');
     
     return isMarried || isDivorced;
   }
@@ -446,16 +446,16 @@ class ProfileFormController extends GetxController with FormStateMixin {
     
     // Force Obx dependency registration
     // ignore: unused_local_variable
-    final _edu = educationList.toList();
+    final eduList = educationList.toList();
     // ignore: unused_local_variable
-    final _addr = contactInfo.addresses.toList();
+    final addrList = contactInfo.addresses.toList();
     
-    final currentEduJson = jsonEncode(_edu.map((e) => e.toJson()).toList());
+    final currentEduJson = jsonEncode(eduList.map((e) => e.toJson()).toList());
     if (currentEduJson != _initialEducationJson) {
       return true;
     }
     
-    final currentAddrJson = jsonEncode(_addr.map((e) => e.toJson()).toList());
+    final currentAddrJson = jsonEncode(addrList.map((e) => e.toJson()).toList());
     if (currentAddrJson != _initialAddressesJson) {
       return true;
     }
@@ -1326,22 +1326,22 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
                 try {
                   final addressesPayload = {
-                    "memberId": newMemberId,
-                    "addresses": contactInfo.addresses.map((addr) {
+                    'memberId': newMemberId,
+                    'addresses': contactInfo.addresses.map((addr) {
                       return {
-                        "memberAddressId": 0,
-                        "memberId": newMemberId,
-                        "addressTypeId": safeGetId(addr.type, contactInfo.addressTypeIdMap) ?? 0,
-                        "stateId": safeGetId(addr.state, workInfo.globalStateIdMap) ?? 0,
-                        "districtId": safeGetId(addr.district, workInfo.globalDistrictIdMap) ?? 0,
-                        "talukaId": safeGetId(addr.taluka, workInfo.globalTalukaIdMap) ?? 0,
-                        "areaId": safeGetId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0,
-                        "addressLine1": addr.line1,
-                        "addressLine2": addr.line2,
-                        "landmark": addr.landmark,
-                        "pincode": addr.pincode,
-                        "isPrimary": addr.isPrimary,
-                        "isActive": true
+                        'memberAddressId': 0,
+                        'memberId': newMemberId,
+                        'addressTypeId': safeGetId(addr.type, contactInfo.addressTypeIdMap) ?? 0,
+                        'stateId': safeGetId(addr.state, workInfo.globalStateIdMap) ?? 0,
+                        'districtId': safeGetId(addr.district, workInfo.globalDistrictIdMap) ?? 0,
+                        'talukaId': safeGetId(addr.taluka, workInfo.globalTalukaIdMap) ?? 0,
+                        'areaId': safeGetId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0,
+                        'addressLine1': addr.line1,
+                        'addressLine2': addr.line2,
+                        'landmark': addr.landmark,
+                        'pincode': addr.pincode,
+                        'isPrimary': addr.isPrimary,
+                        'isActive': true
                       };
                     }).toList()
                   };
@@ -1352,19 +1352,19 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
                 try {
                   final educationsPayload = {
-                    "memberId": newMemberId,
-                    "educations": contactInfo.educationList.map((edu) {
+                    'memberId': newMemberId,
+                    'educations': contactInfo.educationList.map((edu) {
                       return {
-                        "memberEducationId": 0,
-                        "memberId": newMemberId,
-                        "educationalQualificationId": contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId ?? 0,
-                        "description": edu.description,
-                        "institutionName": edu.institute,
-                        "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
-                        "percentage": double.tryParse(edu.percentage) ?? 0,
-                        "grade": edu.grade,
-                        "isHighestQualification": edu.isHighest,
-                        "isActive": true
+                        'memberEducationId': 0,
+                        'memberId': newMemberId,
+                        'educationalQualificationId': contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId ?? 0,
+                        'description': edu.description,
+                        'institutionName': edu.institute,
+                        'yearOfPassing': int.tryParse(edu.passingYear) ?? 0,
+                        'percentage': double.tryParse(edu.percentage) ?? 0,
+                        'grade': edu.grade,
+                        'isHighestQualification': edu.isHighest,
+                        'isActive': true
                       };
                     }).toList()
                   };

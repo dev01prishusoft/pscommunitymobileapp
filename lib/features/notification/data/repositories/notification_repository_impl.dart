@@ -6,29 +6,33 @@ import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart'
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 import 'package:pscommunitymobileapp/features/notification/data/repositories/notification_repository.dart';
 
+import 'package:dio/dio.dart';
+
 class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl(this._apiClient);
 
   final ApiClient _apiClient;
 
   @override
-  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(int page, int pageSize) {
+  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(int page, int pageSize, {CancelToken? cancelToken}) {
     return _apiClient.getPaginated<MemberNotification>(
       ApiEndpoints.notifications,
       queryParameters: {
         'Page': page,
         'PageSize': pageSize,
       },
+      cancelToken: cancelToken,
       listKey: 'data',
       fromJsonT: (json) => MemberNotification.fromJson(json as Map<String, dynamic>),
     );
   }
 
   @override
-  Future<Result<bool>> markAsRead(int notificationId) async {
+  Future<Result<bool>> markAsRead(int notificationId, {CancelToken? cancelToken}) async {
     try {
       final response = await _apiClient.post(
         ApiEndpoints.markNotificationRead(notificationId),
+        cancelToken: cancelToken,
       );
       final isSuccess = response.data['succeeded'] == true;
       return Success(isSuccess);

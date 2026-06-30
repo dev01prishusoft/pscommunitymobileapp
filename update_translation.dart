@@ -8,11 +8,11 @@ void main() {
   final enMap = jsonDecode(enFile.readAsStringSync());
   final guMap = jsonDecode(guFile.readAsStringSync());
   
-  // Add to English
-  enMap['Edit profile request sent'] = 'Edit profile request sent';
-  
-  // Add to Gujarati (User said: "it will also be same in gujarati translation")
-  guMap['Edit profile request sent'] = 'Edit profile request sent';
+  enMap['Notifications'] = 'Notifications';
+  enMap['No notifications found'] = 'No notifications found';
+
+  guMap['Notifications'] = 'નોટિફિકેશન';
+  guMap['No notifications found'] = 'કોઈ નોટિફિકેશન મળ્યા નથી';
   
   enFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(enMap));
   guFile.writeAsStringSync(JsonEncoder.withIndent('  ').convert(guMap));

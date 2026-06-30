@@ -143,53 +143,6 @@ class PaymentsPage extends GetView<PaymentController> {
     );
   }
 
-  Widget _buildDueSummaryCard() {
-    final dash = controller.dashboard.value!;
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                LK.totalDue.tr,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                '₹${dash.totalDue}',
-                style: AppTextStyles.headlineLarge.copyWith(
-                  color: AppColors.destructive,
-                ),
-              ),
-            ],
-          ),
-          if (dash.totalDue > 0)
-            ElevatedButton(
-              onPressed: () =>
-                  controller.initiatePayment(customAmount: dash.totalDue),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.info,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-              child: Text(LK.payAll.tr, style: AppTextStyles.labelLarge),
-            ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildPaymentRequestCard(PaymentRequest req) {
     return Container(
