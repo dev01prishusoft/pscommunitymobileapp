@@ -472,6 +472,13 @@ class LK {
   static String requested = 'Requested';
   static String camera = 'Camera';
   static String gallery = 'Gallery';
+  
+  static String wentForUpdate = 'went_for_update';
+  static String newUpdateAvailable = 'newUpdateAvailable';
+  static String updateDescription = 'updateDescription';
+  static String update = 'update';
+  static String notNow = 'notNow';
+  static String appUpdatedSuccessfully = 'app_updated_successfully';
 
   static List<String> allValues = [
     appTitle,
@@ -932,6 +939,11 @@ class LK {
     grade,
     institute,
     qualification,
+    newUpdateAvailable,
+    updateDescription,
+    update,
+    notNow,
+    appUpdatedSuccessfully
   ];
 }
 

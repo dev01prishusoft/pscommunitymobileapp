@@ -47,4 +47,13 @@ class SecureStorageService {
       AppLogger.e('SecureStorage deleteAll error', e, stack);
     }
   }
+
+  Future<void> setBool(String key, bool value) async {
+    await _storage.write(key: key, value: value.toString());
+  }
+
+  Future<bool> getBool(String key) async {
+    final value = await _storage.read(key: key);
+    return value == 'true';
+  }
 }
