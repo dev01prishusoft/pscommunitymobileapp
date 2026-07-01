@@ -357,9 +357,11 @@ class WorkInfoController extends GetxController {
           for (final e in items) {
             targetList.add(e);
           }
-          for (final f in fallbacks) {
-            if (!targetList.contains(f) && f.isNotEmpty) {
-              targetList.add(f);
+          if (targetList.isEmpty) {
+            for (final f in fallbacks) {
+              if (f.isNotEmpty) {
+                targetList.add(f);
+              }
             }
           }
           return;
