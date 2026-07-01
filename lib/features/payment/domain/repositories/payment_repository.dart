@@ -5,8 +5,11 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_o
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 abstract class PaymentRepository {
+  Future<List<Map<String, dynamic>>> getPaymentStatuses();
   Future<PaymentDashboard> getDashboard();
   Future<List<PaymentMode>> getPaymentModes();
   Future<List<PaymentType>> getPaymentTypes();
@@ -33,7 +36,9 @@ abstract class PaymentRepository {
     int? adminPaymentRequestId,
     bool isRecurring = false,
   });
-  Future<List<PaymentItem>> getHistory({
+  Future<Result<PaginatedResponse<PaymentItem>>> getHistory({
+    int page = 1,
+    int pageSize = 20,
     int? paymentTypeId,
     int? categoryId,
     int? year,

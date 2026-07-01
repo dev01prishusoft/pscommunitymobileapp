@@ -8,11 +8,30 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mo
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository {
   PaymentRepositoryImpl(this._apiClient);
 
   final ApiClient _apiClient;
+
+  @override
+  Future<List<Map<String, dynamic>>> getPaymentStatuses() async {
+    try {
+      final response = await _apiClient.getParsed<List<dynamic>>(
+        '/api/v1/PaymentStatus/dropdown',
+        fromJsonT: (json) => json as List<dynamic>,
+      );
+      if (response.isSuccess && response.dataOrNull?.data != null) {
+        final dataList = response.dataOrNull!.data!;
+        return dataList.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
 
   @override
   Future<PaymentDashboard> getDashboard() async {
@@ -192,7 +211,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<List<PaymentItem>> getHistory({
+  Future<Result<PaginatedResponse<PaymentItem>>> getHistory({
+    int page = 1,
+    int pageSize = 20,
     int? paymentTypeId,
     int? categoryId,
     int? year,
@@ -200,24 +221,23 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }) async {
     try {
       final queryParameters = <String, dynamic>{
-        if (paymentTypeId != null) 'paymentTypeId': paymentTypeId,
-        if (categoryId != null) 'paymentCategoryId': categoryId,
-        if (year != null) 'year': year,
-        if (status != null && status != 'All') 'paymentStatus': status,
+        'Page': page,
+        'PageSize': pageSize,
+        if (paymentTypeId != null) 'PaymentTypeId': paymentTypeId,
+        if (categoryId != null) 'CategoryId': categoryId,
+        if (year != null) 'Year': year,
+        if (status != null && status.isNotEmpty) 'Status': status,
       };
 
-      final response = await _apiClient.getParsed<List<PaymentItem>>(
+      return await _apiClient.getPaginated<PaymentItem>(
         ApiEndpoints.paymentHistory,
+        listKey: 'data',
         queryParameters: queryParameters,
-        fromJsonT: (json) => (json as List)
-            .map((e) => PaymentItem.fromJson(e as Map<String, dynamic>))
-            .toList(),
+        fromJsonT: (json) => PaymentItem.fromJson(json as Map<String, dynamic>),
       );
-      if (response.isFailure) throw response.failureOrNull!;
-      return response.dataOrNull?.data ?? [];
     } catch (e, stack) {
       AppLogger.e('GetHistory Error', e, stack);
-      rethrow;
+      return Error(e is Failure ? e : ServerFailure(e.toString()));
     }
   }
 
