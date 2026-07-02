@@ -7,8 +7,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 
 class ProfileUpdateStatusBadge extends StatelessWidget {
-  const ProfileUpdateStatusBadge({super.key, required this.status});
+  const ProfileUpdateStatusBadge({super.key, required this.status, this.showValue = true});
   final ProfileUpdateStatus status;
+  final bool showValue;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,9 @@ class ProfileUpdateStatusBadge extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             child: Text(
-              '${isRejected ? LK.rejected.tr : LK.requested.tr}: ${status.newValue}',
+              showValue 
+                  ? '${isRejected ? LK.rejected.tr : LK.requested.tr}: ${status.newValue}'
+                  : isRejected ? LK.rejected.tr : LK.requested.tr,
               style: AppTextStyles.labelSmall.copyWith(
                 color: color,
                 fontWeight: FontWeight.w500,

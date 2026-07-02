@@ -319,12 +319,17 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        name,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: AppColors.secondary,
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.secondary,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      SizedBox(width: 8.w),
                       Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 10,

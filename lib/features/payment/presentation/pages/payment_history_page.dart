@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_it
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   const PaymentHistoryPage({super.key});
@@ -24,6 +25,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   @override
   void initState() {
     super.initState();
+    controller.resetHistoryFilters();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _refreshHistory();
     });
@@ -34,7 +36,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       paymentTypeId: controller.historyFilterType.value?.id,
       categoryId: controller.historyFilterCategory.value?.id,
       year: int.tryParse(controller.selectedYear.value),
-      status: controller.selectedStatus.value,
+      status: controller.selectedStatus.value?['name'] as String?,
     );
   }
 
@@ -95,7 +97,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(controller.selectedYear.value),
-                              status: controller.selectedStatus.value,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         ),
@@ -123,7 +125,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(val ?? ''),
-                              status: controller.selectedStatus.value,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         );
@@ -135,15 +137,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         () => _buildFilterDropdown(
                           label: LK.statusLabel.tr,
                           hint: LK.all.tr,
-                          value: controller.selectedStatus.value == 'All' ? null : controller.selectedStatus.value,
-                          items: ['Success', 'Pending', 'Failed'],
+                          value: controller.selectedStatus.value?['name'] as String?,
+                          items: controller.paymentStatuses.map((s) => s['name'] as String).toList(),
                           onChanged: (val) {
-                            controller.selectedStatus.value = val ?? 'All';
+                            if (val == null) {
+                              controller.selectedStatus.value = null;
+                            } else {
+                              controller.selectedStatus.value = controller.paymentStatuses.firstWhere((s) => s['name'] == val);
+                            }
                             controller.loadHistory(
                               paymentTypeId: controller.historyFilterType.value?.id,
                               categoryId: controller.historyFilterCategory.value?.id,
                               year: int.tryParse(controller.selectedYear.value),
-                              status: val,
+                              status: controller.selectedStatus.value?['name'] as String?,
                             );
                           },
                         ),
@@ -159,13 +165,32 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               () => AppStateView(
                 state: controller.historyState.value,
                 onRetry: () => controller.loadHistory(),
-                child: ListView.builder(
-                  padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
-                  itemCount: controller.payments.length,
-                  itemBuilder: (context, index) {
-                    final payment = controller.payments[index];
-                    return _PaymentCard(payment: payment);
-                  },
+                child: RefreshIndicator(
+                  onRefresh: () async => _refreshHistory(),
+                  color: AppColors.primary,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+                        controller.fetchMoreHistory();
+                      }
+                      return false;
+                    },
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 80),
+                      itemCount: controller.payments.length + (controller.isLoadingMore.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == controller.payments.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: AppLoadingIndicator(size: 24)),
+                          );
+                        }
+                        final payment = controller.payments[index];
+                        return _PaymentCard(payment: payment);
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -389,7 +414,7 @@ class _PaymentCard extends StatelessWidget {
                 paymentTypeId: Get.find<PaymentController>().historyFilterType.value?.id,
                 categoryId: Get.find<PaymentController>().historyFilterCategory.value?.id,
                 year: int.tryParse(Get.find<PaymentController>().selectedYear.value),
-                status: Get.find<PaymentController>().selectedStatus.value,
+                status: Get.find<PaymentController>().selectedStatus.value?['name'] as String?,
               );
             },
             style: OutlinedButton.styleFrom(

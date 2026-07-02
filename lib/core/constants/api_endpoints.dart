@@ -48,4 +48,5 @@ class ApiEndpoints {
   static String samajSansthaList = '/api/v1/samaj-sanstha/mobile/list';
   static String notifications = '/api/v1/daily-notification/member/list';
   static String markNotificationRead(int id) => '/api/v1/daily-notification/member/$id/read';
+  static String currenAppVersion(String appVersion) => '/api/v1/application-link/latest-version?currentversion=$appVersion';
 }

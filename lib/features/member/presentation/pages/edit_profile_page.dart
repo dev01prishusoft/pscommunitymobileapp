@@ -840,7 +840,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (status != null) {
               return Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: ProfileUpdateStatusBadge(status: status),
+                child: ProfileUpdateStatusBadge(status: status, showValue: false),
               );
             }
             return const SizedBox.shrink();
@@ -1002,7 +1002,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               },
               label: LK.addressType.tr,
               isRequired: true,
-              updateStatus: controller.getUpdateStatus('AddressTypeId', idMap: controller.contactInfo.addressTypeIdMap),
+              updateStatus: addr.isPrimary ? controller.getUpdateStatus('AddressTypeId', idMap: controller.contactInfo.addressTypeIdMap) : null,
             );
           }),
           AppSpacing.vM,
@@ -1035,7 +1035,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               },
               label: LK.state.tr,
               isRequired: true,
-              updateStatus: controller.getUpdateStatus('StateId', idMap: controller.workInfo.globalStateIdMap),
+              updateStatus: addr.isPrimary ? controller.getUpdateStatus('StateId', idMap: controller.workInfo.globalStateIdMap) : null,
             );
           }),
           AppSpacing.vM,
@@ -1067,7 +1067,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               },
               label: LK.district.tr,
               isRequired: true,
-              updateStatus: controller.getUpdateStatus('DistrictId', idMap: controller.workInfo.globalDistrictIdMap),
+              updateStatus: addr.isPrimary ? controller.getUpdateStatus('DistrictId', idMap: controller.workInfo.globalDistrictIdMap) : null,
             );
           }),
           AppSpacing.vM,
@@ -1098,7 +1098,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
                 label: LK.taluka.tr,
-              updateStatus: controller.getUpdateStatus('TalukaId', idMap: controller.workInfo.globalTalukaIdMap),
+              updateStatus: addr.isPrimary ? controller.getUpdateStatus('TalukaId', idMap: controller.workInfo.globalTalukaIdMap) : null,
             );
           }),
           AppSpacing.vM,
@@ -1128,7 +1128,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
                 label: LK.area.tr,
-              updateStatus: controller.getUpdateStatus('AreaId', idMap: controller.workInfo.globalAreaIdMap),
+              updateStatus: addr.isPrimary ? controller.getUpdateStatus('AreaId', idMap: controller.workInfo.globalAreaIdMap) : null,
             );
           }),
           AppSpacing.vM,
@@ -1138,7 +1138,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 6,
-            updateStatus: controller.getUpdateStatus('Pincode'),
+            updateStatus: addr.isPrimary ? controller.getUpdateStatus('Pincode') : null,
             onChanged: (v) {
               addr.pincode = v;
               controller.addresses.refresh();
@@ -1150,7 +1150,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             label: LK.addressLine1.tr,
             isRequired: true,
             maxLength: 200,
-            updateStatus: controller.getUpdateStatus('AddressLine1'),
+            updateStatus: addr.isPrimary ? controller.getUpdateStatus('AddressLine1') : null,
             onChanged: (v) {
               addr.line1 = v;
               controller.addresses.refresh();
@@ -1162,7 +1162,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             label: LK.addressLine2.tr,
             isRequired: true,
             maxLength: 200,
-            updateStatus: controller.getUpdateStatus('AddressLine2'),
+            updateStatus: addr.isPrimary ? controller.getUpdateStatus('AddressLine2') : null,
             onChanged: (v) {
               addr.line2 = v;
               controller.addresses.refresh();
@@ -1173,7 +1173,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             initialValue: addr.landmark,
             label: LK.landmarkLabel.tr,
             maxLength: 200,
-            updateStatus: controller.getUpdateStatus('Landmark'),
+            updateStatus: addr.isPrimary ? controller.getUpdateStatus('Landmark') : null,
             onChanged: (v) {
               addr.landmark = v;
               controller.addresses.refresh();
@@ -1360,14 +1360,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               } : null,
               label: LK.qualificationLabel.tr,
               isRequired: true,
-              updateStatus: controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap),
+              updateStatus: isHighest ? controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap) : null,
             ),
           ),
           AppSpacing.vM,
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
-            updateStatus: controller.getUpdateStatus('InstitutionName'),
+            updateStatus: isHighest ? controller.getUpdateStatus('InstitutionName') : null,
             maxLength: 200,
             readOnly: !isHighest,
             onChanged: isHighest ? (v) {
@@ -1380,7 +1380,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
-              updateStatus: controller.getUpdateStatus('YearOfPassing'),
+              updateStatus: isHighest ? controller.getUpdateStatus('YearOfPassing') : null,
               hint: 'YYYY',
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -1425,7 +1425,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
-              updateStatus: controller.getUpdateStatus('Percentage'),
+              updateStatus: isHighest ? controller.getUpdateStatus('Percentage') : null,
               hint: '00',
               suffixIcon: Padding(
                 padding: EdgeInsets.only(top: 14.h, right: 16.w),
@@ -1463,7 +1463,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.grade,
               label: 'Grade',
-              updateStatus: controller.getUpdateStatus('Grade'),
+              updateStatus: isHighest ? controller.getUpdateStatus('Grade') : null,
               maxLength: 10,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {
@@ -1474,7 +1474,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.description,
               label: 'Description',
-              updateStatus: controller.getUpdateStatus('Description'),
+              updateStatus: isHighest ? controller.getUpdateStatus('Description') : null,
               maxLength: 500,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {

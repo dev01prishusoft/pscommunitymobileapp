@@ -232,8 +232,6 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ]),
           SizedBox(height: 16.h),
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
-            if (data['planName'] != 'N/A' && data['planName']!.isNotEmpty)
-              _buildInfoRow(LK.planNameLabel.tr, data['planName']!),
             if (data['isRecurring'] != 'N/A')
               _buildInfoRow('${LK.recurring.tr}:', data['isRecurring']!),
             if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
@@ -412,8 +410,6 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Text('${LK.nameLabel.tr} ${data['name']}'),
               pw.Text('${LK.memberNoLabel.tr} ${data['memberNo']}'),
               pw.Divider(),
-              if (data['planName'] != 'N/A' && data['planName']!.isNotEmpty)
-                pw.Text('${LK.planNameLabel.tr} ${data['planName']}'),
               if (data['isRecurring'] != 'N/A')
                 pw.Text('${LK.recurring.tr}: ${data['isRecurring']}'),
               if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
