@@ -655,6 +655,24 @@ class ProfileFormController extends GetxController with FormStateMixin {
   String _initialEducationJson = '[]';
   String _initialAddressesJson = '[]';
 
+  /// Strips language suffixes like "(en)", "(gu)" for comparison.
+  static String _stripLangSuffix(String s) =>
+      s.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+
+  /// Checks if [list] already contains [value], considering language suffixes
+  /// and optionally by ID (to catch same-entity in different scripts).
+  static bool _containsIgnoringLang(List<String> list, String value, {int? id, Map<String, int>? idMap}) {
+    if (list.contains(value)) return true;
+    // Check by ID: if any existing item in the list has the same ID, it's a duplicate
+    if (id != null && idMap != null) {
+      for (final existing in list) {
+        if (idMap[existing] == id) return true;
+      }
+    }
+    final norm = _stripLangSuffix(value);
+    return list.any((e) => _stripLangSuffix(e) == norm);
+  }
+
   Future<void> loadEducation(int memberId) async {
     try {
       final apiClient = Get.find<ApiClient>();
@@ -671,7 +689,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             if (qualId != null) {
               contactInfo.educationIdMap[qualName] = qualId;
             }
-            if (!contactInfo.qualificationList.contains(qualName)) {
+            if (!_containsIgnoringLang(contactInfo.qualificationList, qualName)) {
               contactInfo.qualificationList.add(qualName);
             }
           }
@@ -712,40 +730,49 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final data = response.data['data'] as List<dynamic>? ?? [];
         final newAddresses = data.map((e) {
           final map = e as Map<String, dynamic>;
-          final stateName = map['stateName']?.toString() ?? '';
-          final districtName = map['districtName']?.toString() ?? '';
-          final talukaName = map['talukaName']?.toString() ?? '';
-          final areaName = map['areaName']?.toString() ?? '';
+          var stateName = map['stateName']?.toString() ?? '';
+          var districtName = map['districtName']?.toString() ?? '';
+          var talukaName = map['talukaName']?.toString() ?? '';
+          var areaName = map['areaName']?.toString() ?? '';
 
           if (stateName.isNotEmpty) {
             final stateId = map['stateId'] as int?;
-            if (stateId != null) workInfo.globalStateIdMap[stateName] = stateId;
-            if (!workInfo.workStateList.contains(stateName)) {
-              workInfo.workStateList.add(stateName);
+            if (stateId != null) {
+              String? loc;
+              for (final e in workInfo.workStateIdMap.entries) {
+                if (e.value == stateId) { loc = e.key; break; }
+              }
+              if (loc != null) stateName = loc;
             }
 
             if (districtName.isNotEmpty) {
               final districtId = map['districtId'] as int?;
-              if (districtId != null) workInfo.globalDistrictIdMap[districtName] = districtId;
-              workInfo.addressDistrictCache.putIfAbsent(stateName, () => <String>[].obs);
-              if (!workInfo.addressDistrictCache[stateName]!.contains(districtName)) {
-                workInfo.addressDistrictCache[stateName]!.add(districtName);
+              if (districtId != null) {
+                String? loc;
+                for (final e in workInfo.globalDistrictIdMap.entries) {
+                  if (e.value == districtId) { loc = e.key; break; }
+                }
+                if (loc != null) districtName = loc;
               }
 
               if (talukaName.isNotEmpty) {
                 final talukaId = map['talukaId'] as int?;
-                if (talukaId != null) workInfo.globalTalukaIdMap[talukaName] = talukaId;
-                workInfo.addressTalukaCache.putIfAbsent(districtName, () => <String>[].obs);
-                if (!workInfo.addressTalukaCache[districtName]!.contains(talukaName)) {
-                  workInfo.addressTalukaCache[districtName]!.add(talukaName);
+                if (talukaId != null) {
+                  String? loc;
+                  for (final e in workInfo.globalTalukaIdMap.entries) {
+                    if (e.value == talukaId) { loc = e.key; break; }
+                  }
+                  if (loc != null) talukaName = loc;
                 }
 
                 if (areaName.isNotEmpty) {
                   final areaId = map['areaId'] as int?;
-                  if (areaId != null) workInfo.globalAreaIdMap[areaName] = areaId;
-                  workInfo.addressAreaCache.putIfAbsent(talukaName, () => <String>[].obs);
-                  if (!workInfo.addressAreaCache[talukaName]!.contains(areaName)) {
-                    workInfo.addressAreaCache[talukaName]!.add(areaName);
+                  if (areaId != null) {
+                    String? loc;
+                    for (final e in workInfo.globalAreaIdMap.entries) {
+                      if (e.value == areaId) { loc = e.key; break; }
+                    }
+                    if (loc != null) areaName = loc;
                   }
                 }
               }
@@ -782,6 +809,59 @@ class ProfileFormController extends GetxController with FormStateMixin {
           contactInfo.addresses.value = newAddresses;
         }
         _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+
+        // Eagerly pre-fetch dropdown data for each address so values can be resolved.
+        // Stage 1: Fetch districts for each state
+        final districtFutures = <Future<void>>[];
+        final seenStates = <int>{};
+        for (final addr in contactInfo.addresses) {
+          if (addr.stateId != null && addr.stateId != 0 && seenStates.add(addr.stateId!)) {
+            final list = workInfo.addressDistrictCache.putIfAbsent(addr.state, () => <String>[].obs);
+            workInfo.markStateFetched(addr.state);
+            districtFutures.add(workInfo.fetchDropdown(
+              '/district/dropdown?stateId=${addr.stateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false,
+            ));
+          }
+        }
+        if (districtFutures.isNotEmpty) await Future.wait(districtFutures);
+
+        // Sanitize to resolve state/district names to match dropdown API values
+        sanitizeAddresses();
+
+        // Stage 2: Fetch talukas for each resolved district
+        final talukaFutures = <Future<void>>[];
+        final seenDistricts = <int>{};
+        for (final addr in contactInfo.addresses) {
+          if (addr.districtId != null && addr.districtId != 0 && seenDistricts.add(addr.districtId!)) {
+            final list = workInfo.addressTalukaCache.putIfAbsent(addr.district, () => <String>[].obs);
+            workInfo.markDistrictFetched(addr.district);
+            talukaFutures.add(workInfo.fetchDropdown(
+              '/taluka/dropdown?districtId=${addr.districtId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false,
+            ));
+          }
+        }
+        if (talukaFutures.isNotEmpty) await Future.wait(talukaFutures);
+
+        // Sanitize again to resolve taluka names
+        sanitizeAddresses();
+
+        // Stage 3: Fetch areas for each resolved taluka
+        final areaFutures = <Future<void>>[];
+        final seenTalukas = <int>{};
+        for (final addr in contactInfo.addresses) {
+          if (addr.talukaId != null && addr.talukaId != 0 && seenTalukas.add(addr.talukaId!)) {
+            final list = workInfo.addressAreaCache.putIfAbsent(addr.taluka, () => <String>[].obs);
+            workInfo.markTalukaFetched(addr.taluka);
+            areaFutures.add(workInfo.fetchDropdown(
+              '/Area/dropdown?talukaId=${addr.talukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false,
+            ));
+          }
+        }
+        if (areaFutures.isNotEmpty) await Future.wait(areaFutures);
+
+        // Final sanitize to resolve area names
+        sanitizeAddresses();
+        _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
         _checkAndTakeSnapshot();
       }
     } catch (e) {
@@ -801,15 +881,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
     final gotraPath = samajId != null ? '/Gotra/dropdown?samajId=$samajId' : '/Gotra/dropdown';
 
     await Future.wait([
-      workInfo.fetchDropdown('/gender/dropdown', personalInfo.genderList, personalInfo.defaultGenders, idMap: personalInfo.genderIdMap),
-      workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, personalInfo.defaultMaritalStatuses, idMap: personalInfo.maritalStatusIdMap),
-      workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, personalInfo.defaultBloodGroups, idMap: personalInfo.bloodGroupIdMap),
-      workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, personalInfo.defaultRelations, idMap: personalInfo.relationIdMap),
-      workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, contactInfo.defaultAddressTypes, idMap: contactInfo.addressTypeIdMap),
-      workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, contactInfo.defaultQualifications, idMap: contactInfo.educationIdMap),
-      workInfo.fetchDropdown('/occupation-type/dropdown', workInfo.occupationTypeList, workInfo.defaultOccupationTypes, idMap: workInfo.occupationTypeIdMap),
+      workInfo.fetchDropdown('/gender/dropdown', personalInfo.genderList, [], idMap: personalInfo.genderIdMap),
+      workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, [], idMap: personalInfo.maritalStatusIdMap),
+      workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, [], idMap: personalInfo.bloodGroupIdMap),
+      workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, [], idMap: personalInfo.relationIdMap),
+      workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, [], idMap: contactInfo.addressTypeIdMap),
+      workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, [], idMap: contactInfo.educationIdMap),
+      workInfo.fetchDropdown('/occupation-type/dropdown', workInfo.occupationTypeList, [], idMap: workInfo.occupationTypeIdMap),
       workInfo.fetchDropdown('/JobPosition/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
-      workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, personalInfo.defaultSigns, idMap: personalInfo.signIdMap),
+      workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, [], idMap: personalInfo.signIdMap),
       workInfo.fetchDropdown(gotraPath, personalInfo.gotraList, [], idMap: personalInfo.gotraIdMap),
       workInfo.fetchDropdown(gotraPath, personalInfo.mothersGotraList, [], idMap: personalInfo.mothersGotraIdMap),
       workInfo.fetchDropdown('/state/dropdown', workInfo.workStateList, [], idMap: workInfo.workStateIdMap),
@@ -821,7 +901,107 @@ class ProfileFormController extends GetxController with FormStateMixin {
     await workInfo.fetchAreas();
 
     areDropdownsLoaded = true;
+    sanitizeAddresses();
     _checkAndTakeSnapshot();
+  }
+
+  String? _findLocByName(String name, Iterable<String> mapKeys) {
+    if (name.isEmpty) return null;
+    final cleanName = name.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+    for (final key in mapKeys) {
+      final cleanKey = key.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+      if (cleanKey == cleanName) return key;
+    }
+    return null;
+  }
+
+  void sanitizeAddresses() {
+    bool changed = false;
+    for (final addr in contactInfo.addresses) {
+      // Resolve state name by ID
+      if (addr.stateId != null && addr.stateId != 0) {
+        String? loc;
+        for (final e in workInfo.workStateIdMap.entries) {
+          if (e.value == addr.stateId) { loc = e.key; break; }
+        }
+        if (loc == null) loc = _findLocByName(addr.state, workInfo.workStateIdMap.keys);
+        if (loc != null && addr.state != loc) {
+          workInfo.renameState(addr.state, loc);
+          addr.state = loc;
+          changed = true;
+        }
+      }
+
+      // Resolve district name by ID
+      if (addr.districtId != null && addr.districtId != 0) {
+        String? loc;
+        for (final e in workInfo.globalDistrictIdMap.entries) {
+          if (e.value == addr.districtId) { loc = e.key; break; }
+        }
+        if (loc == null) loc = _findLocByName(addr.district, workInfo.globalDistrictIdMap.keys);
+        if (loc != null && addr.district != loc) {
+          workInfo.renameDistrict(addr.district, loc);
+          addr.district = loc;
+          changed = true;
+        }
+        final list = workInfo.addressDistrictCache[addr.state];
+        if (list != null && addr.district.isNotEmpty && !list.contains(addr.district)) {
+          list.add(addr.district);
+        }
+      }
+
+      // Resolve taluka name by ID
+      if (addr.talukaId != null && addr.talukaId != 0) {
+        String? loc;
+        for (final e in workInfo.globalTalukaIdMap.entries) {
+          if (e.value == addr.talukaId) { loc = e.key; break; }
+        }
+        if (loc == null) loc = _findLocByName(addr.taluka, workInfo.globalTalukaIdMap.keys);
+        if (loc != null && addr.taluka != loc) {
+          workInfo.renameTaluka(addr.taluka, loc);
+          addr.taluka = loc;
+          changed = true;
+        }
+        final list = workInfo.addressTalukaCache[addr.district];
+        if (list != null && addr.taluka.isNotEmpty && !list.contains(addr.taluka)) {
+          list.add(addr.taluka);
+        }
+      }
+
+      // Resolve area name by ID
+      if (addr.areaId != null && addr.areaId != 0) {
+        String? loc;
+        for (final e in workInfo.globalAreaIdMap.entries) {
+          if (e.value == addr.areaId) { loc = e.key; break; }
+        }
+        if (loc == null) loc = _findLocByName(addr.area, workInfo.globalAreaIdMap.keys);
+        if (loc != null && addr.area != loc) {
+          addr.area = loc;
+          changed = true;
+        }
+        final list = workInfo.addressAreaCache[addr.taluka];
+        if (list != null && addr.area.isNotEmpty && !list.contains(addr.area)) {
+          list.add(addr.area);
+        }
+      }
+
+      // Resolve address type by ID
+      if (addr.typeId != null && addr.typeId != 0) {
+        String? loc;
+        for (final e in contactInfo.addressTypeIdMap.entries) {
+          if (e.value == addr.typeId) { loc = e.key; break; }
+        }
+        if (loc != null && addr.type != loc) {
+          addr.type = loc;
+          changed = true;
+        }
+      }
+
+    }
+    if (changed) {
+      contactInfo.addresses.refresh();
+      _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    }
   }
 
   bool isMemberLoaded = false;
@@ -1038,7 +1218,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (m.motherDistrictId != null && personalInfo.motherDistrict.value.isEmpty) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap);
+        await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false);
         String? districtName;
         for (final entry in workInfo.globalDistrictIdMap.entries) {
           if (entry.value == m.motherDistrictId) { districtName = entry.key; break; }
@@ -1056,7 +1236,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (m.motherTalukaId != null && personalInfo.motherTaluka.value.isEmpty) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap);
+        await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false);
         String? talukaName;
         for (final entry in workInfo.globalTalukaIdMap.entries) {
           if (entry.value == m.motherTalukaId) { talukaName = entry.key; break; }
@@ -1074,7 +1254,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (m.motherAreaId != null && personalInfo.motherArea.value.isEmpty) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap);
+        await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false);
         String? areaName;
         for (final entry in workInfo.globalAreaIdMap.entries) {
           if (entry.value == m.motherAreaId) { areaName = entry.key; break; }

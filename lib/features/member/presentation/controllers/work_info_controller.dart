@@ -218,6 +218,37 @@ class WorkInfoController extends GetxController {
     }
   }
 
+  /// Mark a state as already fetched for districts (used by pre-fetch in loadAddresses)
+  void markStateFetched(String stateName) => _fetchedStatesForDistricts.add(stateName);
+  /// Mark a district as already fetched for talukas
+  void markDistrictFetched(String districtName) => _fetchedDistrictsForTalukas.add(districtName);
+  /// Mark a taluka as already fetched for areas
+  void markTalukaFetched(String talukaName) => _fetchedTalukasForAreas.add(talukaName);
+
+  void renameState(String oldName, String newName) {
+    if (oldName == newName) return;
+    if (_fetchedStatesForDistricts.remove(oldName)) _fetchedStatesForDistricts.add(newName);
+    if (addressDistrictCache.containsKey(oldName)) {
+      addressDistrictCache[newName] = addressDistrictCache.remove(oldName)!;
+    }
+  }
+
+  void renameDistrict(String oldName, String newName) {
+    if (oldName == newName) return;
+    if (_fetchedDistrictsForTalukas.remove(oldName)) _fetchedDistrictsForTalukas.add(newName);
+    if (addressTalukaCache.containsKey(oldName)) {
+      addressTalukaCache[newName] = addressTalukaCache.remove(oldName)!;
+    }
+  }
+
+  void renameTaluka(String oldName, String newName) {
+    if (oldName == newName) return;
+    if (_fetchedTalukasForAreas.remove(oldName)) _fetchedTalukasForAreas.add(newName);
+    if (addressAreaCache.containsKey(oldName)) {
+      addressAreaCache[newName] = addressAreaCache.remove(oldName)!;
+    }
+  }
+
   final _fetchedStatesForDistricts = <String>{};
   RxList<String> getAddressDistricts(String stateName) {
     if (stateName.isEmpty) return <String>[].obs;
@@ -229,7 +260,7 @@ class WorkInfoController extends GetxController {
       _fetchedStatesForDistricts.add(stateName);
       final stateId = globalStateIdMap[stateName] ?? workStateIdMap[stateName];
       if (stateId != null) {
-        fetchDropdown('/district/dropdown?stateId=$stateId', list, list.toList(), idMap: globalDistrictIdMap, clearMap: false);
+        fetchDropdown('/district/dropdown?stateId=$stateId', list, [], idMap: globalDistrictIdMap, clearMap: false);
       }
     }
     return list;
@@ -246,7 +277,7 @@ class WorkInfoController extends GetxController {
       _fetchedDistrictsForTalukas.add(districtName);
       final districtId = globalDistrictIdMap[districtName] ?? workDistrictIdMap[districtName];
       if (districtId != null) {
-        fetchDropdown('/taluka/dropdown?districtId=$districtId', list, list.toList(), idMap: globalTalukaIdMap, clearMap: false);
+        fetchDropdown('/taluka/dropdown?districtId=$districtId', list, [], idMap: globalTalukaIdMap, clearMap: false);
       }
     }
     return list;
@@ -263,7 +294,7 @@ class WorkInfoController extends GetxController {
       _fetchedTalukasForAreas.add(talukaName);
       final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
       if (talukaId != null) {
-        fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, list.toList(), idMap: globalAreaIdMap, clearMap: false);
+        fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap, clearMap: false);
       }
     }
     return list;
@@ -295,8 +326,10 @@ class WorkInfoController extends GetxController {
           targetList.clear();
           if (idMap != null && clearMap) idMap.clear();
 
-          final items = list
-              .map((e) {
+          final seenIds = <int>{};
+          final items = <String>[];
+
+          for (final e in list) {
                 final map = e as Map<String, dynamic>;
                 String text = '';
                 final textKeys = [
@@ -321,8 +354,8 @@ class WorkInfoController extends GetxController {
                   }
                 }
 
-                if (text.isNotEmpty && idMap != null) {
-                  int? foundId;
+                int? foundId;
+                if (text.isNotEmpty) {
                   final idKeys = [
                     'id', 'Id', 'value', 'Value', 
                     'bloodGroupId', 'BloodGroupId', 'genderId', 'GenderId', 'maritalStatusId', 'MaritalStatusId', 'signId', 'SignId',
@@ -344,21 +377,43 @@ class WorkInfoController extends GetxController {
                       }
                     }
                   }
-                  if (foundId != null) {
-                    idMap[text] = foundId;
-                  }
                 }
-                return text;
-              })
-              .where((s) => s.isNotEmpty)
-              .toSet()
-              .toList();
+
+                if (text.isEmpty) continue;
+
+                // Skip duplicate entries that share the same ID
+                if (foundId != null && !seenIds.add(foundId)) continue;
+
+                // Skip duplicate text entries
+                if (items.contains(text)) continue;
+
+                if (idMap != null && foundId != null) {
+                  idMap[text] = foundId;
+                }
+                items.add(text);
+          }
 
           for (final e in items) {
             targetList.add(e);
           }
+          // Strip language suffix like "(en)", "(gu)" for comparison
+          String _stripLangSuffix(String s) =>
+              s.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+
           for (final f in fallbacks) {
-            if (!targetList.contains(f) && f.isNotEmpty) {
+            if (f.isEmpty) continue;
+
+            // Skip if an API item with the same ID already exists
+            if (idMap != null) {
+              final fId = idMap[f];
+              if (fId != null && seenIds.contains(fId)) continue;
+            }
+
+            final fNorm = _stripLangSuffix(f);
+            final alreadyExists = targetList.any(
+              (existing) => _stripLangSuffix(existing) == fNorm,
+            );
+            if (!alreadyExists) {
               targetList.add(f);
             }
           }

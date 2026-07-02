@@ -113,7 +113,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   AppFormDatePicker(
                     controller: controller.dobCtrl,
                     label: LK.birthDate.tr,
-                    isRequired: true,
                     lastDate: DateTime.now(),
                   ),
                   AppFormTimePicker(
