@@ -112,6 +112,6 @@ class NotificationController extends GetxController {
       }
     }
 
-    await _navigationService.navigateToSource(notification.pageSource);
+    await _navigationService.navigateToSource(notification);
   }
 }
