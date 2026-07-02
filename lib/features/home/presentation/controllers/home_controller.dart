@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/model/app_link_model.dart';
+import 'package:pscommunitymobileapp/features/update/check_updated_version.dart';
 
 class MenuItem {
   MenuItem({required this.icon, required this.labelKey, required this.route});
@@ -11,15 +18,38 @@ class MenuItem {
   final String route;
 }
 
-class HomeController extends GetxController {
-
+class HomeController extends GetxController with WidgetsBindingObserver {
   final List<MenuItem> menuItems = [
-    MenuItem(icon: Icons.family_restroom, labelKey: LK.family, route: AppRouter.familyAreas),
-    MenuItem(icon: Icons.person_search, labelKey: LK.findMember, route: AppRouter.findMember),
-    MenuItem(icon: Icons.groups_outlined, labelKey: LK.committee, route: AppRouter.committees),
-    MenuItem(icon: Icons.account_balance_wallet, labelKey: LK.payment, route: AppRouter.payments),
-    MenuItem(icon: Icons.work, labelKey: LK.occupationDirectory, route: AppRouter.occupationDirectory),
-    MenuItem(icon: Icons.wc, labelKey: LK.matrimonial, route: AppRouter.marriage),
+    MenuItem(
+      icon: Icons.family_restroom,
+      labelKey: LK.family,
+      route: AppRouter.familyAreas,
+    ),
+    MenuItem(
+      icon: Icons.person_search,
+      labelKey: LK.findMember,
+      route: AppRouter.findMember,
+    ),
+    MenuItem(
+      icon: Icons.groups_outlined,
+      labelKey: LK.committee,
+      route: AppRouter.committees,
+    ),
+    MenuItem(
+      icon: Icons.account_balance_wallet,
+      labelKey: LK.payment,
+      route: AppRouter.payments,
+    ),
+    MenuItem(
+      icon: Icons.work,
+      labelKey: LK.occupationDirectory,
+      route: AppRouter.occupationDirectory,
+    ),
+    MenuItem(
+      icon: Icons.wc,
+      labelKey: LK.matrimonial,
+      route: AppRouter.marriage,
+    ),
     MenuItem(icon: Icons.share, labelKey: LK.share, route: AppRouter.shareApp),
     MenuItem(
       icon: Icons.info_outline,
@@ -33,14 +63,87 @@ class HomeController extends GetxController {
     ),
   ];
 
+  String version = '';
+
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     Get.find<LocalizationService>().fetchLanguages();
+    checkAppVersion();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      if (Get.context == null) return;
+      if (isUpdateSheetOpen && Get.context!.mounted) {
+        Navigator.of(Get.context!, rootNavigator: true).pop();
+      }
+      await checkAppVersion();
+    }
   }
 
   void changeLocale(LocalizationService loc, String? code) {
     if (code == null) return;
     loc.changeLocale(code.toLowerCase(), '');
+  }
+
+  checkAppVersion() {
+    if (Get.context == null) return;
+    PackageInfo.fromPlatform().then((value) async {
+      version = value.version;
+      update();
+      if (version.isNotEmpty) {
+        await Get.find<ShareController>().fetchAppLinks();
+
+        final appLinks = Get.find<ShareController>().appLinks;
+        if (appLinks.isNotEmpty) {
+          final AppLinkModel data = appLinks.firstWhere(
+            (e) => e.appType == (Platform.isAndroid ? 'Android' : 'iOS'),
+          );
+
+          if (data.appType.isNotEmpty) {
+            final String latestVersion = data.currentVersion;
+            final bool forceUpdate = data.appUpdateRequired;
+            final String appLink = data.appLink;
+
+            final bool wentForUpdate = await SecureStorageService().getBool(
+              LK.wentForUpdate,
+            );
+
+            if (!isVersionGreater(latestVersion, version) && wentForUpdate) {
+              if (isUpdateSheetOpen && Get.context!.mounted) {
+                Navigator.of(Get.context!, rootNavigator: true).pop();
+              }
+              await SecureStorageService().setBool(LK.wentForUpdate, false);
+              if (Get.context!.mounted) {
+                ScaffoldMessenger.of(Get.context!).showSnackBar(
+                  SnackBar(
+                    content: Text(LK.appUpdatedSuccessfully.tr),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+              return;
+            }
+            if (isVersionGreater(latestVersion, version)) {
+              showAppUpdateBottomSheet(
+                Get.context!,
+                forceUpdate: forceUpdate,
+                androidUrl: Platform.isAndroid ? appLink : '',
+                iosUrl: Platform.isIOS ? appLink : '',
+              );
+            }
+          }
+        }
+      }
+    });
   }
 }

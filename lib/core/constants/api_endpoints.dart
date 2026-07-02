@@ -46,4 +46,5 @@ class ApiEndpoints {
   static String customerSupport = '/api/v1/SamajSupportTeam/m_GetBySamaj';
   static String appLinks = '/api/v1/application-link/getapplink';
   static String samajSansthaList = '/api/v1/samaj-sanstha/mobile/list';
+  static String currenAppVersion(String appVersion) => '/api/v1/application-link/latest-version?currentversion=$appVersion';
 }
