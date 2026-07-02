@@ -840,7 +840,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (status != null) {
               return Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: ProfileUpdateStatusBadge(status: status),
+                child: ProfileUpdateStatusBadge(status: status, showValue: false),
               );
             }
             return const SizedBox.shrink();
