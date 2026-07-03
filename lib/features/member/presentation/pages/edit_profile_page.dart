@@ -147,7 +147,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             Obx(() => AppFormDatePicker(
                               controller: controller.dobCtrl,
                               label: LK.birthDate.tr,
-                              isRequired: true,
                               originalValue: controller.currentMember?.dateOfBirth ?? '',
                               lastDate: DateTime.now(),
                               updateStatus: controller.getUpdateStatus('DateOfBirth'),
