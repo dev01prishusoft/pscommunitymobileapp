@@ -209,5 +209,17 @@ class LocalizationService {
   void clearLanguages() {
     languages.clear();
   }
+
+  Future<bool> hasSavedLocale() async {
+    final saved = await _storage.read(_localeKey);
+    return saved != null && saved.isNotEmpty;
+  }
+
+  Future<void> resetToDefaultLocale() async {
+    await _storage.delete(_localeKey);
+    final locale = const Locale('en', 'US');
+    currentLocale.value = locale;
+    await Get.updateLocale(locale);
+  }
 }
 

@@ -40,6 +40,7 @@ class SamajController extends GetxController {
 
     try {
       final detail = await _repository.getSamajDetail();
+      _isFetchingSamaj = false; // Allow re-fetches triggered by language change
       if (detail != null) {
         samaj.value = detail;
         AppLogger.d('Samaj details loaded: ${samaj.value?.toJson()}');
@@ -50,15 +51,18 @@ class SamajController extends GetxController {
             if (localizationService.languages.isEmpty) {
               await localizationService.fetchLanguages();
             }
-            final matchedLang = localizationService.languages.firstWhereOrNull(
-              (l) => l.code.toUpperCase() == detail.languageCode!.toUpperCase()
-            );
-            if (matchedLang != null) {
-              final code = matchedLang.code.toUpperCase();
-              if (code == 'EN') {
-                await localizationService.changeLocale('en', 'US');
-              } else if (code == 'GJ' || code == 'GU') {
-                await localizationService.changeLocale('gu', 'IN');
+            final hasSaved = await localizationService.hasSavedLocale();
+            if (!hasSaved) {
+              final matchedLang = localizationService.languages.firstWhereOrNull(
+                (l) => l.code.toUpperCase() == detail.languageCode!.toUpperCase()
+              );
+              if (matchedLang != null) {
+                final code = matchedLang.code.toUpperCase();
+                if (code == 'EN') {
+                  await localizationService.changeLocale('en', 'US');
+                } else if (code == 'GJ' || code == 'GU') {
+                  await localizationService.changeLocale('gu', 'IN');
+                }
               }
             }
           } catch (e) {
