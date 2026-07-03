@@ -37,6 +37,8 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.navyBlue),
         actions: [
+          _NotificationMenu(),
+          AppSpacing.hS,
           _LanguageDropdown(),
           AppSpacing.hL,
         ],
@@ -285,5 +287,17 @@ class _LanguageDropdown extends GetView<LocalizationService> {
         ),
       );
     });
+  }
+}
+
+class _NotificationMenu extends StatelessWidget {
+  const _NotificationMenu();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.notifications, color: AppColors.navyBlue),
+      onPressed: () => Get.toNamed<void>('/notifications'),
+    );
   }
 }

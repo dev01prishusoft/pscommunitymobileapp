@@ -11,6 +11,9 @@ class LK {
   static String passwordHint = '........';
   static String forgotPassword = 'Forgot Password?';
   static String adminWarning = 'Use your admin credentials to continue.';
+  static const String resetPasswordFail = 'Reset password failed. Please try again.';
+  static const String notifications = 'Notifications';
+  static const String noNotificationsFound = 'No notifications found';
   static String resetPassword = 'Reset Password';
   static String newPassword = 'New Password';
   static String confirmNewPassword = 'Confirm New Password';
