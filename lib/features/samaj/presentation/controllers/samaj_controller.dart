@@ -14,11 +14,24 @@ class SamajController extends GetxController {
 
   bool _isFetchingSamaj = false;
 
+  @override
+  void onInit() {
+    super.onInit();
+    try {
+      final localizationService = Get.find<LocalizationService>();
+      ever(localizationService.currentLocale, (_) {
+        fetchSamajDetail(updateLanguage: false);
+      });
+    } catch (_) {
+      // Localization service might not be available in some tests or contexts
+    }
+  }
+
   Future<void> fetchAll() async {
     await Future.wait([fetchSamajDetail()]);
   }
 
-  Future<void> fetchSamajDetail() async {
+  Future<void> fetchSamajDetail({bool updateLanguage = true}) async {
     if (_isFetchingSamaj) return;
     _isFetchingSamaj = true;
 
@@ -31,7 +44,7 @@ class SamajController extends GetxController {
         samaj.value = detail;
         AppLogger.d('Samaj details loaded: ${samaj.value?.toJson()}');
 
-        if (detail.languageCode != null && detail.languageCode!.isNotEmpty) {
+        if (updateLanguage && detail.languageCode != null && detail.languageCode!.isNotEmpty) {
           try {
             final localizationService = Get.find<LocalizationService>();
             if (localizationService.languages.isEmpty) {
