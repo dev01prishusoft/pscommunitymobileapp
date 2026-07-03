@@ -281,7 +281,10 @@ class WorkInfoController extends GetxController {
       if (response.data != null) {
         final json = response.data as Map<String, dynamic>;
         if (json['succeeded'] == true) {
-
+          if (path.toLowerCase().contains('taluka') || path.toLowerCase().contains('area')) {
+            print('--- DROPDOWN RESPONSE FOR $path ---');
+            print(jsonEncode(json));
+          }
           final rawData = json['data'];
           List<dynamic> list = [];
           if (rawData is List) {
