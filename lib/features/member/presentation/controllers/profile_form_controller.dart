@@ -886,7 +886,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
       workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, [], idMap: personalInfo.bloodGroupIdMap),
       workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, [], idMap: personalInfo.relationIdMap),
       workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, [], idMap: contactInfo.addressTypeIdMap),
-      workInfo.fetchDropdown('/EducationalQualification/list/dropdown', contactInfo.qualificationList, [], idMap: contactInfo.educationIdMap),
+      workInfo.fetchDropdown(
+        '/EducationalQualification/mobile/dropdown',
+        contactInfo.qualificationList,
+        [],
+        idMap: contactInfo.educationIdMap,
+      ),
       workInfo.fetchDropdown('/occupation-type/dropdown', workInfo.occupationTypeList, [], idMap: workInfo.occupationTypeIdMap),
       workInfo.fetchDropdown('/JobPosition/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
       workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, [], idMap: personalInfo.signIdMap),
@@ -1471,7 +1476,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               return MapEntry(key, value);
             });
             AppLogger.d('Payload: \n${JsonEncoder.withIndent('  ').convert(printableMap)}');
-
+           
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
