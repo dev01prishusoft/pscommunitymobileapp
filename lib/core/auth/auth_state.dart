@@ -28,7 +28,7 @@ class AuthState {
     }
     final locService = Get.find<LocalizationService>();
     locService.clearLanguages();
-    locService.changeLocale('en', 'US');
+    locService.resetToDefaultLocale();
   }
 
   Future<void> _revokeTokenCall() async {
@@ -83,7 +83,7 @@ class AuthState {
       }
       final locService = Get.find<LocalizationService>();
       locService.clearLanguages();
-      await locService.changeLocale('en', 'US');
+      await locService.resetToDefaultLocale();
       if (Get.currentRoute != AppRouter.login) {
         await Get.offAllNamed<void>(AppRouter.login);
       }
