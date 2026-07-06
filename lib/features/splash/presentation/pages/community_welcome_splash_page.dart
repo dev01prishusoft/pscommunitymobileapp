@@ -1,14 +1,14 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/splash/presentation/controllers/splash_controller.dart';
+import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 
 class CommunityWelcomeSplashPage extends StatefulWidget {
   const CommunityWelcomeSplashPage({super.key});
@@ -171,6 +171,7 @@ class _AnimatedLogo extends StatelessWidget {
         url: logoUrl,
         width: 300.w,
         memCacheWidth: 600,
+        fit: BoxFit.cover,
         placeholder: (context, url) => SizedBox(
           width: 300.w,
           height: 100.h,

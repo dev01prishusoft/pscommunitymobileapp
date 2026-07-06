@@ -248,18 +248,19 @@ class BankDetailsPage extends StatelessWidget {
                 children: [
                   if (samaj.logoUrl.isNotEmpty)
                     Container(
-                      width: 60.w,
-                      height: 60.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: ClipOval(
+                    width: 50.w,
+                    height: 50.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                    ),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
                         child: CachedImg(
                           url: samaj.logoUrl,
-                          fit: BoxFit.contain,
-                          errorWidget: (_, __, ___) => Image.asset('assets/images/prishusoft_logo.png'),
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          errorWidget: (_, __, ___) => Image.asset('assets/images/prishusoft_logo.png',fit: BoxFit.cover,),
                         ),
                       ),
                     ),

@@ -36,28 +36,31 @@ class AppDrawer extends StatelessWidget {
               ),
               currentAccountPicture: Obx(() {
                 final logoUrl = samajController.samaj.value?.logoUrl;
-                return CircleAvatar(
-                  backgroundColor: AppColors.white,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: ClipOval(
-                      child: logoUrl != null && logoUrl.isNotEmpty
-                          ? CachedImg(
-                              url: logoUrl,
-                              fit: BoxFit.contain,
-                              placeholder: (context, url) => Center(
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/prishusoft_logo.png',
-                                fit: BoxFit.contain,
-                              ),
-                            )
-                          : Image.asset(
-                              'assets/images/prishusoft_logo.png',
-                              fit: BoxFit.contain,
+                return Container(
+                  width: 64.w,
+                  height: 64.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.white,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: logoUrl != null && logoUrl.isNotEmpty
+                        ? CachedImg(
+                            url: logoUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                    ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/prishusoft_logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/images/prishusoft_logo.png',
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 );
               }),

@@ -1,17 +1,17 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-
-import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 
 /// [StatefulWidget] so [_scaffoldKey] is created once and stays stable
 /// across rebuilds. A [GlobalKey] inside a [StatelessWidget] is recreated
@@ -99,45 +99,32 @@ class _SamajLogo extends StatelessWidget {
   const _SamajLogo({required this.samaj});
 
   final Samaj? samaj;
-  static BoxDecoration get _containerDecoration => BoxDecoration(
-    color: AppColors.white,
-    shape: BoxShape.circle,
-    boxShadow: [
-      BoxShadow(
-        color: AppColors.black.withValues(alpha: 0.08),
-        blurRadius: 15,
-        offset: Offset(0, 5),
-      ),
-    ],
-  );
-
   @override
   Widget build(BuildContext context) {
     final logoUrl = samaj?.logoUrl;
     return Container(
-      width: 80,
-      height: 80,
-      decoration: _containerDecoration,
-      child: ClipOval(
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: logoUrl != null && logoUrl.isNotEmpty
-              ? CachedImg(
-                  url: logoUrl,
-                  memCacheWidth: 160,
-                  fit: BoxFit.contain,
-                  placeholder: (_, __) =>
-                      Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                  errorWidget: (_, __, ___) => _fallbackLogo(),
-                )
-              : _fallbackLogo(),
-        ),
+      width: 64.w,
+      height: 64.h,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.white,
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(100),
+        child:logoUrl != null && logoUrl.isNotEmpty
+          ? CachedImg(
+              url: logoUrl,
+              fit: BoxFit.cover,
+              placeholder: (_, __) =>
+                  Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              errorWidget: (_, __, ___) => _fallbackLogo(),
+            )
+          : _fallbackLogo(),)
     );
   }
 
   Widget _fallbackLogo() =>
-      Image.asset('assets/images/prishusoft_logo.png', fit: BoxFit.contain);
+      Image.asset('assets/images/prishusoft_logo.png', fit: BoxFit.cover);
 }
 
 class _HomeMenuGrid extends StatelessWidget {
