@@ -1,19 +1,19 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
-import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
+import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
 class AddFamilyMemberPage extends StatefulWidget {
   const AddFamilyMemberPage({super.key});
@@ -1029,6 +1029,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ],
         ),
         SizedBox(height: 8.h),
+        /*
         if (controller.educationList.isEmpty)
           Center(
             child: Padding(
@@ -1051,6 +1052,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
           )
         else
+        */
           ...List.generate(
             controller.educationList.length,
             (index) => _buildEducationItem(index),
