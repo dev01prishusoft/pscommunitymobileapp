@@ -277,14 +277,49 @@ class _LanguageDropdown extends GetView<LocalizationService> {
   }
 }
 
-class _NotificationMenu extends StatelessWidget {
+class _NotificationMenu extends GetView<HomeController> {
   const _NotificationMenu();
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.notifications, color: AppColors.navyBlue),
-      onPressed: () => Get.toNamed<void>('/notifications'),
+      icon: Obx(() {
+        final count = controller.unreadNotificationCount.value;
+        if (count > 0) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Icon(Icons.notifications, color: AppColors.navyBlue),
+              Positioned(
+                right: -4,
+                top: -4,
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    count > 9 ? '9+' : count.toString(),
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        return Icon(Icons.notifications, color: AppColors.navyBlue);
+      }),
+      onPressed: () {
+        Get.toNamed<void>('/notifications')?.then((_) {
+          controller.fetchUnreadNotificationCount();
+        });
+      },
     );
   }
 }

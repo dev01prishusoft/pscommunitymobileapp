@@ -35,6 +35,7 @@ class PaginatedResponse<T> {
     required this.pageSize,
     required this.totalRecords,
     required this.totalPages,
+    this.unreadCount = 0,
   });
 
   factory PaginatedResponse.fromJson(
@@ -50,14 +51,15 @@ class PaginatedResponse<T> {
 
     final dataObj = json['data'];
     List<dynamic> list = [];
-    int pageNumber = 1, pageSize = 20, totalRecords = 0, totalPages = 0;
+    int pageNumber = 1, pageSize = 20, totalRecords = 0, totalPages = 0, unreadCount = 0;
 
     if (dataObj is Map<String, dynamic>) {
       list = (dataObj[listKey] ?? dataObj['data']) as List? ?? [];
       pageNumber = dataObj['pageNumber'] as int? ?? 1;
       pageSize = dataObj['pageSize'] as int? ?? 20;
-      totalRecords = dataObj['totalRecords'] as int? ?? 0;
+      totalRecords = (dataObj['totalRecords'] ?? dataObj['totalCount']) as int? ?? 0;
       totalPages = dataObj['totalPages'] as int? ?? 0;
+      unreadCount = dataObj['unreadCount'] as int? ?? 0;
     } else if (dataObj is List) {
       list = dataObj;
     }
@@ -70,6 +72,7 @@ class PaginatedResponse<T> {
       pageSize: pageSize,
       totalRecords: totalRecords,
       totalPages: totalPages,
+      unreadCount: unreadCount,
     );
   }
   final bool succeeded;
@@ -79,4 +82,5 @@ class PaginatedResponse<T> {
   final int pageSize;
   final int totalRecords;
   final int totalPages;
+  final int unreadCount;
 }

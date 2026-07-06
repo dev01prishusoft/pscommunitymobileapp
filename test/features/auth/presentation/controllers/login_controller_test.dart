@@ -42,7 +42,7 @@ class MockTokenManager implements TokenManager {
 class MockSamajController extends GetxController implements SamajController {
   bool fetchCalled = false;
   @override
-  Future<void> fetchSamajDetail() async {
+  Future<void> fetchSamajDetail({bool updateLanguage = true}) async {
     fetchCalled = true;
   }
 

@@ -10,6 +10,9 @@ import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/model/app_link_model.dart';
 import 'package:pscommunitymobileapp/features/update/check_updated_version.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 
 class MenuItem {
   MenuItem({required this.icon, required this.labelKey, required this.route});
@@ -64,6 +67,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   ];
 
   String version = '';
+  final RxInt unreadNotificationCount = 0.obs;
 
   @override
   void onInit() {
@@ -71,6 +75,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     Get.find<LocalizationService>().fetchLanguages();
     checkAppVersion();
+    fetchUnreadNotificationCount();
   }
 
   @override
@@ -87,6 +92,28 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         Navigator.of(Get.context!, rootNavigator: true).pop();
       }
       await checkAppVersion();
+      await fetchUnreadNotificationCount();
+    }
+  }
+
+  Future<void> fetchUnreadNotificationCount() async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final result = await apiClient.getPaginated<MemberNotification>(
+        ApiEndpoints.notifications,
+        queryParameters: {
+          'Page': 1,
+          'PageSize': 1,
+        },
+        listKey: 'data',
+        fromJsonT: (json) => MemberNotification.fromJson(json as Map<String, dynamic>),
+      );
+
+      if (result.isSuccess) {
+        unreadNotificationCount.value = result.dataOrNull?.unreadCount ?? 0;
+      }
+    } catch (e) {
+      // Ignore
     }
   }
 
@@ -95,7 +122,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     loc.changeLocale(code.toLowerCase(), '');
   }
 
-  checkAppVersion() {
+  Future<void> checkAppVersion() async {
     if (Get.context == null) return;
     PackageInfo.fromPlatform().then((value) async {
       version = value.version;
