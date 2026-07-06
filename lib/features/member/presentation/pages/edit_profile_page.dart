@@ -1,26 +1,25 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';    
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
-import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
-
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
+import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
+import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -1296,6 +1295,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.mutedForeground,
               ),
+            ),
+            TextButton.icon(
+              onPressed: controller.addEducation,
+              icon: Icon(Icons.add, size: 18),
+              label: Text(LK.addEducation.tr),
             ),
           ],
         ),
