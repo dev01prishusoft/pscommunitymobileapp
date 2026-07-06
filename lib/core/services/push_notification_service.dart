@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 @pragma('vm:entry-point')
@@ -145,13 +147,38 @@ class PushNotificationService {
 
   void _handleMessageTap(RemoteMessage message) {
     AppLogger.i('Tapped notification data: ${message.data}');
-    
-    // Handle navigation based on message.data route and arguments
-    if (message.data.containsKey('route')) {
-      final route = message.data['route'] as String;
-      final arguments = message.data['arguments'];
-      
-      Get.toNamed<void>(route, arguments: arguments);
+    final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
+    switch (pageText) {
+      case 'family':
+        Get.toNamed<void>(AppRouter.familyAreas);
+        break;
+      case 'find member':
+        Get.toNamed<void>(AppRouter.findMember);
+        break;
+      case 'committee':
+        Get.toNamed<void>(AppRouter.committees);
+        break;
+      case 'payment':
+        Get.toNamed<void>(AppRouter.payments);
+        break;
+      case 'occupation directory':
+        Get.toNamed<void>(AppRouter.occupationDirectory);
+        break;
+      case 'matrimonial':
+        Get.toNamed<void>(AppRouter.marriage);
+        break;
+      case 'share app':
+        Get.toNamed<void>(AppRouter.shareApp);
+        break;
+      case 'samaj profile':
+        Get.toNamed<void>(AppRouter.bankDetails);
+        break;
+      case 'support':
+        Get.toNamed<void>(AppRouter.customerSupport);
+        break;
+      default:
+        Get.toNamed<void>(AppRouter.notifications);
+        break;
     }
   }
 }
