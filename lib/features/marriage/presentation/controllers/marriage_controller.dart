@@ -449,7 +449,7 @@ class MarriageController extends GetxController {
   Future<void> loadAllDropdowns() async {
     await Future.wait([
       _fetchDropdown(
-        '/EducationalQualification/list/dropdown',
+        '/EducationalQualification/mobile/dropdown',
         dynamicEducations,
         ['Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD'],
       ),
