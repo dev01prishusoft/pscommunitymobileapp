@@ -210,7 +210,7 @@ class WorkInfoController extends GetxController {
   Future<void> fetchOccupations() async {
     final occupationTypeId = occupationTypeIdMap[occupationType.value];
     if (occupationTypeId != null) {
-      await fetchDropdown('/Occupation/dropdown?occupationTypeId=$occupationTypeId', occupationList, [], idMap: occupationIdMap);
+      await fetchDropdown('/Occupation/mobile/dropdown?occupationTypeId=$occupationTypeId', occupationList, [], idMap: occupationIdMap);
     } else {
       occupationList.clear();
       occupationIdMap.clear();
