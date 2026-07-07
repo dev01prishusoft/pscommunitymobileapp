@@ -5,7 +5,39 @@ import 'package:pscommunitymobileapp/features/notification/data/models/member_no
 
 class NotificationNavigationService {
   Future<void> navigateToSource(MemberNotification notification) async {
-    switch (notification.pageSource?.toLowerCase()) {
+    final pageText = (notification.pageText ?? notification.pageSource ?? '').toString().trim().toLowerCase();
+
+    switch (pageText) {
+      case 'family':
+        await Get.toNamed<void>(AppRouter.familyAreas);
+        break;
+      case 'find member':
+        await Get.toNamed<void>(AppRouter.findMember);
+        break;
+      case 'committee':
+        await Get.toNamed<void>(AppRouter.committees);
+        break;
+      case 'payment':
+        await Get.toNamed<void>(AppRouter.payments);
+        break;
+      case 'occupation directory':
+        await Get.toNamed<void>(AppRouter.occupationDirectory);
+        break;
+      case 'matrimonial':
+        await Get.toNamed<void>(AppRouter.marriage);
+        break;
+      case 'share app':
+        await Get.toNamed<void>(AppRouter.shareApp);
+        break;
+      case 'samaj profile':
+        await Get.toNamed<void>(AppRouter.bankDetails);
+        break;
+      case 'support':
+        await Get.toNamed<void>(AppRouter.customerSupport);
+        break;
+      case 'notification':
+        // Already on the notifications page
+        break;
       case 'home':
         await Get.offAllNamed<void>(AppRouter.home);
         break;
@@ -15,12 +47,7 @@ class NotificationNavigationService {
           arguments: {'memberId': notification.memberId},
         );
         break;
-      case 'notification':
-        // Already on the notifications page
-        break;
       default:
-        // Other pages like 'Events' are not implemented yet.
-        // Fallback or do nothing.
         break;
     }
   }
