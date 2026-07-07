@@ -177,7 +177,7 @@ class PushNotificationService {
         Get.toNamed<void>(AppRouter.customerSupport);
         break;
       default:
-        Get.toNamed<void>(AppRouter.notifications);
+        Get.offAllNamed<void>(AppRouter.home);
         break;
     }
   }
