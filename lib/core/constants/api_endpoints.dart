@@ -25,7 +25,7 @@ class ApiEndpoints {
   static String languageDropdown = '/api/v1/member/language-dropdown';
   static String languageResources(String languageCode) => '/api/v1/language-resource/get-resources/$languageCode';
   static String memberDetail = '/api/v1/member/mobile/member';
-  static String memberAddress = '/api/v1/member-address/member';
+  static String memberAddress = '/api/v1/member-address/mobile/member';
   static String samajDetail = '/api/v1/samaj/mobile/samaj';
   static String paymentDashboard = '/api/v1/Payment/dashboard';
   static String paymentModes = '/api/v1/PaymentMode/dropdown';

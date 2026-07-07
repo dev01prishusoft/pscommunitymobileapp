@@ -676,7 +676,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   Future<void> loadEducation(int memberId) async {
     try {
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get('/api/v1/MemberEducation/member/$memberId');
+      final response = await apiClient.get('/api/v1/MemberEducation/mobile/member/$memberId');
       
       if (response.statusCode == 200 && response.data != null) {
         final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
@@ -725,7 +725,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   Future<void> loadAddresses(int memberId) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get('/api/v1/member-address/list?MemberId=$memberId&Page=1&PageSize=20');
+      final response = await apiClient.get('/api/v1/member-address/mobile/member/$memberId');
       if (response.data != null && response.data['succeeded'] == true) {
         final data = response.data['data'] as List<dynamic>? ?? [];
         final newAddresses = data.map((e) {
@@ -892,7 +892,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         idMap: contactInfo.educationIdMap,
       ),
       workInfo.fetchDropdown('/occupation-type/mobile/dropdown', workInfo.occupationTypeList, [], idMap: workInfo.occupationTypeIdMap),
-      workInfo.fetchDropdown('/JobPosition/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
+      workInfo.fetchDropdown('/JobPosition/mobile/dropdown', workInfo.jobPositionList, [], idMap: workInfo.jobPositionIdMap),
       workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, [], idMap: personalInfo.signIdMap),
       workInfo.fetchDropdown(gotraPath, personalInfo.gotraList, [], idMap: personalInfo.gotraIdMap),
       workInfo.fetchDropdown(gotraPath, personalInfo.mothersGotraList, [], idMap: personalInfo.mothersGotraIdMap),
@@ -1529,7 +1529,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
                       };
                     }).toList()
                   };
-                  await apiClient.post('/api/v1/member-address/upsert', data: addressesPayload);
+                  if (addressesPayload.isNotEmpty) {
+                    await apiClient.post('/api/v1/member-address/mobile/upsert', data: addressesPayload);
+                  }
                 } catch (e) {
                   AppLogger.e('Failed to upsert addresses', e);
                 }
@@ -1552,7 +1554,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
                       };
                     }).toList()
                   };
-                  await apiClient.post('/api/v1/MemberEducation/upsert', data: educationsPayload);
+                  if (educationsPayload.isNotEmpty) {
+                    await apiClient.post('/api/v1/MemberEducation/mobile/upsert', data: educationsPayload);
+                  }
                 } catch (e) {
                   AppLogger.e('Failed to upsert educations', e);
                 }
