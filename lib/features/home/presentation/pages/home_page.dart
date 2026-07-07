@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -23,8 +24,26 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with RouteAware {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppRouter.routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    AppRouter.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when the top route has been popped off, and the current route shows up.
+    Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -289,10 +308,10 @@ class _NotificationMenu extends GetView<HomeController> {
           return Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(Icons.notifications, color: AppColors.navyBlue),
+              Icon(Icons.notifications, color: AppColors.navyBlue, size: 28),
               Positioned(
-                right: -4,
-                top: -4,
+                right: -6,
+                top: -6,
                 child: Container(
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -300,7 +319,7 @@ class _NotificationMenu extends GetView<HomeController> {
                     shape: BoxShape.circle,
                   ),
                   child: Text(
-                    count > 9 ? '9+' : count.toString(),
+                    count > 99 ? '99+' : count.toString(),
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: 10,
@@ -313,7 +332,7 @@ class _NotificationMenu extends GetView<HomeController> {
             ],
           );
         }
-        return Icon(Icons.notifications, color: AppColors.navyBlue);
+        return Icon(Icons.notifications, color: AppColors.navyBlue, size: 28);
       }),
       onPressed: () {
         Get.toNamed<void>('/notifications')?.then((_) {

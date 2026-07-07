@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -80,6 +81,9 @@ class PushNotificationService {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         AppLogger.i('Foreground message received: ${message.messageId}');
         _showLocalNotification(message, channel);
+        if (Get.isRegistered<HomeController>()) {
+          Get.find<HomeController>().fetchUnreadNotificationCount();
+        }
       });
 
       // Handle when the app is opened from a background state
@@ -92,7 +96,10 @@ class PushNotificationService {
       final initialMessage = await _firebaseMessaging.getInitialMessage();
       if (initialMessage != null) {
         AppLogger.i('Message opened app from terminated state: ${initialMessage.messageId}');
-        _handleMessageTap(initialMessage);
+        // Delay routing to allow GetMaterialApp to initialize its initial route first
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          _handleMessageTap(initialMessage);
+        });
       }
 
       _isInitialized = true;
@@ -175,6 +182,10 @@ class PushNotificationService {
         break;
       case 'support':
         Get.toNamed<void>(AppRouter.customerSupport);
+        break;
+      case 'notification':
+      case 'notifications':
+        Get.toNamed<void>(AppRouter.notifications);
         break;
       default:
         Get.offAllNamed<void>(AppRouter.home);

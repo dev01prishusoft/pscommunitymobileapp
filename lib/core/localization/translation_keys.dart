@@ -207,6 +207,7 @@ class LK {
   static String viewFullMemberProfile = 'View Full Member Profile';
   static String fullAddress = 'Full Address';
   static String showMore = 'Show more';
+  static String showLess = 'Show less';
   static String occupationTypeLabel = 'Occupation Type:';
   static String companyNameLabel = 'Company Name:';
   static String businessAddressLabel = 'Business Address:';
@@ -645,6 +646,7 @@ class LK {
     viewFullMemberProfile,
     fullAddress,
     showMore,
+    showLess,
     occupationTypeLabel,
     companyNameLabel,
     businessAddressLabel,

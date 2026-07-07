@@ -317,7 +317,7 @@
   "Share App via WhatsApp": "Share App via WhatsApp",
   "Share QR": "Share QR",
   "Show :": "Show :",
-  "Show more": "Show more",
+  "Show more": "Show More",
   "Showing": "Showing",
   "Showing @count members": "Showing @count members",
   "Shree Patel Education Trust": "Shree Patel Education Trust",
@@ -466,5 +466,6 @@
   "Highest": "Highest",
   "Approved": "Approved",
   "Notifications": "Notifications",
-  "No notifications found": "No notifications found"
+  "No notifications found": "No notifications found",
+  "Show less": "Show Less"
 }
