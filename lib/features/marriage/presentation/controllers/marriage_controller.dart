@@ -453,7 +453,7 @@ class MarriageController extends GetxController {
         dynamicEducations,
         ['Secondary', 'Higher Secondary', 'Graduate', 'Post Graduate', 'PHD'],
       ),
-      _fetchDropdown('/Occupation/dropdown', dynamicOccupations, [
+      _fetchDropdown('/Occupation/mobile/dropdown', dynamicOccupations, [
         'Private Employee',
         'Government Employee',
         'Business Owner',
