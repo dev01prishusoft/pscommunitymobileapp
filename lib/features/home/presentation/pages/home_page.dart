@@ -187,7 +187,11 @@ class _MenuCard extends StatelessWidget {
       button: true,
       label: item.labelKey.tr,
       child: GestureDetector(
-        onTap: () => Get.toNamed<void>(item.route),
+        onTap: () {
+          Get.toNamed<void>(item.route)!.then((val)async{
+            await Get.find<SamajController>().fetchAll();
+          });
+        },
         child: Container(
           decoration: cardDecorationWithShadow,
           child: Column(

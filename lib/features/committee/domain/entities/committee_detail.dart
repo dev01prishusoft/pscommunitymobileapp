@@ -71,6 +71,7 @@ class CommitteeMember {
     this.committeeRoleId,
     this.startDate,
     this.endDate,
+    this.profileImage,
   });
 
   factory CommitteeMember.fromJson(Map<String, dynamic> json) {
@@ -86,6 +87,7 @@ class CommitteeMember {
       committeeRoleId: json['committeeRoleId'] as int?,
       startDate: json['startDate'] as String?,
       endDate: json['endDate'] as String?,
+      profileImage: json['profileImage'] as String?
     );
   }
   final int memberId;
@@ -95,4 +97,5 @@ class CommitteeMember {
   final int? committeeRoleId;
   final String? startDate;
   final String? endDate;
+  final String? profileImage;
 }

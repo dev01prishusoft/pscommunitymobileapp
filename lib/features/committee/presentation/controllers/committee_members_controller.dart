@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/network/api_response.dart';
-import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
-import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
-import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 class CommitteeMembersController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
   
@@ -52,6 +52,7 @@ class CommitteeMembersController extends GetxController {
   }
 
   Future<void> _fetchMembers(int id) async {
+    print(id);
     membersState.value = AppState.loading;
     try {
       final result = await _apiClient.getParsed<List<CommitteeMember>>(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -78,10 +79,11 @@ class SupportPage extends StatelessWidget {
                               );
                             },
                             leading: CircleAvatar(
-                              child: Text(
-                                member.displayName
-                                    .substring(0, 1)
-                                    .toUpperCase(),
+                              backgroundColor: Colors.transparent,
+                              child: MemberAvatar(
+                                imageUrl: member.profileImage,
+                                fallbackName: _getInitials(member.displayName),
+                                radius: 24,
                               ),
                             ),
                             title: Text(member.displayName),
@@ -138,4 +140,14 @@ class SupportPage extends StatelessWidget {
       ),
     );
   }
+}
+
+String _getInitials(String name) {
+  final cleanName = name.split('(').first.trim();
+  final parts = cleanName.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+  if (parts.isEmpty) return '';
+  if (parts.length == 1) {
+    return parts.first.substring(0, parts.first.length >= 2 ? 2 : 1).toUpperCase();
+  }
+  return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
 }

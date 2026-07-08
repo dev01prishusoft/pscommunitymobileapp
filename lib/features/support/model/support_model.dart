@@ -60,6 +60,7 @@ class SupportTeamMember {
 
     required this.displayName,
 
+    required this.profileImage,
   });
  
   factory SupportTeamMember.fromJson(Map<String, dynamic> json) {
@@ -70,6 +71,7 @@ class SupportTeamMember {
 
       displayName: json['displayName'] as String? ?? '',
 
+      profileImage: json['profileImage'] as String? ?? '',
     );
 
   }
@@ -77,6 +79,8 @@ class SupportTeamMember {
   final int memberId;
 
   final String displayName;
+
+  final String profileImage;
  
   Map<String, dynamic> toJson() {
 
@@ -85,7 +89,8 @@ class SupportTeamMember {
       'memberId': memberId,
 
       'displayName': displayName,
-
+      
+      'profileImage': profileImage,
     };
 
   }

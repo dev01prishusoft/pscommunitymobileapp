@@ -1,16 +1,16 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
-import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
 
 class CommitteeDetailsPage extends StatefulWidget {
   const CommitteeDetailsPage({super.key});
@@ -106,6 +106,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     separatorBuilder: (context, index) => SizedBox(height: 8.h),
                     itemBuilder: (context, index) {
                       final member = detail.members[index];
+                      print(detail.members[index].profileImage);
                       return _buildMemberTile(
                         context,
                         member.memberId,
@@ -113,7 +114,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         formatDateString(member.startDate, fallback: '-'),
                         formatDateString(member.endDate, fallback: '-'),
                         member.roleName,
-                        '',
+                        member.profileImage ?? '',
                       );
                     },
                   ),

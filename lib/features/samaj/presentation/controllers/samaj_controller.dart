@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/repositories/samaj_repository.dart';
-import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 
-class SamajController extends GetxController {
+class SamajController extends GetxController with WidgetsBindingObserver{
   SamajController(this._repository);
   final SamajRepository _repository;
 
@@ -17,6 +18,7 @@ class SamajController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     try {
       final localizationService = Get.find<LocalizationService>();
       ever(localizationService.currentLocale, (_) {
@@ -24,6 +26,20 @@ class SamajController extends GetxController {
       });
     } catch (_) {
       // Localization service might not be available in some tests or contexts
+    }
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      if (Get.context == null) return;
+      await fetchAll();
     }
   }
 

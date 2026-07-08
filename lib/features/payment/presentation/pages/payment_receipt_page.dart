@@ -1,17 +1,19 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-import 'package:intl/intl.dart';
+import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 class PaymentReceiptPage extends StatefulWidget {
   const PaymentReceiptPage({super.key});
@@ -36,7 +38,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     _receiptId = args?['receiptId'] as int?;
     _isRecurringArg = args?['isRecurring'] as bool? ?? false;
     _planNameArg = args?['planName'] as String? ?? '';
-    
+
     if (_receiptId != null) {
       _receiptFuture = controller.getReceipt(_receiptId!);
     }
@@ -128,13 +130,25 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               ?.toString() ??
           'N/A',
       'memberNo': data['memberNo']?.toString() ?? 'N/A',
-      'planName': (data['planName'] ?? data['plan'])?.toString() ?? (_planNameArg.isNotEmpty ? _planNameArg : 'N/A'),
-      'isRecurring': (data['isRecurring']?.toString() == 'true' || data['isRecurring'] == true || _isRecurringArg) 
-          ? LK.yes.tr 
-          : (data['isRecurring']?.toString() == 'false' || data['isRecurring'] == false)
-              ? LK.no.tr
-              : 'N/A',
-      'recurringPaymentType': (data['recurringPaymentType'] ?? data['recurringType'] ?? data['recurringTypeName'] ?? data['recurringPaymentTypeName'])?.toString() ?? 'N/A',
+      'planName':
+          (data['planName'] ?? data['plan'])?.toString() ??
+          (_planNameArg.isNotEmpty ? _planNameArg : 'N/A'),
+      'isRecurring':
+          (data['isRecurring']?.toString() == 'true' ||
+              data['isRecurring'] == true ||
+              _isRecurringArg)
+          ? LK.yes.tr
+          : (data['isRecurring']?.toString() == 'false' ||
+                data['isRecurring'] == false)
+          ? LK.no.tr
+          : 'N/A',
+      'recurringPaymentType':
+          (data['recurringPaymentType'] ??
+                  data['recurringType'] ??
+                  data['recurringTypeName'] ??
+                  data['recurringPaymentTypeName'])
+              ?.toString() ??
+          'N/A',
       'type':
           ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])
                       ?.toString() ??
@@ -155,7 +169,13 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       'status':
           ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
       'transactionId':
-          (data['transactionId'] ?? data['paymentTransactionId'] ?? data['TransactionId'] ?? data['transactionNo'] ?? data['referenceNo'] ?? data['bankTransactionId'])?.toString() ??
+          (data['transactionId'] ??
+                  data['paymentTransactionId'] ??
+                  data['TransactionId'] ??
+                  data['transactionNo'] ??
+                  data['referenceNo'] ??
+                  data['bankTransactionId'])
+              ?.toString() ??
           'N/A',
       'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
     };
@@ -180,23 +200,40 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               children: [
                 if (samajController.samaj.value?.logoUrl != null &&
                     samajController.samaj.value!.logoUrl.isNotEmpty)
-                  ClipOval(
-                    child: CachedImg(
-                      url: samajController.samaj.value!.logoUrl,
-                      memCacheWidth: 120,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.contain,
-                      placeholder: (_, __) => const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                  Obx(() {
+                    final logoUrl = samajController.samaj.value?.logoUrl;
+                    return Container(
+                      width: 64.w,
+                      height: 64.h,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.white,
+                        border: Border.all(color: AppColors.grey, width: 0.1),
                       ),
-                      errorWidget: (_, __, ___) => const Icon(
-                        Icons.account_balance,
-                        size: 60,
-                        color: AppColors.navyBlue,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: logoUrl != null && logoUrl.isNotEmpty
+                            ? CachedImg(
+                                url: logoUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                      'assets/images/prishusoft_logo.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                              )
+                            : Image.asset(
+                                'assets/images/prishusoft_logo.png',
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                    ),
-                  )
+                    );
+                  })
                 else
                   const Icon(
                     Icons.account_balance,
@@ -234,14 +271,19 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           _buildReceiptSection(LK.paymentDetailsLabel.tr, [
             if (data['isRecurring'] != 'N/A')
               _buildInfoRow('${LK.recurring.tr}:', data['isRecurring']!),
-            if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
-              _buildInfoRow(LK.recurringTypeLabel.tr, data['recurringPaymentType']!.tr),
+            if (data['recurringPaymentType'] != 'N/A' &&
+                data['recurringPaymentType']!.isNotEmpty)
+              _buildInfoRow(
+                LK.recurringTypeLabel.tr,
+                data['recurringPaymentType']!.tr,
+              ),
             _buildInfoRow(LK.typeLabel.tr, data['type']!),
             _buildInfoRow(LK.categoryLabel.tr, data['category']!),
             _buildInfoRow(LK.amountLabel.tr, data['amount']!),
             _buildInfoRow(LK.modeLabel.tr, data['mode']!),
             _buildStatusRow(LK.statusLabel.tr, data['status']!),
-            if (data['transactionId'] != 'N/A' && data['transactionId']!.isNotEmpty)
+            if (data['transactionId'] != 'N/A' &&
+                data['transactionId']!.isNotEmpty)
               _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']!),
           ]),
           SizedBox(height: 32.h),
@@ -378,9 +420,29 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
+  Future<Uint8List?> _loadNetworkImage(String? url) async {
+    try {
+      if (url == null || url.isEmpty) return null;
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      }
+    } catch (e) {
+      debugPrint("Image Load Error: $e");
+    }
+
+    return null;
+  }
+
   Future<pw.Document> _generatePdfDocument(Map<String, String> data) async {
     final font = await PdfGoogleFonts.hindVadodaraRegular();
     final boldFont = await PdfGoogleFonts.hindVadodaraBold();
+
+    final logoBytes = await _loadNetworkImage(
+      samajController.samaj.value?.logoUrl,
+    );
 
     final pdf = pw.Document(
       theme: pw.ThemeData.withFont(base: font, bold: boldFont),
@@ -395,12 +457,33 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             children: [
               pw.Header(
                 level: 0,
-                child: pw.Text(
-                  samajController.samaj.value?.name ?? LK.samajName.tr,
-                  style: pw.TextStyle(
-                    fontSize: 24.sp,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                child: pw.Row(
+                  children: [
+                    pw.Expanded(
+                      child: pw.Text(
+                        samajController.samaj.value?.name ?? LK.samajName.tr,
+                        style: pw.TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (logoBytes != null)
+                      pw.Container(
+                        width: 40.w,
+                        height: 40.w,
+                        decoration: pw.BoxDecoration(
+                          shape: pw.BoxShape.circle,
+                          border: pw.Border.all(),
+                        ),
+                        child: pw.ClipRRect(
+                          child: pw.Image(
+                            pw.MemoryImage(logoBytes),
+                            fit: pw.BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               pw.SizedBox(height: 20.h),
@@ -412,8 +495,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.Divider(),
               if (data['isRecurring'] != 'N/A')
                 pw.Text('${LK.recurring.tr}: ${data['isRecurring']}'),
-              if (data['recurringPaymentType'] != 'N/A' && data['recurringPaymentType']!.isNotEmpty)
-                pw.Text('${LK.recurringTypeLabel.tr} ${data['recurringPaymentType']!.tr}'),
+              if (data['recurringPaymentType'] != 'N/A' &&
+                  data['recurringPaymentType']!.isNotEmpty)
+                pw.Text(
+                  '${LK.recurringTypeLabel.tr} ${data['recurringPaymentType']!.tr}',
+                ),
               pw.Text('${LK.typeLabel.tr} ${data['type']}'),
               pw.Text('${LK.categoryLabel.tr} ${data['category']}'),
               pw.Text('${LK.amountLabel.tr} ${data['amount']}'),

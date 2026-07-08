@@ -1183,7 +1183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               RichText(
                 text: TextSpan(
-                  text: 'Primary',
+                  text: LK.primary.tr,
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.mutedForeground,
                   ),
@@ -1215,7 +1215,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     AppSpacing.hS,
                     Expanded(
-                      child: Text('Primary', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                      child: Text(LK.primary.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
                     ),
                     ],
                   ),

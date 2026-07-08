@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -76,19 +78,37 @@ class _HeaderCard extends GetView<SamajController> {
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.phonelink_setup,
-              size: 40,
-              color: AppColors.primary,
-            ),
-          ),
+          Obx(() {
+            final logoUrl = controller.samaj.value?.logoUrl;
+            return Container(
+              width: 64.w,
+              height: 64.h,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.white,
+                border: Border.all(color: AppColors.grey,width: 0.1)
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: logoUrl != null && logoUrl.isNotEmpty
+                    ? CachedImg(
+                        url: logoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/images/prishusoft_logo.png',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/images/prishusoft_logo.png',
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            );
+          }),
           const SizedBox(height: 16),
           Obx(() {
             final samajName = controller.samaj.value?.name ?? LK.samajName.tr;
@@ -256,13 +276,13 @@ class _QrCard extends StatelessWidget {
               version: QrVersions.auto,
               size: 200,
               eyeStyle: const QrEyeStyle(
-              eyeShape: QrEyeShape.square,
-              color: AppColors.navyBlue,
-            ),
-            dataModuleStyle: const QrDataModuleStyle(
-              dataModuleShape: QrDataModuleShape.square,
-              color: AppColors.navyBlue,
-            ),
+                eyeShape: QrEyeShape.square,
+                color: AppColors.navyBlue,
+              ),
+              dataModuleStyle: const QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: AppColors.navyBlue,
+              ),
             ),
 
             const SizedBox(height: 12),
@@ -279,17 +299,20 @@ class _QrCard extends StatelessWidget {
               onPressed: () {
                 ctrl.shareSelectedLink(selected);
               },
-            icon: const Icon(Icons.share, size: 18),
-            label: Text(LK.shareQR.tr),
-            style: OutlinedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              side: const BorderSide(color: AppColors.primary),
-              foregroundColor: AppColors.primary,
+              icon: const Icon(Icons.share, size: 18),
+              label: Text(LK.shareQR.tr),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                side: const BorderSide(color: AppColors.primary),
+                foregroundColor: AppColors.primary,
+              ),
             ),
-          ),
           ],
         ),
       );

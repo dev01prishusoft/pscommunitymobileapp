@@ -1,19 +1,19 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
+import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_members_controller.dart';
-import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
-import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
-import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
   const CommitteeMembersPage({super.key});
@@ -306,7 +306,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 Divider(height: 1),
                 AppSpacing.vXxl,
                 MemberAvatar(
-                  imageUrl: null,
+                  imageUrl: member.profileImage,
                   fallbackName: member.name,
                   radius: 40,
                 ),
@@ -470,7 +470,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
       leading: MemberAvatar(
-        imageUrl: null,
+        imageUrl: member.profileImage,
         fallbackName: member.name,
         radius: 24,
       ),
