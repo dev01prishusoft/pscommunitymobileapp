@@ -1067,7 +1067,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
       }
-      if (_currentMember!.motherStateId != null && personalInfo.motherState.value.isEmpty) {
+      if ((_currentMember!.motherStateId != null && personalInfo.motherState.value.isEmpty) ||
+          (_currentMember!.motherDistrictId != null && personalInfo.motherDistrict.value.isEmpty) ||
+          (_currentMember!.motherTalukaId != null && personalInfo.motherTaluka.value.isEmpty) ||
+          (_currentMember!.motherAreaId != null && personalInfo.motherArea.value.isEmpty)) {
         await _resolveMotherLocations(_currentMember!);
       }
       if (_currentMember!.signId != null) {
@@ -1205,7 +1208,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   Future<void> _resolveMotherLocations(Member m) async {
     try {
-      if (m.motherStateId != null && personalInfo.motherState.value.isEmpty) {
+      if (m.motherStateId != null) {
         String? stateName;
         for (final entry in workInfo.globalStateIdMap.entries) {
           if (entry.value == m.motherStateId) { stateName = entry.key; break; }
@@ -1220,7 +1223,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       
       if (personalInfo.motherState.value.isEmpty) return;
 
-      if (m.motherDistrictId != null && personalInfo.motherDistrict.value.isEmpty) {
+      if (m.motherDistrictId != null) {
         final list = <String>[].obs;
         await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false);
         String? districtName;
@@ -1238,7 +1241,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (personalInfo.motherDistrict.value.isEmpty) return;
 
-      if (m.motherTalukaId != null && personalInfo.motherTaluka.value.isEmpty) {
+      if (m.motherTalukaId != null) {
         final list = <String>[].obs;
         await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false);
         String? talukaName;
@@ -1256,13 +1259,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (personalInfo.motherTaluka.value.isEmpty) return;
 
-      if (m.motherAreaId != null && personalInfo.motherArea.value.isEmpty) {
+      if (m.motherAreaId != null) {
         final list = <String>[].obs;
+        print('--- FETCHING MOTHER AREA FOR ID ${m.motherAreaId} ---');
         await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false);
         String? areaName;
         for (final entry in workInfo.globalAreaIdMap.entries) {
           if (entry.value == m.motherAreaId) { areaName = entry.key; break; }
         }
+        print('--- MOTHER AREA NAME FOUND: $areaName ---');
         if (areaName != null) {
           personalInfo.motherArea.value = areaName;
           workInfo.addressAreaCache.putIfAbsent(personalInfo.motherTaluka.value, () => <String>[].obs);
