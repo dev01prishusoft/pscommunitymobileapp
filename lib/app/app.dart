@@ -45,6 +45,7 @@ class PsCommunityApp extends StatelessWidget {
               initialRoute: Get.find<AuthState>().isAuthenticated.value
                   ? AppRouter.postLoginSplash
                   : AppRouter.login,
+              navigatorObservers: [AppRouter.routeObserver],
               getPages: AppRouter.pages,
               builder: (context, child) {
                 return child ?? const SizedBox.shrink();

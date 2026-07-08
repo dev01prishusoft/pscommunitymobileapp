@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/auth_guard.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/pages/login_page.dart';
@@ -35,6 +36,8 @@ import 'package:pscommunitymobileapp/features/notification/data/repositories/not
 import 'package:pscommunitymobileapp/features/notification/presentation/services/notification_navigation_service.dart';
 
 class AppRouter {
+  static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
   static String login = '/login';
   static String home = '/home';
   static String shareApp = '/share-app';
