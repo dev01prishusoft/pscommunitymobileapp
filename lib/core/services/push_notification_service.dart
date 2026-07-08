@@ -19,6 +19,16 @@ class PushNotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  RemoteMessage? _initialMessageToHandle;
+  
+  bool get hasInitialMessage => _initialMessageToHandle != null;
+
+  void handleInitialMessage() {
+    if (_initialMessageToHandle != null) {
+      _handleMessageTap(_initialMessageToHandle!);
+      _initialMessageToHandle = null;
+    }
+  }
 
   Future<void> init() async {
     if (_isInitialized) return;
@@ -96,10 +106,7 @@ class PushNotificationService {
       final initialMessage = await _firebaseMessaging.getInitialMessage();
       if (initialMessage != null) {
         AppLogger.i('Message opened app from terminated state: ${initialMessage.messageId}');
-        // Delay routing to allow GetMaterialApp to initialize its initial route first
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          _handleMessageTap(initialMessage);
-        });
+        _initialMessageToHandle = initialMessage;
       }
 
       _isInitialized = true;
@@ -155,41 +162,57 @@ class PushNotificationService {
   void _handleMessageTap(RemoteMessage message) {
     AppLogger.i('Tapped notification data: ${message.data}');
     final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
+    
+    String? targetRoute;
     switch (pageText) {
       case 'family':
-        Get.toNamed<void>(AppRouter.familyAreas);
+        targetRoute = AppRouter.familyAreas;
         break;
       case 'find member':
-        Get.toNamed<void>(AppRouter.findMember);
+        targetRoute = AppRouter.findMember;
         break;
       case 'committee':
-        Get.toNamed<void>(AppRouter.committees);
+        targetRoute = AppRouter.committees;
         break;
       case 'payment':
-        Get.toNamed<void>(AppRouter.payments);
+        targetRoute = AppRouter.payments;
         break;
       case 'occupation directory':
-        Get.toNamed<void>(AppRouter.occupationDirectory);
+        targetRoute = AppRouter.occupationDirectory;
         break;
       case 'matrimonial':
-        Get.toNamed<void>(AppRouter.marriage);
+        targetRoute = AppRouter.marriage;
         break;
       case 'share app':
-        Get.toNamed<void>(AppRouter.shareApp);
+        targetRoute = AppRouter.shareApp;
         break;
       case 'samaj profile':
-        Get.toNamed<void>(AppRouter.bankDetails);
+        targetRoute = AppRouter.bankDetails;
         break;
       case 'support':
-        Get.toNamed<void>(AppRouter.customerSupport);
+        targetRoute = AppRouter.customerSupport;
         break;
       case 'notification':
       case 'notifications':
-        Get.toNamed<void>(AppRouter.notifications);
+      case 'notificatiion':
+        targetRoute = AppRouter.notifications;
         break;
       default:
-        Get.offAllNamed<void>(AppRouter.home);
+        targetRoute = null;
         break;
+    }
+
+    if (targetRoute != null) {
+      if (Get.currentRoute == targetRoute) {
+        Get.offNamed<void>(targetRoute);
+      } else {
+        Get.offAllNamed<void>(
+          AppRouter.home,
+          arguments: {'targetRoute': targetRoute},
+        );
+      }
+    } else {
+      Get.offAllNamed<void>(AppRouter.home);
     }
   }
 }

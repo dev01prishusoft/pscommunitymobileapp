@@ -310,14 +310,20 @@ class _NotificationMenu extends GetView<HomeController> {
             children: [
               Icon(Icons.notifications, color: AppColors.navyBlue, size: 28),
               Positioned(
-                right: -6,
-                top: -6,
+                right: -2,
+                top: -2,
                 child: Container(
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  constraints: BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    shape: BoxShape.circle,
+                    shape: count > 99 ? BoxShape.rectangle : BoxShape.circle,
+                    borderRadius: count > 99 ? BorderRadius.circular(10) : null,
                   ),
+                  alignment: Alignment.center,
                   child: Text(
                     count > 99 ? '99+' : count.toString(),
                     style: TextStyle(

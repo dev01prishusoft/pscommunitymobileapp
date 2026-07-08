@@ -62,6 +62,17 @@ class _NotificationCardState extends State<NotificationCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (widget.notification.announcementType != null && widget.notification.announcementType!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: Text(
+                          widget.notification.announcementType!,
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     Text(
                       widget.notification.message,
                       maxLines: _isExpanded ? null : (isLongText ? 3 : null),
