@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 
 @pragma('vm:entry-point')
@@ -15,6 +18,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class PushNotificationService {
+  PushNotificationService(this._apiClient);
+
+  final ApiClient _apiClient;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
@@ -159,10 +165,17 @@ class PushNotificationService {
     }
   }
 
-  void _handleMessageTap(RemoteMessage message) {
+  void _handleMessageTap(RemoteMessage message) async {
     AppLogger.i('Tapped notification data: ${message.data}');
     final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
-    
+    final String memberNotificationId = message.data['memberNotificationId'].toString();
+    if(memberNotificationId.isNotEmpty) {
+      await _apiClient.post(
+        ApiEndpoints.markNotificationRead(int.parse(memberNotificationId)),
+        cancelToken: CancelToken(),
+      );
+    }
+
     String? targetRoute;
     switch (pageText) {
       case 'family':
