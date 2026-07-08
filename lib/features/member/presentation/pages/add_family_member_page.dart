@@ -1258,12 +1258,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   Widget _buildAssetsLifeSection() {
     return _buildSection(LK.assetsLife.tr, Icons.account_balance_wallet_outlined, [
       _buildFieldPair(
-        _buildCheckbox('Own Land', controller.personalInfo.ownLand),
-        _buildCheckbox('Own House', controller.personalInfo.ownHouse),
+        _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand),
+        _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse),
       ),
       _buildFieldPair(
-        _buildCheckbox('Two Wheeler', controller.personalInfo.twoWheeler),
-        _buildCheckbox('Four Wheeler', controller.personalInfo.fourWheeler),
+        _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler),
+        _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler),
       ),
       SizedBox(height: 12.h),
       AppFormTextField(
