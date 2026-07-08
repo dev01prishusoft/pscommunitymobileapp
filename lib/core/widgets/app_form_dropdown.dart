@@ -56,7 +56,8 @@ class AppFormDropdown<T> extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         DropdownButtonFormField<T>(
-          initialValue: value,
+          key: ValueKey(value),
+          value: value,
           items: items,
           selectedItemBuilder: (BuildContext context) {
             return items.map<Widget>((DropdownMenuItem<T> item) {
