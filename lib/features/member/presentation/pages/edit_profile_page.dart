@@ -1296,11 +1296,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 color: AppColors.mutedForeground,
               ),
             ),
-            TextButton.icon(
-              onPressed: controller.addEducation,
-              icon: Icon(Icons.add, size: 18),
-              label: Text(LK.addEducation.tr),
-            ),
+            if (controller.educationList.isEmpty)
+              TextButton.icon(
+                onPressed: controller.addEducation,
+                icon: Icon(Icons.add, size: 18),
+                label: Text(LK.addEducation.tr),
+              ),
           ],
         ),
         AppSpacing.vS,

@@ -1021,11 +1021,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 color: AppColors.mutedForeground,
               ),
             ),
-            TextButton.icon(
-              onPressed: controller.addEducation,
-              icon: Icon(Icons.add, size: 18),
-              label: Text(LK.addEducation.tr),
-            ),
+            if (controller.educationList.isEmpty)
+              TextButton.icon(
+                onPressed: controller.addEducation,
+                icon: Icon(Icons.add, size: 18),
+                label: Text(LK.addEducation.tr),
+              ),
           ],
         ),
         SizedBox(height: 8.h),
@@ -1214,41 +1215,49 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
           ),
           SizedBox(height: 12.h),
-          InkWell(
-            onTap: () {
-              if (edu.isHighest) return;
-              for (var e in controller.educationList) {
-                e.isHighest = false;
-              }
-              edu.isHighest = true;
-              controller.educationList.refresh();
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 24.h,
-                    width: 24.w,
-                    child: Checkbox(
-                      value: edu.isHighest,
-                      onChanged: (v) {
-                        final newValue = v ?? false;
-                        if (!newValue) return;
-                        for (var e in controller.educationList) {
-                          e.isHighest = false;
-                        }
-                        edu.isHighest = true;
-                        controller.educationList.refresh();
-                      },
-                      activeColor: AppColors.primary,
-                    ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  text: LK.isHighestQualification.tr,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.mutedForeground,
                   ),
-                  SizedBox(width: 8.w),
-                  Text(LK.isHighestQualification.tr, style: AppTextStyles.titleSmall),
-                ],
+                ),
               ),
-            ),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: Checkbox(
+                        value: edu.isHighest,
+                        onChanged: null,
+                        fillColor: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.disabled) && edu.isHighest) {
+                            return AppColors.primary.withValues(alpha: 0.5);
+                          }
+                          return null;
+                        }),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(LK.isHighestQualification.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

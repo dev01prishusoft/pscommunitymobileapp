@@ -119,7 +119,7 @@ class ContactController extends GetxController {
     educationList.add(
       EducationModel(
         qualification: '',
-        isHighest: false,
+        isHighest: true,
       ),
     );
   }
