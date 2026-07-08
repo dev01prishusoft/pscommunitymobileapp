@@ -7,6 +7,7 @@ class MemberNotification {
     required this.sendTime,
     this.pageSource,
     this.pageText,
+    this.announcementType,
     required this.isRead,
     required this.createdAt,
   });
@@ -20,6 +21,7 @@ class MemberNotification {
       sendTime: json['sendTime'] as String? ?? '',
       pageSource: json['pageSource'] as String?,
       pageText: json['pageText'] as String?,
+      announcementType: json['announcementType'] as String?,
       isRead: json['isRead'] as bool? ?? false,
       createdAt: json['createdAt'] as String? ?? '',
     );
@@ -32,6 +34,7 @@ class MemberNotification {
   final String sendTime;
   final String? pageSource;
   final String? pageText;
+  final String? announcementType;
   final bool isRead;
   final String createdAt;
 
@@ -43,6 +46,7 @@ class MemberNotification {
     String? sendTime,
     String? pageSource,
     String? pageText,
+    String? announcementType,
     bool? isRead,
     String? createdAt,
   }) {
@@ -54,6 +58,7 @@ class MemberNotification {
       sendTime: sendTime ?? this.sendTime,
       pageSource: pageSource ?? this.pageSource,
       pageText: pageText ?? this.pageText,
+      announcementType: announcementType ?? this.announcementType,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
     );

@@ -1,11 +1,15 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -14,10 +18,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class PushNotificationService {
+  PushNotificationService(this._apiClient);
+
+  final ApiClient _apiClient;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  RemoteMessage? _initialMessageToHandle;
+  
+  bool get hasInitialMessage => _initialMessageToHandle != null;
+
+  void handleInitialMessage() {
+    if (_initialMessageToHandle != null) {
+      _handleMessageTap(_initialMessageToHandle!);
+      _initialMessageToHandle = null;
+    }
+  }
 
   Future<void> init() async {
     if (_isInitialized) return;
@@ -80,6 +97,9 @@ class PushNotificationService {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         AppLogger.i('Foreground message received: ${message.messageId}');
         _showLocalNotification(message, channel);
+        if (Get.isRegistered<HomeController>()) {
+          Get.find<HomeController>().fetchUnreadNotificationCount();
+        }
       });
 
       // Handle when the app is opened from a background state
@@ -92,7 +112,7 @@ class PushNotificationService {
       final initialMessage = await _firebaseMessaging.getInitialMessage();
       if (initialMessage != null) {
         AppLogger.i('Message opened app from terminated state: ${initialMessage.messageId}');
-        _handleMessageTap(initialMessage);
+        _initialMessageToHandle = initialMessage;
       }
 
       _isInitialized = true;
@@ -145,40 +165,67 @@ class PushNotificationService {
     }
   }
 
-  void _handleMessageTap(RemoteMessage message) {
+  void _handleMessageTap(RemoteMessage message) async {
     AppLogger.i('Tapped notification data: ${message.data}');
     final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
+    final String memberNotificationId = message.data['memberNotificationId'].toString();
+    if(memberNotificationId.isNotEmpty) {
+      await _apiClient.post(
+        ApiEndpoints.markNotificationRead(int.parse(memberNotificationId)),
+        cancelToken: CancelToken(),
+      );
+    }
+
+    String? targetRoute;
     switch (pageText) {
       case 'family':
-        Get.toNamed<void>(AppRouter.familyAreas);
+        targetRoute = AppRouter.familyAreas;
         break;
       case 'find member':
-        Get.toNamed<void>(AppRouter.findMember);
+        targetRoute = AppRouter.findMember;
         break;
       case 'committee':
-        Get.toNamed<void>(AppRouter.committees);
+        targetRoute = AppRouter.committees;
         break;
       case 'payment':
-        Get.toNamed<void>(AppRouter.payments);
+        targetRoute = AppRouter.payments;
         break;
       case 'occupation directory':
-        Get.toNamed<void>(AppRouter.occupationDirectory);
+        targetRoute = AppRouter.occupationDirectory;
         break;
       case 'matrimonial':
-        Get.toNamed<void>(AppRouter.marriage);
+        targetRoute = AppRouter.marriage;
         break;
       case 'share app':
-        Get.toNamed<void>(AppRouter.shareApp);
+        targetRoute = AppRouter.shareApp;
         break;
       case 'samaj profile':
-        Get.toNamed<void>(AppRouter.bankDetails);
+        targetRoute = AppRouter.bankDetails;
         break;
       case 'support':
-        Get.toNamed<void>(AppRouter.customerSupport);
+        targetRoute = AppRouter.customerSupport;
+        break;
+      case 'notification':
+      case 'notifications':
+      case 'notificatiion':
+        targetRoute = AppRouter.notifications;
         break;
       default:
-        Get.toNamed<void>(AppRouter.notifications);
+        targetRoute = null;
         break;
+    }
+
+    if (targetRoute != null) {
+      if (Get.currentRoute == targetRoute) {
+        Get.offNamed<void>(targetRoute);
+      } else {
+        Get.offAllNamed<void>(
+          AppRouter.home,
+          arguments: {'targetRoute': targetRoute},
+        );
+      }
+    } else {
+      Get.offAllNamed<void>(AppRouter.home);
     }
   }
 }

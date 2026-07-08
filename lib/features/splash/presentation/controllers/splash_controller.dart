@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 
 class SplashController extends GetxController {
   static final _splashDuration = Duration(milliseconds: 2500);
@@ -26,7 +27,11 @@ class SplashController extends GetxController {
 
   void _navigateToHome() {
     if (!isClosed) {
-      Get.offNamed<void>(AppRouter.home);
+      if (Get.isRegistered<PushNotificationService>() && Get.find<PushNotificationService>().hasInitialMessage) {
+        Get.find<PushNotificationService>().handleInitialMessage();
+      } else {
+        Get.offNamed<void>(AppRouter.home);
+      }
     }
   }
 }

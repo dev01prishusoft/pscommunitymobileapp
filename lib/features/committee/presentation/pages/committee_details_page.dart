@@ -106,7 +106,6 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     separatorBuilder: (context, index) => SizedBox(height: 8.h),
                     itemBuilder: (context, index) {
                       final member = detail.members[index];
-                      print(detail.members[index].profileImage);
                       return _buildMemberTile(
                         context,
                         member.memberId,
@@ -114,7 +113,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                         formatDateString(member.startDate, fallback: '-'),
                         formatDateString(member.endDate, fallback: '-'),
                         member.roleName,
-                        member.profileImage ?? '',
+                        member.imageUrl ?? '',
                       );
                     },
                   ),

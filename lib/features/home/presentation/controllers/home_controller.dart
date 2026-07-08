@@ -79,6 +79,17 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   }
 
   @override
+  void onReady() {
+    super.onReady();
+    if (Get.arguments != null && Get.arguments is Map) {
+      final targetRoute = Get.arguments['targetRoute'];
+      if (targetRoute != null && targetRoute is String) {
+        Get.toNamed<void>(targetRoute);
+      }
+    }
+  }
+
+  @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
     super.onClose();

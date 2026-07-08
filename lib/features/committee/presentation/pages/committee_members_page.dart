@@ -306,7 +306,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 Divider(height: 1),
                 AppSpacing.vXxl,
                 MemberAvatar(
-                  imageUrl: member.profileImage,
+                  imageUrl: member.imageUrl,
                   fallbackName: member.name,
                   radius: 40,
                 ),
@@ -470,7 +470,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
       leading: MemberAvatar(
-        imageUrl: member.profileImage,
+        imageUrl: member.imageUrl,
         fallbackName: member.name,
         radius: 24,
       ),
