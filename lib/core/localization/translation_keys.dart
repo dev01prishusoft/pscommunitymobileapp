@@ -472,6 +472,9 @@ class LK {
   static String crore = 'Crore';
   static String editRequestComment = 'Edit Request Comment';
 
+  static String adminAnnouncement = 'Admin Announcement';
+  static String samajAnnouncement = 'Samaj Announcement';
+
   static String rejected = 'Rejected';
   static String requested = 'Requested';
   static String camera = 'Camera';
@@ -841,6 +844,11 @@ class LK {
     percentageLabel,
     gradeLabel,
     editRequestComment,
+    educationAddedSuccessfully,
+    profileAndEducationUpdated,
+    adminAnnouncement,
+    samajAnnouncement,
+    rejected,
     markAsHighest,
     jobPositionLabel,
     otherJobPositionLabel,

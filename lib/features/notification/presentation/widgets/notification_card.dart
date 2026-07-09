@@ -66,7 +66,7 @@ class _NotificationCardState extends State<NotificationCard> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: Text(
-                          widget.notification.announcementType!,
+                          widget.notification.announcementType!.tr,
                           style: AppTextStyles.labelMedium.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
