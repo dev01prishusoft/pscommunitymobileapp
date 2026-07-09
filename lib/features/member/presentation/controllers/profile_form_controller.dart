@@ -324,8 +324,36 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('OccupationLandmark', workInfo.workLandmark.value, m.occupationLandmark ?? '');
     addIfChanged('OccupationPincode', workInfo.workPincode.value, m.occupationPincode ?? '');
     
-    // Educational fields have been removed from the update request.
-    // They will be directly updated via /api/v1/MemberEducation/mobile/upsert
+    final currentEduJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
+    if (currentEduJson != _initialEducationJson) {
+      final existingEdus = contactInfo.educationList.where((e) => !e.isNew).toList();
+      if (existingEdus.isNotEmpty) {
+        final edu = existingEdus.firstWhere((e) => e.isHighest, orElse: () => existingEdus.first);
+        Map<String, dynamic>? initialEdu;
+        if (_initialEducationJson.isNotEmpty && _initialEducationJson != '[]') {
+          final decoded = jsonDecode(_initialEducationJson) as List<dynamic>;
+          if (decoded.isNotEmpty) {
+            final maps = decoded.cast<Map<String, dynamic>>();
+            initialEdu = maps.firstWhere((a) => a['isHighest'] == true, orElse: () => maps.first);
+          }
+        }
+
+        final qualId = getId(edu.qualification, contactInfo.educationIdMap) ?? edu.qualificationId ?? 0;
+        final initialQualId = initialEdu?['qualificationId'] as int?;
+        if (qualId != initialQualId && qualId != 0) formDataMap['EducationalQualificationId'] = qualId;
+
+        void addEdu(String key, String current, String? initial) {
+          if (current != (initial ?? '')) {
+            formDataMap[key] = current.isEmpty ? null : current;
+          }
+        }
+        addEdu('InstitutionName', edu.institute, initialEdu?['institute'] as String?);
+        addEdu('YearOfPassing', edu.passingYear, initialEdu?['passingYear'] as String?);
+        addEdu('Percentage', edu.percentage, initialEdu?['percentage'] as String?);
+        addEdu('Grade', edu.grade, initialEdu?['grade'] as String?);
+        addEdu('Description', edu.description, initialEdu?['description'] as String?);
+      }
+    }
 
     final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
     if (currentAddrJson != _initialAddressesJson) {
@@ -644,8 +672,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
       final response = await apiClient.get(
         '/api/v1/MemberEducation/mobile/member/$memberId',
       );
-      
       if (response.statusCode == 200 && response.data != null) {
+        AppLogger.d('--- EDUCATION API RESPONSE ---');
+        AppLogger.d(response.data.toString());
         final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
         final newEducation = data.map((e) {
           final map = e as Map<String, dynamic>;
@@ -1577,38 +1606,41 @@ class ProfileFormController extends GetxController with FormStateMixin {
               educationList.map((e) => e.toJson()).toList(),
             );
             if (currentEduJson != _initialEducationJson) {
-              hasEducationUpdates = true;
-              final apiClient = Get.find<ApiClient>();
-              try {
-                final educationsPayload = {
-                  "memberId": _currentMember!.memberId,
-                  "educations": contactInfo.educationList.map((edu) {
-                    return {
-                      "memberEducationId": 0,
-                      "memberId": _currentMember!.memberId,
-                      "educationalQualificationId":
-                          contactInfo.educationIdMap[edu.qualification] ??
-                          edu.qualificationId ??
-                          0,
-                      "description": edu.description,
-                      "institutionName": edu.institute,
-                      "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
-                      "percentage": double.tryParse(edu.percentage) ?? 0,
-                      "grade": edu.grade,
-                      "isHighestQualification": edu.isHighest,
-                      "isActive": true,
-                    };
-                  }).toList(),
-                };
-                await apiClient.post(
-                  '/api/v1/MemberEducation/mobile/upsert',
-                  data: educationsPayload,
-                );
-              } catch (e) {
-                AppLogger.e(
-                  'Failed to upsert educations directly in edit mode',
-                  e,
-                );
+              final newEducations = contactInfo.educationList.where((e) => e.isNew).toList();
+              if (newEducations.isNotEmpty) {
+                hasEducationUpdates = true;
+                final apiClient = Get.find<ApiClient>();
+                try {
+                  final educationsPayload = {
+                    "memberId": _currentMember!.memberId,
+                    "educations": newEducations.map((edu) {
+                      return {
+                        "memberEducationId": 0,
+                        "memberId": _currentMember!.memberId,
+                        "educationalQualificationId":
+                            contactInfo.educationIdMap[edu.qualification] ??
+                            edu.qualificationId ??
+                            0,
+                        "description": edu.description,
+                        "institutionName": edu.institute,
+                        "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
+                        "percentage": double.tryParse(edu.percentage) ?? 0,
+                        "grade": edu.grade,
+                        "isHighestQualification": edu.isHighest,
+                        "isActive": true,
+                      };
+                    }).toList(),
+                  };
+                  await apiClient.post(
+                    '/api/v1/MemberEducation/mobile/upsert',
+                    data: educationsPayload,
+                  );
+                } catch (e) {
+                  AppLogger.e(
+                    'Failed to upsert educations directly in edit mode',
+                    e,
+                  );
+                }
               }
             }
           }

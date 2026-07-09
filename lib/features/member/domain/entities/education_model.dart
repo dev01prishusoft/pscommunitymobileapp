@@ -8,6 +8,7 @@ class EducationModel {
     this.grade = '',
     this.description = '',
     this.isHighest = false,
+    this.isNew = false,
   });
 
   factory EducationModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class EducationModel {
       grade: json['grade'] as String? ?? '',
       description: json['description'] as String? ?? '',
       isHighest: json['isHighest'] as bool? ?? false,
+      isNew: json['isNew'] as bool? ?? false,
     );
   }
   String qualification;
@@ -30,6 +32,7 @@ class EducationModel {
   String grade;
   String description;
   bool isHighest;
+  bool isNew;
 
   EducationModel copyWith({
     String? qualification,
@@ -40,6 +43,7 @@ class EducationModel {
     String? grade,
     String? description,
     bool? isHighest,
+    bool? isNew,
   }) {
     return EducationModel(
       qualification: qualification ?? this.qualification,
@@ -50,6 +54,7 @@ class EducationModel {
       grade: grade ?? this.grade,
       description: description ?? this.description,
       isHighest: isHighest ?? this.isHighest,
+      isNew: isNew ?? this.isNew,
     );
   }
 
@@ -63,6 +68,7 @@ class EducationModel {
       'grade': grade,
       'description': description,
       'isHighest': isHighest,
+      'isNew': isNew,
     };
   }
 }

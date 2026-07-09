@@ -120,6 +120,7 @@ class ContactController extends GetxController {
       EducationModel(
         qualification: '',
         isHighest: true,
+        isNew: true,
       ),
     );
   }
