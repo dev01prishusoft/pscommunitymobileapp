@@ -844,8 +844,6 @@ class LK {
     percentageLabel,
     gradeLabel,
     editRequestComment,
-    educationAddedSuccessfully,
-    profileAndEducationUpdated,
     adminAnnouncement,
     samajAnnouncement,
     rejected,
