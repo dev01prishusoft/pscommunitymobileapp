@@ -1228,14 +1228,23 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               SizedBox(height: 8),
               InkWell(
                 onTap: () {
-                  final newValue = !edu.isHighest;
-                  if (newValue) {
+                  if (edu.isHighest) {
+                    Get.snackbar(
+                      LK.error.tr,
+                      LK.atLeastOneHighestQualification.tr,
+                      backgroundColor: AppColors.destructive,
+                      colorText: AppColors.white,
+                      snackPosition: SnackPosition.TOP,
+                      margin: const EdgeInsets.all(16),
+                      borderRadius: 8,
+                    );
+                  } else {
                     for (var e in controller.educationList) {
                       e.isHighest = false;
                     }
+                    edu.isHighest = true;
+                    controller.educationList.refresh();
                   }
-                  edu.isHighest = newValue;
-                  controller.educationList.refresh();
                 },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
@@ -1253,13 +1262,23 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                         child: Checkbox(
                           value: edu.isHighest,
                           onChanged: (value) {
-                            if (value == true) {
+                            if (edu.isHighest && value == false) {
+                              Get.snackbar(
+                                LK.error.tr,
+                                LK.atLeastOneHighestQualification.tr,
+                                backgroundColor: AppColors.destructive,
+                                colorText: AppColors.white,
+                                snackPosition: SnackPosition.TOP,
+                                margin: const EdgeInsets.all(16),
+                                borderRadius: 8,
+                              );
+                            } else if (!edu.isHighest && value == true) {
                               for (var e in controller.educationList) {
                                 e.isHighest = false;
                               }
+                              edu.isHighest = true;
+                              controller.educationList.refresh();
                             }
-                            edu.isHighest = value ?? false;
-                            controller.educationList.refresh();
                           },
                           activeColor: AppColors.primary,
                         ),
