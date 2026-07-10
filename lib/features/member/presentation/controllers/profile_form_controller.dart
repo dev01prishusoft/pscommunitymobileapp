@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
@@ -1604,6 +1605,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             backgroundColor: AppColors.green,
             colorText: AppColors.white,
           );
+          
+          if (Get.isRegistered<DrawerUserController>()) {
+            Get.find<DrawerUserController>().fetchUser();
+          }
           
           await Future<void>.delayed(const Duration(milliseconds: 1500));
           await Get.offAllNamed<void>(AppRouter.home);
