@@ -1503,14 +1503,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
               SizedBox(height: 8),
               InkWell(
                 onTap: edu.isHighest ? () {
-                  final newValue = !edu.isHighest;
-                  if (newValue) {
-                    for (var e in controller.educationList) {
-                      e.isHighest = false;
-                    }
-                  }
-                  edu.isHighest = newValue;
-                  controller.educationList.refresh();
+                  Get.snackbar(
+                    LK.error.tr,
+                    LK.atLeastOneHighestQualification.tr,
+                    backgroundColor: AppColors.destructive,
+                    colorText: AppColors.white,
+                    snackPosition: SnackPosition.TOP,
+                    margin: const EdgeInsets.all(16),
+                    borderRadius: 8,
+                  );
                 } : null,
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
@@ -1528,13 +1529,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: Checkbox(
                           value: edu.isHighest,
                           onChanged: edu.isHighest ? (value) {
-                            if (value == true) {
-                              for (var e in controller.educationList) {
-                                e.isHighest = false;
-                              }
-                            }
-                            edu.isHighest = value ?? false;
-                            controller.educationList.refresh();
+                            Get.snackbar(
+                              LK.error.tr,
+                              LK.atLeastOneHighestQualification.tr,
+                              backgroundColor: AppColors.destructive,
+                              colorText: AppColors.white,
+                              snackPosition: SnackPosition.TOP,
+                              margin: const EdgeInsets.all(16),
+                              borderRadius: 8,
+                            );
                           } : null,
                           activeColor: AppColors.primary,
                         ),

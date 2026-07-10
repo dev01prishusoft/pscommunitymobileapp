@@ -1021,12 +1021,11 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 color: AppColors.mutedForeground,
               ),
             ),
-            if (controller.educationList.isEmpty)
-              TextButton.icon(
-                onPressed: controller.addEducation,
-                icon: Icon(Icons.add, size: 18),
-                label: Text(LK.addEducation.tr),
-              ),
+            TextButton.icon(
+              onPressed: controller.addEducation,
+              icon: Icon(Icons.add, size: 18),
+              label: Text(LK.addEducation.tr),
+            ),
           ],
         ),
         SizedBox(height: 8.h),
@@ -1227,34 +1226,50 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
               ),
               SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: Checkbox(
-                        value: edu.isHighest,
-                        onChanged: null,
-                        fillColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.disabled) && edu.isHighest) {
-                            return AppColors.primary.withValues(alpha: 0.5);
-                          }
-                          return null;
-                        }),
+              InkWell(
+                onTap: () {
+                  final newValue = !edu.isHighest;
+                  if (newValue) {
+                    for (var e in controller.educationList) {
+                      e.isHighest = false;
+                    }
+                  }
+                  edu.isHighest = newValue;
+                  controller.educationList.refresh();
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Checkbox(
+                          value: edu.isHighest,
+                          onChanged: (value) {
+                            if (value == true) {
+                              for (var e in controller.educationList) {
+                                e.isHighest = false;
+                              }
+                            }
+                            edu.isHighest = value ?? false;
+                            controller.educationList.refresh();
+                          },
+                          activeColor: AppColors.primary,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: Text(LK.isHighestQualification.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
-                    ),
-                  ],
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(LK.isHighestQualification.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -722,7 +722,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
       final response = await apiClient.get(
-        '/api/v1/member-address/list?MemberId=$memberId&Page=1&PageSize=20',
+        '/api/v1/member-address/mobile/member/$memberId',
       );
       if (response.data != null && response.data['succeeded'] == true) {
         final data = response.data['data'] as List<dynamic>? ?? [];
@@ -897,7 +897,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         idMap: workInfo.occupationTypeIdMap,
       ),
       workInfo.fetchDropdown(
-        '/JobPosition/dropdown',
+        '/JobPosition/mobile/dropdown',
         workInfo.jobPositionList,
         [],
         idMap: workInfo.jobPositionIdMap,
@@ -1076,8 +1076,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
       }
-      if (_currentMember!.motherStateId != null &&
-          personalInfo.motherState.value.isEmpty) {
+      if (_currentMember!.motherStateId != null) {
         await _resolveMotherLocations(_currentMember!);
       }
       if (_currentMember!.signId != null) {
@@ -1085,6 +1084,33 @@ class ProfileFormController extends GetxController with FormStateMixin {
         for (final entry in personalInfo.signIdMap.entries) {
           if (entry.value == id) {
             personalInfo.sign.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.occupationTypeId != null) {
+        final id = _currentMember!.occupationTypeId;
+        for (final entry in workInfo.occupationTypeIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.occupationType.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.occupationId != null) {
+        final id = _currentMember!.occupationId;
+        for (final entry in workInfo.occupationIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.occupation.value = entry.key;
+            break;
+          }
+        }
+      }
+      if (_currentMember!.jobPositionId != null) {
+        final id = _currentMember!.jobPositionId;
+        for (final entry in workInfo.jobPositionIdMap.entries) {
+          if (entry.value == id) {
+            workInfo.jobPosition.value = entry.key;
             break;
           }
         }
@@ -1215,7 +1241,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   Future<void> _resolveMotherLocations(Member m) async {
     try {
-      if (m.motherStateId != null && personalInfo.motherState.value.isEmpty) {
+      if (m.motherStateId != null) {
         String? stateName;
         for (final entry in workInfo.globalStateIdMap.entries) {
           if (entry.value == m.motherStateId) { stateName = entry.key; break; }
@@ -1230,8 +1256,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       
       if (personalInfo.motherState.value.isEmpty) return;
 
-      if (m.motherDistrictId != null &&
-          personalInfo.motherDistrict.value.isEmpty) {
+      if (m.motherDistrictId != null) {
         final list = <String>[].obs;
         await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false);
         String? districtName;
@@ -1249,7 +1274,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (personalInfo.motherDistrict.value.isEmpty) return;
 
-      if (m.motherTalukaId != null && personalInfo.motherTaluka.value.isEmpty) {
+      if (m.motherTalukaId != null) {
         final list = <String>[].obs;
         await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false);
         String? talukaName;
@@ -1267,7 +1292,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (personalInfo.motherTaluka.value.isEmpty) return;
 
-      if (m.motherAreaId != null && personalInfo.motherArea.value.isEmpty) {
+      if (m.motherAreaId != null) {
         final list = <String>[].obs;
         await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false);
         String? areaName;
@@ -1533,7 +1558,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     }).toList()
                   };
                   await apiClient.post(
-                    '/api/v1/member-address/upsert',
+                    '/api/v1/member-address/mobile/upsert',
                     data: addressesPayload,
                   );    
                 } catch (e) {
@@ -1559,7 +1584,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     }).toList()
                   };
                   await apiClient.post(
-                    '/api/v1/MemberEducation/mobile/upsert',
+                    '/api/v1/MemberEducation/mobile/upsert',                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
                     data: educationsPayload,
                   );
                 } catch (e) {

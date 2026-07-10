@@ -34,6 +34,7 @@ class AppFormDatePicker extends StatelessWidget {
   final String? originalValue;
 
   Future<void> _selectDate(BuildContext context) async {
+    FocusScope.of(context).requestFocus(FocusNode());
     DateTime? parsedDate = initialDate;
     if (parsedDate == null && controller.text.isNotEmpty) {
       try {

@@ -469,5 +469,6 @@
   "No notifications found": "No notifications found",
   "Education Added Successfully": "Education added successfully",
   "Profile update requested and education added successfully": "Profile update requested and education added successfully",
-  "Show less": "Show Less"
+  "Show less": "Show Less",
+  "At least one qualification must be marked as highest": "At least one qualification must be marked as highest"
 }

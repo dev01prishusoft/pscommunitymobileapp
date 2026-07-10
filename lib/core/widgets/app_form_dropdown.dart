@@ -55,70 +55,72 @@ class AppFormDropdown<T> extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.h),
-        DropdownButtonFormField<T>(
-          key: ValueKey(value),
-          value: value,
-          items: items,
-          selectedItemBuilder: (BuildContext context) {
-            return items.map<Widget>((DropdownMenuItem<T> item) {
-              return FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: item.child,
-              );
-            }).toList();
-          },
-          onChanged: onChanged,
-          isExpanded: true,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
-            filled: true,
-            fillColor: onChanged == null ? AppColors.surfaceVariant : AppColors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
+        Listener(
+          onPointerDown: (_) => FocusScope.of(context).requestFocus(FocusNode()),
+          child: DropdownButtonFormField<T>(
+            value: value,
+            items: items,
+            selectedItemBuilder: (BuildContext context) {
+              return items.map<Widget>((DropdownMenuItem<T> item) {
+                return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: item.child,
+                );
+              }).toList();
+            },
+            onChanged: onChanged,
+            isExpanded: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.mutedForeground,
+              ),
+              filled: true,
+              fillColor: onChanged == null ? AppColors.surfaceVariant : AppColors.white,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: AppColors.border.withValues(alpha: 0.5),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.red),
               ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.red),
-            ),
+            validator: (val) {
+              if (isRequired && val == null) {
+                if (originalValue == null) {
+                   return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+                }
+              }
+              if (isRequired && val is String && val.trim().isEmpty) {
+                if (originalValue != null && originalValue is String && (originalValue as String).trim().isEmpty) {
+                  // allow it since it was originally empty
+                } else {
+                  return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+                }
+              }
+              if (validator != null) {
+                return validator!(val);
+              }
+              return null;
+            },
           ),
-          validator: (val) {
-            if (isRequired && val == null) {
-              if (originalValue == null) {
-                 return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
-              }
-            }
-            if (isRequired && val is String && val.trim().isEmpty) {
-              if (originalValue != null && originalValue is String && (originalValue as String).trim().isEmpty) {
-                // allow it since it was originally empty
-              } else {
-                return requiredErrorMessage ?? '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
-              }
-            }
-            if (validator != null) {
-              return validator!(val);
-            }
-            return null;
-          },
         ),
         if (updateStatus != null)
           ProfileUpdateStatusBadge(status: updateStatus!),

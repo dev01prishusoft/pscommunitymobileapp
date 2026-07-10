@@ -58,6 +58,9 @@ class Member {
     this.occupationAreaName,
     this.occupationAddressLine1,
     this.occupationAddressLine2,
+    this.occupationTypeId,
+    this.occupationId,
+    this.jobPositionId,
     this.occupationLandmark,
     this.occupationPincode,
     this.stateId,
@@ -213,6 +216,9 @@ class Member {
       occupationDistrictId: json['occupationDistrictId'] as int?,
       occupationTalukaId: json['occupationTalukaId'] as int?,
       occupationAreaId: json['occupationAreaId'] as int?,
+      occupationTypeId: (json['occupationTypeId'] ?? json['OccupationTypeId']) as int?,
+      occupationId: (json['occupationId'] ?? json['OccupationId']) as int?,
+      jobPositionId: (json['jobPositionId'] ?? json['JobPositionId']) as int?,
       familyId: json['familyId'] as int?,
       isHead: json['isHead'] as bool?,
       relatedToMemberName: getString('relatedToMemberName'),
@@ -295,8 +301,11 @@ class Member {
   final int? areaId;
   final int? occupationStateId;
   final int? occupationDistrictId;
-  final int? occupationTalukaId;
+      final int? occupationTalukaId;
   final int? occupationAreaId;
+  final int? occupationTypeId;
+  final int? occupationId;
+  final int? jobPositionId;
   final int? familyId;
   final int? apiAge;
   final bool? isHead;

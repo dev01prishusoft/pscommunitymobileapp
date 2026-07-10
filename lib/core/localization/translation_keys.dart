@@ -479,6 +479,7 @@ class LK {
   static String requested = 'Requested';
   static String camera = 'Camera';
   static String gallery = 'Gallery';
+  static String atLeastOneHighestQualification = 'At least one qualification must be marked as highest';
   
   static String wentForUpdate = 'went_for_update';
   static String newUpdateAvailable = 'newUpdateAvailable';
@@ -954,7 +955,8 @@ class LK {
     updateDescription,
     update,
     notNow,
-    appUpdatedSuccessfully
+    appUpdatedSuccessfully,
+    atLeastOneHighestQualification
   ];
 }
 
