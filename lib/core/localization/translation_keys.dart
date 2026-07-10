@@ -474,6 +474,8 @@ class LK {
 
   static String educationAddedSuccessfully = 'Education Added Successfully';
   static String profileAndEducationUpdated = 'Profile update requested and education added successfully';
+  static String adminAnnouncement = 'Admin Announcement';
+  static String samajAnnouncement = 'Samaj Announcement';
 
   static String rejected = 'Rejected';
   static String requested = 'Requested';
@@ -847,6 +849,8 @@ class LK {
     editRequestComment,
     educationAddedSuccessfully,
     profileAndEducationUpdated,
+    adminAnnouncement,
+    samajAnnouncement,
     rejected,
     markAsHighest,
     jobPositionLabel,
