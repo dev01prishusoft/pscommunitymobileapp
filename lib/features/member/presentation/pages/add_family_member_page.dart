@@ -1347,8 +1347,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
-          isRequired: true,
-          requiredErrorMessage: LK.jobPositionRequired.tr,
         );
       }),
       SizedBox(height: 12.h),

@@ -1666,16 +1666,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
-          isRequired: true,
           originalValue: controller.currentMember?.jobPositionName ?? '',
-          validator: (v) {
-            final initialOccupation = controller.getInitialDropdownValue('OccupationId');
-            final currentOccupation = controller.workInfo.occupation.value;
-            if (initialOccupation != currentOccupation && currentOccupation.isNotEmpty && (v == null || v.isEmpty)) {
-              return LK.fieldRequired.tr;
-            }
-            return null;
-          },
           updateStatus: controller.getUpdateStatus('JobPositionId', idMap: controller.workInfo.jobPositionIdMap),
         );
       }),
