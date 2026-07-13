@@ -19,37 +19,28 @@ class DecimalAutoInsertFormatter extends TextInputFormatter {
     }
 
     final String newText = newValue.text;
-
-    // Check if the input has a decimal point
     if (newText.contains('.')) {
       final parts = newText.split('.');
       if (parts.length > 2) {
-        return oldValue; // Multiple decimals not allowed
+        return oldValue; 
       }
 
       final integerPart = parts[0];
       final decimalPart = parts[1];
-
-      // Integer part exceeds max length
       if (integerPart.length > maxIntegerDigits) {
         return oldValue;
       }
-
-      // Decimal part exceeds max length
       if (decimalPart.length > maxDecimalDigits) {
         return oldValue;
       }
 
       return newValue;
     } else {
-      // No decimal point
       if (newText.length > maxIntegerDigits) {
-        // Auto-insert decimal point
         final integerPart = newText.substring(0, maxIntegerDigits);
         final decimalPart = newText.substring(maxIntegerDigits);
 
         if (decimalPart.length > maxDecimalDigits) {
-          // If still exceeds, reject
           return oldValue;
         }
 

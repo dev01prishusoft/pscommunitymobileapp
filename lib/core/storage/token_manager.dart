@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
@@ -154,10 +152,7 @@ class TokenManager {
                payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid'] ??
                payload['MemberID'];
                
-    if (id == null) {
-      // Log the payload keys to see what we actually got
-      AppLogger.e('JWT Payload keys: ${payload.keys.join(", ")}');
-    }
+    if (id == null) {}
 
     if (id is int) return id;
     if (id is String) return int.tryParse(id);

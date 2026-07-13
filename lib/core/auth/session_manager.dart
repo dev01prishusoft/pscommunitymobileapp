@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 
@@ -7,7 +8,6 @@ class SessionManager extends GetxController {
   
   final AuthState _authState;
   Timer? _inactivityTimer;
-  // final Duration _timeoutDuration = const Duration(minutes: 15);
 
   @override
   void onInit() {
@@ -23,7 +23,6 @@ class SessionManager extends GetxController {
   }
 
   void _startTimer() {
-    // Timer disabled per user request
   }
 
   void _stopTimer() {

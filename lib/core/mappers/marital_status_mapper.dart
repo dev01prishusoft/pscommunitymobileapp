@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class MaritalStatusMapper {
@@ -19,7 +18,6 @@ class MaritalStatusMapper {
       case 'divorced':
         return LK.divorced;
       default:
-        AppLogger.w('Unknown marital status: $status');
         return null;
     }
   }

@@ -1,19 +1,19 @@
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:flutter/material.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentController extends GetxController {
   PaymentController(this._repository);
@@ -91,18 +91,14 @@ class PaymentController extends GetxController {
     try {
       final types = await _repository.getPaymentTypes();
       paymentTypes.assignAll(types);
-    } catch (e) {
-      AppLogger.e('Failed to load payment types', e);
-    }
+    } catch (_) {}
   }
 
   Future<void> loadPaymentModes() async {
     try {
       final modes = await _repository.getPaymentModes();
       paymentModes.assignAll(modes);
-    } catch (e) {
-      AppLogger.e('Failed to load payment modes', e);
-    }
+    } catch (_) {}
   }
 
   void resetPaymentForm() {
@@ -123,9 +119,7 @@ class PaymentController extends GetxController {
       try {
         final results = await _repository.getCategories(type.id);
         categories.assignAll(results);
-      } catch (e) {
-        AppLogger.e('Failed to load categories', e);
-      }
+      } catch (_) {}
     }
   }
 
@@ -219,8 +213,6 @@ class PaymentController extends GetxController {
       final int paymentModeId = selectedMode.value?.id ?? 0;
       final int paymentStatusId = 0;
       
-      AppLogger.i('Initiating payment with: amount=$amount, typeId=$typeId, categoryId=$categoryId, memberId=$memberId');
-
       final order = await _repository.createOrder(
         amount: amount,
         paymentTypeId: typeId ?? 0,
@@ -272,7 +264,6 @@ class PaymentController extends GetxController {
 
       _razorpay.open(options);
     } catch (e) {
-      AppLogger.e('Failed to initiate payment', e);
       final errorMessage = e.toString();
       Get.snackbar(
         LK.error.tr,
@@ -284,8 +275,6 @@ class PaymentController extends GetxController {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    AppLogger.i('Payment Success: paymentId=${response.paymentId}, orderId=${response.orderId}, data=${response.data}');
-
     try {
       unawaited(
         Get.dialog<void>(
@@ -326,8 +315,7 @@ class PaymentController extends GetxController {
         resetPaymentForm();
         Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
       }
-    } catch (e, stack) {
-      AppLogger.e('Payment Verification Exception', e, stack);
+    } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back<void>();
       Get.snackbar(LK.error.tr, LK.verificationFailed.tr);
     } finally {
@@ -336,9 +324,7 @@ class PaymentController extends GetxController {
     }
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-    AppLogger.e('Payment Error: ${response.code} - ${response.message}');
-    
+  void _handlePaymentError(PaymentFailureResponse response) {    
     String message = response.message ?? LK.paymentFailed.tr;
     bool shouldRedirectBack = false;
     
@@ -360,7 +346,6 @@ class PaymentController extends GetxController {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    AppLogger.i('External Wallet: ${response.walletName}');
     Get.snackbar(LK.info.tr, LK.externalWalletSelected.tr);
   }
 
@@ -372,18 +357,20 @@ class PaymentController extends GetxController {
     historyCategories.clear();
   }
 
+  Future<void> fetchHistoryCategories(int typeId) async {
+    try {
+      final results = await _repository.getCategories(typeId);
+      historyCategories.assignAll(results);
+    } catch (_) {}
+  }
+
   Future<void> onHistoryTypeChanged(PaymentType? type) async {
     historyFilterType.value = type;
     historyFilterCategory.value = null;
     historyCategories.clear();
 
     if (type != null) {
-      try {
-        final results = await _repository.getCategories(type.id);
-        historyCategories.assignAll(results);
-      } catch (e) {
-        AppLogger.e('Failed to load history categories', e);
-      }
+      await fetchHistoryCategories(type.id);
     }
     
     await loadHistory(
@@ -460,7 +447,6 @@ class PaymentController extends GetxController {
     try {
       return await _repository.getReceipt(receiptId);
     } catch (e) {
-      AppLogger.e('Failed to load receipt', e);
       rethrow;
     }
   }
@@ -469,9 +455,7 @@ class PaymentController extends GetxController {
     try {
       final statuses = await _repository.getPaymentStatuses();
       paymentStatuses.assignAll(statuses);
-    } catch (e) {
-      AppLogger.e('Failed to load payment statuses', e);
-    }
+    } catch (_) {}
   }
 
   void _showErrorSnackbar(String message) {

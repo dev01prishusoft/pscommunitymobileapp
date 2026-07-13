@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,9 +29,8 @@ class SupportController extends GetxController {
         json['data'] as Map<String, dynamic>,
       );
       update();
-    } catch (e, stack) {
+    } catch (e) {
       supportError.value = e.toString();
-      AppLogger.e('Failed to fetch support details', e, stack);
     } finally {
       isLoading.value = false;
     }

@@ -1,22 +1,20 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/entities/unmarried_count.dart';
+import 'package:pscommunitymobileapp/features/marriage/domain/repositories/marriage_repository.dart';
+import 'package:pscommunitymobileapp/features/marriage/utils/marriage_filter_applicator.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/repositories/member_repository.dart';
-import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
-import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-
-
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/features/marriage/utils/marriage_filter_applicator.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class MarriageController extends GetxController {
   MarriageController(
@@ -37,6 +35,7 @@ class MarriageController extends GetxController {
   final RxString selectedGender = 'All'.obs;
   final RxBool isAdvancedFiltersOpen = false.obs;
   final RxBool excludeSameGotra = false.obs;
+  final RxBool isSearchVisible = false.obs;
   String? _myGotra;
 
   final RxString selectedAgeFrom = '18'.obs;
@@ -53,7 +52,7 @@ class MarriageController extends GetxController {
   final RxString selectedOccupation = 'Any'.obs;
   final RxString selectedIncomeFrom = ''.obs;
   final RxString selectedIncomeTo = ''.obs;
-  
+
   final TextEditingController incomeFromCtrl = TextEditingController();
   final TextEditingController incomeToCtrl = TextEditingController();
   final RxString incomeError = ''.obs;
@@ -85,7 +84,7 @@ class MarriageController extends GetxController {
 
   final RxList<Member> filteredMembers = <Member>[].obs;
   final List<Member> _allMembers = [];
-  
+
   int _currentPage = 1;
   final int _pageSize = 20;
   final RxBool hasMore = true.obs;
@@ -126,7 +125,7 @@ class MarriageController extends GetxController {
       selectedIncomeFrom.value = incomeFromCtrl.text;
       _validateIncome();
     });
-    
+
     incomeToCtrl.addListener(() {
       selectedIncomeTo.value = incomeToCtrl.text;
       _validateIncome();
@@ -138,14 +137,17 @@ class MarriageController extends GetxController {
       _validateIncome();
       _debounceTimer?.cancel();
       _debounceTimer = Timer(Duration(milliseconds: 300), () {
-        if (ageError.value.isEmpty && heightError.value.isEmpty && incomeError.value.isEmpty) {
+        if (ageError.value.isEmpty &&
+            heightError.value.isEmpty &&
+            incomeError.value.isEmpty) {
           applyFilters();
         }
       });
     });
-    
+
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
         loadNextPage();
       }
     });
@@ -177,8 +179,10 @@ class MarriageController extends GetxController {
   }
 
   void _validateHeight() {
-    final fromVal = double.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 0;
-    final toVal = double.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 1000;
+    final fromVal =
+        double.tryParse(selectedHeightFrom.value.replaceAll(' cm', '')) ?? 0;
+    final toVal =
+        double.tryParse(selectedHeightTo.value.replaceAll(' cm', '')) ?? 1000;
     if (fromVal > toVal) {
       heightError.value = LK.fromGreaterToError.tr;
     } else {
@@ -194,23 +198,21 @@ class MarriageController extends GetxController {
         if (memberId != null) {
           final member = await _familyRepository.getMemberDetails(memberId);
           _myGotra = member.gotra.trim();
-          if (excludeSameGotra.value && _myGotra != null && _myGotra!.isNotEmpty) {
+          if (excludeSameGotra.value &&
+              _myGotra != null &&
+              _myGotra!.isNotEmpty) {
             applyFilters();
           }
         }
       }
-    } catch (e) {
-      AppLogger.e('Failed to load my gotra', e);
-    }
+    } catch (_) {}
   }
 
   Future<void> loadLocations() async {
     try {
       final s = await _familyRepository.getStates();
       states.assignAll(s);
-    } catch (e) {
-      AppLogger.e('Failed to load states', e);
-    }
+    } catch (_) {}
   }
 
   Future<void> onStateChanged(String stateName) async {
@@ -262,18 +264,19 @@ class MarriageController extends GetxController {
       return;
     }
 
-    final talukaId = talukas
-        .firstWhereOrNull((t) => t.text == talukaName)
-        ?.id;
+    final talukaId = talukas.firstWhereOrNull((t) => t.text == talukaName)?.id;
     if (talukaId != null) {
       final a = await _familyRepository.getAreas(talukaId);
       areas.assignAll(a);
     }
   }
 
-  Future<void> loadProfiles({bool showLoading = true, bool isRefresh = true}) async {
+  Future<void> loadProfiles({
+    bool showLoading = true,
+    bool isRefresh = true,
+  }) async {
     final requestId = ++_currentLoadRequestId;
-    
+
     if (isRefresh) {
       _currentPage = 1;
       hasMore.value = true;
@@ -307,7 +310,7 @@ class MarriageController extends GetxController {
 
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
       final List<Member> newMembers = memberResult.dataOrNull?.data ?? [];
-      
+
       if (newMembers.isEmpty) {
         hasMore.value = false;
         if (_allMembers.isEmpty) {
@@ -320,14 +323,14 @@ class MarriageController extends GetxController {
       }
 
       _allMembers.addAll(newMembers);
-      
+
       _currentPage++;
       if (newMembers.length < _pageSize) {
         hasMore.value = false;
       }
 
       _updateDynamicLists(_allMembers);
-      
+
       String? myGotra;
       if (excludeSameGotra.value && _myGotra != null && _myGotra!.isNotEmpty) {
         myGotra = _myGotra;
@@ -345,9 +348,15 @@ class MarriageController extends GetxController {
         selectedDistrict: selectedDistrict.value,
         selectedTaluka: selectedTaluka.value,
         selectedArea: selectedArea.value,
-        selectedStateId: states.firstWhereOrNull((s) => s.text == selectedState.value)?.id,
-        selectedDistrictId: districts.firstWhereOrNull((d) => d.text == selectedDistrict.value)?.id,
-        selectedTalukaId: talukas.firstWhereOrNull((t) => t.text == selectedTaluka.value)?.id,
+        selectedStateId: states
+            .firstWhereOrNull((s) => s.text == selectedState.value)
+            ?.id,
+        selectedDistrictId: districts
+            .firstWhereOrNull((d) => d.text == selectedDistrict.value)
+            ?.id,
+        selectedTalukaId: talukas
+            .firstWhereOrNull((t) => t.text == selectedTaluka.value)
+            ?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
         selectedIncomeFrom: selectedIncomeFrom.value,
@@ -358,15 +367,14 @@ class MarriageController extends GetxController {
 
       final filtered = MarriageFilterApplicator.apply(_allMembers, filterState);
       filteredMembers.assignAll(filtered);
-      
+
       if (isRefresh && results.length > 1) {
         unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
       }
-      
+
       state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
-    } catch (e, stack) {
+    } catch (e) {
       if (requestId != _currentLoadRequestId) return;
-      AppLogger.e('Failed to load marriage profiles', e, stack);
       if (isRefresh) {
         state.value = AppState.error;
       }
@@ -417,10 +425,14 @@ class MarriageController extends GetxController {
   }
 
   void closeAdvancedFilters() {
-    if (incomeError.value.isNotEmpty || ageError.value.isNotEmpty || heightError.value.isNotEmpty) {
-      final errorMsg = [incomeError.value, ageError.value, heightError.value]
-          .where((e) => e.isNotEmpty)
-          .first;
+    if (incomeError.value.isNotEmpty ||
+        ageError.value.isNotEmpty ||
+        heightError.value.isNotEmpty) {
+      final errorMsg = [
+        incomeError.value,
+        ageError.value,
+        heightError.value,
+      ].where((e) => e.isNotEmpty).first;
       Get.rawSnackbar(
         message: errorMsg,
         backgroundColor: Colors.red,
@@ -522,7 +534,6 @@ class MarriageController extends GetxController {
       }
       targetList.assignAll(['Any', ...fallbacks]);
     } catch (e) {
-      AppLogger.e('Failed to fetch dropdown $path', e);
       targetList.assignAll(['Any', ...fallbacks]);
     }
   }

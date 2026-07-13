@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
-
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 
 class NotificationNavigationService {
@@ -36,7 +35,6 @@ class NotificationNavigationService {
         await Get.toNamed<void>(AppRouter.customerSupport);
         break;
       case 'notification':
-        // Already on the notifications page
         break;
       case 'home':
         await Get.offAllNamed<void>(AppRouter.home);

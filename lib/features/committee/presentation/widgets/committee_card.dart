@@ -17,12 +17,10 @@ class CommitteeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CommitteeController>();
 
-    return Material(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(12),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      shadowColor: AppColors.black.withValues(alpha: 0.2),
+    return Card(
+      elevation: 0,
+      color: AppColors.grey.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Obx(() => _buildNodeTree(node, controller, 0)),
     );
   }
@@ -34,7 +32,7 @@ class CommitteeCard extends StatelessWidget {
   ) {
     final isExpanded = controller.nodeExpansion[currentNode.id] ?? true;
     final hasChildren = currentNode.children.isNotEmpty;
-   
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -45,81 +43,117 @@ class CommitteeCard extends StatelessWidget {
               arguments: currentNode,
             );
           },
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Container(
+            color: currentDepth > 0
+                ? AppColors.grey.withValues(alpha: 0.02)
+                : AppColors.transparent,
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Row(
               children: [
                 if (currentDepth > 0)
                   Container(
-                    width: 2.w,
-                    height: 40.h,
+                    width: 1.5.w,
+                    height: 38.h,
                     margin: EdgeInsets.only(
-                      left: (currentDepth - 1) * 20.0,
-                      right: 14,
+                      left: (currentDepth - 1) * 20.w,
+                      right: 12.w,
                     ),
-                    color: AppColors.border,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(1.r),
+                    ),
                   ),
                 if (hasChildren)
                   InkWell(
                     onTap: () => controller.toggleNode(currentNode),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                     child: Padding(
-                      padding: EdgeInsets.all(4.0),
+                      padding: EdgeInsets.all(4.r),
                       child: Icon(
                         isExpanded
-                            ? Icons.keyboard_arrow_down
-                            : Icons.chevron_right,
+                            ? Icons.keyboard_arrow_down_rounded
+                            : Icons.chevron_right_rounded,
                         color: AppColors.primary,
-                        size: 24,
+                        size: 22.r,
                       ),
                     ),
                   )
                 else
                   Padding(
-                    padding: EdgeInsets.all(4.0),
+                    padding: EdgeInsets.all(4.r),
                     child: Icon(
-                      Icons.chevron_right,
-                      color: AppColors.primary,
-                      size: 24,
+                      Icons.chevron_right_rounded,
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      size: 22.r,
                     ),
                   ),
-
+                SizedBox(width: 8.w),
+                Container(
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    color:
+                        (currentDepth == 0
+                                ? AppColors.primary
+                                : AppColors.secondary)
+                            .withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    currentDepth == 0
+                        ? Icons.account_balance_rounded
+                        : Icons.corporate_fare_rounded,
+                    color: currentDepth == 0
+                        ? AppColors.primary
+                        : AppColors.secondary,
+                    size: 18.sp,
+                  ),
+                ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currentNode.name,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: AppColors.secondary,
+                  child: Text(
+                    currentNode.name,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontWeight: currentDepth == 0
+                          ? FontWeight.w700
+                          : FontWeight.w600,
+                      fontSize: currentDepth == 0 ? 14.sp : 13.sp,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (currentNode.memberCount > 0) ...[
+                  10.horizontalSpace,
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6.w,
+                      vertical: 3.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.group_outlined,
+                          size: 12.sp,
+                          color: AppColors.primary,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (currentNode.memberCount > 0)
-                        Padding(
-                          padding: EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            '${LK.membersCount.tr}: ${currentNode.memberCount}',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.mutedForeground,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        SizedBox(width: 4.w),
+                        Text(
+                          '${currentNode.memberCount} ${LK.membersCount.tr.toLowerCase()}',
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10.sp,
                           ),
                         ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8.0),
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                ),
+                ],
               ],
             ),
           ),

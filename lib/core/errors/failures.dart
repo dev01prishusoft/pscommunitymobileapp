@@ -1,4 +1,3 @@
-// ignore_for_file: use_super_parameters
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 sealed class Result<T> {

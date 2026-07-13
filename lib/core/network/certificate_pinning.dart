@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 
 class CertificatePinning {
@@ -28,10 +28,7 @@ class CertificatePinning {
       );
 
       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
-        if (kDebugMode) {
-          AppLogger.d('WARNING: Bypassing SSL Pinning in Debug Mode');
-          return true;
-        }
+        if (kDebugMode) return true;
         return false;
       };
 
@@ -46,27 +43,16 @@ class CertificatePinning {
           if (cert == null) return false;
 
           final expectedHost = Uri.parse(AppEnvironment.I.apiBaseUrl).host;
-          if (host != expectedHost) {
-            AppLogger.e('Host mismatch: $host != $expectedHost');
-            return false;
-          }
+          if (host != expectedHost) return false;
+          
 
           final hash = sha256.convert(cert.der).bytes;
           final base64Hash = base64.encode(hash);
           final currentPin = 'sha256/$base64Hash';
 
           final allValidPins = [...primaryPins, ...backupPins];
-          if (DateTime.now().isAfter(pinExpiryDate)) {
-            AppLogger.e(
-              'CRITICAL: Certificate pins have expired! Initiate rotation.',
-            );
-          }
-
-          if (!allValidPins.contains(currentPin)) {
-            AppLogger.e('PINNING FAILURE for $host. Invalid PIN: $currentPin');
-            return false;
-          }
-
+          if (!allValidPins.contains(currentPin)) return false;
+        
           return true;
         };
   }

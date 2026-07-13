@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pscommunitymobileapp/core/utils/diagnostic_logger.dart';
-
-/// Centralized app lifecycle observer.
-/// It tracks foreground, background, inactive, and detached states.
-/// Other services can register callbacks to react to lifecycle changes.
 class AppLifecycleObserver extends WidgetsBindingObserver {
   AppLifecycleObserver._internal();
 
@@ -19,7 +14,6 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
     if (!_isInitialized) {
       WidgetsBinding.instance.addObserver(this);
       _isInitialized = true;
-      DiagnosticLogger.logLifecycle('AppLifecycleObserver', 'Initialized');
     }
   }
 
@@ -27,7 +21,6 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _isInitialized = false;
     _listeners.clear();
-    DiagnosticLogger.logLifecycle('AppLifecycleObserver', 'Disposed');
   }
 
   void addListener(void Function(AppLifecycleState) listener) {
@@ -43,7 +36,6 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    DiagnosticLogger.log('App State changed to: ${state.name}', tag: 'Lifecycle');
 
     for (var listener in _listeners) {
       listener(state);
@@ -53,6 +45,5 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
   @override
   void didHaveMemoryPressure() {
     super.didHaveMemoryPressure();
-    DiagnosticLogger.log('Low memory warning received!', tag: 'Lifecycle');
   }
 }

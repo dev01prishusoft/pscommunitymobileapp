@@ -24,75 +24,207 @@ class SupportPage extends StatelessWidget {
 
         if (controller.isLoading.value) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
 
         return Scaffold(
-          appBar: AppBar(title: Text(LK.support.tr)),
-          body: support == null
-              ? const Center(child: Text('No Data Found'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(LK.needHelp.tr, style: AppTextStyles.displaySmall),
-
-                      SizedBox(height: 24.h),
-
-                      _contactCard(
-                        controller: controller,
-                        isWhatsApp: false,
-                        contactDetails: support.contactEmail ?? '-',
-                      ),
-
-                      SizedBox(height: 12.h),
-
-                      _contactCard(
-                        controller: controller,
-                        isWhatsApp: true,
-                        contactDetails: support.whatsAppNumber ?? '-',
-                      ),
-
-                      SizedBox(height: 24.h),
-
-                      Text(
-                        'Support Members',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-
-                      SizedBox(height: 12.h),
-
-                      ...support.members.map(
-                        (member) => Container(
-                          margin: EdgeInsets.only(bottom: 5.h),
+          appBar: AppBar(
+            title: Text(
+              LK.support.tr,
+              style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+            ),
+            elevation: 0,
+            centerTitle: true,
+          ),
+          body: Container(
+            color: AppColors.sfBackground,
+            child: support == null
+                ? const Center(child: Text('No Data Found'))
+                : SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: AppColors.grey.shade200,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              Get.toNamed<void>(
-                                AppRouter.memberProfile,
-                                arguments: {'memberId': member.memberId},
-                              );
-                            },
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.transparent,
-                              child: MemberAvatar(
-                                imageUrl: member.profileImage,
-                                fallbackName: _getInitials(member.displayName),
-                                radius: 24,
-                              ),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [AppColors.primary, AppColors.secondary],
                             ),
-                            title: Text(member.displayName),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.25),
+                                blurRadius: 16,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.18),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.support_agent_rounded,
+                                  color: Colors.white,
+                                  size: 36,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      LK.needHelp.tr,
+                                      style: AppTextStyles.displaySmall.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Our support team is here to assist you.',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 24.h),
+                        _contactCard(
+                          controller: controller,
+                          isWhatsApp: false,
+                          contactDetails: support.contactEmail ?? '-',
+                        ),
+                        SizedBox(height: 12.h),
+                        _contactCard(
+                          controller: controller,
+                          isWhatsApp: true,
+                          contactDetails: support.whatsAppNumber ?? '-',
+                        ),
+                        SizedBox(height: 28.h),
+                        if (support.members.isNotEmpty) ...[
+                          Text(
+                            'Support Members',
+                            style: AppTextStyles.titleLarge.copyWith(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: support.members.length,
+                            separatorBuilder: (context, index) => SizedBox(height: 10.h),
+                            itemBuilder: (context, index) {
+                              final member = support.members[index];
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                  border: Border.all(color: Colors.grey.shade100),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.toNamed<void>(
+                                        AppRouter.memberProfile,
+                                        arguments: {'memberId': member.memberId},
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: AppColors.primary.withValues(alpha: 0.1),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: CircleAvatar(
+                                              backgroundColor: Colors.transparent,
+                                              radius: 24,
+                                              child: MemberAvatar(
+                                                imageUrl: member.profileImage,
+                                                fallbackName: _getInitials(member.displayName),
+                                                radius: 24,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  member.displayName,
+                                                  style: AppTextStyles.titleMedium.copyWith(
+                                                    color: AppColors.secondary,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'Representative',
+                                                  style: TextStyle(
+                                                    fontSize: 11.sp,
+                                                    color: Colors.grey.shade500,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.chevron_right_rounded,
+                                            color: Colors.grey.shade400,
+                                            size: 24,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
+          ),
         );
       },
     );
@@ -103,40 +235,76 @@ class SupportPage extends StatelessWidget {
     required bool isWhatsApp,
     required String contactDetails,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: isWhatsApp
-            ? AppColors.chart2.withValues(alpha: 0.3)
-            : AppColors.chart5.withValues(alpha: 0.3),
-      ),
-      child: ListTile(
-        leading: Icon(
-          isWhatsApp ? Icons.chat : Icons.email,
-          color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
-        ),
-        title: Text(
-          contactDetails,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
+    final Color themeColor = isWhatsApp ? const Color(0xFF25D366) : AppColors.primary;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: contactDetails.isNotEmpty && contactDetails != '-'
+            ? () {
+                if (isWhatsApp) {
+                  controller.openWhatsApp(contactDetails);
+                } else {
+                  controller.openEmail(contactDetails);
+                }
+              }
+            : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: themeColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: themeColor.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isWhatsApp ? Icons.chat_bubble_rounded : Icons.mail_rounded,
+                    color: themeColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isWhatsApp ? 'WhatsApp Support' : 'Email Support',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: themeColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        contactDetails,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: themeColor,
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
-        subtitle: Text(
-          isWhatsApp ? 'WhatsApp Support' : 'Email Support',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isWhatsApp ? AppColors.chart2 : AppColors.chart5,
-          ),
-        ),
-        onTap: () {
-          if (contactDetails.isEmpty) return;
-          if (isWhatsApp) {
-            controller.openWhatsApp(contactDetails);
-          } else {
-            controller.openEmail(contactDetails);
-          }
-        },
       ),
     );
   }

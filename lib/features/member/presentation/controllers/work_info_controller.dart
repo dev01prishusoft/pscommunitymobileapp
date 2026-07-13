@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class WorkInfoController extends GetxController {
   final defaultOccupationTypes = ['Agriculture', 'Business', 'Job', 'Profession'];
@@ -127,7 +126,6 @@ class WorkInfoController extends GetxController {
     occupation.value = m.occupationName ?? '';
     jobPosition.value = m.jobPositionName ?? '';
     otherJobPosition.value = m.otherJobPosition ?? '';
-    // Note: OtherJobPositionEnglish is not in Member entity yet, assume empty or handle if added
     otherOccupation.value = m.otherOccupation ?? '';
     companyName.value = m.companyName ?? '';
     businessName.value = m.businessName ?? '';
@@ -155,7 +153,7 @@ class WorkInfoController extends GetxController {
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
     if (selected.value.isNotEmpty && !list.contains(selected.value)) {
-      if (list.isEmpty) return; // Wait for list to load before wiping out data
+      if (list.isEmpty) return; 
       final query = selected.value.replaceAll(' ', '').toLowerCase();
       
       String? match;
@@ -217,12 +215,8 @@ class WorkInfoController extends GetxController {
       occupation.value = '';
     }
   }
-
-  /// Mark a state as already fetched for districts (used by pre-fetch in loadAddresses)
   void markStateFetched(String stateName) => _fetchedStatesForDistricts.add(stateName);
-  /// Mark a district as already fetched for talukas
   void markDistrictFetched(String districtName) => _fetchedDistrictsForTalukas.add(districtName);
-  /// Mark a taluka as already fetched for areas
   void markTalukaFetched(String talukaName) => _fetchedTalukasForAreas.add(talukaName);
 
   void renameState(String oldName, String newName) {
@@ -313,8 +307,6 @@ class WorkInfoController extends GetxController {
         final json = response.data as Map<String, dynamic>;
         if (json['succeeded'] == true) {
           if (path.toLowerCase().contains('taluka') || path.toLowerCase().contains('area')) {
-            print('--- DROPDOWN RESPONSE FOR $path ---');
-            print(jsonEncode(json));
           }
           final rawData = json['data'];
           List<dynamic> list = [];
@@ -380,11 +372,7 @@ class WorkInfoController extends GetxController {
                 }
 
                 if (text.isEmpty) continue;
-
-                // Skip duplicate entries that share the same ID
                 if (foundId != null && !seenIds.add(foundId)) continue;
-
-                // Skip duplicate text entries
                 if (items.contains(text)) continue;
 
                 if (idMap != null && foundId != null) {
@@ -396,14 +384,11 @@ class WorkInfoController extends GetxController {
           for (final e in items) {
             targetList.add(e);
           }
-          // Strip language suffix like "(en)", "(gu)" for comparison
           String _stripLangSuffix(String s) =>
               s.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
 
           for (final f in fallbacks) {
             if (f.isEmpty) continue;
-
-            // Skip if an API item with the same ID already exists
             if (idMap != null) {
               final fId = idMap[f];
               if (fId != null && seenIds.contains(fId)) continue;
@@ -421,7 +406,6 @@ class WorkInfoController extends GetxController {
         }
       }
     } catch (e) {
-      // Ignore error
     }
     targetList.assignAll(fallbacks);
   }

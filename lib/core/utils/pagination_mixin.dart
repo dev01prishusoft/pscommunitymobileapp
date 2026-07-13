@@ -1,6 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 
@@ -20,8 +20,6 @@ abstract class PaginationMixin<T> extends GetxController {
   final Debouncer searchDebouncer = Debouncer(milliseconds: 500);
   CancelToken? refreshCancelToken;
   CancelToken? loadMoreCancelToken;
-
-  /// Override this method to provide the API call logic.
   Future<Result<List<T>>> fetchPage(int page, CancelToken? cancelToken);
 
   @override

@@ -6,7 +6,6 @@ import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/auth/session_manager.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
@@ -117,8 +116,7 @@ class DI {
           unawaited(samajController.fetchAll());
         }   
       }).timeout(const Duration(seconds: 15));
-    } catch (e, stack) {
-      AppLogger.e('Fatal crash during dependency injection bootstrap', e, stack);
+    } catch (e) {
       rethrow;
     }
   }

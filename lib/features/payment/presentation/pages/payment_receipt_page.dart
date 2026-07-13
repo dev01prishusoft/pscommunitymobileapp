@@ -11,7 +11,6 @@ import 'package:printing/printing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
@@ -54,10 +53,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.primary),
           onPressed: () => Get.back<void>(),
@@ -183,6 +179,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Widget _buildContent(Map<String, dynamic> rawData) {
     final data = _getParsedData(rawData);
+    final status = data['status'] ?? 'N/A';
+    final isSuccess =
+        status.toLowerCase() == 'success' ||
+        status.toLowerCase() == 'completed' ||
+        status.toLowerCase() == 'successful';
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.0),
@@ -190,117 +191,148 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 32, horizontal: 24),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               children: [
-                if (samajController.samaj.value?.logoUrl != null &&
-                    samajController.samaj.value!.logoUrl.isNotEmpty)
-                  Obx(() {
-                    final logoUrl = samajController.samaj.value?.logoUrl;
-                    return Container(
-                      width: 64.w,
-                      height: 64.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.white,
-                        border: Border.all(color: AppColors.grey, width: 0.1),
+                Container(
+                  padding: const EdgeInsets.only(top: 24, bottom: 20),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isSuccess
+                              ? Colors.green.shade50
+                              : Colors.orange.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isSuccess
+                              ? Icons.check_circle_rounded
+                              : Icons.pending_rounded,
+                          color: isSuccess ? AppColors.green : AppColors.orange,
+                          size: 56,
+                        ),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: logoUrl != null && logoUrl.isNotEmpty
-                            ? CachedImg(
-                                url: logoUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    Image.asset(
-                                      'assets/images/prishusoft_logo.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                              )
-                            : Image.asset(
-                                'assets/images/prishusoft_logo.png',
-                                fit: BoxFit.cover,
-                              ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        isSuccess ? 'Payment Successful' : 'Payment Pending',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: isSuccess ? AppColors.green : AppColors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    );
-                  })
-                else
-                  const Icon(
-                    Icons.account_balance,
-                    size: 60,
-                    color: AppColors.navyBlue,
-                  ),
-                SizedBox(height: 16.h),
-                Text(
-                  samajController.samaj.value?.name ?? LK.samajName.tr,
-                  style: AppTextStyles.headlineLarge.copyWith(
-                    color: AppColors.secondary,
+                      SizedBox(height: 8.h),
+                      Text(
+                        '₹${data['amount']}',
+                        style: TextStyle(
+                          fontSize: 32.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        data['category']!,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.grey.shade600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  LK.officialPaymentReceipt.tr,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.mutedForeground,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: List.generate(
+                      30,
+                      (index) => Expanded(
+                        child: Container(
+                          color: index % 2 == 0
+                              ? Colors.transparent
+                              : Colors.grey.shade200,
+                          height: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildReceiptSectionHeader(LK.receiptDetailsLabel.tr),
+                      _buildInfoRow(LK.receiptNoLabel.tr, data['receiptNo']!),
+                      _buildInfoRow(LK.dateLabel.tr, data['date']!),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Divider(height: 1, color: Colors.black12),
+                      ),
+                      _buildReceiptSectionHeader(LK.memberDetailsLabel.tr),
+                      _buildInfoRow(LK.nameLabel.tr, data['name']!),
+                      _buildInfoRow(LK.memberNoLabel.tr, data['memberNo']!),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Divider(height: 1, color: Colors.black12),
+                      ),
+                      _buildReceiptSectionHeader(LK.paymentDetailsLabel.tr),
+                      if (data['isRecurring'] != 'N/A')
+                        _buildInfoRow(
+                          '${LK.recurring.tr}:',
+                          data['isRecurring']!,
+                        ),
+                      if (data['recurringPaymentType'] != 'N/A' &&
+                          data['recurringPaymentType']!.isNotEmpty)
+                        _buildInfoRow(
+                          LK.recurringTypeLabel.tr,
+                          data['recurringPaymentType']!.tr,
+                        ),
+                      _buildInfoRow(LK.typeLabel.tr, data['type']!),
+                      _buildInfoRow(LK.modeLabel.tr, data['mode']!),
+                      if (data['transactionId'] != 'N/A' &&
+                          data['transactionId']!.isNotEmpty)
+                        _buildInfoRow(
+                          LK.transactionIdLabel.tr,
+                          data['transactionId']!,
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20.h),
-          _buildReceiptSection(LK.receiptDetailsLabel.tr, [
-            _buildInfoRow(LK.receiptNoLabel.tr, data['receiptNo']!),
-            _buildInfoRow(LK.dateLabel.tr, data['date']!),
-          ]),
-          SizedBox(height: 16.h),
-          _buildReceiptSection(LK.memberDetailsLabel.tr, [
-            _buildInfoRow(LK.nameLabel.tr, data['name']!),
-            _buildInfoRow(LK.memberNoLabel.tr, data['memberNo']!),
-          ]),
-          SizedBox(height: 16.h),
-          _buildReceiptSection(LK.paymentDetailsLabel.tr, [
-            if (data['isRecurring'] != 'N/A')
-              _buildInfoRow('${LK.recurring.tr}:', data['isRecurring']!),
-            if (data['recurringPaymentType'] != 'N/A' &&
-                data['recurringPaymentType']!.isNotEmpty)
-              _buildInfoRow(
-                LK.recurringTypeLabel.tr,
-                data['recurringPaymentType']!.tr,
-              ),
-            _buildInfoRow(LK.typeLabel.tr, data['type']!),
-            _buildInfoRow(LK.categoryLabel.tr, data['category']!),
-            _buildInfoRow(LK.amountLabel.tr, data['amount']!),
-            _buildInfoRow(LK.modeLabel.tr, data['mode']!),
-            _buildStatusRow(LK.statusLabel.tr, data['status']!),
-            if (data['transactionId'] != 'N/A' &&
-                data['transactionId']!.isNotEmpty)
-              _buildInfoRow(LK.transactionIdLabel.tr, data['transactionId']!),
-          ]),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           ElevatedButton.icon(
             onPressed: () => _generateAndPrintPdf(rawData),
-            icon: Icon(Icons.file_download, color: AppColors.white),
+            icon: Icon(Icons.file_download_rounded, color: AppColors.white),
             label: Text(
               LK.downloadPdf.tr,
-              style: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
+              style: AppTextStyles.titleLarge.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 56),
+              minimumSize: Size(double.infinity, 56.h),
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
-              elevation: 0,
+              elevation: 2,
             ),
           ),
           SizedBox(height: 40.h),
@@ -309,36 +341,16 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
-  Widget _buildReceiptSection(String title, List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: AppColors.primary,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Divider(color: AppColors.primary.withValues(alpha: 0.2)),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          ...children,
-        ],
+  Widget _buildReceiptSectionHeader(String title) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h, top: 4.h),
+      child: Text(
+        title.toUpperCase(),
+        style: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
@@ -347,50 +359,23 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            width: 110.w,
-            child: Text(
-              label,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.mutedForeground,
-              ),
+          Text(
+            label,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.grey.shade500,
+              fontWeight: FontWeight.w500,
             ),
           ),
+          SizedBox(width: 16.w),
           Expanded(
             child: Text(
               value,
+              textAlign: TextAlign.end,
               style: AppTextStyles.labelLarge.copyWith(
                 color: AppColors.secondary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatusRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 110.w,
-            child: Text(
-              label,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.mutedForeground,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: AppTextStyles.labelLarge.copyWith(
-                color: value.toLowerCase() == 'success'
-                    ? AppColors.green
-                    : AppColors.orange,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -430,7 +415,6 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         return response.bodyBytes;
       }
     } catch (e) {
-      debugPrint("Image Load Error: $e");
     }
 
     return null;
@@ -448,68 +432,264 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       theme: pw.ThemeData.withFont(base: font, bold: boldFont),
     );
 
+    final primaryColor = PdfColor.fromInt(0xFF8F0500);
+    final secondaryColor = PdfColor.fromInt(0xFF4A0200);
+    final lightGrey = PdfColor.fromInt(0xFFF9F9F9);
+    final borderGrey = PdfColor.fromInt(0xFFE5E5E5);
+
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Header(
-                level: 0,
-                child: pw.Row(
-                  children: [
-                    pw.Expanded(
-                      child: pw.Text(
-                        samajController.samaj.value?.name ?? LK.samajName.tr,
-                        style: pw.TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: pw.FontWeight.bold,
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  if (logoBytes != null)
+                    pw.Container(
+                      width: 50,
+                      height: 50,
+                      decoration: const pw.BoxDecoration(
+                        shape: pw.BoxShape.circle,
+                      ),
+                      child: pw.ClipRRect(
+                        horizontalRadius: 25,
+                        verticalRadius: 25,
+                        child: pw.Image(
+                          pw.MemoryImage(logoBytes),
+                          fit: pw.BoxFit.cover,
                         ),
                       ),
-                    ),
-                    if (logoBytes != null)
-                      pw.Container(
-                        width: 40.w,
-                        height: 40.w,
-                        decoration: pw.BoxDecoration(
-                          shape: pw.BoxShape.circle,
-                          border: pw.Border.all(),
-                        ),
-                        child: pw.ClipRRect(
-                          child: pw.Image(
-                            pw.MemoryImage(logoBytes),
-                            fit: pw.BoxFit.cover,
+                    )
+                  else
+                    pw.Container(
+                      width: 50,
+                      height: 50,
+                      decoration: pw.BoxDecoration(
+                        shape: pw.BoxShape.circle,
+                        color: primaryColor,
+                      ),
+                      child: pw.Center(
+                        child: pw.Text(
+                          'S',
+                          style: pw.TextStyle(
+                            fontSize: 24,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.white,
                           ),
                         ),
                       ),
-                  ],
+                    ),
+                  pw.SizedBox(width: 16),
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          samajController.samaj.value?.name ?? LK.samajName.tr,
+                          style: pw.TextStyle(
+                            fontSize: 20,
+                            fontWeight: pw.FontWeight.bold,
+                            color: secondaryColor,
+                          ),
+                        ),
+                        if (samajController
+                                .samaj
+                                .value
+                                ?.description
+                                .isNotEmpty ??
+                            false)
+                          pw.Text(
+                            samajController.samaj.value!.description,
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 24),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
+                decoration: pw.BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: const pw.BorderRadius.all(
+                    pw.Radius.circular(4),
+                  ),
+                ),
+                child: pw.Text(
+                  LK.officialPaymentReceipt.tr.toUpperCase(),
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.white,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
-              pw.SizedBox(height: 20.h),
-              pw.Text('${LK.receiptNoLabel.tr} ${data['receiptNo']}'),
-              pw.Text('${LK.dateLabel.tr} ${data['date']}'),
-              pw.Divider(),
-              pw.Text('${LK.nameLabel.tr} ${data['name']}'),
-              pw.Text('${LK.memberNoLabel.tr} ${data['memberNo']}'),
-              pw.Divider(),
-              if (data['isRecurring'] != 'N/A')
-                pw.Text('${LK.recurring.tr}: ${data['isRecurring']}'),
-              if (data['recurringPaymentType'] != 'N/A' &&
-                  data['recurringPaymentType']!.isNotEmpty)
-                pw.Text(
-                  '${LK.recurringTypeLabel.tr} ${data['recurringPaymentType']!.tr}',
-                ),
-              pw.Text('${LK.typeLabel.tr} ${data['type']}'),
-              pw.Text('${LK.categoryLabel.tr} ${data['category']}'),
-              pw.Text('${LK.amountLabel.tr} ${data['amount']}'),
-              pw.Text('${LK.modeLabel.tr} ${data['mode']}'),
-              pw.Text('${LK.statusLabel.tr} ${data['status']}'),
-              pw.Text('${LK.transactionIdLabel.tr} ${data['transactionId']}'),
-              pw.SizedBox(height: 40.h),
+              pw.SizedBox(height: 20),
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          LK.receiptDetailsLabel.tr.toUpperCase(),
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                        pw.SizedBox(height: 6),
+                        _buildPdfInfoRow(
+                          LK.receiptNoLabel.tr,
+                          data['receiptNo']!,
+                        ),
+                        _buildPdfInfoRow(LK.dateLabel.tr, data['date']!),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(width: 32),
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          LK.memberDetailsLabel.tr.toUpperCase(),
+                          style: pw.TextStyle(
+                            fontSize: 10,
+                            fontWeight: pw.FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                        pw.SizedBox(height: 6),
+                        _buildPdfInfoRow(LK.nameLabel.tr, data['name']!),
+                        _buildPdfInfoRow(
+                          LK.memberNoLabel.tr,
+                          data['memberNo']!,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 24),
+              pw.Divider(color: borderGrey, thickness: 1),
+              pw.SizedBox(height: 16),
               pw.Text(
-                LK.thankYouForPayment.tr,
-                style: pw.TextStyle(fontSize: 14.sp),
+                LK.paymentDetailsLabel.tr.toUpperCase(),
+                style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: pw.FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              pw.SizedBox(height: 8),
+              pw.Table(
+                border: pw.TableBorder.all(color: borderGrey, width: 0.5),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(3),
+                  1: const pw.FlexColumnWidth(5),
+                },
+                children: [
+                  _buildPdfTableCell(
+                    'Category',
+                    data['category']!,
+                    background: lightGrey,
+                    isHeader: true,
+                  ),
+                  _buildPdfTableCell(LK.typeLabel.tr, data['type']!),
+                  _buildPdfTableCell(LK.modeLabel.tr, data['mode']!),
+                  if (data['isRecurring'] != 'N/A')
+                    _buildPdfTableCell(LK.recurring.tr, data['isRecurring']!),
+                  if (data['recurringPaymentType'] != 'N/A' &&
+                      data['recurringPaymentType']!.isNotEmpty)
+                    _buildPdfTableCell(
+                      LK.recurringTypeLabel.tr,
+                      data['recurringPaymentType']!.tr,
+                    ),
+                  if (data['transactionId'] != 'N/A' &&
+                      data['transactionId']!.isNotEmpty)
+                    _buildPdfTableCell(
+                      LK.transactionIdLabel.tr,
+                      data['transactionId']!,
+                    ),
+                  _buildPdfTableCell('Status', data['status']!, isStatus: true),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Container(
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: pw.BoxDecoration(
+                    color: lightGrey,
+                    borderRadius: const pw.BorderRadius.all(
+                      pw.Radius.circular(6),
+                    ),
+                    border: pw.Border.all(color: borderGrey, width: 0.5),
+                  ),
+                  child: pw.Row(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      pw.Text(
+                        'Total Paid:  ',
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          fontWeight: pw.FontWeight.bold,
+                          color: secondaryColor,
+                        ),
+                      ),
+                      pw.Text(
+                        '₹${data['amount']}',
+                        style: pw.TextStyle(
+                          fontSize: 16,
+                          fontWeight: pw.FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              pw.Spacer(),
+              pw.Divider(color: borderGrey, thickness: 1),
+              pw.SizedBox(height: 12),
+              pw.Center(
+                child: pw.Text(
+                  LK.thankYouForPayment.tr,
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    fontWeight: pw.FontWeight.bold,
+                    color: secondaryColor,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 4),
+              pw.Center(
+                child: pw.Text(
+                  'This is a computer-generated receipt, signature is not required.',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey600,
+                  ),
+                ),
               ),
             ],
           );
@@ -518,5 +698,73 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
 
     return pdf;
+  }
+
+  pw.Widget _buildPdfInfoRow(String label, String value) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 2),
+      child: pw.Row(
+        children: [
+          pw.SizedBox(
+            width: 80,
+            child: pw.Text(
+              label,
+              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+            ),
+          ),
+          pw.Expanded(
+            child: pw.Text(
+              value,
+              style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.TableRow _buildPdfTableCell(
+    String label,
+    String value, {
+    PdfColor? background,
+    bool isHeader = false,
+    bool isStatus = false,
+  }) {
+    final statusColor =
+        (value.toLowerCase() == 'success' ||
+            value.toLowerCase() == 'completed' ||
+            value.toLowerCase() == 'successful')
+        ? PdfColor.fromInt(0xFF2E7D32)
+        : PdfColor.fromInt(0xFFEF6C00);
+
+    return pw.TableRow(
+      decoration: background != null
+          ? pw.BoxDecoration(color: background)
+          : null,
+      children: [
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8),
+          child: pw.Text(
+            label,
+            style: pw.TextStyle(
+              fontSize: 9,
+              fontWeight: isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
+              color: PdfColors.grey800,
+            ),
+          ),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8),
+          child: pw.Text(
+            value,
+            style: pw.TextStyle(
+              fontSize: 9,
+              fontWeight: pw.FontWeight.bold,
+              color: isStatus ? statusColor : PdfColors.black,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

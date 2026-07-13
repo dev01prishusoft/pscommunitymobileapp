@@ -14,6 +14,7 @@ class LK {
   static const String resetPasswordFail = 'Reset password failed. Please try again.';
   static const String notifications = 'Notifications';
   static const String noNotificationsFound = 'No notifications found';
+  static const String newLabel = 'New';
   static String resetPassword = 'Reset Password';
   static String newPassword = 'New Password';
   static String confirmNewPassword = 'Confirm New Password';

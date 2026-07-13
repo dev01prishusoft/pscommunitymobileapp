@@ -1,14 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
-import 'package:dio/dio.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 class CommitteeRepositoryImpl implements CommitteeRepository {
   CommitteeRepositoryImpl(this._apiClient);
 
@@ -80,9 +79,7 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
             final activeMembers = fetchedMembers.where((m) => !isDateInPast(m.endDate)).toList();
             return Success(detail.copyWith(members: activeMembers));
           }
-        } catch (e) {
-          AppLogger.e('Failed to fetch committee members', e);
-        }
+        } catch (_) {}
       }
       return Success(detail);
     } else {
@@ -91,9 +88,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
   }
 
   void _printNode(CommitteeNode node, int depth) {
-    AppLogger.i(
-      '${"  " * depth}Node: ${node.name} (ID: ${node.id}, Parent: ${node.parentId}, Children: ${node.children.length})',
-    );
     for (var child in node.children) {
       _printNode(child, depth + 1);
     }

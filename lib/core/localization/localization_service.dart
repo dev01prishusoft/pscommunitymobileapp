@@ -3,15 +3,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/models/language.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart' as pscommunitymobileapp_token_manager;
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart'
+    as pscommunitymobileapp_token_manager;
 
 class LocalizationService {
   LocalizationService(this._storage);
@@ -40,28 +40,22 @@ class LocalizationService {
       'en_US': Map<String, String>.from(jsonDecode(results[0]) as Map),
       'gu_IN': Map<String, String>.from(jsonDecode(results[1]) as Map),
     };
-    
-    // Load from local file cache if available
     for (final localeKey in keys.keys) {
       try {
         final file = await _getLocalFile(localeKey);
         if (await file.exists()) {
           final content = await file.readAsString();
-          final cachedKeys = Map<String, String>.from(jsonDecode(content) as Map);
+          final cachedKeys = Map<String, String>.from(
+            jsonDecode(content) as Map,
+          );
           keys[localeKey]!.addAll(cachedKeys);
         }
-      } catch (e) {
-        AppLogger.e('Failed to load cached locale file for $localeKey', e);
-      }
+      } catch (_) {}
     }
-    
-    // Fetch remote translations silently in background
     try {
       unawaited(fetchLanguagesAndAllResources());
-    } catch (e, stack) {
-      AppLogger.e('Sync error in fetch', e, stack as StackTrace?);
-    }
-    
+    } catch (_) {}
+
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {
       final parts = savedLocale.split('_');
@@ -70,9 +64,7 @@ class LocalizationService {
         currentLocale.value = locale;
         try {
           await Get.updateLocale(locale);
-        } catch (e) {
-          AppLogger.e('Failed to update locale', e);
-        }
+        } catch (_) {}
       }
     }
   }
@@ -86,18 +78,14 @@ class LocalizationService {
         currentLocale.value = locale;
         try {
           await Get.updateLocale(locale);
-        } catch (e) {
-          AppLogger.e('Failed to update locale', e);
-        }
+        } catch (_) {}
       }
     } else {
       final defaultLocale = const Locale('en', 'US');
       currentLocale.value = defaultLocale;
       try {
         await Get.updateLocale(defaultLocale);
-      } catch (e) {
-        AppLogger.e('Failed to update default locale', e);
-      }
+      } catch (_) {}
     }
   }
 
@@ -105,17 +93,15 @@ class LocalizationService {
     try {
       await fetchLanguages();
       await Future.wait(languages.map((l) => fetchLanguageResources(l.code)));
-    } catch (e, stack) {
-      AppLogger.e('Failed to fetch languages and all resources', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<void> fetchLanguages() async {
     if (_isFetchingLanguages || languages.isNotEmpty) return;
-    
-    final tokenManager = Get.find<pscommunitymobileapp_token_manager.TokenManager>();
+
+    final tokenManager =
+        Get.find<pscommunitymobileapp_token_manager.TokenManager>();
     if (tokenManager.accessToken == null || tokenManager.accessToken!.isEmpty) {
-      // Don't attempt to fetch languages if we aren't logged in.
       return;
     }
 
@@ -135,8 +121,10 @@ class LocalizationService {
 
         if (languages.isNotEmpty) {
           final currentCode = currentLocale.value.languageCode;
-          final isSupported = languages.any((lang) => lang.code.toLowerCase() == currentCode.toLowerCase());
-          
+          final isSupported = languages.any(
+            (lang) => lang.code.toLowerCase() == currentCode.toLowerCase(),
+          );
+
           if (!isSupported) {
             final fallback = languages.first;
             await changeLocale(fallback.code.toLowerCase(), '');
@@ -151,47 +139,42 @@ class LocalizationService {
 
   Future<void> fetchLanguageResources(String langCode) async {
     try {
-      final tokenManager = Get.find<pscommunitymobileapp_token_manager.TokenManager>();
-      if (tokenManager.accessToken == null || tokenManager.accessToken!.isEmpty) {
-        // Don't attempt to fetch remote resources if we aren't logged in.
+      final tokenManager =
+          Get.find<pscommunitymobileapp_token_manager.TokenManager>();
+      if (tokenManager.accessToken == null ||
+          tokenManager.accessToken!.isEmpty) {
         return;
       }
-      
+
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get(ApiEndpoints.languageResources(langCode));
+      final response = await apiClient.get(
+        ApiEndpoints.languageResources(langCode),
+      );
       final json = response.data as Map<String, dynamic>?;
       if (json != null && json['succeeded'] == true) {
         final data = json['data'] as Map<String, dynamic>?;
         if (data != null) {
-          final remoteKeys = data.map((key, value) => MapEntry(key, value.toString()));
-          final localeKey = keys.keys.firstWhere(
-            (k) => k.startsWith(langCode), 
-            orElse: () => '${langCode}_US'
+          final remoteKeys = data.map(
+            (key, value) => MapEntry(key, value.toString()),
           );
-          
+          final localeKey = keys.keys.firstWhere(
+            (k) => k.startsWith(langCode),
+            orElse: () => '${langCode}_US',
+          );
+
           if (!keys.containsKey(localeKey)) {
-             keys[localeKey] = {};
+            keys[localeKey] = {};
           }
           keys[localeKey]!.addAll(remoteKeys);
-          
-          // Save to local cache
           try {
             final file = await _getLocalFile(localeKey);
             await file.writeAsString(jsonEncode(keys[localeKey]));
-          } catch (e) {
-            AppLogger.e('Failed to save cached locale file for $localeKey', e);
-          }
-          
-          Get.appendTranslations({
-            localeKey: remoteKeys
-          });
-          
-          AppLogger.d('Appended and cached ${remoteKeys.length} translations for $langCode');
+          } catch (_) {}
+
+          Get.appendTranslations({localeKey: remoteKeys});
         }
       }
-    } catch (e, stack) {
-      AppLogger.e('Failed to fetch remote language resources for $langCode', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<void> changeLocale(String langCode, String countryCode) async {
@@ -201,9 +184,7 @@ class LocalizationService {
     await _storage.write(_localeKey, '${langCode}_$countryCode');
     try {
       unawaited(fetchLanguageResources(langCode));
-    } catch (e, stack) {
-      AppLogger.e('Sync error in fetchLanguageResources', e, stack as StackTrace?);
-    }
+    } catch (_) {}
   }
 
   void clearLanguages() {
@@ -222,4 +203,3 @@ class LocalizationService {
     await Get.updateLocale(locale);
   }
 }
-

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
@@ -28,7 +30,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   );
   late CommitteeNode node;
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -41,14 +42,12 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   @override
   void dispose() {
     _searchController.dispose();
-    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(title: Text(LK.committeeMembers.tr)),
       body: Obx(() {
         return AppStateView(
@@ -67,49 +66,54 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          child: Row(
             children: [
-              TextField(
-                controller: _searchController,
-                focusNode: _focusNode,
-                onTapOutside: (event) => _focusNode.unfocus(),
-                onChanged: controller.onSearchChanged,
-                decoration: InputDecoration(
-                  hintText: LK.searchMember.tr,
-                  prefixIcon: Icon(Icons.search),
-                  suffixIcon: Obx(() {
-                    return controller.searchQuery.value.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              _searchController.clear();
-                              controller.onSearchChanged('');
-                            },
-                          )
-                        : SizedBox.shrink();
-                  }),
-                  filled: true,
-                  fillColor: AppColors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.border),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 0),
+              Expanded(
+                flex: 2,
+                child: _buildFilterDropdown(
+                  '${LK.role.tr}:',
+                  controller.selectedRole.value,
+                  roles,
+                  (DropdownItem? val) => controller.selectRole(val),
                 ),
               ),
-              AppSpacing.vM,
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildFilterDropdown(
-                      '${LK.role.tr}:',
-                      controller.selectedRole.value,
-                      roles,
-                      (DropdownItem? val) => controller.selectRole(val),
-                    ),
+              SizedBox(width: 4.w),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                ],
+                  child: AppTextField(
+                    hint: LK.searchMember.tr,
+                    controller: _searchController,
+                    icon: Iconsax.search_normal_copy,
+                    onChanged: controller.onSearchChanged,
+                    suffixIcon: Obx(() {
+                      return controller.searchQuery.value.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: AppColors.grey,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                controller.onSearchChanged('');
+                              },
+                            )
+                          : const SizedBox.shrink();
+                    }),
+                  ),
+                ),
               ),
             ],
           ),
@@ -121,15 +125,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.person_off_outlined,
-                        size: 64,
-                        color: AppColors.grey.shade300,
+                        Icons.person_off_rounded,
+                        size: 64.r,
+                        color: AppColors.grey.withValues(alpha: 0.3),
                       ),
-                      AppSpacing.vL,
+                      SizedBox(height: 16.h),
                       Text(
                         LK.noMembersFound.tr,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey.shade500,
+                          color: AppColors.grey,
                         ),
                       ),
                     ],
@@ -137,8 +141,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 )
               : ListView.separated(
                   itemCount: groups.length,
-                  padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.xl, bottom: AppSpacing.section),
-                  separatorBuilder: (context, index) => AppSpacing.vL,
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  separatorBuilder: (context, index) => SizedBox(height: 10.h),
                   itemBuilder: (context, index) {
                     final role = groups.keys.elementAt(index);
                     final members = groups[role]!;
@@ -156,26 +160,25 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     List<DropdownItem?> options,
     ValueChanged<DropdownItem?> onChanged,
   ) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return Card(
+      color: AppColors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<DropdownItem?>(
           value: value,
           isExpanded: true,
-          itemHeight: 56,
           icon: Icon(
-            Icons.keyboard_arrow_down,
+            Icons.keyboard_arrow_down_rounded,
             color: AppColors.primary,
-            size: 20,
+            size: 20.r,
           ),
+          dropdownColor: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
           style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondary),
           onChanged: onChanged,
-          items: options.map<DropdownMenuItem<DropdownItem?>>((DropdownItem? val) {
+          items: options.map<DropdownMenuItem<DropdownItem?>>((
+            DropdownItem? val,
+          ) {
             final displayText = val?.text ?? 'All';
             return DropdownMenuItem<DropdownItem?>(
               value: val,
@@ -184,17 +187,25 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    label.replaceAll(':', ''),
+                    label.replaceAll(':', '').trim(),
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.mutedForeground,
+                      color: AppColors.grey,
+                      fontSize: 9.sp,
                     ),
                   ),
                   Builder(
                     builder: (context) {
                       final valKey = RoleMapper.getLabelKey(displayText);
+                      final resolvedText = valKey != null
+                          ? valKey.tr
+                          : (displayText == 'All' ? LK.all.tr : displayText);
                       return Text(
-                        valKey != null ? valKey.tr : (displayText == 'All' ? LK.all.tr : displayText),
-                        style: AppTextStyles.labelMedium,
+                        resolvedText,
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11.sp,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       );
@@ -205,37 +216,54 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             );
           }).toList(),
         ),
-      ),
+      ).paddingSymmetric(horizontal: 10.w),
     );
   }
 
   Widget _buildRoleGroup(String role, List<CommitteeMember> members) {
     return Obx(() {
       final isExpanded = controller.expandedGroups[role] ?? true;
-      return Material(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         clipBehavior: Clip.antiAlias,
-        elevation: 2,
-        shadowColor: AppColors.black.withValues(alpha: 0.2),
         child: Column(
           children: [
             InkWell(
               onTap: () => controller.toggleGroup(role),
               child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.slate.withValues(alpha: 0.5),
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                color: AppColors.grey.withValues(alpha: 0.1),
                 child: Row(
                   children: [
-                    Icon(Icons.group, color: AppColors.primary, size: 20),
-                    AppSpacing.hM,
+                    Container(
+                      padding: EdgeInsets.all(6.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.badge_rounded,
+                        color: AppColors.primary,
+                        size: 16.r,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
                     Expanded(
                       child: Text(
                         '${role.toUpperCase()} (${members.length})',
                         style: AppTextStyles.labelLarge.copyWith(
-                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -243,27 +271,33 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                     ),
                     Icon(
                       isExpanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
                       color: AppColors.primary,
-                      size: 20,
+                      size: 22.r,
                     ),
                   ],
                 ),
               ),
             ),
-            Divider(height: 1),
-            if (isExpanded)
+            if (isExpanded) ...[
+              const Divider(height: 1, thickness: 0.5),
               Column(
                 children: members.map((member) {
                   return Column(
                     children: [
                       _buildMemberTile(member),
-                      if (member != members.last) Divider(height: 1),
+                      if (member != members.last)
+                        Divider(
+                          height: 1,
+                          thickness: 0.5,
+                          color: AppColors.grey.withValues(alpha: 0.1),
+                        ),
                     ],
                   );
                 }).toList(),
               ),
+            ],
           ],
         ),
       );
@@ -278,188 +312,215 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: SingleChildScrollView(
-          padding: AppSpacing.pXl,
+          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(width: 48),
-                  Expanded(
-                      child: Text(
-                        LK.memberDetails.tr,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.headlineSmall.copyWith(
-                          color: AppColors.secondary,
-                        ),
+                  const SizedBox(width: 40),
+                  Text(
+                    LK.memberDetails.tr,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: AppColors.secondary,
+                        size: 18.r,
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: AppColors.mutedForeground),
-                      onPressed: () => Get.back<void>(),
+                    onPressed: () => Get.back<void>(),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Container(
+                padding: EdgeInsets.all(4.r),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    width: 2.5,
+                  ),
+                ),
+                child: MemberAvatar(
+                  imageUrl: member.imageUrl,
+                  fallbackName: member.name,
+                  radius: 44.r,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                member.name,
+                style: AppTextStyles.headlineLarge.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 6.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Text(
+                  member.roleTypeName.trim().isEmpty
+                      ? member.roleName
+                      : '${member.roleName} (${member.roleTypeName})',
+                  style: AppTextStyles.titleSmall.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.grey.withValues(alpha: 0.02),
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: AppColors.grey.withValues(alpha: 0.08),
+                  ),
+                ),
+                padding: EdgeInsets.all(16.r),
+                child: Column(
+                  children: [
+                    _buildDetailsItem(
+                      Icons.account_balance_rounded,
+                      LK.committeeInfo.tr,
+                      node.name,
+                    ),
+                    Divider(
+                      height: 24.h,
+                      thickness: 0.5,
+                      color: AppColors.grey.withValues(alpha: 0.1),
+                    ),
+                    _buildDetailsItem(
+                      Icons.assignment_ind_rounded,
+                      LK.role.tr,
+                      member.roleName,
+                    ),
+                    Divider(
+                      height: 24.h,
+                      thickness: 0.5,
+                      color: AppColors.grey.withValues(alpha: 0.1),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDetailsItem(
+                            Icons.calendar_today_rounded,
+                            LK.startDateLabel.tr,
+                            formatDateString(member.startDate, fallback: '-'),
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: _buildDetailsItem(
+                            Icons.event_busy_rounded,
+                            LK.endDateLabel.tr,
+                            formatDateString(member.endDate, fallback: '-'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                Divider(height: 1),
-                AppSpacing.vXxl,
-                MemberAvatar(
-                  imageUrl: member.imageUrl,
-                  fallbackName: member.name,
-                  radius: 40,
-                ),
-                AppSpacing.vL,
-                Text(
-                  member.name,
-                  style: AppTextStyles.headlineLarge.copyWith(
-                    color: AppColors.secondary,
+              ),
+              SizedBox(height: 24.h),
+              ElevatedButton(
+                onPressed: () {
+                  Get.back<void>();
+                  Get.toNamed<void>(
+                    AppRouter.memberProfile,
+                    arguments: {'memberId': member.memberId},
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50.h),
+                  backgroundColor: AppColors.primary,
+                  elevation: 2,
+                  shadowColor: AppColors.primary.withValues(alpha: 0.3),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
-                AppSpacing.vXs,
-                Text(
-                  member.roleTypeName.trim().isEmpty 
-                    ? member.roleName
-                    : '${member.roleName} (${member.roleTypeName})',
-                  style: AppTextStyles.titleSmall.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-                AppSpacing.vXxxl,
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.assignment_ind,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                            ),
-                            AppSpacing.hM,
-                            Text(
-                              LK.committeeInfo.tr.toUpperCase(),
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: AppColors.primary,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(height: 1),
-                      Padding(
-                        padding: AppSpacing.pXl,
-                        child: Column(
-                          children: [
-                            _buildDetailRow(LK.nameLabel.tr, node.name),
-                            AppSpacing.vL,
-                            _buildDetailRow(LK.role.tr, member.roleName),
-                            AppSpacing.vL,
-                            _buildDetailRow(
-                              LK.startDateLabel.tr,
-                              formatDateString(member.startDate, fallback: '-'),
-                            ),
-                            AppSpacing.vL,
-                            _buildDetailRow(
-                              LK.endDateLabel.tr,
-                              formatDateString(member.endDate, fallback: '-'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                AppSpacing.vXxxl,
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back<void>();
-                    Get.toNamed<void>(
-                      AppRouter.memberProfile,
-                      arguments: {'memberId': member.memberId},
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 54),
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.account_circle_outlined,
+                      color: AppColors.white,
+                      size: 22.r,
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.account_circle_outlined,
+                    SizedBox(width: 10.w),
+                    Text(
+                      LK.viewProfile.tr,
+                      style: AppTextStyles.titleMedium.copyWith(
                         color: AppColors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                      AppSpacing.hM,
-                      Text(
-                        LK.viewProfile.tr,
-                        style: AppTextStyles.titleLarge.copyWith(
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailsItem(IconData icon, String title, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            label,
-            style: AppTextStyles.labelLarge.copyWith(
-              color: AppColors.secondary,
-            ),
+        Container(
+          padding: EdgeInsets.all(6.r),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            shape: BoxShape.circle,
           ),
+          child: Icon(icon, color: AppColors.primary, size: 16.r),
         ),
-        Text(
-          ':   ',
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.mutedForeground,
-          ),
-        ),
+        SizedBox(width: 12.w),
         Expanded(
-          child: Text(
-            value,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.secondary,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.grey,
+                  fontSize: 10.sp,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                value,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.secondary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -467,45 +528,79 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   }
 
   Widget _buildMemberTile(CommitteeMember member) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
-      leading: MemberAvatar(
-        imageUrl: member.imageUrl,
-        fallbackName: member.name,
-        radius: 24,
-      ),
-      title: Text(
-        member.name,
-        style: AppTextStyles.labelLarge.copyWith(color: AppColors.secondary),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Builder(
-        builder: (context) {
-          final nameKey = RoleMapper.getLabelKey(member.roleName);
-          final typeKey = RoleMapper.getLabelKey(member.roleTypeName);
-          final roleNameStr = nameKey != null ? nameKey.tr : member.roleName;
-          final roleTypeStr = typeKey != null ? typeKey.tr : member.roleTypeName;
-          
-          final text = roleTypeStr.trim().isEmpty 
-              ? '${LK.role.tr}: $roleNameStr'
-              : '${LK.role.tr}: $roleNameStr ($roleTypeStr)';
-
-          return Text(
-            text,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.mutedForeground,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          );
-        },
-      ),
-      trailing: Icon(
-        Icons.keyboard_arrow_right,
-        color: AppColors.mutedForeground,
-      ),
+    return InkWell(
       onTap: () => _showMemberDetails(member),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  width: 1.5,
+                ),
+              ),
+              child: MemberAvatar(
+                imageUrl: member.imageUrl,
+                fallbackName: member.name,
+                radius: 20.r,
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    member.name,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  Builder(
+                    builder: (context) {
+                      final nameKey = RoleMapper.getLabelKey(member.roleName);
+                      final typeKey = RoleMapper.getLabelKey(
+                        member.roleTypeName,
+                      );
+                      final roleNameStr = nameKey != null
+                          ? nameKey.tr
+                          : member.roleName;
+                      final roleTypeStr = typeKey != null
+                          ? typeKey.tr
+                          : member.roleTypeName;
+
+                      final text = roleTypeStr.trim().isEmpty
+                          ? '${LK.role.tr}: $roleNameStr'
+                          : '${LK.role.tr}: $roleNameStr ($roleTypeStr)';
+
+                      return Text(
+                        text,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.primary.withValues(alpha: 0.4),
+              size: 20.r,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

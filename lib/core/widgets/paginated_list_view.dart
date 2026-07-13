@@ -35,32 +35,24 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
         );
       }
 
-      if (controller.paginationError.value != null && controller.items.isEmpty) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: AppErrorState(
-            errorMessage: controller.paginationError.value?.message,
-            onRetry: () {
-              if (onRetry != null) onRetry!();
-              controller.refreshData(showInitialLoading: true);
-            },
-          ),
+      if (controller.paginationError.value != null &&
+          controller.items.isEmpty) {
+        return AppErrorState(
+          errorMessage: controller.paginationError.value?.message,
+          onRetry: () {
+            if (onRetry != null) onRetry!();
+            controller.refreshData(showInitialLoading: true);
+          },
         );
       }
 
       if (controller.items.isEmpty) {
         return Center(
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: AppEmptyState(
-                icon: emptyIcon ?? Icons.search_off_rounded,
-                secondaryIcon: emptyIcon != null ? null : Icons.search,
-                title: emptyMessage ?? LK.noResultsFound.tr,
-                subtitle: LK.trySelectingDifferentFilters.tr,
-              ),
-            ),
+          child: AppEmptyState(
+            icon: emptyIcon ?? Icons.search_off_rounded,
+            secondaryIcon: emptyIcon != null ? null : Icons.search,
+            title: emptyMessage ?? LK.noResultsFound.tr,
+            subtitle: LK.trySelectingDifferentFilters.tr,
           ),
         );
       }
@@ -72,8 +64,10 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
           controller: controller.scrollController,
           padding: padding,
           physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: controller.items.length + (controller.hasMore.value ? 1 : 0),
-          separatorBuilder: separatorBuilder ?? (_, __) => const SizedBox(height: 12),
+          itemCount:
+              controller.items.length + (controller.hasMore.value ? 1 : 0),
+          separatorBuilder:
+              separatorBuilder ?? (_, __) => const SizedBox.shrink(),
           itemBuilder: (context, index) {
             if (index == controller.items.length) {
               return _buildPaginationLoader();
@@ -94,7 +88,8 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    controller.paginationError.value?.message ?? LK.somethingWrong.tr,
+                    controller.paginationError.value?.message ??
+                        LK.somethingWrong.tr,
                     style: const TextStyle(color: Colors.red, fontSize: 12),
                     textAlign: TextAlign.center,
                   ),

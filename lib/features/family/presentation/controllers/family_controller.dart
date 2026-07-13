@@ -1,15 +1,14 @@
-import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FamilyController extends GetxController {
   FamilyController(this._repository);
@@ -43,15 +42,18 @@ class FamilyController extends GetxController {
       final addressFuture = _repository.getMemberAddresses(memberId);
       final educationFuture = _repository.getMemberEducations(memberId);
 
-      final results = await Future.wait([detailFuture, addressFuture, educationFuture]);
+      final results = await Future.wait([
+        detailFuture,
+        addressFuture,
+        educationFuture,
+      ]);
 
       selectedMember.value = results[0] as Member;
       memberAddresses.assignAll(results[1] as List<MemberAddress>);
       memberEducations.assignAll(results[2] as List<EducationModel>);
 
       memberDetailState.value = AppState.data;
-    } catch (e, stack) {
-      AppLogger.e('Failed to load member details for ID: $memberId', e, stack);
+    } catch (e) {
       memberDetailState.value = AppState.error;
     }
   }
@@ -61,9 +63,7 @@ class FamilyController extends GetxController {
     try {
       final results = await _repository.getStates();
       states.assignAll(results);
-    } catch (e) {
-      AppLogger.e('Failed to load states', e);
-    } finally {
+    } catch (_) {} finally {
       isStatesLoading.value = false;
     }
   }
@@ -78,49 +78,61 @@ class FamilyController extends GetxController {
     if (state != null) {
       isDistrictsLoading.value = true;
       try {
-        await Future.wait([
-          loadAreas(),
-          _repository
-              .getDistricts(state.id)
-              .then((results) => districts.assignAll(results)),
-        ]);
-      } catch (e) {
-        AppLogger.e('Failed to load districts', e);
+        final results = await _repository.getDistricts(state.id);
+        districts.assignAll(results);
       } finally {
         isDistrictsLoading.value = false;
       }
-    } else {
-      await loadAreas();
     }
   }
 
-  Future<void> onDistrictChanged(DropdownItem? district) async {
-    selectedDistrict.value = district;
-    selectedTaluka.value = null;
+  Future<void> loadDistricts(DropdownItem? state) async {
+    districts.clear();
     talukas.clear();
 
-    if (district != null) {
-      isTalukasLoading.value = true;
-      try {
-        await Future.wait([
-          loadAreas(),
-          _repository
-              .getTalukas(district.id)
-              .then((results) => talukas.assignAll(results)),
-        ]);
-      } catch (e) {
-        AppLogger.e('Failed to load talukas', e);
-      } finally {
-        isTalukasLoading.value = false;
-      }
-    } else {
-      await loadAreas();
+    if (state == null) return;
+
+    isDistrictsLoading.value = true;
+
+    try {
+      final result = await _repository.getDistricts(state.id);
+      districts.assignAll(result);
+    } finally {
+      isDistrictsLoading.value = false;
     }
   }
 
-  void onTalukaChanged(DropdownItem? taluka) {
+  Future<void> loadTalukas(DropdownItem? district) async {
+    talukas.clear();
+
+    if (district == null) return;
+
+    isTalukasLoading.value = true;
+
+    try {
+      final result = await _repository.getTalukas(district.id);
+      talukas.assignAll(result);
+    } finally {
+      isTalukasLoading.value = false;
+    }
+  }
+  Future<List<DropdownItem>> fetchDistricts(int stateId) async {
+    return _repository.getDistricts(stateId);
+  }
+  Future<List<DropdownItem>> fetchTalukas(int districtId) async {
+    return _repository.getTalukas(districtId);
+  }
+
+  Future<void> applyFilters({
+    required DropdownItem? state,
+    required DropdownItem? district,
+    required DropdownItem? taluka,
+  }) async {
+    selectedState.value = state;
+    selectedDistrict.value = district;
     selectedTaluka.value = taluka;
-    loadAreas();
+
+    await loadAreas();
   }
 
   void searchAreas() {
@@ -135,6 +147,10 @@ class FamilyController extends GetxController {
 
   final RxString memberSearchQuery = ''.obs;
   final RxList<Family> filteredFamilies = <Family>[].obs;
+
+  final tempSelectedState = Rxn<DropdownItem>();
+  final tempSelectedDistrict = Rxn<DropdownItem>();
+  final tempSelectedTaluka = Rxn<DropdownItem>();
 
   @override
   void onInit() {
@@ -232,9 +248,8 @@ class FamilyController extends GetxController {
       }
 
       state.value = AppState.data;
-    } catch (e, stack) {
+    } catch (e) {
       if (requestId != _currentLoadRequestId) return;
-      AppLogger.e('Failed to load family areas', e, stack);
       if (isRefresh) {
         state.value = AppState.error;
       }
@@ -293,8 +308,7 @@ class FamilyController extends GetxController {
       familyListState.value = filteredFamilies.isEmpty
           ? AppState.empty
           : AppState.data;
-    } catch (e, stack) {
-      AppLogger.e('Failed to load families for areaId: $areaId', e, stack);
+    } catch (e) {
       if (isRefresh) {
         familyListState.value = AppState.error;
       }
@@ -304,10 +318,15 @@ class FamilyController extends GetxController {
   }
 
   Future<void> resetFilters() async {
+    tempSelectedState.value = null;
+    tempSelectedDistrict.value = null;
+    tempSelectedTaluka.value = null;
+
     selectedState.value = null;
     selectedDistrict.value = null;
     selectedTaluka.value = null;
     districts.clear();
+
     talukas.clear();
     await loadAreas();
   }
@@ -334,8 +353,10 @@ class FamilyController extends GetxController {
       member.emergencyContactNo ?? LK.na;
   String formatGotra(Member member) => member.gotraName ?? LK.na;
   String formatEmail(Member member) => member.emailAddress ?? LK.na;
-  String formatIncome(Member member) => '₹${_formatDouble(member.monthlyIncome)}';
-  String formatAge(Member member) => member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
+  String formatIncome(Member member) =>
+      '₹${_formatDouble(member.monthlyIncome)}';
+  String formatAge(Member member) =>
+      member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
 
   Future<void> launchSafeUrl(String urlString) async {
     try {
@@ -352,7 +373,6 @@ class FamilyController extends GetxController {
         }
       }
     } catch (e) {
-      // Ignore error
     }
   }
 
@@ -361,7 +381,8 @@ class FamilyController extends GetxController {
     String dobStr = '';
     try {
       final dob = DateTime.parse(member.dateOfBirth!);
-      dobStr = '${dob.day.toString().padLeft(2, '0')} / ${dob.month.toString().padLeft(2, '0')} / ${dob.year}';
+      dobStr =
+          '${dob.day.toString().padLeft(2, '0')} / ${dob.month.toString().padLeft(2, '0')} / ${dob.year}';
     } catch (_) {
       final parts = member.dateOfBirth!.split('T')[0].split('-');
       if (parts.length == 3) {
@@ -370,7 +391,7 @@ class FamilyController extends GetxController {
         dobStr = member.dateOfBirth!;
       }
     }
-    
+
     return dobStr;
   }
 

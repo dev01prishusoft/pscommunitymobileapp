@@ -1,14 +1,14 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/repositories/auth_repository.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
-import 'package:pscommunitymobileapp/core/network/api_response.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._apiClient, this._tokenManager);
@@ -60,10 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
         deviceType = 'ios';
       }
       deviceToken = await FirebaseMessaging.instance.getToken() ?? '';
-      AppLogger.i('=== DEVICE TOKEN (from Login) ===\n$deviceToken');
-    } catch (e, stack) {
-      AppLogger.e('Failed to get device token', e, stack);
-    }
+    } catch (_) {}
 
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,
@@ -134,7 +131,6 @@ class AuthRepositoryImpl implements AuthRepository {
       if (tokens == null) {
         return Error(ServerFailure('Missing tokens in response'));
       }
-      // Note: the interceptor will call saveTokens
       return Success(tokens);
     } else {
       return Error((result as Error).failure);

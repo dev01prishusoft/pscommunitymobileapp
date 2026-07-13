@@ -58,7 +58,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         controller.loadFromMember(member);
       }
     } catch (e) {
-      // Ignore or log error
     } finally {
       if (mounted) {
         setState(() {
@@ -77,7 +76,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceVariant,
+      
       appBar: AppBar(title: Text(LK.editProfile.tr)),
       body: _isLoading 
           ? const Center(child: CircularProgressIndicator()) 
@@ -404,7 +403,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     () => controller.personalInfo.isFamilyHead.value
                         ? const SizedBox.shrink()
                         : Padding(
-                            padding: const EdgeInsets.only(bottom: 16), // AppSpacing.vM
+                            padding: const EdgeInsets.only(bottom: 16), 
                             child: IgnorePointer(
                               child: AppFormTextField(
                                 controller: TextEditingController(
@@ -710,7 +709,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.grey),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -768,7 +767,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.grey),
       ),
       child: Column(
         children: [
@@ -787,7 +786,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      color: AppColors.muted,
+                      color: AppColors.white,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.primary.withValues(alpha: 0.2),
@@ -809,7 +808,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? Icon(
                             Icons.person,
                             size: 60,
-                            color: AppColors.mutedForeground,
+                            color: AppColors.grey,
                           )
                         : null,
                   );
@@ -947,7 +946,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Text(
               '${controller.addresses.length} ${LK.addressesTab.tr}',
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.mutedForeground,
+                color: AppColors.grey,
               ),
             ),
           ],
@@ -1185,7 +1184,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 text: TextSpan(
                   text: LK.primary.tr,
                   style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.mutedForeground,
+                    color: AppColors.grey,
                   ),
                 ),
               ),
@@ -1193,9 +1192,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                  border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   children: [
@@ -1215,7 +1214,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     AppSpacing.hS,
                     Expanded(
-                      child: Text(LK.primary.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                      child: Text(LK.primary.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey)),
                     ),
                     ],
                   ),
@@ -1231,9 +1230,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return Container(
         margin: EdgeInsets.only(bottom: AppSpacing.l),
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppColors.grey),
         ),
         child: Theme(
           data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
@@ -1253,9 +1252,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       margin: EdgeInsets.only(bottom: AppSpacing.l),
       padding: AppSpacing.pM,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.grey),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1293,7 +1292,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Text(
               '${controller.educationList.length} ${LK.educationTab.tr}',
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.mutedForeground,
+                color: AppColors.grey,
               ),
             ),
             TextButton.icon(
@@ -1318,9 +1317,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.l),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.grey),
       ),
       child: Theme(
         data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
@@ -1432,7 +1431,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               hint: '00',
               suffixIcon: Padding(
                 padding: EdgeInsets.only(top: 14.h, right: 16.w),
-                child: Text('%', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                child: Text('%', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey)),
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
@@ -1494,7 +1493,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 text: TextSpan(
                   text: LK.markAsHighest.tr,
                   style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.mutedForeground,
+                    color: AppColors.grey,
                   ),
                 ),
               ),
@@ -1502,9 +1501,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                  border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   children: [
@@ -1524,7 +1523,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     AppSpacing.hS,
                     Expanded(
-                      child: Text(LK.markAsHighest.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
+                      child: Text(LK.markAsHighest.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey)),
                     ),
                   ],
                 ),

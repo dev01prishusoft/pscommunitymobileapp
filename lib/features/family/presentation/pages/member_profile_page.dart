@@ -1,11 +1,11 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
@@ -36,7 +36,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceVariant,
       appBar: AppBar(title: Text(LK.memberDetails.tr)),
       body: SafeArea(
         child: Obx(
@@ -56,7 +55,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
                     color: AppColors.white,
                     border: Border(
                       top: BorderSide(
-                        color: AppColors.border.withValues(alpha: 0.5),
+                        color: AppColors.grey.withValues(alpha: 0.5),
                       ),
                     ),
                     boxShadow: [
@@ -127,31 +126,30 @@ class _ProfileContent extends GetView<FamilyController> {
 }
 
 class _ProfileHeader extends StatelessWidget {
-
   const _ProfileHeader({required this.member});
   final Member member;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(16),
-      padding: EdgeInsets.all(20),
+      margin: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: AppColors.grey.withValues(alpha: 0.15), width: 1.w),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: Offset(0, 4),
+            color: AppColors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(3),
+            padding: EdgeInsets.all(3.w),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.primary, width: 2.w),
@@ -170,7 +168,7 @@ class _ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   member.fullName,
-                  style: TextStyle(
+                  style: AppTextStyles.titleLarge.copyWith(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
@@ -179,32 +177,31 @@ class _ProfileHeader extends StatelessWidget {
                 SizedBox(height: 4.h),
                 Text(
                   member.memberNo ?? '',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: AppColors.mutedForeground,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.grey,
                     fontFamily: 'monospace',
                   ),
                 ),
                 SizedBox(height: 8.h),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.12), width: 1.w),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.workspace_premium,
-                        size: 14,
+                        Icons.workspace_premium_rounded,
+                        size: 14.sp,
                         color: AppColors.primary,
                       ),
-                      SizedBox(width: 4.w),
+                      SizedBox(width: 6.w),
                       Text(
                         member.jobPositionName ?? 'Member',
-                        style: TextStyle(
-                          fontSize: 12.sp,
+                        style: AppTextStyles.labelSmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
@@ -222,7 +219,6 @@ class _ProfileHeader extends StatelessWidget {
 }
 
 class _MemberDetailsSection extends StatelessWidget {
-
   const _MemberDetailsSection({required this.member, required this.controller});
   final Member member;
   final FamilyController controller;
@@ -332,7 +328,7 @@ class _MemberDetailsSection extends StatelessWidget {
 
   Widget _buildDetailRow(Widget item1, Widget item2, {bool isLast = false}) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.0),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -352,31 +348,32 @@ class _MemberDetailsSection extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(10.r),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: 2.0),
-            child: Icon(icon, size: 20, color: AppColors.primary),
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(icon, size: 20.sp, color: AppColors.primary),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: AppColors.mutedForeground,
-                  ),
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 13.sp,
+                  style: AppTextStyles.labelMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
                     decoration: onTap != null ? TextDecoration.underline : null,
@@ -392,7 +389,6 @@ class _MemberDetailsSection extends StatelessWidget {
 }
 
 class _AddressSection extends StatelessWidget {
-
   const _AddressSection({required this.controller});
   final FamilyController controller;
 
@@ -405,22 +401,22 @@ class _AddressSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: controller.memberAddresses.map((addr) {
           return Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+            padding: EdgeInsets.only(bottom: 16.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: 1.w),
                       ),
                       child: Text(
                         addr.addressTypeName,
-                        style: TextStyle(
-                          fontSize: 10.sp,
+                        style: AppTextStyles.labelSmall.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
@@ -428,10 +424,10 @@ class _AddressSection extends StatelessWidget {
                     ),
                     if (addr.isPrimary) ...[
                       SizedBox(width: 8.w),
-                      Icon(
-                        Icons.check_circle,
-                        size: 14,
-                        color: AppColors.success,
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        size: 16,
+                        color: AppColors.green,
                       ),
                     ],
                   ],
@@ -439,16 +435,15 @@ class _AddressSection extends StatelessWidget {
                 SizedBox(height: 12.h),
                 Text(
                   addr.fullAddress,
-                  style: TextStyle(
-                    fontSize: 14.sp,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.secondary,
-                    height: 1.5.h,
+                    height: 1.4,
                   ),
                 ),
                 if (controller.memberAddresses.last != addr)
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: Divider(height: 1.h),
+                    padding: EdgeInsets.only(top: 12.h),
+                    child: Divider(height: 1.h, color: AppColors.grey.withValues(alpha: 0.15)),
                   ),
               ],
             ),
@@ -501,7 +496,7 @@ class _AssetLifeSection extends StatelessWidget {
     bool value2,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.0),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
         children: [
           Expanded(
@@ -510,32 +505,28 @@ class _AssetLifeSection extends StatelessWidget {
                     children: [
                       Text(
                         label1,
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: AppColors.mutedForeground,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.grey,
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       if (value1 is bool)
                         Icon(
-                          value1 ? Icons.check_circle : Icons.cancel,
-                          size: 18,
-                          color: value1
-                              ? AppColors.success
-                              : AppColors.destructive,
+                          value1 ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                          size: 18.sp,
+                          color: value1 ? AppColors.green : AppColors.red,
                         )
                       else
                         Text(
                           value1.toString(),
-                          style: TextStyle(
-                            fontSize: 13.sp,
+                          style: AppTextStyles.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.secondary,
                           ),
                         ),
                     ],
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ),
           SizedBox(width: 32.w),
           Expanded(
@@ -543,16 +534,13 @@ class _AssetLifeSection extends StatelessWidget {
               children: [
                 Text(
                   label2,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: AppColors.mutedForeground,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
                 ),
-                Spacer(),
+                const Spacer(),
                 Icon(
-                  value2 ? Icons.check_circle : Icons.cancel,
-                  size: 18,
-                  color: value2 ? AppColors.success : AppColors.destructive,
+                  value2 ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  size: 18.sp,
+                  color: value2 ? AppColors.green : AppColors.red,
                 ),
               ],
             ),
@@ -584,7 +572,7 @@ class _SocialMediaSection extends StatelessWidget {
                 ? () => controller.launchSafeUrl(member.facebookUrl!)
                 : null,
           ),
-          SizedBox(height: 16.0),
+          SizedBox(height: 16.h),
           _buildSocialItem(
             Icons.camera_alt_outlined,
             LK.instagram.tr,
@@ -594,7 +582,7 @@ class _SocialMediaSection extends StatelessWidget {
                 ? () => controller.launchSafeUrl(member.instagramUrl!)
                 : null,
           ),
-          SizedBox(height: 16.0),
+          SizedBox(height: 16.h),
           _buildSocialItem(
             Icons.chat_bubble_outline,
             LK.whatsapp.tr,
@@ -604,7 +592,7 @@ class _SocialMediaSection extends StatelessWidget {
                 ? () => controller.launchSafeUrl(member.whatsappUrl!)
                 : null,
           ),
-          SizedBox(height: 16.0),
+          SizedBox(height: 16.h),
           _buildSocialItem(
             Icons.alternate_email,
             LK.twitterX.tr,
@@ -628,31 +616,32 @@ class _SocialMediaSection extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(8.r),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: 2.0),
-            child: Icon(icon, size: 22, color: color),
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 20.sp, color: color),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: AppColors.mutedForeground,
-                  ),
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   handle,
-                  style: TextStyle(
-                    fontSize: 12.sp,
+                  style: AppTextStyles.labelMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.secondary,
                   ),
@@ -669,7 +658,6 @@ class _SocialMediaSection extends StatelessWidget {
 }
 
 class _SectionContainer extends StatelessWidget {
-
   const _SectionContainer({this.title, this.icon, required this.child});
   final String? title;
   final IconData? icon;
@@ -678,12 +666,19 @@ class _SectionContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: AppColors.grey.withValues(alpha: 0.15), width: 1.w),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.02),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -691,15 +686,22 @@ class _SectionContainer extends StatelessWidget {
           if (title != null) ...[
             Row(
               children: [
-                Icon(icon, size: 18, color: AppColors.primary),
-                SizedBox(width: 8.w),
-                Text(
-                  title!,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
+                Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 18.sp, color: AppColors.primary),
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Text(
+                    title!,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondary,
+                    ),
                   ),
                 ),
               ],
@@ -728,22 +730,22 @@ class _EducationSection extends StatelessWidget {
           final index = entry.key;
           final edu = entry.value;
           return Padding(
-            padding: EdgeInsets.only(bottom: 16.0),
+            padding: EdgeInsets.only(bottom: 16.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: 1.w),
                       ),
                       child: Text(
                         edu.qualification,
-                        style: TextStyle(
-                          fontSize: 10.sp,
+                        style: AppTextStyles.labelSmall.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
@@ -752,18 +754,20 @@ class _EducationSection extends StatelessWidget {
                     if (edu.isHighest) ...[
                       SizedBox(width: 8.w),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 4.h,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: AppColors.success),
+                          color: AppColors.green.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: AppColors.green.withValues(alpha: 0.15), width: 1.w),
                         ),
                         child: Text(
                           LK.highest.tr,
-                          style: TextStyle(
-                            fontSize: 10.sp,
+                          style: AppTextStyles.labelSmall.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.success,
+                            color: AppColors.green,
                           ),
                         ),
                       ),
@@ -779,17 +783,27 @@ class _EducationSection extends StatelessWidget {
                 Row(
                   children: [
                     if (edu.passingYear.isNotEmpty)
-                      Expanded(child: _buildColumnItem(LK.passingYear.tr, edu.passingYear)),
+                      Expanded(
+                        child: _buildColumnItem(
+                          LK.passingYear.tr,
+                          edu.passingYear,
+                        ),
+                      ),
                     if (edu.percentage.isNotEmpty)
-                      Expanded(child: _buildColumnItem(LK.percentage.tr, '${edu.percentage}%')),
+                      Expanded(
+                        child: _buildColumnItem(
+                          LK.percentage.tr,
+                          '${edu.percentage}%',
+                        ),
+                      ),
                     if (edu.grade.isNotEmpty)
                       Expanded(child: _buildColumnItem(LK.grade.tr, edu.grade)),
                   ],
                 ),
                 if (index != controller.memberEducations.length - 1)
                   Padding(
-                    padding: EdgeInsets.only(top: 12.0),
-                    child: Divider(height: 1.h),
+                    padding: EdgeInsets.only(top: 12.h),
+                    child: Divider(height: 1.h, color: AppColors.grey.withValues(alpha: 0.15)),
                   ),
               ],
             ),
@@ -801,19 +815,15 @@ class _EducationSection extends StatelessWidget {
 
   Widget _buildRowItem(String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 4.0),
+      padding: EdgeInsets.only(bottom: 4.h),
       child: RichText(
         text: TextSpan(
           text: '$label: ',
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: AppColors.mutedForeground,
-          ),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
           children: [
             TextSpan(
               text: value,
-              style: TextStyle(
-                fontSize: 13.sp,
+              style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.secondary,
               ),
@@ -830,16 +840,12 @@ class _EducationSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11.sp,
-            color: AppColors.mutedForeground,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 13.sp,
+          style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.secondary,
           ),
@@ -858,7 +864,10 @@ class _OccupationSection extends StatelessWidget {
     final fields = <Widget>[];
 
     void addField(String label, String? value) {
-      if (value != null && value.isNotEmpty && value != LK.na.tr && value != 'null') {
+      if (value != null &&
+          value.isNotEmpty &&
+          value != LK.na.tr &&
+          value != 'null') {
         fields.add(_buildColumnItem(label, value));
       }
     }
@@ -885,7 +894,7 @@ class _OccupationSection extends StatelessWidget {
     final rows = <Widget>[];
     for (int i = 0; i < fields.length; i += 2) {
       final item1 = fields[i];
-      final item2 = (i + 1 < fields.length) ? fields[i + 1] : SizedBox();
+      final item2 = (i + 1 < fields.length) ? fields[i + 1] : const SizedBox();
       rows.add(
         Padding(
           padding: EdgeInsets.only(bottom: 12.h),
@@ -917,16 +926,12 @@ class _OccupationSection extends StatelessWidget {
       children: [
         Text(
           label.replaceAll(':', ''),
-          style: TextStyle(
-            fontSize: 11.sp,
-            color: AppColors.mutedForeground,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 13.sp,
+          style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.secondary,
           ),

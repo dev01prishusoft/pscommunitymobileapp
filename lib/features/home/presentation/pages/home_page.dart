@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -11,12 +12,8 @@ import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
-import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
-/// [StatefulWidget] so [_scaffoldKey] is created once and stays stable
-/// across rebuilds. A [GlobalKey] inside a [StatelessWidget] is recreated
-/// on every build, which can cause state loss.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -30,7 +27,10 @@ class _HomePageState extends State<HomePage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    AppRouter.routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+    AppRouter.routeObserver.subscribe(
+      this,
+      ModalRoute.of(context) as PageRoute,
+    );
   }
 
   @override
@@ -41,7 +41,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   @override
   void didPopNext() {
-    // Called when the top route has been popped off, and the current route shows up.
     Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
   }
 
@@ -49,12 +48,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: AppColors.surfaceVariant,
       drawer: AppDrawer(),
       appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: AppColors.navyBlue),
         actions: [
           _NotificationMenu(),
           AppSpacing.hS,
@@ -65,9 +60,12 @@ class _HomePageState extends State<HomePage> with RouteAware {
       body: SafeArea(
         child: Column(
           children: [
+            AppSpacing.vL,
             _HomeHeader(),
             AppSpacing.vL,
-            Expanded(child: _HomeMenuGrid(controller: Get.find<HomeController>())),
+            Expanded(
+              child: _HomeMenuGrid(controller: Get.find<HomeController>()),
+            ),
           ],
         ),
       ),
@@ -81,15 +79,46 @@ class _HomeHeader extends GetView<SamajController> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: AppSpacing.s, left: AppSpacing.xxl, right: AppSpacing.xxl),
+      padding: EdgeInsets.only(
+        top: AppSpacing.s,
+        left: AppSpacing.xxl,
+        right: AppSpacing.xxl,
+      ),
       child: Obx(() {
         final samaj = controller.samaj.value;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          
           children: [
-            Expanded(child: _SamajNameText(samaj: samaj)),
-            _SamajLogo(samaj: samaj),
+            Expanded(
+              child: Text(
+                samaj?.name ?? LK.samajName.tr,
+                style: AppTextStyles.displayMedium.copyWith(
+                  color: AppColors.black,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ),
+            Container(
+              width: 64.w,
+              height: 64.h,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.white,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: samaj?.logoUrl != null && samaj!.logoUrl.isNotEmpty
+                    ? CachedImg(
+                        url: samaj.logoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (_, __, ___) => _fallbackLogo(),
+                      )
+                    : _fallbackLogo(),
+              ),
+            ),
           ],
         );
       }),
@@ -97,54 +126,8 @@ class _HomeHeader extends GetView<SamajController> {
   }
 }
 
-class _SamajNameText extends StatelessWidget {
-  const _SamajNameText({required this.samaj});
-
-  final Samaj? samaj;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      samaj?.name ?? LK.samajName.tr,
-      style: AppTextStyles.displaySmall.copyWith(
-        color: AppColors.navyBlue,
-        letterSpacing: 0.2,
-      ),
-    );
-  }
-}
-
-class _SamajLogo extends StatelessWidget {
-  const _SamajLogo({required this.samaj});
-
-  final Samaj? samaj;
-  @override
-  Widget build(BuildContext context) {
-    final logoUrl = samaj?.logoUrl;
-    return Container(
-      width: 64.w,
-      height: 64.h,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.white,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child:logoUrl != null && logoUrl.isNotEmpty
-          ? CachedImg(
-              url: logoUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, __) =>
-                  Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              errorWidget: (_, __, ___) => _fallbackLogo(),
-            )
-          : _fallbackLogo(),)
-    );
-  }
-
-  Widget _fallbackLogo() =>
-      Image.asset('assets/images/prishusoft_logo.png', fit: BoxFit.cover);
-}
+Widget _fallbackLogo() =>
+    Image.asset('assets/images/prishusoft_logo.png', fit: BoxFit.cover);
 
 class _HomeMenuGrid extends StatelessWidget {
   const _HomeMenuGrid({required this.controller});
@@ -154,25 +137,28 @@ class _HomeMenuGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       child: Padding(
-        padding: AppSpacing.pHXl,
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(context, desiredItemWidth: 120);
-            return GridView.builder( 
+            final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
+              context,
+              desiredItemWidth: 110.w,
+            );
+            return GridView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: controller.menuItems.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                mainAxisSpacing: 14.h,
+                crossAxisSpacing: 14.w,
+                childAspectRatio: 0.84,
               ),
               itemBuilder: (context, index) {
                 final item = controller.menuItems[index];
-                return _MenuCard(item: item); 
+                return _MenuCard(item: item);
               },
             );
           },
@@ -186,58 +172,80 @@ class _MenuCard extends StatelessWidget {
   const _MenuCard({required this.item});
 
   final MenuItem item;
-  static final BoxDecoration _cardDecoration = BoxDecoration(
-    color: AppColors.white,
-    borderRadius: BorderRadius.all(Radius.circular(16)),
-  );
-  static BoxDecoration get cardDecorationWithShadow => _cardDecoration.copyWith(
-    boxShadow: [
-      BoxShadow(
-        color: AppColors.black.withValues(alpha: 0.04),
-        blurRadius: 10,
-        offset: Offset(0, 4),
-      ),
-    ],
-  );
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: item.labelKey.tr,
-      child: GestureDetector(
-        onTap: () {
-          Get.toNamed<void>(item.route)!.then((val)async{
-            await Get.find<SamajController>().fetchAll();
-          });
-        },
-        child: Container(
-          decoration: cardDecorationWithShadow,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: AppSpacing.pM,
-                decoration: BoxDecoration(
-                  color: AppColors.lightBlue,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(item.icon, size: 32, color: AppColors.navyBlue),
-              ),
-              AppSpacing.vM,
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text(
-                  item.labelKey.tr,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.navyBlue,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: AppColors.grey.withValues(alpha: 0.12),
+          width: 1.w,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20.r),
+          onTap: () {
+            Get.toNamed<void>(item.route)?.then((_) async {
+              await Get.find<SamajController>().fetchAll();
+            });
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 52.h,
+                  width: 52.w,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.08),
+                        AppColors.primary.withValues(alpha: 0.02),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Center(
+                    child: Icon(
+                      item.icon,
+                      size: 24.sp,
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 10.h),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      item.labelKey.tr,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -250,49 +258,49 @@ class _LanguageDropdown extends GetView<LocalizationService> {
 
   @override
   Widget build(BuildContext context) {
-
     return Obx(() {
-      final String currentCode = controller.currentLocale.value.languageCode.toUpperCase();
+      final currentCode = controller.currentLocale.value.languageCode
+          .toUpperCase();
+
       final homeController = Get.find<HomeController>();
-      
+
       List<String> codes = controller.languages
-          .map((l) => l.code.toUpperCase())
+          .map((e) => e.code.toUpperCase())
           .toSet()
           .toList();
-          
-      if (codes.isEmpty) codes = ['EN', 'GU'];
+
+      if (codes.isEmpty) {
+        codes = ['EN', 'GU'];
+      }
 
       final selectedCode = codes.contains(currentCode)
           ? currentCode
           : codes.first;
 
       return Container(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.m),
+        height: 35.h,
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
         decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: selectedCode,
-            icon: Icon(Icons.language, color: AppColors.navyBlue, size: 18),
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.navyBlue,
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 20.sp,
+              color: AppColors.primary,
             ),
-            items: codes
-                .map(
-                  (code) =>
-                      DropdownMenuItem(value: code, child: Text(' $code')),
-                )  
-                .toList(),
-            onChanged: (code) => homeController.changeLocale(controller, code),
+            borderRadius: BorderRadius.circular(10.r),
+            style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+            items: codes.map((code) {
+              return DropdownMenuItem<String>(value: code, child: Text(code));
+            }).toList(),
+            onChanged: (code) {
+              homeController.changeLocale(controller, code);
+            },
           ),
         ),
       );
@@ -308,31 +316,21 @@ class _NotificationMenu extends GetView<HomeController> {
     return IconButton(
       icon: Obx(() {
         final count = controller.unreadNotificationCount.value;
-        if (count > 0) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Icon(Icons.notifications, color: AppColors.navyBlue, size: 28),
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Icon(Iconsax.notification_copy),
+            if (count > 0) ...[
               Positioned(
                 right: -2,
                 top: -2,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  constraints: BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: count > 99 ? BoxShape.rectangle : BoxShape.circle,
-                    borderRadius: count > 99 ? BorderRadius.circular(10) : null,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
+                child: Badge(
+                  backgroundColor: AppColors.primary,
+                  label: Text(
                     count > 99 ? '99+' : count.toString(),
                     style: TextStyle(
+                      fontSize: 8.sp,
                       color: AppColors.white,
-                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -340,9 +338,8 @@ class _NotificationMenu extends GetView<HomeController> {
                 ),
               ),
             ],
-          );
-        }
-        return Icon(Icons.notifications, color: AppColors.navyBlue, size: 28);
+          ],
+        );
       }),
       onPressed: () {
         Get.toNamed<void>('/notifications')?.then((_) {

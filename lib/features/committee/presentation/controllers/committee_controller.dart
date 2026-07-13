@@ -1,12 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
-import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/utils/pagination_mixin.dart';
-import 'package:dio/dio.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+import 'package:pscommunitymobileapp/features/committee/domain/repositories/committee_repository.dart';
 
 class CommitteeController extends PaginationMixin<CommitteeNode> {
   CommitteeController(this._repository);
@@ -57,9 +56,8 @@ class CommitteeController extends PaginationMixin<CommitteeNode> {
       } else {
         detailState.value = AppState.error;
       }
-    } catch (e, stack) {
+    } catch (e) {
       if (e is DioException && e.type == DioExceptionType.cancel) return;
-      AppLogger.e('Failed to load committee detail', e, stack);
       detailState.value = AppState.error;
     }
   }

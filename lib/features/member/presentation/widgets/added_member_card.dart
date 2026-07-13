@@ -21,7 +21,7 @@ class AddedMemberCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.grey),
       ),
       color: AppColors.white,
       margin: EdgeInsets.zero,
@@ -136,7 +136,7 @@ class AddedMemberCard extends StatelessWidget {
     return Text(
       parts.join(' • '),
       style: AppTextStyles.bodySmall.copyWith(
-        color: AppColors.mutedForeground,
+        color: AppColors.grey,
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -160,7 +160,7 @@ class AddedMemberCard extends StatelessWidget {
           child: Text(
             loc.trim(),
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class RoleMapper {
@@ -19,7 +18,6 @@ class RoleMapper {
       case 'committee member':
         return LK.roleCommitteeMember;
       default:
-        AppLogger.w('Unknown role: $role');
         return null;
     }
   }

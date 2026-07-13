@@ -47,12 +47,10 @@ class CommitteeMembersController extends GetxController {
         availableRoles.value = result.data.data ?? [];
       }
     } catch (e) {
-      // Ignore or log error
     }
   }
 
   Future<void> _fetchMembers(int id) async {
-    print(id);
     membersState.value = AppState.loading;
     try {
       final result = await _apiClient.getParsed<List<CommitteeMember>>(

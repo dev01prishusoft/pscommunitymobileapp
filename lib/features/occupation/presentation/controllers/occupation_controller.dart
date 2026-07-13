@@ -1,10 +1,9 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
+import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
+import 'package:pscommunitymobileapp/features/occupation/domain/repositories/occupation_repository.dart';
 
 class OccupationController extends GetxController {
   OccupationController(this._repository);
@@ -25,8 +24,9 @@ class OccupationController extends GetxController {
   final int _membersPageSize = 20;
   final RxBool hasMoreMembers = true.obs;
   final RxBool isNextMembersPageLoading = false.obs;
-
-  // Pagination
+  final RxnInt activeOccupationId = RxnInt();
+  final RxString memberSearchQuery = ''.obs;
+  String _lastMemberSearchQuery = '';
   int _currentPage = 1;
   final int _pageSize = 20;
   final RxBool hasMore = true.obs;
@@ -35,17 +35,21 @@ class OccupationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
-    // Initialize with 'All' item and select it by default
     final allItem = DropdownItem(id: 0, text: 'All');
     occupationTypes.assignAll([allItem]);
     selectedOccupationType.value = allItem;
-
-    // Load types then occupations sequentially to avoid race conditions
     _initData();
-
-    // Debounce search
-    debounce(searchQuery, (_) => loadOccupations(), time: const Duration(milliseconds: 300));
+    debounce(
+      searchQuery,
+      (_) => loadOccupations(),
+      time: const Duration(milliseconds: 300),
+    );
+    debounce(memberSearchQuery, (query) {
+      final occId = activeOccupationId.value;
+      if (occId != null && query != _lastMemberSearchQuery) {
+        loadOccupationMembers(occId, refresh: true);
+      }
+    }, time: const Duration(milliseconds: 300));
   }
 
   Future<void> _initData() async {
@@ -56,26 +60,27 @@ class OccupationController extends GetxController {
   Future<void> loadOccupationTypes() async {
     try {
       final results = await _repository.getOccupationDropdown();
-      occupationTypes.assignAll([
-        DropdownItem(id: 0, text: 'All'),
-        ...results,
-      ]);
-    } catch (e) {
-      AppLogger.e('Failed to load occupation types', e);
-    }
+      occupationTypes.assignAll([DropdownItem(id: 0, text: 'All'), ...results]);
+    } catch (_) {}
   }
 
   void onOccupationTypeChanged(DropdownItem? type) {
+    if (selectedOccupationType.value?.id == type?.id) return;
     selectedOccupationType.value = type;
     loadOccupations(occupationTypeId: type?.id);
   }
 
-  Future<void> loadOccupationMembers(int occupationId, {bool refresh = true}) async {
+  Future<void> loadOccupationMembers(
+    int occupationId, {
+    bool refresh = true,
+  }) async {
     if (refresh) {
       _membersPage = 1;
       hasMoreMembers.value = true;
       membersState.value = AppState.loading;
       occupationMembers.clear();
+      _lastMemberSearchQuery = memberSearchQuery.value;
+      activeOccupationId.value = occupationId;
     } else {
       if (!hasMoreMembers.value || isNextMembersPageLoading.value) return;
       isNextMembersPageLoading.value = true;
@@ -84,6 +89,9 @@ class OccupationController extends GetxController {
     try {
       final results = await _repository.getOccupationMembers(
         occupationId: occupationId,
+        search: memberSearchQuery.value.isNotEmpty
+            ? memberSearchQuery.value
+            : null,
         pageNumber: _membersPage,
         pageSize: _membersPageSize,
       );
@@ -97,16 +105,20 @@ class OccupationController extends GetxController {
           hasMoreMembers.value = false;
         }
       }
-      membersState.value = occupationMembers.isEmpty ? AppState.empty : AppState.data;
-    } catch (e, stack) {
-      AppLogger.e('Failed to load occupation members', e, stack);
+      membersState.value = occupationMembers.isEmpty
+          ? AppState.empty
+          : AppState.data;
+    } catch (e) {
       if (refresh) membersState.value = AppState.error;
     } finally {
       isNextMembersPageLoading.value = false;
     }
   }
 
-  Future<void> loadOccupations({int? occupationTypeId, bool refresh = true}) async {
+  Future<void> loadOccupations({
+    int? occupationTypeId,
+    bool refresh = true,
+  }) async {
     if (refresh) {
       _currentPage = 1;
       hasMore.value = true;
@@ -138,9 +150,10 @@ class OccupationController extends GetxController {
           hasMore.value = false;
         }
       }
-      state.value = filteredOccupations.isEmpty ? AppState.empty : AppState.data;
-    } catch (e, stack) {
-      AppLogger.e('Failed to load occupations', e, stack);
+      state.value = filteredOccupations.isEmpty
+          ? AppState.empty
+          : AppState.data;
+    } catch (e) {
       if (refresh) state.value = AppState.error;
     } finally {
       isNextPageLoading.value = false;
@@ -154,5 +167,14 @@ class OccupationController extends GetxController {
   void clearSearch() {
     if (searchQuery.value.isEmpty) return;
     searchQuery.value = '';
+  }
+
+  void searchMembers(String query) {
+    memberSearchQuery.value = query;
+  }
+
+  void clearMemberSearch() {
+    if (memberSearchQuery.value.isEmpty) return;
+    memberSearchQuery.value = '';
   }
 }

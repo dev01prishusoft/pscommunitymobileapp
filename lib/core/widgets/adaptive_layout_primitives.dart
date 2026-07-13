@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class ResponsiveSection extends StatelessWidget {
   const ResponsiveSection({
@@ -28,7 +28,7 @@ class ResponsiveSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.grey),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

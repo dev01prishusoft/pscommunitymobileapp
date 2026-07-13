@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/splash/presentation/controllers/splash_controller.dart';
-import 'package:pscommunitymobileapp/features/update/app_update_gate.dart';
 
 class CommunityWelcomeSplashPage extends StatefulWidget {
   const CommunityWelcomeSplashPage({super.key});
@@ -52,103 +51,39 @@ class _CommunityWelcomeSplashPageState extends State<CommunityWelcomeSplashPage>
 
   @override
   Widget build(BuildContext context) {
-    return AppUpdateGate(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: Stack(
-          children: [
-            _BackgroundGradient(),
-            _DecorativeCircle(top: -80, left: -80, size: 200),
-            _DecorativeCircle(bottom: -100, right: -100, size: 250),
-            _SplashContent(scaleAnim: _scaleAnim, fadeAnim: _fadeAnim),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BackgroundGradient extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.background, AppColors.lightBlue],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    );
-  }
-}
-
-class _DecorativeCircle extends StatelessWidget {
-  const _DecorativeCircle({
-    required this.size,
-    this.top,
-    this.left,
-    this.bottom,
-    this.right,
-  });
-
-  final double size;
-  final double? top;
-  final double? left;
-  final double? bottom;
-  final double? right;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      left: left,
-      bottom: bottom,
-      right: right,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.2),
-          shape: BoxShape.circle,
-        ),
-      ),
-    );
-  }
-}
-
-class _SplashContent extends GetView<SamajController> {
-  const _SplashContent({required this.scaleAnim, required this.fadeAnim});
-
-  final Animation<double> scaleAnim;
-  final Animation<double> fadeAnim;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Obx(() => _AnimatedLogo(scaleAnim: scaleAnim, samaj: controller.samaj.value)),
-          SizedBox(height: 32.h),
-          Obx(() {
-            final samaj = controller.samaj.value;
-            if (samaj == null) {
-              return SizedBox(height: 116.h); // Maintain spacing when hidden
-            }
-            return Column(
-              children: [
-                _AnimatedSamajName(fadeAnim: fadeAnim, samaj: samaj),
-                SizedBox(height: 8.h),
-                _AnimatedDivider(fadeAnim: fadeAnim),
-                SizedBox(height: 16.h),
-                _AnimatedWelcomeText(fadeAnim: fadeAnim),
-              ],
-            );
-          }),
-          SizedBox(height: 60.h),
-        ],
-      ),
+    return GetBuilder<SamajController>(
+      builder: (controller) {
+        return Scaffold(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Obx(
+                () => _AnimatedLogo(
+                  scaleAnim: _scaleAnim,
+                  samaj: controller.samaj.value,
+                ),
+              ),
+              SizedBox(height: 32.h),
+              Obx(() {
+                final samaj = controller.samaj.value;
+                if (samaj == null) {
+                  return SizedBox(height: 116.h);
+                }
+                return Column(
+                  children: [
+                    _AnimatedSamajName(fadeAnim: _fadeAnim, samaj: samaj),
+                    SizedBox(height: 8.h),
+                    _AnimatedDivider(fadeAnim: _fadeAnim),
+                    SizedBox(height: 16.h),
+                    _AnimatedWelcomeText(fadeAnim: _fadeAnim),
+                  ],
+                );
+              }),
+              SizedBox(height: 60.h),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -175,7 +110,7 @@ class _AnimatedLogo extends StatelessWidget {
         placeholder: (context, url) => SizedBox(
           width: 300.w,
           height: 100.h,
-          child: Center(child: CircularProgressIndicator()),
+          child: Center(child: CircularProgressIndicator(strokeWidth: 1.5)),
         ),
         errorWidget: (context, url, error) => SizedBox.shrink(),
       );
@@ -200,7 +135,7 @@ class _AnimatedSamajName extends StatelessWidget {
           samaj?.name ?? '',
           textAlign: TextAlign.center,
           style: AppTextStyles.displayLarge.copyWith(
-            color: AppColors.navyBlue,
+            color: AppColors.black,
             letterSpacing: 0.2,
           ),
         ),

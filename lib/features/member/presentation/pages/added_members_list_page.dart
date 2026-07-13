@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/added_members_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/widgets/added_member_card.dart';
@@ -40,7 +40,6 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(title: Text(LK.addedMembers.tr)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,26 +105,26 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppColors.grey),
         ),
         child: TextField(
           controller: _searchController,
           decoration: InputDecoration(
             hintText: LK.searchHint.tr,
             hintStyle: TextStyle(
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
               fontSize: 14.sp,
             ),
             prefixIcon: Icon(
               Icons.search,
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
             ),
             suffixIcon: Obx(
               () => _controller.searchQuery.value.isNotEmpty
                   ? IconButton(
                       icon: Icon(
                         Icons.close,
-                        color: AppColors.mutedForeground,
+                        color: AppColors.grey,
                         size: 20,
                       ),
                       onPressed: () {
@@ -157,7 +156,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
           text: TextSpan(
             style: TextStyle(
               fontSize: 13.sp,
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
             ),
             children: [
               TextSpan(text: '${LK.showing.tr} '),
