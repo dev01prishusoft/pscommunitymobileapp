@@ -372,14 +372,10 @@ class MarriagePage extends GetView<MarriageController> {
                                   Expanded(
                                     child: _buildDropdownField(
                                       rxValue: controller.selectedMaritalStatus,
-                                      staticItems: controller.maritalStatuses,
+                                      rxItems: controller.dynamicMaritalStatuses,
                                       mapper: (val) {
                                         if (val == 'All') return LK.all.tr;
-                                        final key =
-                                            MaritalStatusMapper.getLabelKey(
-                                              val,
-                                            );
-                                        return key != null ? key.tr : val;
+                                        return val;
                                       },
                                     ),
                                   ),
