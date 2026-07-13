@@ -10,8 +10,40 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
+class DrawerUserController extends GetxController {
+  final Rx<Member?> member = Rx<Member?>(null);
+  final RxBool isLoading = true.obs;
+  
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUser();
+  }
+  
+  Future<void> fetchUser() async {
+    try {
+      isLoading.value = true;
+      final tokenManager = Get.find<TokenManager>();
+      final memberId = tokenManager.memberId;
+      if (memberId != null) {
+        final apiClient = Get.find<ApiClient>();
+        final response = await apiClient.getParsed<Member>(
+          '/api/v1/member/$memberId',
+          fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
+        );
+        member.value = response.dataOrNull?.data;
+      }
+    } catch (_) {
+    } finally {
+      isLoading.value = false;
+    }
+  }
+}
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -19,6 +51,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final samajController = Get.find<SamajController>();
     final authState = Get.find<AuthState>();
+    final userController = Get.put(DrawerUserController(), permanent: true);
 
     return SafeArea(
       top: false,
@@ -35,7 +68,21 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
               currentAccountPicture: Obx(() {
-                final logoUrl = samajController.samaj.value?.logoUrl;
+                if (userController.isLoading.value) {
+                  return Container(
+                    width: 64.w,
+                    height: 64.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                }
+                final userPic = userController.member.value?.profilePhotoFullUrl;
+                final logoUrl = userPic?.isNotEmpty == true ? userPic : samajController.samaj.value?.logoUrl;
                 return Container(
                   width: 64.w,
                   height: 64.h,
@@ -64,14 +111,26 @@ class AppDrawer extends StatelessWidget {
                   ),
                 );
               }),
-              accountName: Obx(
-                () => Text(
-                  samajController.samaj.value?.name ?? LK.samajName.tr,
+              accountName: Obx(() {
+                if (userController.isLoading.value) {
+                  return Text(
+                    '...',
+                    style: AppTextStyles.titleLarge.copyWith(
+                      color: AppColors.white,
+                    ),
+                  );
+                }
+                final member = userController.member.value;
+                final name = member != null 
+                    ? '${member.firstName} ${member.lastName}' 
+                    : (samajController.samaj.value?.name ?? LK.samajName.tr);
+                return Text(
+                  name,
                   style: AppTextStyles.titleLarge.copyWith(
                     color: AppColors.white,
                   ),
-                ),
-              ),
+                );
+              }),
               accountEmail: const SizedBox.shrink(),
             ),
             Expanded(
