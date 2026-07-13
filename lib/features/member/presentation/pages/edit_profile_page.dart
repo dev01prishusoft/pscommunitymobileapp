@@ -1296,11 +1296,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 color: AppColors.mutedForeground,
               ),
             ),
-            TextButton.icon(
-              onPressed: controller.addEducation,
-              icon: Icon(Icons.add, size: 18),
-              label: Text(LK.addEducation.tr),
-            ),
+            if (controller.educationList.isEmpty)
+              TextButton.icon(
+                onPressed: controller.addEducation,
+                icon: Icon(Icons.add, size: 18),
+                label: Text(LK.addEducation.tr),
+              ),
           ],
         ),
         AppSpacing.vS,
@@ -1315,6 +1316,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget _buildEducationItem(int index) {
     final edu = controller.educationList[index];
     final isHighest = edu.isHighest;
+    final isNew = edu.isNew;
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.l),
       decoration: BoxDecoration(
@@ -1363,14 +1365,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               } : null,
               label: LK.qualificationLabel.tr,
               isRequired: true,
-              updateStatus: isHighest ? controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap) : null,
+              updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('EducationalQualificationId', idMap: controller.contactInfo.educationIdMap) : null,
             ),
           ),
           AppSpacing.vM,
           AppFormTextField(
             initialValue: edu.institute,
             label: LK.instituteNameLabel.tr,
-            updateStatus: isHighest ? controller.getUpdateStatus('InstitutionName') : null,
+            updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('InstitutionName') : null,
             maxLength: 200,
             readOnly: !isHighest,
             onChanged: isHighest ? (v) {
@@ -1383,7 +1385,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.passingYear,
               label: LK.passingYearLabel.tr,
-              updateStatus: isHighest ? controller.getUpdateStatus('YearOfPassing') : null,
+              updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('YearOfPassing') : null,
               hint: 'YYYY',
               keyboardType: TextInputType.phone,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -1428,7 +1430,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.percentage,
               label: LK.percentageLabel.tr,
-              updateStatus: isHighest ? controller.getUpdateStatus('Percentage') : null,
+              updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('Percentage') : null,
               hint: '00',
               suffixIcon: Padding(
                 padding: EdgeInsets.only(top: 14.h, right: 16.w),
@@ -1466,7 +1468,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.grade,
               label: 'Grade',
-              updateStatus: isHighest ? controller.getUpdateStatus('Grade') : null,
+              updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('Grade') : null,
               maxLength: 10,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {
@@ -1477,7 +1479,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppFormTextField(
               initialValue: edu.description,
               label: 'Description',
-              updateStatus: isHighest ? controller.getUpdateStatus('Description') : null,
+              updateStatus: (isHighest && !isNew) ? controller.getUpdateStatus('Description') : null,
               maxLength: 500,
               readOnly: !isHighest,
               onChanged: isHighest ? (v) {
@@ -1499,34 +1501,58 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: Checkbox(
-                        value: edu.isHighest,
-                        onChanged: null,
-                        fillColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.disabled) && edu.isHighest) {
-                            return AppColors.primary.withValues(alpha: 0.5);
-                          }
-                          return null;
-                        }),
+              InkWell(
+                onTap: edu.isHighest ? () {
+                  Get.snackbar(
+                    LK.error.tr,
+                    LK.atLeastOneHighestQualification.tr,
+                    backgroundColor: AppColors.destructive,
+                    colorText: AppColors.white,
+                    snackPosition: SnackPosition.TOP,
+                    margin: const EdgeInsets.all(16),
+                    borderRadius: 8,
+                  );
+                } : null,
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: edu.isHighest ? AppColors.surfaceVariant : AppColors.surfaceVariant.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Checkbox(
+                          value: edu.isHighest,
+                          onChanged: edu.isHighest ? (value) {
+                            Get.snackbar(
+                              LK.error.tr,
+                              LK.atLeastOneHighestQualification.tr,
+                              backgroundColor: AppColors.destructive,
+                              colorText: AppColors.white,
+                              snackPosition: SnackPosition.TOP,
+                              margin: const EdgeInsets.all(16),
+                              borderRadius: 8,
+                            );
+                          } : null,
+                          activeColor: AppColors.primary,
+                        ),
                       ),
-                    ),
-                    AppSpacing.hS,
-                    Expanded(
-                      child: Text(LK.markAsHighest.tr, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.mutedForeground)),
-                    ),
-                  ],
+                      AppSpacing.hS,
+                      Expanded(
+                        child: Text(
+                          LK.markAsHighest.tr, 
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: edu.isHighest ? AppColors.secondary : AppColors.mutedForeground,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -1640,16 +1666,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             if (v != null) controller.workInfo.jobPosition.value = v;
           },
           label: LK.jobPositionLabel.tr,
-          isRequired: true,
           originalValue: controller.currentMember?.jobPositionName ?? '',
-          validator: (v) {
-            final initialOccupation = controller.getInitialDropdownValue('OccupationId');
-            final currentOccupation = controller.workInfo.occupation.value;
-            if (initialOccupation != currentOccupation && currentOccupation.isNotEmpty && (v == null || v.isEmpty)) {
-              return LK.fieldRequired.tr;
-            }
-            return null;
-          },
           updateStatus: controller.getUpdateStatus('JobPositionId', idMap: controller.workInfo.jobPositionIdMap),
         );
       }),
