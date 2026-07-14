@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
@@ -33,17 +32,6 @@ class ApiClient {
 
     refreshDio.interceptors.add(RetryInterceptor(dio: refreshDio, maxRetries: 1));
 
-    if (AppEnvironment.I.enableLogging) {
-      refreshDio.interceptors.add(
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          compact: true,
-        ),
-      );
-    }
-
     _dio.interceptors.addAll([
       LanguageInterceptor(),
       AuthInterceptor(
@@ -54,13 +42,6 @@ class ApiClient {
       ),
       RetryInterceptor(dio: _dio),
       ErrorMappingInterceptor(),
-      if (AppEnvironment.I.enableLogging)
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          compact: true,
-        ),
     ]);
   }
   final Dio _dio;

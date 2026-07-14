@@ -270,6 +270,9 @@ class PersonalInfoController extends GetxController {
   Future<void> _cropImage(String path) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
+      compressQuality: 70,
+      maxHeight: 800,
+      maxWidth: 800,
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Crop Profile Photo',
