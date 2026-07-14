@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -645,8 +646,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         '/api/v1/MemberEducation/mobile/member/$memberId',
       );
       if (response.statusCode == 200 && response.data != null) {
-        AppLogger.d('--- EDUCATION API RESPONSE ---');
-        AppLogger.d(response.data.toString());
         final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
         final newEducation = data.map((e) {
           final map = e as Map<String, dynamic>;
