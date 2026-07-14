@@ -141,7 +141,7 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
         RichText(
           text: TextSpan(
             text: widget.label,
-            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
             children: [
               if (widget.isRequired)
                 TextSpan(
@@ -152,19 +152,15 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
                 ),
             ],
           ),
-        ),
-        SizedBox(height: 8.h),
+        ).paddingOnly(left: 5.w, bottom: 6.h),
         TextFormField(
           controller: _displayController,
           readOnly: true,
           onTap: () => _selectTime(context),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           decoration: InputDecoration(
             hintText: widget.hint,
-            prefixIcon: Icon(
-              Icons.access_time,
-              color: AppColors.grey,
-              size: 20,
-            ),
+            prefixIcon: Icon(Icons.access_time, size: 20, color: AppColors.grey),
           ),
           validator: (value) {
             if (widget.isRequired && (value == null || value.trim().isEmpty)) {

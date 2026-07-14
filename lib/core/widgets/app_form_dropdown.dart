@@ -40,7 +40,7 @@ class AppFormDropdown<T> extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
             children: [
               if (isRequired)
                 TextSpan(
@@ -51,14 +51,19 @@ class AppFormDropdown<T> extends StatelessWidget {
                 ),
             ],
           ),
-        ),
-        SizedBox(height: 8.h),
+        ).paddingOnly(left: 5.w, bottom: 6.h),
         Listener(
-          onPointerDown: (_) => FocusScope.of(context).requestFocus(FocusNode()),
+          onPointerDown: (_) =>
+              FocusScope.of(context).requestFocus(FocusNode()),
           child: DropdownButtonFormField<T>(
             key: ValueKey(value),
             initialValue: value,
             items: items,
+            icon: Icon(
+              Icons.arrow_drop_down,
+              size: 20,
+              color: AppColors.grey,
+            ),
             selectedItemBuilder: (BuildContext context) {
               return items.map<Widget>((DropdownMenuItem<T> item) {
                 return FittedBox(
@@ -71,9 +76,12 @@ class AppFormDropdown<T> extends StatelessWidget {
             onChanged: onChanged,
             isExpanded: true,
             autovalidateMode: AutovalidateMode.onUserInteraction,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+              hintStyle: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey,
+              ),
             ),
             validator: (val) {
               if (isRequired && val == null) {

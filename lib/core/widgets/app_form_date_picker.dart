@@ -39,8 +39,7 @@ class AppFormDatePicker extends StatelessWidget {
     if (parsedDate == null && controller.text.isNotEmpty) {
       try {
         parsedDate = DateFormat('dd-MM-yyyy').parse(controller.text);
-      } catch (_) {
-      }
+      } catch (_) {}
     }
 
     final DateTime? picked = await showDatePicker(
@@ -54,7 +53,7 @@ class AppFormDatePicker extends StatelessWidget {
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: AppColors.white,
-              onSurface: AppColors.white,
+              onSurface: AppColors.black,
             ),
           ),
           child: child!,
@@ -74,7 +73,7 @@ class AppFormDatePicker extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
             children: [
               if (isRequired)
                 TextSpan(
@@ -85,20 +84,16 @@ class AppFormDatePicker extends StatelessWidget {
                 ),
             ],
           ),
-        ),
-        SizedBox(height: 8.h),
+        ).paddingOnly(left: 5.w, bottom: 6.h),
         TextFormField(
           controller: controller,
           readOnly: true,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onTap: () => _selectDate(context),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           decoration: InputDecoration(
             hintText: hint,
-            suffixIcon: Icon(
-              Icons.calendar_today,
-              color: AppColors.grey,
-              size: 20,
-            ),
+            prefixIcon: Icon(Icons.calendar_today, size: 20, color: AppColors.grey),
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {

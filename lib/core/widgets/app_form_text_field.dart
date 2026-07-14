@@ -57,9 +57,7 @@ class AppFormTextField extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.grey,
-            ),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
             children: [
               if (isRequired)
                 TextSpan(
@@ -70,8 +68,7 @@ class AppFormTextField extends StatelessWidget {
                 ),
             ],
           ),
-        ),
-        SizedBox(height: 8.h),
+        ).paddingOnly(left: 5.w, bottom: 6.h),
         TextFormField(
           controller: controller,
           initialValue: initialValue,
@@ -83,15 +80,31 @@ class AppFormTextField extends StatelessWidget {
           textAlign: textAlign,
           inputFormatters: inputFormatters,
           maxLength: maxLength,
-          buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+          buildCounter:
+              (
+                context, {
+                required currentLength,
+                required isFocused,
+                maxLength,
+              }) => null,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           style: AppTextStyles.bodyMedium.copyWith(
             color: readOnly ? AppColors.grey : AppColors.black,
           ),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon,
+            prefixIcon: prefixIcon != null
+                ? IconTheme(
+                    data: const IconThemeData(size: 20),
+                    child: prefixIcon!,
+                  )
+                : null,
+            suffixIcon: suffixIcon != null
+                ? IconTheme(
+                    data: const IconThemeData(size: 20),
+                    child: suffixIcon!,
+                  )
+                : null,
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
@@ -111,4 +124,3 @@ class AppFormTextField extends StatelessWidget {
     );
   }
 }
-
