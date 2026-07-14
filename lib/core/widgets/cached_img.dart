@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -9,7 +8,6 @@ class CachedImg extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.placeholder,
     this.errorWidget,
-    this.imageBuilder,
     this.memCacheHeight,
     this.memCacheWidth,
     this.width,
@@ -20,7 +18,6 @@ class CachedImg extends StatelessWidget {
   final BoxFit fit;
   final Widget Function(BuildContext, String)? placeholder;
   final Widget Function(BuildContext, String, dynamic)? errorWidget;
-  final Widget Function(BuildContext, ImageProvider<Object>)? imageBuilder;
   final int? memCacheHeight;
   final int? memCacheWidth;
   final double? width;
@@ -33,27 +30,28 @@ class CachedImg extends StatelessWidget {
           Icon(Icons.broken_image, color: AppColors.grey);
     }
 
-    return CachedNetworkImage(
-      imageUrl: url,
+    return Image.network(
+      url,
       fit: fit,
       width: width,
       height: height,
-      imageBuilder: imageBuilder,
-      placeholder:
-          placeholder ??
-          (_, __) => Center(
-            child: SizedBox(
-              width: 24.w,
-              height: 24.h,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-      errorWidget:
-          errorWidget ??
-          (_, __, ___) => Icon(Icons.error, color: AppColors.red),
-      fadeInDuration: Duration(milliseconds: 300),
-      memCacheHeight: memCacheHeight,
-      memCacheWidth: memCacheWidth,
+      cacheHeight: memCacheHeight,
+      cacheWidth: memCacheWidth,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return placeholder?.call(context, url) ??
+            Center(
+              child: SizedBox(
+                width: 24.w,
+                height: 24.h,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return errorWidget?.call(context, url, error) ??
+            Icon(Icons.error, color: AppColors.red);
+      },
     );
   }
 }

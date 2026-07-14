@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -291,54 +291,14 @@ class PersonalInfoController extends GetxController {
     );
 
     if (croppedFile != null) {
-      await _compressImage(croppedFile.path);
-    }
-  }
-
-  Future<void> _compressImage(String path) async {
-    try {
       uploadProgress.value = 0.1;
-      final file = File(path);
-      final size = await file.length();
-
-      if (size <= 500 * 1024) {
-        profileImage.value = file;
-        isPhotoRemoved.value = false;
-        uploadProgress.value = 1.0;
-        Future<void>.delayed(
-          Duration(milliseconds: 500),
-          () => uploadProgress.value = 0.0,
-        );
-        return;
-      }
-
-      uploadProgress.value = 0.5;
-      final targetPath =
-          '${path.substring(0, path.lastIndexOf('.'))}_compressed.jpg';
-      final compressedFile = await FlutterImageCompress.compressAndGetFile(
-        path,
-        targetPath,
-        quality: 70,
-        minWidth: 800,
-        minHeight: 800,
-      );
-
-      if (compressedFile != null) {
-        profileImage.value = File(compressedFile.path);
-      } else {
-        profileImage.value = file;
-      }
-
+      profileImage.value = File(croppedFile.path);
       isPhotoRemoved.value = false;
       uploadProgress.value = 1.0;
       Future<void>.delayed(
         Duration(milliseconds: 500),
         () => uploadProgress.value = 0.0,
       );
-    } catch (e) {
-      profileImage.value = File(path);
-      isPhotoRemoved.value = false;
-      uploadProgress.value = 0.0;
     }
   }
 

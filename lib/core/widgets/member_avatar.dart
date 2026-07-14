@@ -23,15 +23,19 @@ class MemberAvatar extends StatelessWidget {
     final memCacheSize = (radius * 3).toInt();
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return CachedImg(
-        url: imageUrl!,
-        memCacheHeight: memCacheSize,
-        memCacheWidth: memCacheSize,
-        imageBuilder: (context, imageProvider) =>
-            CircleAvatar(radius: radius, backgroundImage: imageProvider),
-        placeholder: (context, url) =>
-            _buildFallback(avatarColors, fallbackNameStr, isLoading: true),
-        errorWidget: (context, url, error) => _buildFallback(avatarColors, fallbackNameStr),
+      return ClipOval(
+        child: SizedBox(
+          width: radius * 2,
+          height: radius * 2,
+          child: CachedImg(
+            url: imageUrl!,
+            memCacheHeight: memCacheSize,
+            memCacheWidth: memCacheSize,
+            placeholder: (context, url) =>
+                _buildFallback(avatarColors, fallbackNameStr, isLoading: true),
+            errorWidget: (context, url, error) => _buildFallback(avatarColors, fallbackNameStr),
+          ),
+        ),
       );
     }
 

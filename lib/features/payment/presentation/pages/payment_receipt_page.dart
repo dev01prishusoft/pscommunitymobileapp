@@ -3,7 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -409,10 +410,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     try {
       if (url == null || url.isEmpty) return null;
 
-      final response = await http.get(Uri.parse(url));
+      final request = await HttpClient().getUrl(Uri.parse(url));
+      final response = await request.close();
 
       if (response.statusCode == 200) {
-        return response.bodyBytes;
+        return await consolidateHttpClientResponseBytes(response);
       }
     } catch (e) {
     }
