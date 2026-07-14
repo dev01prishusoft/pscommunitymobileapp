@@ -9,7 +9,6 @@ void main() {
   for (final file in files) {
     final content = file.readAsStringSync();
     if (content.contains('appBar: AppBar(')) {
-      // Find all matches
       final newContent = content.replaceAllMapped(overrideRegex, (match) {
         final titleText = match.group(4) ?? '';
         return 'appBar: AppBar(title: Text($titleText))';
@@ -17,8 +16,6 @@ void main() {
 
       if (newContent != content) {
         file.writeAsStringSync(newContent);
-        // ignore: avoid_print
-        print('Updated \${file.path}');
       }
     }
   }

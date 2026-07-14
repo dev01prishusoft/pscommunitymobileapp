@@ -149,7 +149,6 @@ class MarriageFilterApplicator {
     int? maxIncome = getIncomeValue(filters.selectedIncomeTo);
 
     if (minIncome != null && maxIncome != null && minIncome > maxIncome) {
-      // Invalid range, ignore income filter
       minIncome = null;
       maxIncome = null;
     }

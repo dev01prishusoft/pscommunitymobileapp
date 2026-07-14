@@ -23,8 +23,6 @@ class ResponsiveHelper {
     if (isTablet(context)) return DeviceType.tablet;
     return DeviceType.mobile;
   }
-
-  /// Returns a value based on the current device size
   static T value<T>({
     required BuildContext context,
     required T mobile,
@@ -35,8 +33,6 @@ class ResponsiveHelper {
     if (isTablet(context) && tablet != null) return tablet;
     return mobile;
   }
-
-  /// Calculates an optimal cross axis count for GridViews based on screen width
   static int calculateGridCrossAxisCount(BuildContext context, {double desiredItemWidth = 150}) {
     final width = MediaQuery.of(context).size.width;
     final count = (width / desiredItemWidth).floor();

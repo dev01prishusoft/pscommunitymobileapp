@@ -1,18 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
-import 'package:pscommunitymobileapp/core/network/api_response.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/network/auth_interceptor.dart';
-import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
-import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart';
-import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/certificate_pinning.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart';
+import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 
 class ApiClient {
   ApiClient({
@@ -34,20 +32,6 @@ class ApiClient {
 
     refreshDio.interceptors.add(RetryInterceptor(dio: refreshDio, maxRetries: 1));
 
-    if (AppEnvironment.I.enableLogging) {
-      refreshDio.interceptors.add(
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          compact: true,
-          logPrint: (Object object) {
-            AppLogger.d(object.toString());
-          },
-        ),
-      );
-    }
-
     _dio.interceptors.addAll([
       LanguageInterceptor(),
       AuthInterceptor(
@@ -58,16 +42,6 @@ class ApiClient {
       ),
       RetryInterceptor(dio: _dio),
       ErrorMappingInterceptor(),
-      if (AppEnvironment.I.enableLogging)
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseHeader: true,
-          compact: true,
-          logPrint: (Object object) {
-            AppLogger.d(object.toString());
-          },
-        ),
     ]);
   }
   final Dio _dio;

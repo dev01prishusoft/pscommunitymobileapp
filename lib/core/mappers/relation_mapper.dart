@@ -10,8 +10,6 @@ class RelationMapper {
       case 'wife':
         return LK.wife;
       default:
-        // Gracefully fallback to the raw relation string so the UI can display it
-        // and .tr can translate it if the key is added later.
         return relation;
     }
   }

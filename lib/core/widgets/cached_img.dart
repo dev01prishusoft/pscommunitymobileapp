@@ -1,7 +1,7 @@
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class CachedImg extends StatelessWidget {
   const CachedImg({
@@ -50,7 +50,7 @@ class CachedImg extends StatelessWidget {
           ),
       errorWidget:
           errorWidget ??
-          (_, __, ___) => Icon(Icons.error, color: AppColors.redAccent),
+          (_, __, ___) => Icon(Icons.error, color: AppColors.red),
       fadeInDuration: Duration(milliseconds: 300),
       memCacheHeight: memCacheHeight,
       memCacheWidth: memCacheWidth,

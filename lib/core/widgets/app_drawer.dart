@@ -62,7 +62,7 @@ class AppDrawer extends StatelessWidget {
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.navyBlue],
+                  colors: [AppColors.primary, AppColors.white],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -138,7 +138,10 @@ class AppDrawer extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   ListTile(
-                    leading: Icon(Icons.home_outlined, color: AppColors.primary),
+                    leading: Icon(
+                      Icons.home_outlined,
+                      color: AppColors.primary,
+                    ),
                     title: Text(LK.home.tr),
                     onTap: () => Get.back<void>(),
                   ),
@@ -151,17 +154,26 @@ class AppDrawer extends StatelessWidget {
                     onTap: () => Get.toNamed<void>(AppRouter.findMember),
                   ),
                   ListTile(
-                    leading: Icon(Icons.favorite_outline, color: AppColors.primary),
+                    leading: Icon(
+                      Icons.favorite_outline,
+                      color: AppColors.primary,
+                    ),
                     title: Text(LK.marriage.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.marriage),
                   ),
                   ListTile(
-                    leading: Icon(Icons.edit_outlined, color: AppColors.primary),
+                    leading: Icon(
+                      Icons.edit_outlined,
+                      color: AppColors.primary,
+                    ),
                     title: Text(LK.editProfile.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.editProfile),
                   ),
                   ListTile(
-                    leading: Icon(Icons.corporate_fare_outlined, color: AppColors.primary),
+                    leading: Icon(
+                      Icons.corporate_fare_outlined,
+                      color: AppColors.primary,
+                    ),
                     title: Text(LK.samajSansthas.tr),
                     onTap: () {
                       Get.back<void>();
@@ -201,7 +213,10 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.gavel_outlined, color: AppColors.primary),
+                    leading: Icon(
+                      Icons.gavel_outlined,
+                      color: AppColors.primary,
+                    ),
                     title: Text(LK.termsAndConditions.tr),
                     onTap: () {
                       Get.back<void>();
@@ -220,13 +235,11 @@ class AppDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.person_remove_alt_1_outlined,
-                color: AppColors.redAccent,
+                color: AppColors.red,
               ),
               title: Text(
                 LK.deleteAccount.tr,
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.redAccent,
-                ),
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.red),
               ),
               onTap: () {
                 Get.back<void>();
@@ -234,12 +247,10 @@ class AppDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout_rounded, color: AppColors.redAccent),
+              leading: Icon(Icons.logout_rounded, color: AppColors.red),
               title: Text(
                 LK.logout.tr,
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.redAccent,
-                ),
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.red),
               ),
               onTap: () {
                 Get.back<void>();
@@ -264,9 +275,7 @@ class AppDrawer extends StatelessWidget {
             onPressed: () => Get.back<void>(),
             child: Text(
               LK.cancel.tr,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.mutedForeground,
-              ),
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
             ),
           ),
           SizedBox(width: 8.w),
@@ -292,7 +301,7 @@ class AppDrawer extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
           LK.deleteAccount.tr,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.redAccent),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.red),
         ),
         content: Text(LK.deleteAccountConfirm.tr),
         actions: [
@@ -300,9 +309,7 @@ class AppDrawer extends StatelessWidget {
             onPressed: () => Get.back<void>(),
             child: Text(
               LK.cancel.tr,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.mutedForeground,
-              ),
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
             ),
           ),
           SizedBox(width: 8.w),
@@ -317,7 +324,7 @@ class AppDrawer extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.redAccent,
+              backgroundColor: AppColors.red,
               foregroundColor: AppColors.white,
               elevation: 0,
               minimumSize: Size(120, 45),
@@ -325,7 +332,10 @@ class AppDrawer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Text(LK.deleteAccount.tr, style: AppTextStyles.labelLarge),
+            child: Text(
+              LK.deleteAccount.tr,
+              style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+            ),
           ),
         ],
       ),

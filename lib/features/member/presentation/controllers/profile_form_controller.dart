@@ -1,24 +1,24 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
+import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
-import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/contact_controller.dart';
+import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
-import 'package:dio/dio.dart' as dio;
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
   final showListErrors = false.obs;
@@ -63,8 +63,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         '${now.second.toString().padLeft(2, '0')}';
     return 'PSC-$year-$ts';
   }
-
-  // --- Personal Info Getters ---
   List<String> get defaultGenders => personalInfo.defaultGenders;
   List<String> get defaultMaritalStatuses => personalInfo.defaultMaritalStatuses;
   List<String> get defaultBloodGroups => personalInfo.defaultBloodGroups;
@@ -133,8 +131,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   void pickProfilePhoto() => personalInfo.pickProfilePhoto();
   void removePhoto() => personalInfo.removePhoto();
-
-  // --- Contact Info Getters ---
   List<String> get defaultAddressTypes => contactInfo.defaultAddressTypes;
   List<String> get defaultQualifications => contactInfo.defaultQualifications;
   RxList<String> get addressTypeList => contactInfo.addressTypeList;
@@ -167,8 +163,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
   void removeAddress(int index) => contactInfo.removeAddress(index);
   void addEducation() => contactInfo.addEducation();
   void removeEducation(int index) => contactInfo.removeEducation(index);
-
-  // --- Work Info Getters ---
   List<String> get defaultOccupationTypes => workInfo.defaultOccupationTypes;
   RxList<String> get occupationTypeList => workInfo.occupationTypeList;
   RxList<String> get workStateList => workInfo.workStateList;
@@ -259,7 +253,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     addIfChanged('Weight', normDouble(double.tryParse(personalInfo.weight.value)), normDouble(m.weight?.toDouble()));
     addIfChanged('Height', normDouble(double.tryParse(personalInfo.height.value)), normDouble(m.height?.toDouble()));
     void addDropdown(String key, RxString rxStr, Map<String, int> idMap, String? originalName, [int? originalId]) {
-      final currentStr = rxStr.value; // Read early so Obx registers the dependency
+      final currentStr = rxStr.value; 
       
       if (!_initialDropdownValues.containsKey(key)) return;
 
@@ -272,7 +266,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         } else if (currentStr.isEmpty && initialStr != null && initialStr.isNotEmpty) {
           formDataMap[key] = null;
         } else {
-          formDataMap['_dummy_$key'] = true; // Trigger hasChanges
+          formDataMap['_dummy_$key'] = true; 
         }
       }
     }
@@ -437,11 +431,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (_currentMember == null) return false;
     if (personalInfo.profileImage.value != null) return true;
     if (personalInfo.isPhotoRemoved.value) return true;
-    
-    // Force Obx dependency registration
-    // ignore: unused_local_variable
     final _edu = educationList.toList();
-    // ignore: unused_local_variable
     final _addr = contactInfo.addresses.toList();
     
     final currentEduJson = jsonEncode(_edu.map((e) => e.toJson()).toList());
@@ -499,8 +489,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         addressMemberId = m.familyId!;
       }
     }
-    
-    // Asynchronously fetch addresses and education for this member
     loadAddresses(addressMemberId);
     loadEducation(m.memberId);
     fetchProfileUpdateStatus();
@@ -523,14 +511,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
         
         fieldStatuses.value = newStatuses;
       }
-    } catch (e, stack) {
-      AppLogger.e('Failed to load profile update status', e, stack);
-    }
+    } catch (_) {}
   }
 
   ProfileUpdateStatus? getUpdateStatus(String keyName, {Map<String, int>? idMap}) {
-    // Trigger Obx reactivity correctly for the map
-    // ignore: unused_local_variable
     final _ = fieldStatuses.keys.toList();
 
     ProfileUpdateStatus? status;
@@ -540,8 +524,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         break;
       }
     }
-    
-    // Do not display "Approved" status as requested by user
     if (status == null || status.isApproved) return null;
     
     if (idMap != null && status.newValue != null) {
@@ -559,8 +541,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
             );
           }
         }
-        
-        // Fallback to global maps to find the ID text if missing from the specific dropdown map
         final List<Map<String, int>> globalMaps = [];
         if (keyName.contains('State')) globalMaps.add(workInfo.globalStateIdMap);
         if (keyName.contains('District')) globalMaps.add(workInfo.globalDistrictIdMap);
@@ -589,8 +569,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       }
     }
-    
-    // For specific checkboxes
     final lowerKey = keyName.toLowerCase();
     if (lowerKey == 'islookingformarriage' || lowerKey == 'isownland' || lowerKey == 'isownhouse' || lowerKey == 'hastwowheeler' || lowerKey == 'hasfourwheeler') {
        final newValueStr = status.newValue?.toLowerCase() == 'true' ? LK.yes.tr : LK.no.tr;
@@ -648,16 +626,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   String _initialEducationJson = '[]';
   String _initialAddressesJson = '[]';
-
-  /// Strips language suffixes like "(en)", "(gu)" for comparison.
   static String _stripLangSuffix(String s) =>
       s.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
-
-  /// Checks if [list] already contains [value], considering language suffixes
-  /// and optionally by ID (to catch same-entity in different scripts).
   static bool _containsIgnoringLang(List<String> list, String value, {int? id, Map<String, int>? idMap}) {
     if (list.contains(value)) return true;
-    // Check by ID: if any existing item in the list has the same ID, it's a duplicate
     if (id != null && idMap != null) {
       for (final existing in list) {
         if (idMap[existing] == id) return true;
@@ -674,8 +646,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         '/api/v1/MemberEducation/mobile/member/$memberId',
       );
       if (response.statusCode == 200 && response.data != null) {
-        AppLogger.d('--- EDUCATION API RESPONSE ---');
-        AppLogger.d(response.data.toString());
         final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
         final newEducation = data.map((e) {
           final map = e as Map<String, dynamic>;
@@ -714,9 +684,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
         _checkAndTakeSnapshot();
       }
-    } catch (e, stack) {
-      AppLogger.e('Failed to load education for member $memberId', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<void> loadAddresses(int memberId) async {
@@ -796,8 +764,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
             isPrimary: map['isPrimary'] == true,
           );
         }).toList();
-
-        // Sort addresses so the primary one is always first
         newAddresses.sort((a, b) {
           if (a.isPrimary && !b.isPrimary) return -1;
           if (!a.isPrimary && b.isPrimary) return 1;
@@ -808,9 +774,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           contactInfo.addresses.value = newAddresses;
         }
         _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
-
-        // Eagerly pre-fetch dropdown data for each address so values can be resolved.
-        // Stage 1: Fetch districts for each state
         final districtFutures = <Future<void>>[];
         final seenStates = <int>{};
         for (final addr in contactInfo.addresses) {
@@ -823,11 +786,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
         if (districtFutures.isNotEmpty) await Future.wait(districtFutures);
-
-        // Sanitize to resolve state/district names to match dropdown API values
         sanitizeAddresses();
-
-        // Stage 2: Fetch talukas for each resolved district
         final talukaFutures = <Future<void>>[];
         final seenDistricts = <int>{};
         for (final addr in contactInfo.addresses) {
@@ -840,11 +799,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
         if (talukaFutures.isNotEmpty) await Future.wait(talukaFutures);
-
-        // Sanitize again to resolve taluka names
         sanitizeAddresses();
-
-        // Stage 3: Fetch areas for each resolved taluka
         final areaFutures = <Future<void>>[];
         final seenTalukas = <int>{};
         for (final addr in contactInfo.addresses) {
@@ -857,20 +812,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
         if (areaFutures.isNotEmpty) await Future.wait(areaFutures);
-
-        // Final sanitize to resolve area names
         sanitizeAddresses();
         _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
         _checkAndTakeSnapshot();
       }
     } catch (e) {
-      // Ignore
     }
   }
 
   void markAsAddMode() {
     isAddMode = true;
-    isMemberLoaded = true; // Pretend it's loaded so snapshot runs when dropdowns finish
+    isMemberLoaded = true; 
     _checkAndTakeSnapshot();
   }
 
@@ -932,7 +884,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
   void sanitizeAddresses() {
     bool changed = false;
     for (final addr in contactInfo.addresses) {
-      // Resolve state name by ID
       if (addr.stateId != null && addr.stateId != 0) {
         String? loc;
         for (final e in workInfo.workStateIdMap.entries) {
@@ -945,8 +896,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           changed = true;
         }
       }
-
-      // Resolve district name by ID
       if (addr.districtId != null && addr.districtId != 0) {
         String? loc;
         for (final e in workInfo.globalDistrictIdMap.entries) {
@@ -963,8 +912,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           list.add(addr.district);
         }
       }
-
-      // Resolve taluka name by ID
       if (addr.talukaId != null && addr.talukaId != 0) {
         String? loc;
         for (final e in workInfo.globalTalukaIdMap.entries) {
@@ -981,8 +928,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           list.add(addr.taluka);
         }
       }
-
-      // Resolve area name by ID
       if (addr.areaId != null && addr.areaId != 0) {
         String? loc;
         for (final e in workInfo.globalAreaIdMap.entries) {
@@ -998,8 +943,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           list.add(addr.area);
         }
       }
-
-      // Resolve address type by ID
       if (addr.typeId != null && addr.typeId != 0) {
         String? loc;
         for (final e in contactInfo.addressTypeIdMap.entries) {
@@ -1219,8 +1162,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _initialDropdownValues['OccupationDistrictId'] = workInfo.workDistrict.value;
     _initialDropdownValues['OccupationTalukaId'] = workInfo.workTaluka.value;
     _initialDropdownValues['OccupationAreaId'] = workInfo.workArea.value;
-
-    // Fix up addresses based on dropdown ID maps
     for (final addr in contactInfo.addresses) {
       if (addr.typeId != null) {
         for (final entry in contactInfo.addressTypeIdMap.entries) {
@@ -1234,8 +1175,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
     contactInfo.addresses.refresh();
     _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
     _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
-
-    // Trigger an update so Obx recalculates hasChanges now that snapshot is ready
     changedFormData; 
     fieldStatuses.refresh();
   }
@@ -1309,7 +1248,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       }
     } catch (e) {
-      // Ignore
     } finally {
       _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
       _initialDropdownValues['MotherDistrictId'] = personalInfo.motherDistrict.value;
@@ -1321,7 +1259,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   void _ensureSelectionValue(RxString selected, List<String> list) {
     if (selected.value.isNotEmpty && !list.contains(selected.value)) {
-      if (list.isEmpty) return; // Wait for list to load before wiping out data
+      if (list.isEmpty) return; 
       final query = selected.value.replaceAll(' ', '').toLowerCase();
       
       String? match;
@@ -1492,28 +1430,20 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
 
           if (formDataMap.isNotEmpty) {
-            // Remove any internal dummy tracking keys before sending to API
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
-
-            AppLogger.d('--- API REQUEST ---');
-            AppLogger.d('URL: ${isEdit ? '/api/v1/MemberUpdateRequest/create' : '/api/v1/member/mobile/upsert'}');
-            final printableMap = formDataMap.map((key, value) {
+            formDataMap.map((key, value) {
               if (value is dio.MultipartFile) {
                 return MapEntry(key, 'MultipartFile(${value.filename})');
               }
               return MapEntry(key, value);
             });
-            AppLogger.d('Payload: \n${JsonEncoder.withIndent('  ').convert(printableMap)}');
            
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
               isEdit ? '/api/v1/MemberUpdateRequest/create' : '/api/v1/member/mobile/upsert',
               data: formData,
-            );
-            
-            AppLogger.d('--- API RESPONSE ---');
-            AppLogger.d(response.data?.toString() ?? 'No Response Data');
+            );        
             
             if (response.data != null && response.data is Map<String, dynamic>) {
               final msg = response.data['message'] as String?;
@@ -1562,9 +1492,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/member-address/mobile/upsert',
                     data: addressesPayload,
                   );    
-                } catch (e) {
-                  AppLogger.e('Failed to upsert addresses', e);
-                }
+                } catch (_) {}
 
                 try {
                   final educationsPayload = {
@@ -1588,9 +1516,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/MemberEducation/mobile/upsert',                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
                     data: educationsPayload,
                   );
-                } catch (e) {
-                  AppLogger.e('Failed to upsert educations', e);
-                }
+                } catch (_) {}
               }
             }
 
@@ -1604,9 +1530,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     'rejectedReasonCommentByAdmin': null
                   },
                 );
-              } catch (e, stack) {
-                AppLogger.e('Failed to send edit request comment', e, stack);
-              }
+              } catch (_) {}
             }
           } else if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
             final apiClient = Get.find<ApiClient>();
@@ -1619,9 +1543,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   'rejectedReasonCommentByAdmin': null
                 },
               );
-            } catch (e, stack) {
-              AppLogger.e('Failed to send edit request comment', e, stack);
-            }
+            } catch (_) {}
           }
           
           bool hasProfileUpdates = formDataMap.isNotEmpty;
@@ -1661,12 +1583,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/MemberEducation/mobile/upsert',
                     data: educationsPayload,
                   );
-                } catch (e) {
-                  AppLogger.e(
-                    'Failed to upsert educations directly in edit mode',
-                    e,
-                  );
-                }
+                } catch (_) {}
               }
             }
           }
@@ -1693,16 +1610,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
           
           await Future<void>.delayed(const Duration(milliseconds: 1500));
           await Get.offAllNamed<void>(AppRouter.home);
-        } catch (e, stack) {
-          AppLogger.e('Submit form error', e, stack);
+        } catch (e) {
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
             errorMessage = e.message;
-          } else if (e is dio.DioException) {
-            AppLogger.e('--- DIO ERROR DETAILS ---');
-            AppLogger.e('Status Code: ${e.response?.statusCode}');
-            AppLogger.e('Response Data: ${e.response?.data}');
-          }
+          } 
           Get.snackbar(
             LK.error.tr,
             errorMessage,

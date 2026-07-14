@@ -1,7 +1,7 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
@@ -48,20 +48,23 @@ class AppTextField extends StatelessWidget {
                   TextSpan(
                     text: '${label!.replaceAll('*', '').trimRight()} ',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   TextSpan(
                     text: '*',
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ] else ...[
                   TextSpan(
                     text: label!,
                     style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -80,17 +83,17 @@ class AppTextField extends StatelessWidget {
           maxLength: maxLength,
           inputFormatters: inputFormatters,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.foreground,
-            fontWeight: FontWeight.w400,
+            color: AppColors.black,
             fontSize: 14.0.sp,
           ),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
               fontSize: 14.0.sp,
             ),
-            prefixIcon: Icon(icon, color: AppColors.mutedForeground),
+            prefixIcon: Icon(icon, color: AppColors.grey),
             suffixIcon: suffixIcon,
             counterText: '',
           ),

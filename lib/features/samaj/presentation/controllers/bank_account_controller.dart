@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_bank_details_model.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/repositories/samaj_repository.dart';
 
@@ -27,9 +26,8 @@ class BankAccountController extends GetxController {
       if (detail.isNotEmpty) {
         bankAccountDetails.assignAll(detail);
       }
-    } catch (e, stack) {
+    } catch (e) {
       bankdetailsError.value = e.toString();
-      AppLogger.e('Failed to fetch bank details', e, stack);
     } finally {
       isLoading.value = false;
       _isFetchingBankDetails = false;

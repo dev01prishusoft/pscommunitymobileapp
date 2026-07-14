@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 import 'package:pscommunitymobileapp/features/notification/data/repositories/notification_repository.dart';
@@ -91,8 +91,6 @@ class NotificationController extends GetxController {
     if (!notification.isRead) {
       final index = notifications.indexWhere((n) => n.memberNotificationId == notification.memberNotificationId);
       MemberNotification? oldNotification;
-      
-      // Optimistic update
       if (index != -1) {
         oldNotification = notifications[index];
         final updatedNotification = oldNotification.copyWith(isRead: true);
@@ -101,14 +99,13 @@ class NotificationController extends GetxController {
       
       final result = await _repository.markAsRead(notification.memberNotificationId, cancelToken: _cancelToken);
       if (result.isFailure) {
-        // Revert on failure
         if (index != -1 && oldNotification != null) {
           notifications[index] = oldNotification;
         }
         if (result.failureOrNull?.message != 'canceled') {
           Get.snackbar(LK.error.tr, result.failureOrNull?.message ?? LK.unknownError.tr);
         }
-        return; // Don't navigate if markAsRead fails? The prompt says "Handle markAsRead() failure". Usually we still navigate or we don't. I'll let it proceed.
+        return; 
       }
     }
 

@@ -1,7 +1,8 @@
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppInlineError extends StatelessWidget {
   const AppInlineError({super.key, required this.message});
@@ -18,7 +19,7 @@ class AppInlineError extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          Icon(Icons.error_outline, color: AppColors.red, size: 18),
+          Icon(Iconsax.info_circle_copy, color: AppColors.red, size: 18),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(

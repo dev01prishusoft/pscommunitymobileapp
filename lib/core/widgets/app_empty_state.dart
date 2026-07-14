@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
@@ -20,55 +20,67 @@ class AppEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl, horizontal: AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.5),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 96.w,
+          height: 96.h,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            shape: BoxShape.circle,
+          ),
+          child: Stack(
             alignment: Alignment.center,
             children: [
               Icon(
                 icon,
-                size: 80,
-                color: AppColors.primary.withValues(alpha: 0.15),
+                size: 44.sp,
+                color: AppColors.primary.withValues(alpha: 0.35),
               ),
               if (secondaryIcon != null)
                 Positioned(
-                  top: 10,
-                  child: Icon(
-                    secondaryIcon,
-                    size: 40,
-                    color: AppColors.primary,
+                  bottom: 8.h,
+                  right: 8.w,
+                  child: Container(
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      secondaryIcon,
+                      size: 18.sp,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
             ],
           ),
-          AppSpacing.vL,
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.headlineSmall.copyWith(
-              color: AppColors.secondary,
-            ),
+        ),
+        SizedBox(height: 24.h),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.headlineSmall.copyWith(
+            fontWeight: FontWeight.bold,
           ),
-          AppSpacing.vS,
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
-          ),
-          if (actionButton != null) ...[AppSpacing.vXxl, actionButton!],
-        ],
-      ),
+        ),
+        SizedBox(height: 10.h),
+        Text(
+          subtitle,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+        ),
+        if (actionButton != null) ...[SizedBox(height: 24.h), actionButton!],
+      ],
     );
   }
 }

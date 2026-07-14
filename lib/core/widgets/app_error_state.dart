@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class AppErrorState extends StatelessWidget {
   const AppErrorState({super.key, this.errorMessage, this.onRetry});
@@ -23,13 +22,13 @@ class AppErrorState extends StatelessWidget {
             Container(
               padding: AppSpacing.pL,
               decoration: BoxDecoration(
-                color: AppColors.destructive.withValues(alpha: 0.1),
+                color: AppColors.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.error_outline_rounded,
                 size: 60,
-                color: AppColors.destructive,
+                color: AppColors.red,
               ),
             ),
             AppSpacing.vXxl,
@@ -37,7 +36,7 @@ class AppErrorState extends StatelessWidget {
               errorMessage ?? LK.somethingWrong.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.titleMedium.copyWith(
-                color: AppColors.foreground,
+                color: AppColors.primary,
               ),
             ),
             if (onRetry != null) ...[

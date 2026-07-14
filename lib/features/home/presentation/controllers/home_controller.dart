@@ -124,7 +124,6 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         unreadNotificationCount.value = result.dataOrNull?.unreadCount ?? 0;
       }
     } catch (e) {
-      // Ignore
     }
   }
 

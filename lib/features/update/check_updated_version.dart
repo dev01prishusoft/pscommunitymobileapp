@@ -60,7 +60,7 @@ void showAppUpdateBottomSheet(
                         textAlign: TextAlign.start,
                         style: AppTextStyles.titleLarge.copyWith(
                           fontSize: 18,
-                          color: AppColors.accentForeground,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -97,7 +97,7 @@ void showAppUpdateBottomSheet(
                   padding: EdgeInsets.all(12),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: AppColors.accentForeground,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

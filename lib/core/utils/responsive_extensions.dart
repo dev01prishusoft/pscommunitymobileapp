@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'responsive_helper.dart';
 
 extension ResponsiveContext on BuildContext {
@@ -11,8 +12,6 @@ extension ResponsiveContext on BuildContext {
   
   EdgeInsets get padding => MediaQuery.of(this).padding;
   EdgeInsets get viewInsets => MediaQuery.of(this).viewInsets;
-
-  /// Returns value based on screen size
   T adaptiveValue<T>({required T mobile, T? tablet, T? desktop}) {
     return ResponsiveHelper.value<T>(
       context: this,
@@ -21,8 +20,6 @@ extension ResponsiveContext on BuildContext {
       desktop: desktop,
     );
   }
-
-  /// Calculates dynamic optimal max width for forms to avoid them looking stretched on tablets
   double get optimalFormWidth {
     if (isTablet || isDesktop) return 600.0;
     return screenWidth;

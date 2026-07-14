@@ -1,5 +1,5 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 

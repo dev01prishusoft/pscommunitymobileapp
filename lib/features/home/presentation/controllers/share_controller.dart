@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/model/app_link_model.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -54,9 +53,8 @@ class ShareController extends GetxController {
       );
 
       update();
-    } catch (e, stack) {
+    } catch (e) {
       applinkError.value = e.toString();
-      AppLogger.e('Failed to fetch app link details', e, stack);
     } finally {
       isLoading.value = false;
     }

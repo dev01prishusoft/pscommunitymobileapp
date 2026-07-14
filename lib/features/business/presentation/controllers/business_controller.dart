@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/features/business/domain/entities/business_category.dart';
+import 'package:pscommunitymobileapp/features/business/domain/repositories/business_repository.dart';
 
 class BusinessController extends GetxController {
   BusinessController(this._repository);
@@ -23,8 +22,7 @@ class BusinessController extends GetxController {
       } else {
         state.value = AppState.error;
       }
-    } catch (e, stack) {
-      AppLogger.e('Failed to load business categories', e, stack);
+    } catch (e) {
       state.value = AppState.error;
     }
   }

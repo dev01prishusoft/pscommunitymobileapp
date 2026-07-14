@@ -1,12 +1,12 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class AppWebViewPage extends StatefulWidget {
   const AppWebViewPage({super.key, required this.title, required this.url});
@@ -59,7 +59,6 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
-      // Ignore error
     }
   }
 
@@ -130,14 +129,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: Text(widget.title, style: AppTextStyles.headlineSmall.copyWith(color: AppColors.white)),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        iconTheme: const IconThemeData(color: AppColors.white),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       body: Stack(
         children: [
           if (_hasError)
@@ -147,11 +139,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 60,
-                      color: AppColors.destructive,
-                    ),
+                    Icon(Icons.error_outline, size: 60, color: AppColors.red),
                     SizedBox(height: 16.h),
                     Text(
                       'Failed to load page',
@@ -162,7 +150,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
                       _errorMessage,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.mutedForeground,
+                        color: AppColors.grey,
                       ),
                     ),
                     SizedBox(height: 24.h),

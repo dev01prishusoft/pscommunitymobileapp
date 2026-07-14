@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'dart:async';
 
 class AddedMembersController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
@@ -72,12 +72,8 @@ class AddedMembersController extends GetxController {
             }
           }
         }
-      } else {
-        AppLogger.e('Failed to fetch members: ${response.data['message']}');
       }
-    } catch (e, stackTrace) {
-      AppLogger.e('Error fetching members', e, stackTrace);
-    } finally {
+    } catch (_) {} finally {
       isLoading.value = false;
     }
   }

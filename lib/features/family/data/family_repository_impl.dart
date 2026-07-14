@@ -1,13 +1,12 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
-import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
-import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family.dart';
+import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
+import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member_address.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 
 class FamilyRepositoryImpl implements FamilyRepository {
   FamilyRepositoryImpl(this._apiClient);
@@ -15,7 +14,6 @@ class FamilyRepositoryImpl implements FamilyRepository {
 
   @override
   Future<Member> getMemberDetails(int memberId) async {
-    AppLogger.d('Member Detail Request for ID: $memberId');
     final response = await _apiClient.getParsed<Member>(
       '${ApiEndpoints.memberDetail}/$memberId',
       fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
@@ -25,7 +23,6 @@ class FamilyRepositoryImpl implements FamilyRepository {
 
   @override
   Future<List<MemberAddress>> getMemberAddresses(int memberId) async {
-    AppLogger.d('Member Address Request for ID: $memberId');
     final response = await _apiClient.getParsed<List<MemberAddress>>(
       '${ApiEndpoints.memberAddress}/$memberId',
       fromJsonT: (json) => (json as List)
@@ -37,7 +34,6 @@ class FamilyRepositoryImpl implements FamilyRepository {
 
   @override
   Future<List<EducationModel>> getMemberEducations(int memberId) async {
-    AppLogger.d('Member Education Request for ID: $memberId');
     final response = await _apiClient.get('/api/v1/MemberEducation/mobile/member/$memberId');
     
     if (response.statusCode == 200 && response.data != null) {
@@ -124,8 +120,6 @@ class FamilyRepositoryImpl implements FamilyRepository {
       'pageSize': pageSize,
     };
 
-    AppLogger.d('Family Areas Request: $queryParameters');
-
     try {
       final response = await _apiClient.getPaginated<FamilyArea>(
         ApiEndpoints.familyAreas,
@@ -134,8 +128,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         fromJsonT: (json) => FamilyArea.fromJson(json as Map<String, dynamic>),
       );
       return response.dataOrNull?.data ?? [];
-    } on Exception catch (e) {
-      AppLogger.e('GetFamilyAreaForSamaj Error', e);
+    } on Exception catch (_) {
       rethrow;
     }
   }
@@ -152,8 +145,6 @@ class FamilyRepositoryImpl implements FamilyRepository {
       'pageSize': pageSize,
     };
 
-    AppLogger.d('Families By Area Request: $queryParameters');
-
     try {
       final response = await _apiClient.getPaginated<Family>(
         ApiEndpoints.getFamiliesByArea,
@@ -162,8 +153,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         fromJsonT: (json) => Family.fromJson(json as Map<String, dynamic>),
       );
       return response.dataOrNull?.data ?? [];
-    } on Exception catch (e) {
-      AppLogger.e('GetFamiliesByArea Error', e);
+    } on Exception catch (_) {
       rethrow;
     }
   }

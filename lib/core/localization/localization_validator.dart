@@ -1,7 +1,8 @@
+
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class LocalizationValidator {
   static Future<void> validate() async {
@@ -26,43 +27,12 @@ class LocalizationValidator {
 
       for (final key in LK.allValues) {
         if (!enMap.containsKey(key)) {
-          AppLogger.e('Localization Error: Key "$key" missing in en_US.json');
           errorCount++;
         }
         if (!guMap.containsKey(key)) {
-          AppLogger.e('Localization Error: Key "$key" missing in gu_IN.json');
           errorCount++;
         }
       }
-
-      for (final key in enMap.keys) {
-        if (!LK.allValues.contains(key)) {
-          AppLogger.w(
-            'Localization Warning: Orphan key "$key" in en_US.json (not in LK.allValues)',
-          );
-        }
-      }
-
-      for (final key in guMap.keys) {
-        if (!LK.allValues.contains(key)) {
-          AppLogger.w(
-            'Localization Warning: Orphan key "$key" in gu_IN.json (not in LK.allValues)',
-          );
-        }
-      }
-
-      if (errorCount == 0) {
-        AppLogger.i('Localization Validation: Passed (0 missing keys)');
-      } else {
-        AppLogger.e(
-          'Localization Validation: Failed with $errorCount missing keys',
-        );
-      }
-    } catch (e) {
-      AppLogger.e(
-        'Localization Validation: Failed to load translation files',
-        e,
-      );
-    }
+    } catch (_) {}
   }
 }

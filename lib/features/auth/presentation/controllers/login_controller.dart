@@ -1,16 +1,16 @@
-// ignore_for_file: unawaited_futures, inference_failure_on_function_invocation
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
-import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
-import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
-import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
+import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart' as ps_localization;
+import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
+import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
+import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 enum LoginResult { success, requirePasswordReset, failure }
 

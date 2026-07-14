@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/repositories/samaj_repository.dart';
 
@@ -24,9 +23,7 @@ class SamajController extends GetxController with WidgetsBindingObserver{
       ever(localizationService.currentLocale, (_) {
         fetchSamajDetail(updateLanguage: false);
       });
-    } catch (_) {
-      // Localization service might not be available in some tests or contexts
-    }
+    } catch (_) {}
   }
 
   @override
@@ -56,10 +53,9 @@ class SamajController extends GetxController with WidgetsBindingObserver{
 
     try {
       final detail = await _repository.getSamajDetail();
-      _isFetchingSamaj = false; // Allow re-fetches triggered by language change
+      _isFetchingSamaj = false; 
       if (detail != null) {
         samaj.value = detail;
-        AppLogger.d('Samaj details loaded: ${samaj.value?.toJson()}');
 
         if (updateLanguage && detail.languageCode != null && detail.languageCode!.isNotEmpty) {
           try {
@@ -81,14 +77,11 @@ class SamajController extends GetxController with WidgetsBindingObserver{
                 }
               }
             }
-          } catch (e) {
-            AppLogger.e('Failed to set default language from samaj', e);
-          }
+          } catch (_) {}
         }
       }
-    } catch (e, stack) {
+    } catch (e) {
       samajError.value = e.toString();
-      AppLogger.e('Failed to fetch samaj details', e, stack);
     } finally {
       isSamajLoading.value = false;
       _isFetchingSamaj = false;

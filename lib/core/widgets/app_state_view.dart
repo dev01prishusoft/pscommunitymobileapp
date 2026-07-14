@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 
@@ -17,6 +16,7 @@ class AppStateView extends StatelessWidget {
     this.onRetry,
     this.emptyMessage,
     this.emptyIcon,
+    this.emptyActionButton,
   });
   final AppState state;
   final Widget child;
@@ -24,6 +24,7 @@ class AppStateView extends StatelessWidget {
   final VoidCallback? onRetry;
   final String? emptyMessage;
   final IconData? emptyIcon;
+  final Widget? emptyActionButton;
 
   @override
   Widget build(BuildContext context) {
@@ -36,25 +37,16 @@ class AppStateView extends StatelessWidget {
         );
       case AppState.error:
         return Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: AppSpacing.pM,
-              child: AppErrorState(errorMessage: errorMessage, onRetry: onRetry),
-            ),
-          ),
+          child: AppErrorState(errorMessage: errorMessage, onRetry: onRetry),
         );
       case AppState.empty:
         return Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: AppSpacing.pM,
-              child: AppEmptyState(
-                icon: emptyIcon ?? Icons.search_off_rounded,
-                secondaryIcon: emptyIcon != null ? null : Icons.search,
-                title: emptyMessage ?? LK.noResultsFound.tr,
-                subtitle: LK.trySelectingDifferentFilters.tr,
-              ),
-            ),
+          child: AppEmptyState(
+            icon: emptyIcon ?? Icons.search_off_rounded,
+            secondaryIcon: emptyIcon,
+            title: emptyMessage ?? LK.noResultsFound.tr,
+            subtitle: LK.trySelectingDifferentFilters.tr,
+            actionButton: emptyActionButton,
           ),
         );
       case AppState.data:

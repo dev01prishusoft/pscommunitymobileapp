@@ -379,7 +379,6 @@ class Member {
       'districtId': districtId,
       'talukaId': talukaId,
       'areaId': areaId,
-      // Add other fields if necessary
     };
   }
 }

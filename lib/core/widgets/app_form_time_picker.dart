@@ -1,11 +1,11 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 
 class AppFormTimePicker extends StatefulWidget {
   const AppFormTimePicker({
@@ -63,26 +63,23 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
       if (_displayController.text.isNotEmpty) _displayController.text = '';
       return;
     }
-    
-    // Parse 24h format from the main controller
     try {
       final parts = text.split(':');
       if (parts.length >= 2) {
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
         final time = TimeOfDay(hour: hour, minute: minute);
-        
+
         final displayHour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
         final displayMinute = time.minute.toString().padLeft(2, '0');
         final period = time.period == DayPeriod.am ? 'AM' : 'PM';
         final newDisplayText = '$displayHour:$displayMinute $period';
-        
+
         if (_displayController.text != newDisplayText) {
           _displayController.text = newDisplayText;
         }
       }
     } catch (_) {
-      // If parsing fails (maybe it's already AM/PM somehow), just use it
       if (_displayController.text != text) {
         _displayController.text = text;
       }
@@ -113,27 +110,26 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: AppColors.white,
-              onSurface: AppColors.foreground,
             ),
           ),
           child: Localizations.override(
             context: context,
             locale: const Locale('en', 'US'),
             child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+              data: MediaQuery.of(
+                context,
+              ).copyWith(alwaysUse24HourFormat: false),
               child: child!,
             ),
           ),
         );
       },
     );
-    
+
     if (picked != null) {
-      // Save 24h format to the underlying controller
       final String hour = picked.hour.toString().padLeft(2, '0');
       final String minute = picked.minute.toString().padLeft(2, '0');
       widget.controller.text = '$hour:$minute';
-      // _updateDisplay will be called automatically via the listener
     }
   }
 
@@ -145,9 +141,7 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
         RichText(
           text: TextSpan(
             text: widget.label,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
+            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
             children: [
               if (widget.isRequired)
                 TextSpan(
@@ -164,39 +158,12 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
           controller: _displayController,
           readOnly: true,
           onTap: () => _selectTime(context),
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
             prefixIcon: Icon(
               Icons.access_time,
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
               size: 20,
-            ),
-            filled: true,
-            fillColor: AppColors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.red),
             ),
           ),
           validator: (value) {
@@ -215,4 +182,3 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
     );
   }
 }
-

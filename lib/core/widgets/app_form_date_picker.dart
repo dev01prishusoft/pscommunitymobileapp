@@ -1,12 +1,12 @@
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 
 class AppFormDatePicker extends StatelessWidget {
   const AppFormDatePicker({
@@ -40,7 +40,6 @@ class AppFormDatePicker extends StatelessWidget {
       try {
         parsedDate = DateFormat('dd-MM-yyyy').parse(controller.text);
       } catch (_) {
-        // Ignore parse error
       }
     }
 
@@ -55,7 +54,7 @@ class AppFormDatePicker extends StatelessWidget {
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: AppColors.white,
-              onSurface: AppColors.foreground,
+              onSurface: AppColors.white,
             ),
           ),
           child: child!,
@@ -75,9 +74,7 @@ class AppFormDatePicker extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
+            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
             children: [
               if (isRequired)
                 TextSpan(
@@ -95,46 +92,17 @@ class AppFormDatePicker extends StatelessWidget {
           readOnly: true,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onTap: () => _selectDate(context),
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.mutedForeground,
-            ),
             suffixIcon: Icon(
               Icons.calendar_today,
-              color: AppColors.mutedForeground,
+              color: AppColors.grey,
               size: 20,
-            ),
-            filled: true,
-            fillColor: AppColors.white,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.border.withValues(alpha: 0.5),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5.w),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.red),
             ),
           ),
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
-              if (originalValue != null && originalValue!.trim().isEmpty) {
-                // allow since originally empty
-              } else {
+              if (originalValue != null && originalValue!.trim().isNotEmpty) {
                 return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
               }
             }

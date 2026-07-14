@@ -1,15 +1,14 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
-import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
-import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
-import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/razorpay_order.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
 
 class PaymentRepositoryImpl implements PaymentRepository {
   PaymentRepositoryImpl(this._apiClient);
@@ -43,8 +42,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull!.data!;
-    } catch (e, stack) {
-      AppLogger.e('GetDashboard Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -60,8 +58,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
-    } catch (e, stack) {
-      AppLogger.e('GetPaymentModes Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -77,8 +74,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
-    } catch (e, stack) {
-      AppLogger.e('GetPaymentTypes Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -95,8 +91,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? [];
-    } catch (e, stack) {
-      AppLogger.e('GetCategories Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -127,7 +122,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
         'description': description ?? '',
         'isRecurring': isRecurring,
       };
-      AppLogger.i('CreateOrder Payload: $payload');
 
       final response = await _apiClient.postParsed<RazorpayOrder>(
         ApiEndpoints.createOrder,
@@ -135,18 +129,13 @@ class PaymentRepositoryImpl implements PaymentRepository {
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
-      
-      AppLogger.i('CreateOrder Response Status: ${response.isFailure ? "Failure" : "Success"}');
-      
+            
       if (response.isFailure) {
-        AppLogger.e('CreateOrder Failed - Message: ${response.failureOrNull?.message}');
         throw response.failureOrNull!;
       }
       
-      AppLogger.i('CreateOrder Success Data: ${response.dataOrNull?.data}');
       return response.dataOrNull!.data!;
-    } catch (e, stack) {
-      AppLogger.e('CreateOrder Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -186,26 +175,18 @@ class PaymentRepositoryImpl implements PaymentRepository {
         };
       }
 
-      AppLogger.i('VerifyPayment API Endpoint: $endpoint');
-      AppLogger.i('VerifyPayment API Payload: $payload');
-
       final response = await _apiClient.postParsed<Map<String, dynamic>>(
         endpoint,
         data: payload,
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
       
-      AppLogger.i('VerifyPayment API Raw Status: ${response.isSuccess ? 'Success' : 'Failure'}');
-
       if (response.isFailure) {
-        AppLogger.e('VerifyPayment API Failed - Message: ${response.failureOrNull?.message}');
         throw response.failureOrNull!;
       }
       
-      AppLogger.i('VerifyPayment API Success Response: ${response.dataOrNull?.data}');
       return response.dataOrNull?.data ?? {};
-    } catch (e, stack) {
-      AppLogger.e('VerifyPayment Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }
@@ -235,8 +216,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         queryParameters: queryParameters,
         fromJsonT: (json) => PaymentItem.fromJson(json as Map<String, dynamic>),
       );
-    } catch (e, stack) {
-      AppLogger.e('GetHistory Error', e, stack);
+    } catch (e) {
       return Error(e is Failure ? e : ServerFailure(e.toString()));
     }
   }
@@ -250,8 +230,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       if (response.isFailure) throw response.failureOrNull!;
       return response.dataOrNull?.data ?? {};
-    } catch (e, stack) {
-      AppLogger.e('GetReceipt Error', e, stack);
+    } catch (e) {
       rethrow;
     }
   }

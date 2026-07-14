@@ -1,5 +1,4 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 
 class SecureStorageService {
   SecureStorageService()
@@ -18,16 +17,13 @@ class SecureStorageService {
   Future<void> write(String key, String? value) async {
     try {
       await _storage.write(key: 'ps_community_$key', value: value);
-    } catch (e, stack) {
-      AppLogger.e('SecureStorage write error', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<String?> read(String key) async {
     try {
       return await _storage.read(key: 'ps_community_$key');
-    } catch (e, stack) {
-      AppLogger.e('SecureStorage read error', e, stack);
+    } catch (e) {
       return null;
     }
   }
@@ -35,17 +31,13 @@ class SecureStorageService {
   Future<void> delete(String key) async {
     try {
       await _storage.delete(key: 'ps_community_$key');
-    } catch (e, stack) {
-      AppLogger.e('SecureStorage delete error', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<void> deleteAll() async {
     try {
       await _storage.deleteAll();
-    } catch (e, stack) {
-      AppLogger.e('SecureStorage deleteAll error', e, stack);
-    }
+    } catch (_) {}
   }
 
   Future<void> setBool(String key, bool value) async {

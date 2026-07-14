@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
 
@@ -13,9 +14,6 @@ mixin FormStateMixin on GetxController {
   bool get isFormError => formState.value == FormSubmissionState.error;
 
   bool _isThrottling = false;
-
-  /// Throttled submission prevents multiple rapid taps from firing the submit action
-  /// multiple times before the loading state even registers.
   Future<void> submitThrottled(Future<void> Function() submitAction) async {
     if (_isThrottling || isFormLoading) return;
     

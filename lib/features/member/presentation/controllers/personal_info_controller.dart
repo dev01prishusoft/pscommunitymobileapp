@@ -1,14 +1,15 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
 class PersonalInfoController extends GetxController {
   final defaultGenders = ['Male', 'Female', 'Other'];
@@ -191,7 +192,7 @@ class PersonalInfoController extends GetxController {
     await Get.bottomSheet<void>(
       Container(
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: AppColors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
@@ -204,7 +205,7 @@ class PersonalInfoController extends GetxController {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: AppColors.grey,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -269,6 +270,9 @@ class PersonalInfoController extends GetxController {
   Future<void> _cropImage(String path) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: path,
+      compressQuality: 70,
+      maxHeight: 800,
+      maxWidth: 800,
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Crop Profile Photo',

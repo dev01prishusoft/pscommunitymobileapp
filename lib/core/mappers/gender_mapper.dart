@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/logging/app_logger.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class GenderMapper {
@@ -11,7 +10,6 @@ class GenderMapper {
       case 'female':
         return LK.female;
       default:
-        AppLogger.w('Unknown gender: $gender');
         return null;
     }
   }
