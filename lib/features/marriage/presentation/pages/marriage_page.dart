@@ -674,7 +674,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                     icon: Iconsax.info_circle_copy,
                     child: _FilterDropdownField(
                       rxValue: controller.selectedMaritalStatus,
-                      staticItems: controller.maritalStatuses,
+                      staticItems: controller.dynamicMaritalStatuses,
                       mapper: (val) {
                         if (val == 'All') return LK.all.tr;
                         final key = MaritalStatusMapper.getLabelKey(val);

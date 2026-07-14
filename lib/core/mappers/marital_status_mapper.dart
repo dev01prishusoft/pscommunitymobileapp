@@ -4,7 +4,9 @@ class MaritalStatusMapper {
   static String? getLabelKey(String? status) {
     if (status == null || status.isEmpty) return null;
 
-    switch (status.toLowerCase()) {
+    final normalized = status.toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
+
+    switch (normalized) {
       case 'married':
         return LK.married;
       case 'unmarried':

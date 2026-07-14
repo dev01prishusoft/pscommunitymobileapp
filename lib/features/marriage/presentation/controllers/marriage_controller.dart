@@ -64,14 +64,8 @@ class MarriageController extends GetxController {
   final RxString searchQuery = ''.obs;
   final List<String> ages = List.generate(43, (i) => (18 + i).toString());
   final List<String> heights = List.generate(121, (i) => '${(120 + i)} cm');
-  final List<String> maritalStatuses = [
-    'All',
-    'Unmarried',
-    'Married',
-    'Widow',
-    'Widower',
-    'Divorced',
-  ];
+  final RxList<String> dynamicMaritalStatuses = <String>['All'].obs;
+  final Map<String, int> maritalStatusIdMap = {};
 
   final RxList<String> dynamicGotras = <String>['Any'].obs;
   final RxList<String> dynamicOccupations = <String>['Any'].obs;
@@ -310,7 +304,6 @@ class MarriageController extends GetxController {
 
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
       final List<Member> newMembers = memberResult.dataOrNull?.data ?? [];
-
       if (newMembers.isEmpty) {
         hasMore.value = false;
         if (_allMembers.isEmpty) {
@@ -448,18 +441,20 @@ class MarriageController extends GetxController {
   }
 
   void _updateDynamicLists(List<Member> members) {
-    final gotras = members
-        .map((m) => m.gotra.trim())
-        .where((g) => g.isNotEmpty)
-        .map((g) => g[0].toUpperCase() + g.substring(1).toLowerCase())
-        .toSet()
-        .toList();
-    gotras.sort();
-    dynamicGotras.assignAll(['Any', ...gotras]);
+    // Left empty if no other lists need dynamic updates from members list
   }
 
   Future<void> loadAllDropdowns() async {
+    final samajId = Get.find<TokenManager>().samajId;
+    final gotraPath = samajId != null ? '/Gotra/dropdown?samajId=$samajId' : '/Gotra/dropdown';
+
     await Future.wait([
+      _fetchDropdown(
+        gotraPath,
+        dynamicGotras,
+        [],
+        firstItem: 'Any',
+      ),
       _fetchDropdown(
         '/EducationalQualification/mobile/dropdown',
         dynamicEducations,
@@ -476,14 +471,24 @@ class MarriageController extends GetxController {
         'Unemployed',
         'Other',
       ]),
+      _fetchDropdown(
+        '/MaritalStatus/dropdown',
+        dynamicMaritalStatuses,
+        ['Unmarried', 'Married', 'Widow', 'Widower', 'Divorced'],
+        firstItem: 'All',
+        idMap: maritalStatusIdMap,
+      ),
     ]);
   }
 
   Future<void> _fetchDropdown(
     String path,
     RxList<String> targetList,
-    List<String> fallbacks,
-  ) async {
+    List<String> fallbacks, {
+    String firstItem = 'Any',
+    Map<String, int>? idMap,
+    bool clearMap = true,
+  }) async {
     try {
       final ApiClient apiClient = Get.find<ApiClient>();
       final response = await apiClient.get('/api/v1$path');
@@ -499,42 +504,54 @@ class MarriageController extends GetxController {
                 (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ??
                 [];
           }
-          final items = list
-              .map((e) {
-                final map = e as Map<String, dynamic>;
-                final textKeys = [
-                  'text',
-                  'Text',
-                  'name',
-                  'Name',
-                  'value',
-                  'Value',
-                ];
-                for (final key in textKeys) {
-                  if (map.containsKey(key) && map[key] != null) {
-                    return map[key].toString().trim();
-                  }
+          if (idMap != null && clearMap) idMap.clear();
+          final items = list.map((e) {
+            final map = e as Map<String, dynamic>;
+            String text = '';
+            int? id;
+            
+            for (final key in ['text', 'Text', 'name', 'Name', 'value', 'Value']) {
+              if (map.containsKey(key) && map[key] != null) {
+                text = map[key].toString().trim();
+                break;
+              }
+            }
+            
+            if (text.isEmpty) {
+              for (final entry in map.entries) {
+                if (!entry.key.toLowerCase().contains('id')) {
+                  text = entry.value.toString().trim();
+                  break;
                 }
-                for (final entry in map.entries) {
-                  if (!entry.key.toLowerCase().contains('id')) {
-                    return entry.value.toString().trim();
-                  }
-                }
-                return '';
-              })
-              .where((s) => s.isNotEmpty)
-              .toSet()
-              .toList();
+              }
+            }
+
+            for (final entry in map.entries) {
+              if (entry.key.toLowerCase().contains('id')) {
+                id = int.tryParse(entry.value.toString());
+                break;
+              }
+            }
+
+            if (idMap != null && text.isNotEmpty && id != null) {
+              idMap[text] = id;
+            }
+
+            return text;
+          })
+          .where((s) => s.isNotEmpty)
+          .toSet()
+          .toList();
 
           if (items.isNotEmpty) {
-            targetList.assignAll(['Any', ...items]);
+            targetList.assignAll([firstItem, ...items]);
             return;
           }
         }
       }
-      targetList.assignAll(['Any', ...fallbacks]);
+      targetList.assignAll([firstItem, ...fallbacks]);
     } catch (e) {
-      targetList.assignAll(['Any', ...fallbacks]);
+      targetList.assignAll([firstItem, ...fallbacks]);
     }
   }
 

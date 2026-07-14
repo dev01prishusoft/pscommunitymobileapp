@@ -87,6 +87,7 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
   }
 
   Future<void> _selectTime(BuildContext context) async {
+    FocusScope.of(context).requestFocus(FocusNode());
     TimeOfDay initialTime = TimeOfDay.now();
     if (widget.controller.text.isNotEmpty) {
       try {

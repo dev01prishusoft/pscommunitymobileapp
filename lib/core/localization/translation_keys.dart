@@ -473,6 +473,8 @@ class LK {
   static String crore = 'Crore';
   static String editRequestComment = 'Edit Request Comment';
 
+  static String educationAddedSuccessfully = 'Education Added Successfully';
+  static String profileAndEducationUpdated = 'Profile update requested and education added successfully';
   static String adminAnnouncement = 'Admin Announcement';
   static String samajAnnouncement = 'Samaj Announcement';
 
@@ -480,6 +482,7 @@ class LK {
   static String requested = 'Requested';
   static String camera = 'Camera';
   static String gallery = 'Gallery';
+  static String atLeastOneHighestQualification = 'At least one qualification must be marked as highest';
   
   static String wentForUpdate = 'went_for_update';
   static String newUpdateAvailable = 'newUpdateAvailable';
@@ -845,6 +848,8 @@ class LK {
     percentageLabel,
     gradeLabel,
     editRequestComment,
+    educationAddedSuccessfully,
+    profileAndEducationUpdated,
     adminAnnouncement,
     samajAnnouncement,
     rejected,
@@ -955,7 +960,8 @@ class LK {
     updateDescription,
     update,
     notNow,
-    appUpdatedSuccessfully
+    appUpdatedSuccessfully,
+    atLeastOneHighestQualification
   ];
 }
 

@@ -116,10 +116,12 @@ class ContactController extends GetxController {
   }
 
   void addEducation() {
+    final hasHighest = educationList.any((e) => e.isHighest);
     educationList.add(
       EducationModel(
         qualification: '',
-        isHighest: false,
+        isHighest: !hasHighest,
+        isNew: true,
       ),
     );
   }

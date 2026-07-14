@@ -82,11 +82,9 @@ class MarriageFilterApplicator {
     }
 
     if (filters.selectedGotra != 'Any') {
+      final selectedLower = filters.selectedGotra.trim().toLowerCase();
       result = result.where((m) {
-        final mGotra = m.gotra.trim();
-        if (mGotra.isEmpty) return false;
-        final normalized = mGotra[0].toUpperCase() + mGotra.substring(1).toLowerCase();
-        return normalized == filters.selectedGotra;
+        return m.gotra.trim().toLowerCase() == selectedLower;
       }).toList();
     }
 
@@ -97,12 +95,12 @@ class MarriageFilterApplicator {
 
     if (filters.selectedMaritalStatus != 'All') {
       result = result.where((m) {
-        final status = (m.maritalStatusName ?? '').toLowerCase();
-        final selected = filters.selectedMaritalStatus.toLowerCase();
-        if (selected == 'unmarried') {
-          return status == 'unmarried' || status == 'single';
+        final statusRaw = (m.maritalStatusName ?? '').toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
+        final selectedRaw = filters.selectedMaritalStatus.toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
+        if (selectedRaw == 'unmarried' || selectedRaw == 'single') {
+          return statusRaw == 'unmarried' || statusRaw == 'single';
         }
-        return status == selected;
+        return statusRaw == selectedRaw;
       }).toList();
     }
 

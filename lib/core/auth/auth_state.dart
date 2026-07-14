@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart'
     as pscommunitymobileapp_api_client;
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 
 class AuthState {
   AuthState(this._tokenManager) {
@@ -25,6 +26,9 @@ class AuthState {
     _tokenManager.clearTokens();
     if (Get.isRegistered<SamajController>()) {
       Get.find<SamajController>().clear();
+    }
+    if (Get.isRegistered<DrawerUserController>()) {
+      Get.delete<DrawerUserController>(force: true);
     }
     final locService = Get.find<LocalizationService>();
     locService.clearLanguages();
@@ -66,6 +70,9 @@ class AuthState {
       await _tokenManager.clearTokens();
       if (Get.isRegistered<SamajController>()) {
         Get.find<SamajController>().clear();
+      }
+      if (Get.isRegistered<DrawerUserController>()) {
+        Get.delete<DrawerUserController>(force: true);
       }
       final locService = Get.find<LocalizationService>();
       locService.clearLanguages();
