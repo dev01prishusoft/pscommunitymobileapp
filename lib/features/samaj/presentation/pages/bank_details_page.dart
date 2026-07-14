@@ -150,7 +150,7 @@ class BankDetailsPage extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(18),
-              color: Colors.grey.shade50,
+              color: Colors.grey.shade200,
               child: Row(
                 children: [
                   Container(
@@ -286,7 +286,6 @@ class BankDetailsPage extends StatelessWidget {
                 child: Text(
                   value,
                   style: AppTextStyles.titleSmall.copyWith(
-                    color: AppColors.secondary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

@@ -15,9 +15,8 @@ class BankAccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final SamajBankDetais bank = Get.arguments as SamajBankDetais;
 
-    final upiUri = bank.upiId != null && 
-            bank.upiId!.isNotEmpty && 
-            bank.upiId != '-'
+    final upiUri =
+        bank.upiId != null && bank.upiId!.isNotEmpty && bank.upiId != '-'
         ? 'upi://pay?pa=${bank.upiId}&pn=${Uri.encodeComponent(bank.accountHolderName ?? '')}'
         : null;
 
@@ -25,7 +24,10 @@ class BankAccountDetailsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           LK.bankAccountDetails.tr,
-          style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.5,
+          ),
         ),
         elevation: 0,
         centerTitle: true,
@@ -68,7 +70,10 @@ class BankAccountDetailsPage extends StatelessWidget {
                         ),
                         if (bank.isPrimary == true)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.18),
                               borderRadius: BorderRadius.circular(6),
@@ -87,9 +92,12 @@ class BankAccountDetailsPage extends StatelessWidget {
                     ),
                     SizedBox(height: 28.h),
                     Text(
-                      bank.accountNumber != null && bank.accountNumber!.length >= 4
+                      bank.accountNumber != null &&
+                              bank.accountNumber!.length >= 4
                           ? bank.accountNumber!.replaceAllMapped(
-                              RegExp(r".{4}"), (match) => "${match.group(0)}  ")
+                              RegExp(r".{4}"),
+                              (match) => "${match.group(0)}  ",
+                            )
                           : bank.accountNumber ?? '-',
                       style: TextStyle(
                         color: Colors.white,
@@ -175,7 +183,10 @@ class BankAccountDetailsPage extends StatelessWidget {
                 child: ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   children: [
                     _buildDetailItem(
                       icon: Icons.person_outline_rounded,
@@ -257,12 +268,15 @@ class BankAccountDetailsPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.qr_code_scanner_rounded, color: AppColors.primary, size: 20),
+                        const Icon(
+                          Icons.qr_code_scanner_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           LK.scanToPay.tr,
                           style: AppTextStyles.titleLarge.copyWith(
-                            color: AppColors.secondary,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -290,11 +304,11 @@ class BankAccountDetailsPage extends StatelessWidget {
                               size: 160.w,
                               eyeStyle: const QrEyeStyle(
                                 eyeShape: QrEyeShape.circle,
-                                color: AppColors.secondary,
+                                color: AppColors.black,
                               ),
                               dataModuleStyle: const QrDataModuleStyle(
                                 dataModuleShape: QrDataModuleShape.circle,
-                                color: AppColors.secondary,
+                                color: AppColors.black,
                               ),
                             )
                           : Column(
@@ -355,11 +369,7 @@ class BankAccountDetailsPage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: Colors.grey.shade600,
-          ),
+          Icon(icon, size: 20, color: Colors.grey.shade600),
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
@@ -423,4 +433,3 @@ class BankAccountDetailsPage extends StatelessWidget {
     );
   }
 }
-
