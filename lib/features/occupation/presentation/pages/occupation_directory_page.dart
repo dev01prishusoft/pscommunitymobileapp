@@ -139,8 +139,9 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                                       crossAxisCount: 2,
                                       crossAxisSpacing: 6.w,
                                       mainAxisSpacing: 10.h,
-                                      childAspectRatio: 1.3,
+                                      childAspectRatio: 1.2,
                                     ),
+                                padding: EdgeInsets.only(bottom: 20.h),
                                 itemCount:
                                     _controller.filteredOccupations.length,
                                 itemBuilder: (context, index) {
