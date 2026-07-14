@@ -19,12 +19,14 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/profile_upd
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
+
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
   final showListErrors = false.obs;
   Member? _currentMember;
   final Map<String, String> _initialDropdownValues = {};
-  final RxMap<String, ProfileUpdateStatus> fieldStatuses = <String, ProfileUpdateStatus>{}.obs;
+  final RxMap<String, ProfileUpdateStatus> fieldStatuses =
+      <String, ProfileUpdateStatus>{}.obs;
   final TextEditingController editRequestCommentCtrl = TextEditingController();
   final RxString editRequestComment = ''.obs;
 
@@ -39,7 +41,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
     contactInfo = Get.put(ContactController(), tag: 'contact');
     workInfo = Get.put(WorkInfoController(), tag: 'work');
 
-    editRequestCommentCtrl.addListener(() => editRequestComment.value = editRequestCommentCtrl.text);
+    editRequestCommentCtrl.addListener(
+      () => editRequestComment.value = editRequestCommentCtrl.text,
+    );
 
     loadAllDropdowns();
   }
@@ -56,15 +60,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
   String generateMemberNo() {
     final now = DateTime.now();
     final year = now.year;
-    final ts = '${now.month.toString().padLeft(2, '0')}'
+    final ts =
+        '${now.month.toString().padLeft(2, '0')}'
         '${now.day.toString().padLeft(2, '0')}'
         '${now.hour.toString().padLeft(2, '0')}'
         '${now.minute.toString().padLeft(2, '0')}'
         '${now.second.toString().padLeft(2, '0')}';
     return 'PSC-$year-$ts';
   }
+
   List<String> get defaultGenders => personalInfo.defaultGenders;
-  List<String> get defaultMaritalStatuses => personalInfo.defaultMaritalStatuses;
+  List<String> get defaultMaritalStatuses =>
+      personalInfo.defaultMaritalStatuses;
   List<String> get defaultBloodGroups => personalInfo.defaultBloodGroups;
   List<String> get defaultRelations => personalInfo.defaultRelations;
   List<String> get defaultSigns => personalInfo.defaultSigns;
@@ -87,15 +94,19 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxString get height => personalInfo.height;
   RxString get gender => personalInfo.gender;
   RxString get maritalStatus => personalInfo.maritalStatus;
-  
+
   bool get shouldHideLookingForMarriage {
     final s = maritalStatus.value.trim().toLowerCase();
-    bool isUnmarried = s.contains('unmarried') || s.contains('અપરિણીત') || s.contains('single') || s.contains('સિંગલ');
+    bool isUnmarried =
+        s.contains('unmarried') ||
+        s.contains('અપરિણીત') ||
+        s.contains('single') ||
+        s.contains('સિંગલ');
     if (isUnmarried) return false;
-    
+
     bool isMarried = s.contains('married') || s.contains('પરિણીત');
     bool isDivorced = s.contains('divorced') || s.contains('છૂટાછેડા');
-    
+
     return isMarried || isDivorced;
   }
 
@@ -118,7 +129,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxDouble get uploadProgress => personalInfo.uploadProgress;
   TextEditingController get memberNoCtrl => personalInfo.memberNoCtrl;
   TextEditingController get tobCtrl => personalInfo.tobCtrl;
-  TextEditingController get motherFatherNameCtrl => personalInfo.motherFatherNameCtrl;
+  TextEditingController get motherFatherNameCtrl =>
+      personalInfo.motherFatherNameCtrl;
   TextEditingController get firstNameCtrl => personalInfo.firstNameCtrl;
   TextEditingController get middleNameCtrl => personalInfo.middleNameCtrl;
   TextEditingController get lastNameCtrl => personalInfo.lastNameCtrl;
@@ -149,11 +161,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxList<AddressModel> get addresses => contactInfo.addresses;
   RxList<EducationModel> get educationList => contactInfo.educationList;
   TextEditingController get mobileCtrl => contactInfo.mobileCtrl;
-  TextEditingController get secondaryMobileCtrl => contactInfo.secondaryMobileCtrl;
+  TextEditingController get secondaryMobileCtrl =>
+      contactInfo.secondaryMobileCtrl;
   TextEditingController get emailCtrl => contactInfo.emailCtrl;
   TextEditingController get emergencyNameCtrl => contactInfo.emergencyNameCtrl;
   TextEditingController get emergencyNoCtrl => contactInfo.emergencyNoCtrl;
-  TextEditingController get entryPersonMobileCtrl => contactInfo.entryPersonMobileCtrl;
+  TextEditingController get entryPersonMobileCtrl =>
+      contactInfo.entryPersonMobileCtrl;
   TextEditingController get facebookCtrl => contactInfo.facebookCtrl;
   TextEditingController get whatsappCtrl => contactInfo.whatsappCtrl;
   TextEditingController get instagramCtrl => contactInfo.instagramCtrl;
@@ -189,19 +203,27 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxString get workPincode => workInfo.workPincode;
   TextEditingController get companyNameCtrl => workInfo.companyNameCtrl;
   TextEditingController get businessNameCtrl => workInfo.businessNameCtrl;
-  TextEditingController get workAddressLine1Ctrl => workInfo.workAddressLine1Ctrl;
-  TextEditingController get workAddressLine2Ctrl => workInfo.workAddressLine2Ctrl;
+  TextEditingController get workAddressLine1Ctrl =>
+      workInfo.workAddressLine1Ctrl;
+  TextEditingController get workAddressLine2Ctrl =>
+      workInfo.workAddressLine2Ctrl;
   TextEditingController get workLandmarkCtrl => workInfo.workLandmarkCtrl;
   TextEditingController get workPincodeCtrl => workInfo.workPincodeCtrl;
   TextEditingController get jobPositionCtrl => workInfo.jobPositionCtrl;
-  TextEditingController get otherJobPositionCtrl => workInfo.otherJobPositionCtrl;
-  TextEditingController get otherJobPositionEnglishCtrl => workInfo.otherJobPositionEnglishCtrl;
+  TextEditingController get otherJobPositionCtrl =>
+      workInfo.otherJobPositionCtrl;
+  TextEditingController get otherJobPositionEnglishCtrl =>
+      workInfo.otherJobPositionEnglishCtrl;
   TextEditingController get otherOccupationCtrl => workInfo.otherOccupationCtrl;
-  TextEditingController get occupationDescriptionCtrl => workInfo.occupationDescriptionCtrl;
+  TextEditingController get occupationDescriptionCtrl =>
+      workInfo.occupationDescriptionCtrl;
 
-  RxList<String> getAddressDistricts(String stateName) => workInfo.getAddressDistricts(stateName);
-  RxList<String> getAddressTalukas(String districtName) => workInfo.getAddressTalukas(districtName);
-  RxList<String> getAddressAreas(String talukaName) => workInfo.getAddressAreas(talukaName);
+  RxList<String> getAddressDistricts(String stateName) =>
+      workInfo.getAddressDistricts(stateName);
+  RxList<String> getAddressTalukas(String districtName) =>
+      workInfo.getAddressTalukas(districtName);
+  RxList<String> getAddressAreas(String talukaName) =>
+      workInfo.getAddressAreas(talukaName);
 
   Member? get currentMember => _currentMember;
 
@@ -212,7 +234,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
     void addIfChanged(String key, dynamic currentValue, dynamic originalValue) {
       if (currentValue != originalValue) {
-        if (currentValue is String && currentValue.isEmpty && (originalValue == null || (originalValue is String && originalValue.isEmpty))) {
+        if (currentValue is String &&
+            currentValue.isEmpty &&
+            (originalValue == null ||
+                (originalValue is String && originalValue.isEmpty))) {
           return;
         }
         formDataMap[key] = currentValue;
@@ -225,36 +250,75 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
 
     addIfChanged('FirstName', personalInfo.firstName.value, m.firstName);
-    addIfChanged('FirstNameEnglish', personalInfo.firstNameEn.value, m.firstNameEnglish ?? '');
-    addIfChanged('MiddleName', personalInfo.middleName.value, m.middleName ?? '');
+    addIfChanged(
+      'FirstNameEnglish',
+      personalInfo.firstNameEn.value,
+      m.firstNameEnglish ?? '',
+    );
+    addIfChanged(
+      'MiddleName',
+      personalInfo.middleName.value,
+      m.middleName ?? '',
+    );
     addIfChanged('LastName', personalInfo.lastName.value, m.lastName);
-    addIfChanged('LastNameEnglish', personalInfo.lastNameEn.value, m.lastNameEnglish ?? '');
-    
+    addIfChanged(
+      'LastNameEnglish',
+      personalInfo.lastNameEn.value,
+      m.lastNameEnglish ?? '',
+    );
+
     String? formatDob(String? d) {
-       if (d == null || d.isEmpty) return null;
-       try {
-         DateTime dt;
-         if (d.contains('-') && d.split('-')[0].length == 2) {
-           final parts = d.split('-');
-           dt = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
-         } else {
-           dt = DateTime.parse(d);
-         }
-         return dt.toIso8601String().replaceAll('Z', '');
-       } catch (_) {
-         return d;
-       }
+      if (d == null || d.isEmpty) return null;
+      try {
+        DateTime dt;
+        if (d.contains('-') && d.split('-')[0].length == 2) {
+          final parts = d.split('-');
+          dt = DateTime(
+            int.parse(parts[2]),
+            int.parse(parts[1]),
+            int.parse(parts[0]),
+          );
+        } else {
+          dt = DateTime.parse(d);
+        }
+        return dt.toIso8601String().replaceAll('Z', '');
+      } catch (_) {
+        return d;
+      }
     }
-    addIfChanged('DateOfBirth', formatDob(personalInfo.dob.value), formatDob(m.dateOfBirth));
-    addIfChanged('DateOfBirthTime', personalInfo.tob.value, m.dateOfBirthTime ?? '');
-    
+
+    addIfChanged(
+      'DateOfBirth',
+      formatDob(personalInfo.dob.value),
+      formatDob(m.dateOfBirth),
+    );
+    addIfChanged(
+      'DateOfBirthTime',
+      personalInfo.tob.value,
+      m.dateOfBirthTime ?? '',
+    );
+
     double? normDouble(double? v) => (v == null || v == 0.0) ? null : v;
-    
-    addIfChanged('Weight', normDouble(double.tryParse(personalInfo.weight.value)), normDouble(m.weight?.toDouble()));
-    addIfChanged('Height', normDouble(double.tryParse(personalInfo.height.value)), normDouble(m.height?.toDouble()));
-    void addDropdown(String key, RxString rxStr, Map<String, int> idMap, String? originalName, [int? originalId]) {
-      final currentStr = rxStr.value; 
-      
+
+    addIfChanged(
+      'Weight',
+      normDouble(double.tryParse(personalInfo.weight.value)),
+      normDouble(m.weight?.toDouble()),
+    );
+    addIfChanged(
+      'Height',
+      normDouble(double.tryParse(personalInfo.height.value)),
+      normDouble(m.height?.toDouble()),
+    );
+    void addDropdown(
+      String key,
+      RxString rxStr,
+      Map<String, int> idMap,
+      String? originalName, [
+      int? originalId,
+    ]) {
+      final currentStr = rxStr.value;
+
       if (!_initialDropdownValues.containsKey(key)) return;
 
       final initialStr = _initialDropdownValues[key];
@@ -263,135 +327,363 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final currentId = getId(currentStr, idMap);
         if (currentId != null) {
           formDataMap[key] = currentId;
-        } else if (currentStr.isEmpty && initialStr != null && initialStr.isNotEmpty) {
+        } else if (currentStr.isEmpty &&
+            initialStr != null &&
+            initialStr.isNotEmpty) {
           formDataMap[key] = null;
         } else {
-          formDataMap['_dummy_$key'] = true; 
+          formDataMap['_dummy_$key'] = true;
         }
       }
     }
 
-    addDropdown('GenderId', personalInfo.gender, personalInfo.genderIdMap, m.genderName);
-    addDropdown('MaritalStatusId', personalInfo.maritalStatus, personalInfo.maritalStatusIdMap, m.maritalStatusName);
-    addDropdown('BloodGroupId', personalInfo.bloodGroup, personalInfo.bloodGroupIdMap, m.bloodGroupName);
-    addDropdown('GotraId', personalInfo.gotra, personalInfo.gotraIdMap, m.gotraName, m.gotraId);
-    addDropdown('MotherGotraId', personalInfo.mothersGotra, personalInfo.mothersGotraIdMap, null, m.motherGotraId);
-    addDropdown('MotherAreaId', personalInfo.motherArea, workInfo.globalAreaIdMap, m.motherAreaName, m.motherAreaId);
-    addDropdown('signId', personalInfo.sign, personalInfo.signIdMap, m.signName, m.signId);
-    addDropdown('RelationTypeId', personalInfo.relation, personalInfo.relationIdMap, m.relatedToMemberName, m.relationTypeId);
-    
-    addIfChanged('MotherFatherName', personalInfo.motherFatherName.value, m.motherFatherName ?? '');
-    addIfChanged('IsLookingforMarriage', personalInfo.openToMarriage.value, m.isLookingforMarriage ?? false);
-    
-    addIfChanged('EntryPersonMobileNo', contactInfo.entryPersonMobile.value, m.entryPersonMobileNo ?? '');
+    addDropdown(
+      'GenderId',
+      personalInfo.gender,
+      personalInfo.genderIdMap,
+      m.genderName,
+    );
+    addDropdown(
+      'MaritalStatusId',
+      personalInfo.maritalStatus,
+      personalInfo.maritalStatusIdMap,
+      m.maritalStatusName,
+    );
+    addDropdown(
+      'BloodGroupId',
+      personalInfo.bloodGroup,
+      personalInfo.bloodGroupIdMap,
+      m.bloodGroupName,
+    );
+    addDropdown(
+      'GotraId',
+      personalInfo.gotra,
+      personalInfo.gotraIdMap,
+      m.gotraName,
+      m.gotraId,
+    );
+    addDropdown(
+      'MotherGotraId',
+      personalInfo.mothersGotra,
+      personalInfo.mothersGotraIdMap,
+      null,
+      m.motherGotraId,
+    );
+    addDropdown(
+      'MotherAreaId',
+      personalInfo.motherArea,
+      workInfo.globalAreaIdMap,
+      m.motherAreaName,
+      m.motherAreaId,
+    );
+    addDropdown(
+      'signId',
+      personalInfo.sign,
+      personalInfo.signIdMap,
+      m.signName,
+      m.signId,
+    );
+    addDropdown(
+      'RelationTypeId',
+      personalInfo.relation,
+      personalInfo.relationIdMap,
+      m.relatedToMemberName,
+      m.relationTypeId,
+    );
+
+    addIfChanged(
+      'MotherFatherName',
+      personalInfo.motherFatherName.value,
+      m.motherFatherName ?? '',
+    );
+    addIfChanged(
+      'IsLookingforMarriage',
+      personalInfo.openToMarriage.value,
+      m.isLookingforMarriage ?? false,
+    );
+
+    addIfChanged(
+      'EntryPersonMobileNo',
+      contactInfo.entryPersonMobile.value,
+      m.entryPersonMobileNo ?? '',
+    );
     addIfChanged('MobileNo', contactInfo.mobileNo.value, m.mobileNo ?? '');
-    addIfChanged('SecondaryMobile', contactInfo.secondaryMobile.value, m.secondaryMobile ?? '');
+    addIfChanged(
+      'SecondaryMobile',
+      contactInfo.secondaryMobile.value,
+      m.secondaryMobile ?? '',
+    );
     addIfChanged('EmailAddress', contactInfo.email.value, m.emailAddress ?? '');
-    addIfChanged('EmergencyContactName', contactInfo.emergencyContactName.value, m.emergencyContactName ?? '');
-    addIfChanged('EmergencyContactNo', contactInfo.emergencyContactNo.value, m.emergencyContactNo ?? '');
-    addIfChanged('FacebookUrl', contactInfo.facebook.value, m.facebookUrl ?? '');
-    addIfChanged('WhatsappUrl', contactInfo.whatsapp.value, m.whatsappUrl ?? '');
-    addIfChanged('InstagramUrl', contactInfo.instagram.value, m.instagramUrl ?? '');
+    addIfChanged(
+      'EmergencyContactName',
+      contactInfo.emergencyContactName.value,
+      m.emergencyContactName ?? '',
+    );
+    addIfChanged(
+      'EmergencyContactNo',
+      contactInfo.emergencyContactNo.value,
+      m.emergencyContactNo ?? '',
+    );
+    addIfChanged(
+      'FacebookUrl',
+      contactInfo.facebook.value,
+      m.facebookUrl ?? '',
+    );
+    addIfChanged(
+      'WhatsappUrl',
+      contactInfo.whatsapp.value,
+      m.whatsappUrl ?? '',
+    );
+    addIfChanged(
+      'InstagramUrl',
+      contactInfo.instagram.value,
+      m.instagramUrl ?? '',
+    );
     addIfChanged('TwitterUrl', contactInfo.twitter.value, m.twitterUrl ?? '');
 
-    addDropdown('OccupationTypeId', workInfo.occupationType, workInfo.occupationTypeIdMap, m.occupationTypeName);
-    addDropdown('OccupationId', workInfo.occupation, workInfo.occupationIdMap, m.occupationName);
-    addDropdown('JobPositionId', workInfo.jobPosition, workInfo.jobPositionIdMap, m.jobPositionName);
-    addIfChanged('OtherOccupation', workInfo.otherOccupation.value, m.otherOccupation ?? '');
-    addIfChanged('OtherJobPosition', workInfo.otherJobPosition.value, m.otherJobPosition ?? '');
-    addIfChanged('OtherJobPositionEnglish', workInfo.otherJobPositionEnglish.value, '');
-    addIfChanged('CompanyName', workInfo.companyName.value, m.companyName ?? '');
-    addIfChanged('BusinessName', workInfo.businessName.value, m.businessName ?? '');
-    addIfChanged('MonthlyIncome', normDouble(double.tryParse(personalInfo.monthlyIncome.value)), normDouble(m.monthlyIncome?.toDouble()));
-    addIfChanged('OccupationDescription', workInfo.occupationDescription.value, m.occupationDescription ?? '');
-    
+    addDropdown(
+      'OccupationTypeId',
+      workInfo.occupationType,
+      workInfo.occupationTypeIdMap,
+      m.occupationTypeName,
+    );
+    addDropdown(
+      'OccupationId',
+      workInfo.occupation,
+      workInfo.occupationIdMap,
+      m.occupationName,
+    );
+    addDropdown(
+      'JobPositionId',
+      workInfo.jobPosition,
+      workInfo.jobPositionIdMap,
+      m.jobPositionName,
+    );
+    addIfChanged(
+      'OtherOccupation',
+      workInfo.otherOccupation.value,
+      m.otherOccupation ?? '',
+    );
+    addIfChanged(
+      'OtherJobPosition',
+      workInfo.otherJobPosition.value,
+      m.otherJobPosition ?? '',
+    );
+    addIfChanged(
+      'OtherJobPositionEnglish',
+      workInfo.otherJobPositionEnglish.value,
+      '',
+    );
+    addIfChanged(
+      'CompanyName',
+      workInfo.companyName.value,
+      m.companyName ?? '',
+    );
+    addIfChanged(
+      'BusinessName',
+      workInfo.businessName.value,
+      m.businessName ?? '',
+    );
+    addIfChanged(
+      'MonthlyIncome',
+      normDouble(double.tryParse(personalInfo.monthlyIncome.value)),
+      normDouble(m.monthlyIncome?.toDouble()),
+    );
+    addIfChanged(
+      'OccupationDescription',
+      workInfo.occupationDescription.value,
+      m.occupationDescription ?? '',
+    );
+
     addIfChanged('IsOwnLand', personalInfo.ownLand.value, m.isOwnLand ?? false);
-    addIfChanged('IsOwnHouse', personalInfo.ownHouse.value, m.isOwnHouse ?? false);
-    addIfChanged('HasTwoWheeler', personalInfo.twoWheeler.value, m.hasTwoWheeler ?? false);
-    addIfChanged('HasFourWheeler', personalInfo.fourWheeler.value, m.hasFourWheeler ?? false);
-    
-    addDropdown('OccupationStateId', workInfo.workState, workInfo.workStateIdMap, m.occupationStateName);
-    addDropdown('OccupationDistrictId', workInfo.workDistrict, workInfo.workDistrictIdMap, m.occupationDistrictName);
-    addDropdown('OccupationTalukaId', workInfo.workTaluka, workInfo.workTalukaIdMap, m.occupationTalukaName);
-    addDropdown('OccupationAreaId', workInfo.workArea, workInfo.workAreaIdMap, m.occupationAreaName);
-    addIfChanged('OccupationAddressLine1', workInfo.workAddressLine1.value, m.occupationAddressLine1 ?? '');
-    addIfChanged('OccupationAddressLine2', workInfo.workAddressLine2.value, m.occupationAddressLine2 ?? '');
-    addIfChanged('OccupationLandmark', workInfo.workLandmark.value, m.occupationLandmark ?? '');
-    addIfChanged('OccupationPincode', workInfo.workPincode.value, m.occupationPincode ?? '');
-    
-    final currentEduJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
+    addIfChanged(
+      'IsOwnHouse',
+      personalInfo.ownHouse.value,
+      m.isOwnHouse ?? false,
+    );
+    addIfChanged(
+      'HasTwoWheeler',
+      personalInfo.twoWheeler.value,
+      m.hasTwoWheeler ?? false,
+    );
+    addIfChanged(
+      'HasFourWheeler',
+      personalInfo.fourWheeler.value,
+      m.hasFourWheeler ?? false,
+    );
+
+    addDropdown(
+      'OccupationStateId',
+      workInfo.workState,
+      workInfo.workStateIdMap,
+      m.occupationStateName,
+    );
+    addDropdown(
+      'OccupationDistrictId',
+      workInfo.workDistrict,
+      workInfo.workDistrictIdMap,
+      m.occupationDistrictName,
+    );
+    addDropdown(
+      'OccupationTalukaId',
+      workInfo.workTaluka,
+      workInfo.workTalukaIdMap,
+      m.occupationTalukaName,
+    );
+    addDropdown(
+      'OccupationAreaId',
+      workInfo.workArea,
+      workInfo.workAreaIdMap,
+      m.occupationAreaName,
+    );
+    addIfChanged(
+      'OccupationAddressLine1',
+      workInfo.workAddressLine1.value,
+      m.occupationAddressLine1 ?? '',
+    );
+    addIfChanged(
+      'OccupationAddressLine2',
+      workInfo.workAddressLine2.value,
+      m.occupationAddressLine2 ?? '',
+    );
+    addIfChanged(
+      'OccupationLandmark',
+      workInfo.workLandmark.value,
+      m.occupationLandmark ?? '',
+    );
+    addIfChanged(
+      'OccupationPincode',
+      workInfo.workPincode.value,
+      m.occupationPincode ?? '',
+    );
+
+    final currentEduJson = jsonEncode(
+      contactInfo.educationList.map((e) => e.toJson()).toList(),
+    );
     if (currentEduJson != _initialEducationJson) {
-      final existingEdus = contactInfo.educationList.where((e) => !e.isNew).toList();
+      final existingEdus = contactInfo.educationList
+          .where((e) => !e.isNew)
+          .toList();
       if (existingEdus.isNotEmpty) {
-        final edu = existingEdus.firstWhere((e) => e.isHighest, orElse: () => existingEdus.first);
+        final edu = existingEdus.firstWhere(
+          (e) => e.isHighest,
+          orElse: () => existingEdus.first,
+        );
         Map<String, dynamic>? initialEdu;
         if (_initialEducationJson.isNotEmpty && _initialEducationJson != '[]') {
           final decoded = jsonDecode(_initialEducationJson) as List<dynamic>;
           if (decoded.isNotEmpty) {
             final maps = decoded.cast<Map<String, dynamic>>();
-            initialEdu = maps.firstWhere((a) => a['isHighest'] == true, orElse: () => maps.first);
+            initialEdu = maps.firstWhere(
+              (a) => a['isHighest'] == true,
+              orElse: () => maps.first,
+            );
           }
         }
 
-        final qualId = getId(edu.qualification, contactInfo.educationIdMap) ?? edu.qualificationId ?? 0;
+        final qualId =
+            getId(edu.qualification, contactInfo.educationIdMap) ??
+            edu.qualificationId ??
+            0;
         final initialQualId = initialEdu?['qualificationId'] as int?;
-        if (qualId != initialQualId && qualId != 0) formDataMap['EducationalQualificationId'] = qualId;
+        if (qualId != initialQualId && qualId != 0)
+          formDataMap['EducationalQualificationId'] = qualId;
 
         void addEdu(String key, String current, String? initial) {
           if (current != (initial ?? '')) {
             formDataMap[key] = current.isEmpty ? null : current;
           }
         }
-        addEdu('InstitutionName', edu.institute, initialEdu?['institute'] as String?);
-        addEdu('YearOfPassing', edu.passingYear, initialEdu?['passingYear'] as String?);
-        addEdu('Percentage', edu.percentage, initialEdu?['percentage'] as String?);
+
+        addEdu(
+          'InstitutionName',
+          edu.institute,
+          initialEdu?['institute'] as String?,
+        );
+        addEdu(
+          'YearOfPassing',
+          edu.passingYear,
+          initialEdu?['passingYear'] as String?,
+        );
+        addEdu(
+          'Percentage',
+          edu.percentage,
+          initialEdu?['percentage'] as String?,
+        );
         addEdu('Grade', edu.grade, initialEdu?['grade'] as String?);
-        addEdu('Description', edu.description, initialEdu?['description'] as String?);
+        addEdu(
+          'Description',
+          edu.description,
+          initialEdu?['description'] as String?,
+        );
       }
     }
 
-    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    final currentAddrJson = jsonEncode(
+      contactInfo.addresses.map((e) => e.toJson()).toList(),
+    );
     if (currentAddrJson != _initialAddressesJson) {
       if (contactInfo.addresses.isNotEmpty) {
-        final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
+        final addr = contactInfo.addresses.firstWhere(
+          (a) => a.isPrimary,
+          orElse: () => contactInfo.addresses.first,
+        );
         Map<String, dynamic>? initialAddr;
         if (_initialAddressesJson.isNotEmpty && _initialAddressesJson != '[]') {
           final decoded = jsonDecode(_initialAddressesJson) as List<dynamic>;
           if (decoded.isNotEmpty) {
             final maps = decoded.cast<Map<String, dynamic>>();
-            initialAddr = maps.firstWhere((a) => a['isPrimary'] == true, orElse: () => maps.first);
+            initialAddr = maps.firstWhere(
+              (a) => a['isPrimary'] == true,
+              orElse: () => maps.first,
+            );
           }
         }
 
-        final typeId = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
+        final typeId =
+            getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
         final initialTypeId = initialAddr?['typeId'] as int?;
-        if (typeId != initialTypeId && typeId != 0) formDataMap['AddressTypeId'] = typeId;
+        if (typeId != initialTypeId && typeId != 0)
+          formDataMap['AddressTypeId'] = typeId;
 
         void addAddr(String key, String current, String? initial) {
           if (current != (initial ?? '')) {
             formDataMap[key] = current.isEmpty ? null : current;
           }
         }
+
         addAddr('AddressLine1', addr.line1, initialAddr?['line1'] as String?);
         addAddr('AddressLine2', addr.line2, initialAddr?['line2'] as String?);
         addAddr('Landmark', addr.landmark, initialAddr?['landmark'] as String?);
         addAddr('Pincode', addr.pincode, initialAddr?['pincode'] as String?);
 
-        final areaId = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
+        final areaId =
+            getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
         final initialAreaId = initialAddr?['areaId'] as int?;
-        if (areaId != initialAreaId && areaId != 0) formDataMap['AreaId'] = areaId;
+        if (areaId != initialAreaId && areaId != 0)
+          formDataMap['AreaId'] = areaId;
 
-        final talukaId = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
+        final talukaId =
+            getId(addr.taluka, workInfo.globalTalukaIdMap) ??
+            addr.talukaId ??
+            0;
         final initialTalukaId = initialAddr?['talukaId'] as int?;
-        if (talukaId != initialTalukaId && talukaId != 0) formDataMap['TalukaId'] = talukaId;
+        if (talukaId != initialTalukaId && talukaId != 0)
+          formDataMap['TalukaId'] = talukaId;
 
-        final districtId = getId(addr.district, workInfo.globalDistrictIdMap) ?? addr.districtId ?? 0;
+        final districtId =
+            getId(addr.district, workInfo.globalDistrictIdMap) ??
+            addr.districtId ??
+            0;
         final initialDistrictId = initialAddr?['districtId'] as int?;
-        if (districtId != initialDistrictId && districtId != 0) formDataMap['DistrictId'] = districtId;
+        if (districtId != initialDistrictId && districtId != 0)
+          formDataMap['DistrictId'] = districtId;
 
-        final stateId = getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
+        final stateId =
+            getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
         final initialStateId = initialAddr?['stateId'] as int?;
-        if (stateId != initialStateId && stateId != 0) formDataMap['StateId'] = stateId;
+        if (stateId != initialStateId && stateId != 0)
+          formDataMap['StateId'] = stateId;
       } else {
         formDataMap['AddressTypeId'] = null;
         formDataMap['AddressLine1'] = null;
@@ -412,7 +704,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
     final List<String> details = [];
     for (var key in changedFormData.keys) {
       if (key == 'GenderId' || key == 'MaritalStatusId') {
-        final current = key == 'GenderId' ? personalInfo.gender.value : personalInfo.maritalStatus.value;
+        final current = key == 'GenderId'
+            ? personalInfo.gender.value
+            : personalInfo.maritalStatus.value;
         final initial = _initialDropdownValues[key];
         details.add('$key("$current" != "$initial")');
       } else {
@@ -433,17 +727,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (personalInfo.isPhotoRemoved.value) return true;
     final _edu = educationList.toList();
     final _addr = contactInfo.addresses.toList();
-    
+
     final currentEduJson = jsonEncode(_edu.map((e) => e.toJson()).toList());
     if (currentEduJson != _initialEducationJson) {
       return true;
     }
-    
+
     final currentAddrJson = jsonEncode(_addr.map((e) => e.toJson()).toList());
     if (currentAddrJson != _initialAddressesJson) {
       return true;
     }
-    
+
     final map = changedFormData;
     if (map.isNotEmpty) {
       return true;
@@ -453,22 +747,30 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   bool get hasMotherAddressChanged {
     if (_currentMember == null) return true;
-    return personalInfo.motherState.value != (_currentMember!.motherStateName ?? '') ||
-           personalInfo.motherDistrict.value != (_currentMember!.motherDistrictName ?? '') ||
-           personalInfo.motherTaluka.value != (_currentMember!.motherTalukaName ?? '') ||
-           personalInfo.motherArea.value != (_currentMember!.motherAreaName ?? '');
+    return personalInfo.motherState.value !=
+            (_currentMember!.motherStateName ?? '') ||
+        personalInfo.motherDistrict.value !=
+            (_currentMember!.motherDistrictName ?? '') ||
+        personalInfo.motherTaluka.value !=
+            (_currentMember!.motherTalukaName ?? '') ||
+        personalInfo.motherArea.value != (_currentMember!.motherAreaName ?? '');
   }
 
   bool get hasWorkAddressChanged {
     if (_currentMember == null) return true;
-    return workInfo.workState.value != (_currentMember!.occupationStateName ?? '') ||
-           workInfo.workDistrict.value != (_currentMember!.occupationDistrictName ?? '') ||
-           workInfo.workTaluka.value != (_currentMember!.occupationTalukaName ?? '') ||
-           workInfo.workArea.value != (_currentMember!.occupationAreaName ?? '');
+    return workInfo.workState.value !=
+            (_currentMember!.occupationStateName ?? '') ||
+        workInfo.workDistrict.value !=
+            (_currentMember!.occupationDistrictName ?? '') ||
+        workInfo.workTaluka.value !=
+            (_currentMember!.occupationTalukaName ?? '') ||
+        workInfo.workArea.value != (_currentMember!.occupationAreaName ?? '');
   }
 
   bool get hasContactAddressChanged {
-    final currentAddrJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+    final currentAddrJson = jsonEncode(
+      contactInfo.addresses.map((e) => e.toJson()).toList(),
+    );
     return currentAddrJson != _initialAddressesJson;
   }
 
@@ -480,7 +782,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
     isMemberLoaded = true;
     _checkAndTakeSnapshot();
-    
+
     int addressMemberId = m.memberId;
     if (m.issameAddressasMyFamilyHeadAddress == true) {
       if (m.relatedToMemberId != null && m.relatedToMemberId! > 0) {
@@ -497,24 +799,33 @@ class ProfileFormController extends GetxController with FormStateMixin {
   Future<void> fetchProfileUpdateStatus() async {
     try {
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get('/api/v1/MemberUpdateRequest/profile-status');
-      
-      if (response.statusCode == 200 && response.data != null && response.data['succeeded'] == true) {
+      final response = await apiClient.get(
+        '/api/v1/MemberUpdateRequest/profile-status',
+      );
+
+      if (response.statusCode == 200 &&
+          response.data != null &&
+          response.data['succeeded'] == true) {
         final data = response.data['data'] as Map<String, dynamic>;
         final items = data['items'] as List<dynamic>? ?? [];
-        
+
         final newStatuses = <String, ProfileUpdateStatus>{};
         for (var item in items) {
-          final status = ProfileUpdateStatus.fromJson(item as Map<String, dynamic>);
+          final status = ProfileUpdateStatus.fromJson(
+            item as Map<String, dynamic>,
+          );
           newStatuses[status.keyName] = status;
         }
-        
+
         fieldStatuses.value = newStatuses;
       }
     } catch (_) {}
   }
 
-  ProfileUpdateStatus? getUpdateStatus(String keyName, {Map<String, int>? idMap}) {
+  ProfileUpdateStatus? getUpdateStatus(
+    String keyName, {
+    Map<String, int>? idMap,
+  }) {
     final _ = fieldStatuses.keys.toList();
 
     ProfileUpdateStatus? status;
@@ -525,7 +836,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
     if (status == null || status.isApproved) return null;
-    
+
     if (idMap != null && status.newValue != null) {
       final id = int.tryParse(status.newValue!);
       if (id != null) {
@@ -542,8 +853,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
         final List<Map<String, int>> globalMaps = [];
-        if (keyName.contains('State')) globalMaps.add(workInfo.globalStateIdMap);
-        if (keyName.contains('District')) globalMaps.add(workInfo.globalDistrictIdMap);
+        if (keyName.contains('State'))
+          globalMaps.add(workInfo.globalStateIdMap);
+        if (keyName.contains('District'))
+          globalMaps.add(workInfo.globalDistrictIdMap);
         if (keyName.contains('Taluka')) {
           globalMaps.add(workInfo.globalTalukaIdMap);
           globalMaps.add(workInfo.workTalukaIdMap);
@@ -552,7 +865,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           globalMaps.add(workInfo.globalAreaIdMap);
           globalMaps.add(workInfo.workAreaIdMap);
         }
-        
+
         for (final gMap in globalMaps) {
           for (final entry in gMap.entries) {
             if (entry.value == id) {
@@ -570,22 +883,29 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
     final lowerKey = keyName.toLowerCase();
-    if (lowerKey == 'islookingformarriage' || lowerKey == 'isownland' || lowerKey == 'isownhouse' || lowerKey == 'hastwowheeler' || lowerKey == 'hasfourwheeler') {
-       final newValueStr = status.newValue?.toLowerCase() == 'true' ? LK.yes.tr : LK.no.tr;
-       return ProfileUpdateStatus(
-              approvalRequestId: status.approvalRequestId,
-              keyName: status.keyName,
-              oldValue: status.oldValue,
-              newValue: newValueStr,
-              status: status.status,
-              rawJson: status.rawJson,
-            );
+    if (lowerKey == 'islookingformarriage' ||
+        lowerKey == 'isownland' ||
+        lowerKey == 'isownhouse' ||
+        lowerKey == 'hastwowheeler' ||
+        lowerKey == 'hasfourwheeler') {
+      final newValueStr = status.newValue?.toLowerCase() == 'true'
+          ? LK.yes.tr
+          : LK.no.tr;
+      return ProfileUpdateStatus(
+        approvalRequestId: status.approvalRequestId,
+        keyName: status.keyName,
+        oldValue: status.oldValue,
+        newValue: newValueStr,
+        status: status.status,
+        rawJson: status.rawJson,
+      );
     }
-    
+
     if (keyName == 'DateOfBirth' && status.newValue != null) {
       try {
         final dt = DateTime.parse(status.newValue!);
-        final formatted = '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
+        final formatted =
+            '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
         return ProfileUpdateStatus(
           approvalRequestId: status.approvalRequestId,
           keyName: status.keyName,
@@ -608,7 +928,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
           } else if (hour > 12) {
             hour -= 12;
           }
-          final formattedTime = '$hour:${minute.toString().padLeft(2, '0')} $period';
+          final formattedTime =
+              '$hour:${minute.toString().padLeft(2, '0')} $period';
           return ProfileUpdateStatus(
             approvalRequestId: status.approvalRequestId,
             keyName: status.keyName,
@@ -620,7 +941,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       } catch (_) {}
     }
-    
+
     return status;
   }
 
@@ -628,7 +949,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
   String _initialAddressesJson = '[]';
   static String _stripLangSuffix(String s) =>
       s.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
-  static bool _containsIgnoringLang(List<String> list, String value, {int? id, Map<String, int>? idMap}) {
+  static bool _containsIgnoringLang(
+    List<String> list,
+    String value, {
+    int? id,
+    Map<String, int>? idMap,
+  }) {
     if (list.contains(value)) return true;
     if (id != null && idMap != null) {
       for (final existing in list) {
@@ -646,17 +972,22 @@ class ProfileFormController extends GetxController with FormStateMixin {
         '/api/v1/MemberEducation/mobile/member/$memberId',
       );
       if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
+        final List<dynamic> data =
+            response.data['data'] as List<dynamic>? ?? [];
         final newEducation = data.map((e) {
           final map = e as Map<String, dynamic>;
-          final qualName = map['educationalQualificationName']?.toString() ?? '';
+          final qualName =
+              map['educationalQualificationName']?.toString() ?? '';
 
           if (qualName.isNotEmpty) {
             final qualId = map['educationalQualificationId'] as int?;
             if (qualId != null) {
               contactInfo.educationIdMap[qualName] = qualId;
             }
-            if (!_containsIgnoringLang(contactInfo.qualificationList, qualName)) {
+            if (!_containsIgnoringLang(
+              contactInfo.qualificationList,
+              qualName,
+            )) {
               contactInfo.qualificationList.add(qualName);
             }
           }
@@ -665,8 +996,16 @@ class ProfileFormController extends GetxController with FormStateMixin {
             qualification: qualName,
             qualificationId: map['educationalQualificationId'] as int?,
             institute: map['institutionName']?.toString() ?? '',
-            passingYear: (map['yearOfPassing']?.toString() == '0' || map['yearOfPassing']?.toString() == '0.0') ? '' : (map['yearOfPassing']?.toString() ?? ''),
-            percentage: (map['percentage']?.toString() == '0' || map['percentage']?.toString() == '0.0') ? '' : (map['percentage']?.toString() ?? ''),
+            passingYear:
+                (map['yearOfPassing']?.toString() == '0' ||
+                    map['yearOfPassing']?.toString() == '0.0')
+                ? ''
+                : (map['yearOfPassing']?.toString() ?? ''),
+            percentage:
+                (map['percentage']?.toString() == '0' ||
+                    map['percentage']?.toString() == '0.0')
+                ? ''
+                : (map['percentage']?.toString() ?? ''),
             grade: map['grade']?.toString() ?? '',
             description: map['description']?.toString() ?? '',
             isHighest: map['isHighestQualification'] == true,
@@ -681,7 +1020,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
           });
           contactInfo.educationList.value = newEducation;
         }
-        _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
+        _initialEducationJson = jsonEncode(
+          contactInfo.educationList.map((e) => e.toJson()).toList(),
+        );
         _checkAndTakeSnapshot();
       }
     } catch (_) {}
@@ -707,7 +1048,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             if (stateId != null) {
               String? loc;
               for (final e in workInfo.workStateIdMap.entries) {
-                if (e.value == stateId) { loc = e.key; break; }
+                if (e.value == stateId) {
+                  loc = e.key;
+                  break;
+                }
               }
               if (loc != null) stateName = loc;
             }
@@ -717,7 +1061,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
               if (districtId != null) {
                 String? loc;
                 for (final e in workInfo.globalDistrictIdMap.entries) {
-                  if (e.value == districtId) { loc = e.key; break; }
+                  if (e.value == districtId) {
+                    loc = e.key;
+                    break;
+                  }
                 }
                 if (loc != null) districtName = loc;
               }
@@ -727,7 +1074,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 if (talukaId != null) {
                   String? loc;
                   for (final e in workInfo.globalTalukaIdMap.entries) {
-                    if (e.value == talukaId) { loc = e.key; break; }
+                    if (e.value == talukaId) {
+                      loc = e.key;
+                      break;
+                    }
                   }
                   if (loc != null) talukaName = loc;
                 }
@@ -737,7 +1087,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   if (areaId != null) {
                     String? loc;
                     for (final e in workInfo.globalAreaIdMap.entries) {
-                      if (e.value == areaId) { loc = e.key; break; }
+                      if (e.value == areaId) {
+                        loc = e.key;
+                        break;
+                      }
                     }
                     if (loc != null) areaName = loc;
                   }
@@ -773,16 +1126,29 @@ class ProfileFormController extends GetxController with FormStateMixin {
         if (newAddresses.isNotEmpty) {
           contactInfo.addresses.value = newAddresses;
         }
-        _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+        _initialAddressesJson = jsonEncode(
+          contactInfo.addresses.map((e) => e.toJson()).toList(),
+        );
         final districtFutures = <Future<void>>[];
         final seenStates = <int>{};
         for (final addr in contactInfo.addresses) {
-          if (addr.stateId != null && addr.stateId != 0 && seenStates.add(addr.stateId!)) {
-            final list = workInfo.addressDistrictCache.putIfAbsent(addr.state, () => <String>[].obs);
+          if (addr.stateId != null &&
+              addr.stateId != 0 &&
+              seenStates.add(addr.stateId!)) {
+            final list = workInfo.addressDistrictCache.putIfAbsent(
+              addr.state,
+              () => <String>[].obs,
+            );
             workInfo.markStateFetched(addr.state);
-            districtFutures.add(workInfo.fetchDropdown(
-              '/district/dropdown?stateId=${addr.stateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false,
-            ));
+            districtFutures.add(
+              workInfo.fetchDropdown(
+                '/district/dropdown?stateId=${addr.stateId}',
+                list,
+                [],
+                idMap: workInfo.globalDistrictIdMap,
+                clearMap: false,
+              ),
+            );
           }
         }
         if (districtFutures.isNotEmpty) await Future.wait(districtFutures);
@@ -790,12 +1156,23 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final talukaFutures = <Future<void>>[];
         final seenDistricts = <int>{};
         for (final addr in contactInfo.addresses) {
-          if (addr.districtId != null && addr.districtId != 0 && seenDistricts.add(addr.districtId!)) {
-            final list = workInfo.addressTalukaCache.putIfAbsent(addr.district, () => <String>[].obs);
+          if (addr.districtId != null &&
+              addr.districtId != 0 &&
+              seenDistricts.add(addr.districtId!)) {
+            final list = workInfo.addressTalukaCache.putIfAbsent(
+              addr.district,
+              () => <String>[].obs,
+            );
             workInfo.markDistrictFetched(addr.district);
-            talukaFutures.add(workInfo.fetchDropdown(
-              '/taluka/dropdown?districtId=${addr.districtId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false,
-            ));
+            talukaFutures.add(
+              workInfo.fetchDropdown(
+                '/taluka/dropdown?districtId=${addr.districtId}',
+                list,
+                [],
+                idMap: workInfo.globalTalukaIdMap,
+                clearMap: false,
+              ),
+            );
           }
         }
         if (talukaFutures.isNotEmpty) await Future.wait(talukaFutures);
@@ -803,40 +1180,79 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final areaFutures = <Future<void>>[];
         final seenTalukas = <int>{};
         for (final addr in contactInfo.addresses) {
-          if (addr.talukaId != null && addr.talukaId != 0 && seenTalukas.add(addr.talukaId!)) {
-            final list = workInfo.addressAreaCache.putIfAbsent(addr.taluka, () => <String>[].obs);
+          if (addr.talukaId != null &&
+              addr.talukaId != 0 &&
+              seenTalukas.add(addr.talukaId!)) {
+            final list = workInfo.addressAreaCache.putIfAbsent(
+              addr.taluka,
+              () => <String>[].obs,
+            );
             workInfo.markTalukaFetched(addr.taluka);
-            areaFutures.add(workInfo.fetchDropdown(
-              '/Area/dropdown?talukaId=${addr.talukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false,
-            ));
+            areaFutures.add(
+              workInfo.fetchDropdown(
+                '/Area/dropdown?talukaId=${addr.talukaId}',
+                list,
+                [],
+                idMap: workInfo.globalAreaIdMap,
+                clearMap: false,
+              ),
+            );
           }
         }
         if (areaFutures.isNotEmpty) await Future.wait(areaFutures);
         sanitizeAddresses();
-        _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+        _initialAddressesJson = jsonEncode(
+          contactInfo.addresses.map((e) => e.toJson()).toList(),
+        );
         _checkAndTakeSnapshot();
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   void markAsAddMode() {
     isAddMode = true;
-    isMemberLoaded = true; 
+    isMemberLoaded = true;
     _checkAndTakeSnapshot();
   }
 
   Future<void> loadAllDropdowns() async {
     final tokenManager = Get.find<TokenManager>();
     final samajId = tokenManager.samajId;
-    final gotraPath = samajId != null ? '/Gotra/dropdown?samajId=$samajId' : '/Gotra/dropdown';
+    final gotraPath = samajId != null
+        ? '/Gotra/dropdown?samajId=$samajId'
+        : '/Gotra/dropdown';
 
     await Future.wait([
-      workInfo.fetchDropdown('/gender/dropdown', personalInfo.genderList, [], idMap: personalInfo.genderIdMap),
-      workInfo.fetchDropdown('/MaritalStatus/dropdown', personalInfo.maritalStatusList, [], idMap: personalInfo.maritalStatusIdMap),
-      workInfo.fetchDropdown('/BloodGroup/dropdown', personalInfo.bloodGroupList, [], idMap: personalInfo.bloodGroupIdMap),
-      workInfo.fetchDropdown('/RelationType/dropdown', personalInfo.relationList, [], idMap: personalInfo.relationIdMap),
-      workInfo.fetchDropdown('/AddressType/dropdown', contactInfo.addressTypeList, [], idMap: contactInfo.addressTypeIdMap),
+      workInfo.fetchDropdown(
+        '/gender/dropdown',
+        personalInfo.genderList,
+        [],
+        idMap: personalInfo.genderIdMap,
+      ),
+      workInfo.fetchDropdown(
+        '/MaritalStatus/dropdown',
+        personalInfo.maritalStatusList,
+        [],
+        idMap: personalInfo.maritalStatusIdMap,
+      ),
+      workInfo.fetchDropdown(
+        '/BloodGroup/dropdown',
+        personalInfo.bloodGroupList,
+        [],
+        idMap: personalInfo.bloodGroupIdMap,
+      ),
+      workInfo.fetchDropdown(
+        '/RelationType/dropdown',
+        personalInfo.relationList,
+        [],
+        idMap: personalInfo.relationIdMap,
+      ),
+      workInfo.fetchDropdown(
+        '/AddressType/dropdown',
+        contactInfo.addressTypeList,
+        [],
+        idMap: contactInfo.addressTypeIdMap,
+      ),
       workInfo.fetchDropdown(
         '/EducationalQualification/mobile/dropdown',
         contactInfo.qualificationList,
@@ -855,12 +1271,32 @@ class ProfileFormController extends GetxController with FormStateMixin {
         [],
         idMap: workInfo.jobPositionIdMap,
       ),
-      workInfo.fetchDropdown('/Sign/dropdown', personalInfo.signList, [], idMap: personalInfo.signIdMap),
-      workInfo.fetchDropdown(gotraPath, personalInfo.gotraList, [], idMap: personalInfo.gotraIdMap),
-      workInfo.fetchDropdown(gotraPath, personalInfo.mothersGotraList, [], idMap: personalInfo.mothersGotraIdMap),
-      workInfo.fetchDropdown('/state/dropdown', workInfo.workStateList, [], idMap: workInfo.workStateIdMap),
+      workInfo.fetchDropdown(
+        '/Sign/dropdown',
+        personalInfo.signList,
+        [],
+        idMap: personalInfo.signIdMap,
+      ),
+      workInfo.fetchDropdown(
+        gotraPath,
+        personalInfo.gotraList,
+        [],
+        idMap: personalInfo.gotraIdMap,
+      ),
+      workInfo.fetchDropdown(
+        gotraPath,
+        personalInfo.mothersGotraList,
+        [],
+        idMap: personalInfo.mothersGotraIdMap,
+      ),
+      workInfo.fetchDropdown(
+        '/state/dropdown',
+        workInfo.workStateList,
+        [],
+        idMap: workInfo.workStateIdMap,
+      ),
     ]);
-    
+
     await workInfo.fetchOccupations();
     await workInfo.fetchDistricts();
     await workInfo.fetchTalukas();
@@ -873,9 +1309,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   String? _findLocByName(String name, Iterable<String> mapKeys) {
     if (name.isEmpty) return null;
-    final cleanName = name.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+    final cleanName = name
+        .replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '')
+        .trim()
+        .toLowerCase();
     for (final key in mapKeys) {
-      final cleanKey = key.replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '').trim().toLowerCase();
+      final cleanKey = key
+          .replaceAll(RegExp(r'\s*\([a-zA-Z]+\)$'), '')
+          .trim()
+          .toLowerCase();
       if (cleanKey == cleanName) return key;
     }
     return null;
@@ -887,9 +1329,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
       if (addr.stateId != null && addr.stateId != 0) {
         String? loc;
         for (final e in workInfo.workStateIdMap.entries) {
-          if (e.value == addr.stateId) { loc = e.key; break; }
+          if (e.value == addr.stateId) {
+            loc = e.key;
+            break;
+          }
         }
-        if (loc == null) loc = _findLocByName(addr.state, workInfo.workStateIdMap.keys);
+        if (loc == null)
+          loc = _findLocByName(addr.state, workInfo.workStateIdMap.keys);
         if (loc != null && addr.state != loc) {
           workInfo.renameState(addr.state, loc);
           addr.state = loc;
@@ -899,41 +1345,60 @@ class ProfileFormController extends GetxController with FormStateMixin {
       if (addr.districtId != null && addr.districtId != 0) {
         String? loc;
         for (final e in workInfo.globalDistrictIdMap.entries) {
-          if (e.value == addr.districtId) { loc = e.key; break; }
+          if (e.value == addr.districtId) {
+            loc = e.key;
+            break;
+          }
         }
-        if (loc == null) loc = _findLocByName(addr.district, workInfo.globalDistrictIdMap.keys);
+        if (loc == null)
+          loc = _findLocByName(
+            addr.district,
+            workInfo.globalDistrictIdMap.keys,
+          );
         if (loc != null && addr.district != loc) {
           workInfo.renameDistrict(addr.district, loc);
           addr.district = loc;
           changed = true;
         }
         final list = workInfo.addressDistrictCache[addr.state];
-        if (list != null && addr.district.isNotEmpty && !list.contains(addr.district)) {
+        if (list != null &&
+            addr.district.isNotEmpty &&
+            !list.contains(addr.district)) {
           list.add(addr.district);
         }
       }
       if (addr.talukaId != null && addr.talukaId != 0) {
         String? loc;
         for (final e in workInfo.globalTalukaIdMap.entries) {
-          if (e.value == addr.talukaId) { loc = e.key; break; }
+          if (e.value == addr.talukaId) {
+            loc = e.key;
+            break;
+          }
         }
-        if (loc == null) loc = _findLocByName(addr.taluka, workInfo.globalTalukaIdMap.keys);
+        if (loc == null)
+          loc = _findLocByName(addr.taluka, workInfo.globalTalukaIdMap.keys);
         if (loc != null && addr.taluka != loc) {
           workInfo.renameTaluka(addr.taluka, loc);
           addr.taluka = loc;
           changed = true;
         }
         final list = workInfo.addressTalukaCache[addr.district];
-        if (list != null && addr.taluka.isNotEmpty && !list.contains(addr.taluka)) {
+        if (list != null &&
+            addr.taluka.isNotEmpty &&
+            !list.contains(addr.taluka)) {
           list.add(addr.taluka);
         }
       }
       if (addr.areaId != null && addr.areaId != 0) {
         String? loc;
         for (final e in workInfo.globalAreaIdMap.entries) {
-          if (e.value == addr.areaId) { loc = e.key; break; }
+          if (e.value == addr.areaId) {
+            loc = e.key;
+            break;
+          }
         }
-        if (loc == null) loc = _findLocByName(addr.area, workInfo.globalAreaIdMap.keys);
+        if (loc == null)
+          loc = _findLocByName(addr.area, workInfo.globalAreaIdMap.keys);
         if (loc != null && addr.area != loc) {
           addr.area = loc;
           changed = true;
@@ -946,18 +1411,22 @@ class ProfileFormController extends GetxController with FormStateMixin {
       if (addr.typeId != null && addr.typeId != 0) {
         String? loc;
         for (final e in contactInfo.addressTypeIdMap.entries) {
-          if (e.value == addr.typeId) { loc = e.key; break; }
+          if (e.value == addr.typeId) {
+            loc = e.key;
+            break;
+          }
         }
         if (loc != null && addr.type != loc) {
           addr.type = loc;
           changed = true;
         }
       }
-
     }
     if (changed) {
       contactInfo.addresses.refresh();
-      _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
+      _initialAddressesJson = jsonEncode(
+        contactInfo.addresses.map((e) => e.toJson()).toList(),
+      );
     }
   }
 
@@ -972,7 +1441,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   Future<void> takeSnapshot() async {
     _ensureSelectionValue(personalInfo.gender, personalInfo.genderList);
-    _ensureSelectionValue(personalInfo.maritalStatus, personalInfo.maritalStatusList);
+    _ensureSelectionValue(
+      personalInfo.maritalStatus,
+      personalInfo.maritalStatusList,
+    );
     _ensureSelectionValue(personalInfo.bloodGroup, personalInfo.bloodGroupList);
     if (_currentMember != null) {
       if (_currentMember!.genderId != null) {
@@ -1065,7 +1537,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(workInfo.occupation, workInfo.occupationList);
     _ensureSelectionValue(workInfo.jobPosition, workInfo.jobPositionList);
     _ensureSelectionValue(personalInfo.sign, personalInfo.signList);
-    
+
     if (_currentMember != null) {
       if (_currentMember!.signId != null) {
         final id = _currentMember!.signId;
@@ -1135,22 +1607,27 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
     _ensureSelectionValue(personalInfo.gotra, personalInfo.gotraList);
-    _ensureSelectionValue(personalInfo.mothersGotra, personalInfo.mothersGotraList);
+    _ensureSelectionValue(
+      personalInfo.mothersGotra,
+      personalInfo.mothersGotraList,
+    );
     _ensureSelectionValue(workInfo.workState, workInfo.workStateList);
-    
+
     _ensureSelectionValue(workInfo.workDistrict, workInfo.workDistrictList);
-    
+
     _ensureSelectionValue(workInfo.workTaluka, workInfo.workTalukaList);
-    
+
     _ensureSelectionValue(workInfo.workArea, workInfo.workAreaList);
 
     _initialDropdownValues['GenderId'] = personalInfo.gender.value;
-    _initialDropdownValues['MaritalStatusId'] = personalInfo.maritalStatus.value;
+    _initialDropdownValues['MaritalStatusId'] =
+        personalInfo.maritalStatus.value;
     _initialDropdownValues['BloodGroupId'] = personalInfo.bloodGroup.value;
     _initialDropdownValues['GotraId'] = personalInfo.gotra.value;
     _initialDropdownValues['MotherGotraId'] = personalInfo.mothersGotra.value;
     _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
-    _initialDropdownValues['MotherDistrictId'] = personalInfo.motherDistrict.value;
+    _initialDropdownValues['MotherDistrictId'] =
+        personalInfo.motherDistrict.value;
     _initialDropdownValues['MotherTalukaId'] = personalInfo.motherTaluka.value;
     _initialDropdownValues['MotherAreaId'] = personalInfo.motherArea.value;
     _initialDropdownValues['signId'] = personalInfo.sign.value;
@@ -1159,7 +1636,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _initialDropdownValues['OccupationId'] = workInfo.occupation.value;
     _initialDropdownValues['JobPositionId'] = workInfo.jobPosition.value;
     _initialDropdownValues['OccupationStateId'] = workInfo.workState.value;
-    _initialDropdownValues['OccupationDistrictId'] = workInfo.workDistrict.value;
+    _initialDropdownValues['OccupationDistrictId'] =
+        workInfo.workDistrict.value;
     _initialDropdownValues['OccupationTalukaId'] = workInfo.workTaluka.value;
     _initialDropdownValues['OccupationAreaId'] = workInfo.workArea.value;
     for (final addr in contactInfo.addresses) {
@@ -1173,9 +1651,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
     contactInfo.addresses.refresh();
-    _initialAddressesJson = jsonEncode(contactInfo.addresses.map((e) => e.toJson()).toList());
-    _initialEducationJson = jsonEncode(contactInfo.educationList.map((e) => e.toJson()).toList());
-    changedFormData; 
+    _initialAddressesJson = jsonEncode(
+      contactInfo.addresses.map((e) => e.toJson()).toList(),
+    );
+    _initialEducationJson = jsonEncode(
+      contactInfo.educationList.map((e) => e.toJson()).toList(),
+    );
+    changedFormData;
     fieldStatuses.refresh();
   }
 
@@ -1184,30 +1666,51 @@ class ProfileFormController extends GetxController with FormStateMixin {
       if (m.motherStateId != null) {
         String? stateName;
         for (final entry in workInfo.globalStateIdMap.entries) {
-          if (entry.value == m.motherStateId) { stateName = entry.key; break; }
+          if (entry.value == m.motherStateId) {
+            stateName = entry.key;
+            break;
+          }
         }
         if (stateName == null) {
           for (final entry in workInfo.workStateIdMap.entries) {
-            if (entry.value == m.motherStateId) { stateName = entry.key; break; }
+            if (entry.value == m.motherStateId) {
+              stateName = entry.key;
+              break;
+            }
           }
         }
         if (stateName != null) personalInfo.motherState.value = stateName;
       }
-      
+
       if (personalInfo.motherState.value.isEmpty) return;
 
       if (m.motherDistrictId != null) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/district/dropdown?stateId=${m.motherStateId}', list, [], idMap: workInfo.globalDistrictIdMap, clearMap: false);
+        await workInfo.fetchDropdown(
+          '/district/dropdown?stateId=${m.motherStateId}',
+          list,
+          [],
+          idMap: workInfo.globalDistrictIdMap,
+          clearMap: false,
+        );
         String? districtName;
         for (final entry in workInfo.globalDistrictIdMap.entries) {
-          if (entry.value == m.motherDistrictId) { districtName = entry.key; break; }
+          if (entry.value == m.motherDistrictId) {
+            districtName = entry.key;
+            break;
+          }
         }
         if (districtName != null) {
           personalInfo.motherDistrict.value = districtName;
-          workInfo.addressDistrictCache.putIfAbsent(personalInfo.motherState.value, () => <String>[].obs);
-          if (!workInfo.addressDistrictCache[personalInfo.motherState.value]!.contains(districtName)) {
-            workInfo.addressDistrictCache[personalInfo.motherState.value]!.add(districtName);
+          workInfo.addressDistrictCache.putIfAbsent(
+            personalInfo.motherState.value,
+            () => <String>[].obs,
+          );
+          if (!workInfo.addressDistrictCache[personalInfo.motherState.value]!
+              .contains(districtName)) {
+            workInfo.addressDistrictCache[personalInfo.motherState.value]!.add(
+              districtName,
+            );
           }
         }
       }
@@ -1216,16 +1719,31 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (m.motherTalukaId != null) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/taluka/dropdown?districtId=${m.motherDistrictId}', list, [], idMap: workInfo.globalTalukaIdMap, clearMap: false);
+        await workInfo.fetchDropdown(
+          '/taluka/dropdown?districtId=${m.motherDistrictId}',
+          list,
+          [],
+          idMap: workInfo.globalTalukaIdMap,
+          clearMap: false,
+        );
         String? talukaName;
         for (final entry in workInfo.globalTalukaIdMap.entries) {
-          if (entry.value == m.motherTalukaId) { talukaName = entry.key; break; }
+          if (entry.value == m.motherTalukaId) {
+            talukaName = entry.key;
+            break;
+          }
         }
         if (talukaName != null) {
           personalInfo.motherTaluka.value = talukaName;
-          workInfo.addressTalukaCache.putIfAbsent(personalInfo.motherDistrict.value, () => <String>[].obs);
-          if (!workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!.contains(talukaName)) {
-            workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!.add(talukaName);
+          workInfo.addressTalukaCache.putIfAbsent(
+            personalInfo.motherDistrict.value,
+            () => <String>[].obs,
+          );
+          if (!workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!
+              .contains(talukaName)) {
+            workInfo.addressTalukaCache[personalInfo.motherDistrict.value]!.add(
+              talukaName,
+            );
           }
         }
       }
@@ -1234,34 +1752,50 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
       if (m.motherAreaId != null) {
         final list = <String>[].obs;
-        await workInfo.fetchDropdown('/Area/dropdown?talukaId=${m.motherTalukaId}', list, [], idMap: workInfo.globalAreaIdMap, clearMap: false);
+        await workInfo.fetchDropdown(
+          '/Area/dropdown?talukaId=${m.motherTalukaId}',
+          list,
+          [],
+          idMap: workInfo.globalAreaIdMap,
+          clearMap: false,
+        );
         String? areaName;
         for (final entry in workInfo.globalAreaIdMap.entries) {
-          if (entry.value == m.motherAreaId) { areaName = entry.key; break; }
+          if (entry.value == m.motherAreaId) {
+            areaName = entry.key;
+            break;
+          }
         }
         if (areaName != null) {
           personalInfo.motherArea.value = areaName;
-          workInfo.addressAreaCache.putIfAbsent(personalInfo.motherTaluka.value, () => <String>[].obs);
-          if (!workInfo.addressAreaCache[personalInfo.motherTaluka.value]!.contains(areaName)) {
-            workInfo.addressAreaCache[personalInfo.motherTaluka.value]!.add(areaName);
+          workInfo.addressAreaCache.putIfAbsent(
+            personalInfo.motherTaluka.value,
+            () => <String>[].obs,
+          );
+          if (!workInfo.addressAreaCache[personalInfo.motherTaluka.value]!
+              .contains(areaName)) {
+            workInfo.addressAreaCache[personalInfo.motherTaluka.value]!.add(
+              areaName,
+            );
           }
         }
       }
     } catch (e) {
     } finally {
       _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
-      _initialDropdownValues['MotherDistrictId'] = personalInfo.motherDistrict.value;
-      _initialDropdownValues['MotherTalukaId'] = personalInfo.motherTaluka.value;
+      _initialDropdownValues['MotherDistrictId'] =
+          personalInfo.motherDistrict.value;
+      _initialDropdownValues['MotherTalukaId'] =
+          personalInfo.motherTaluka.value;
       _initialDropdownValues['MotherAreaId'] = personalInfo.motherArea.value;
     }
   }
 
-
   void _ensureSelectionValue(RxString selected, List<String> list) {
     if (selected.value.isNotEmpty && !list.contains(selected.value)) {
-      if (list.isEmpty) return; 
+      if (list.isEmpty) return;
       final query = selected.value.replaceAll(' ', '').toLowerCase();
-      
+
       String? match;
       for (final item in list) {
         if (item.replaceAll(' ', '').toLowerCase() == query) {
@@ -1269,7 +1803,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           break;
         }
       }
-      
+
       if (match != null) {
         selected.value = match;
       } else {
@@ -1281,7 +1815,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   void submitForm({String? successMessage}) {
     final isEdit = _currentMember != null;
     bool hasListErrors = false;
-    
+
     if (!isEdit) {
       if (addresses.isEmpty) {
         hasListErrors = true;
@@ -1292,13 +1826,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
     if (!hasListErrors && (formKey.currentState?.validate() ?? false)) {
       personalInfo.firstName.value = personalInfo.firstNameCtrl.text;
       personalInfo.lastName.value = personalInfo.lastNameCtrl.text;
-      
+
       submitThrottled(() async {
         personalInfo.uploadProgress.value = 0.1;
-        
+
         try {
           final formDataMap = <String, dynamic>{};
-          
+
           if (isEdit) {
             final formDataChanges = changedFormData;
             formDataMap.addAll(formDataChanges);
@@ -1306,7 +1840,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             if (personalInfo.profileImage.value != null) {
               final file = personalInfo.profileImage.value!;
               final fileName = file.path.split('/').last;
-              formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(file.path, filename: fileName);
+              formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(
+                file.path,
+                filename: fileName,
+              );
             } else if (personalInfo.isPhotoRemoved.value) {
               formDataMap['ProfileImage'] = null;
               formDataMap['ProfilePhotoPath'] = null;
@@ -1318,19 +1855,23 @@ class ProfileFormController extends GetxController with FormStateMixin {
             }
 
             String? formatDob(String? d) {
-               if (d == null || d.isEmpty) return null;
-               try {
-                 DateTime dt;
-                 if (d.contains('-') && d.split('-')[0].length == 2) {
-                   final parts = d.split('-');
-                   dt = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
-                 } else {
-                   dt = DateTime.parse(d);
-                 }
-                 return dt.toIso8601String();
-               } catch (_) {
-                 return d;
-               }
+              if (d == null || d.isEmpty) return null;
+              try {
+                DateTime dt;
+                if (d.contains('-') && d.split('-')[0].length == 2) {
+                  final parts = d.split('-');
+                  dt = DateTime(
+                    int.parse(parts[2]),
+                    int.parse(parts[1]),
+                    int.parse(parts[0]),
+                  );
+                } else {
+                  dt = DateTime.parse(d);
+                }
+                return dt.toIso8601String();
+              } catch (_) {
+                return d;
+              }
             }
 
             formDataMap['FirstName'] = personalInfo.firstNameCtrl.text;
@@ -1340,69 +1881,149 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['LastNameEnglish'] = personalInfo.lastNameEnCtrl.text;
             formDataMap['DateOfBirth'] = formatDob(personalInfo.dob.value);
             formDataMap['DateOfBirthTime'] = personalInfo.tob.value;
-            formDataMap['Weight'] = double.tryParse(personalInfo.weightCtrl.text);
-            formDataMap['Height'] = double.tryParse(personalInfo.heightCtrl.text) ?? 999.99;
-            formDataMap['GenderId'] = getId(personalInfo.gender.value, personalInfo.genderIdMap);
-            formDataMap['MaritalStatusId'] = getId(personalInfo.maritalStatus.value, personalInfo.maritalStatusIdMap);
-            formDataMap['BloodGroupId'] = getId(personalInfo.bloodGroup.value, personalInfo.bloodGroupIdMap);
-            formDataMap['RelationTypeId'] = getId(personalInfo.relation.value, personalInfo.relationIdMap);
-            formDataMap['GotraId'] = getId(personalInfo.gotra.value, personalInfo.gotraIdMap);
-            formDataMap['MotherGotraId'] = getId(personalInfo.mothersGotra.value, personalInfo.mothersGotraIdMap);
-            formDataMap['MotherStateId'] = getId(personalInfo.motherState.value, workInfo.globalStateIdMap);
-            formDataMap['MotherDistrictId'] = getId(personalInfo.motherDistrict.value, workInfo.globalDistrictIdMap);
-            formDataMap['MotherTalukaId'] = getId(personalInfo.motherTaluka.value, workInfo.globalTalukaIdMap);
-            formDataMap['MotherAreaId'] = getId(personalInfo.motherArea.value, workInfo.globalAreaIdMap);
-            formDataMap['MotherFatherName'] = personalInfo.motherFatherNameCtrl.text;
-            formDataMap['signId'] = getId(personalInfo.sign.value, personalInfo.signIdMap);
-            formDataMap['IsLookingforMarriage'] = personalInfo.openToMarriage.value;
-            
+            formDataMap['Weight'] = double.tryParse(
+              personalInfo.weightCtrl.text,
+            );
+            formDataMap['Height'] =
+                double.tryParse(personalInfo.heightCtrl.text) ?? 999.99;
+            formDataMap['GenderId'] = getId(
+              personalInfo.gender.value,
+              personalInfo.genderIdMap,
+            );
+            formDataMap['MaritalStatusId'] = getId(
+              personalInfo.maritalStatus.value,
+              personalInfo.maritalStatusIdMap,
+            );
+            formDataMap['BloodGroupId'] = getId(
+              personalInfo.bloodGroup.value,
+              personalInfo.bloodGroupIdMap,
+            );
+            formDataMap['RelationTypeId'] = getId(
+              personalInfo.relation.value,
+              personalInfo.relationIdMap,
+            );
+            formDataMap['GotraId'] = getId(
+              personalInfo.gotra.value,
+              personalInfo.gotraIdMap,
+            );
+            formDataMap['MotherGotraId'] = getId(
+              personalInfo.mothersGotra.value,
+              personalInfo.mothersGotraIdMap,
+            );
+            formDataMap['MotherStateId'] = getId(
+              personalInfo.motherState.value,
+              workInfo.globalStateIdMap,
+            );
+            formDataMap['MotherDistrictId'] = getId(
+              personalInfo.motherDistrict.value,
+              workInfo.globalDistrictIdMap,
+            );
+            formDataMap['MotherTalukaId'] = getId(
+              personalInfo.motherTaluka.value,
+              workInfo.globalTalukaIdMap,
+            );
+            formDataMap['MotherAreaId'] = getId(
+              personalInfo.motherArea.value,
+              workInfo.globalAreaIdMap,
+            );
+            formDataMap['MotherFatherName'] =
+                personalInfo.motherFatherNameCtrl.text;
+            formDataMap['signId'] = getId(
+              personalInfo.sign.value,
+              personalInfo.signIdMap,
+            );
+            formDataMap['IsLookingforMarriage'] =
+                personalInfo.openToMarriage.value;
+
             formDataMap['MobileNo'] = contactInfo.mobileCtrl.text;
-            formDataMap['SecondaryMobile'] = contactInfo.secondaryMobileCtrl.text;
+            formDataMap['SecondaryMobile'] =
+                contactInfo.secondaryMobileCtrl.text;
             formDataMap['EmailAddress'] = contactInfo.emailCtrl.text;
-            formDataMap['EmergencyContactName'] = contactInfo.emergencyNameCtrl.text;
-            formDataMap['EmergencyContactNo'] = contactInfo.emergencyNoCtrl.text;
-            formDataMap['EntryPersonMobileNo'] = contactInfo.entryPersonMobileCtrl.text;
+            formDataMap['EmergencyContactName'] =
+                contactInfo.emergencyNameCtrl.text;
+            formDataMap['EmergencyContactNo'] =
+                contactInfo.emergencyNoCtrl.text;
+            formDataMap['EntryPersonMobileNo'] =
+                contactInfo.entryPersonMobileCtrl.text;
             formDataMap['FacebookUrl'] = contactInfo.facebookCtrl.text;
             formDataMap['WhatsappUrl'] = contactInfo.whatsappCtrl.text;
             formDataMap['InstagramUrl'] = contactInfo.instagramCtrl.text;
             formDataMap['TwitterUrl'] = contactInfo.twitterCtrl.text;
-            
-            formDataMap['OccupationTypeId'] = getId(workInfo.occupationType.value, workInfo.occupationTypeIdMap);
-            formDataMap['OccupationId'] = getId(workInfo.occupation.value, workInfo.occupationIdMap);
-            formDataMap['JobPositionId'] = getId(workInfo.jobPosition.value, workInfo.jobPositionIdMap);
+
+            formDataMap['OccupationTypeId'] = getId(
+              workInfo.occupationType.value,
+              workInfo.occupationTypeIdMap,
+            );
+            formDataMap['OccupationId'] = getId(
+              workInfo.occupation.value,
+              workInfo.occupationIdMap,
+            );
+            formDataMap['JobPositionId'] = getId(
+              workInfo.jobPosition.value,
+              workInfo.jobPositionIdMap,
+            );
             formDataMap['OtherOccupation'] = workInfo.otherOccupation.value;
             formDataMap['OtherJobPosition'] = workInfo.otherJobPosition.value;
-            formDataMap['OtherJobPositionEnglish'] = workInfo.otherJobPositionEnglish.value;
+            formDataMap['OtherJobPositionEnglish'] =
+                workInfo.otherJobPositionEnglish.value;
             formDataMap['CompanyName'] = workInfo.companyNameCtrl.text;
             formDataMap['BusinessName'] = workInfo.businessNameCtrl.text;
-            formDataMap['MonthlyIncome'] = double.tryParse(personalInfo.monthlyIncomeCtrl.text);
-            formDataMap['OccupationDescription'] = workInfo.occupationDescription.value;
-            
+            formDataMap['MonthlyIncome'] = double.tryParse(
+              personalInfo.monthlyIncomeCtrl.text,
+            );
+            formDataMap['OccupationDescription'] =
+                workInfo.occupationDescription.value;
+
             formDataMap['IsOwnLand'] = personalInfo.ownLand.value;
             formDataMap['IsOwnHouse'] = personalInfo.ownHouse.value;
             formDataMap['HasTwoWheeler'] = personalInfo.twoWheeler.value;
             formDataMap['HasFourWheeler'] = personalInfo.fourWheeler.value;
-            
-            formDataMap['OccupationTalukaId'] = getId(workInfo.workTaluka.value, workInfo.globalTalukaIdMap);
-            formDataMap['OccupationAreaId'] = getId(workInfo.workArea.value, workInfo.workAreaIdMap);
-            formDataMap['OccupationAddressLine1'] = workInfo.workAddressLine1Ctrl.text;
-            formDataMap['OccupationAddressLine2'] = workInfo.workAddressLine2Ctrl.text;
+
+            formDataMap['OccupationTalukaId'] = getId(
+              workInfo.workTaluka.value,
+              workInfo.globalTalukaIdMap,
+            );
+            formDataMap['OccupationAreaId'] = getId(
+              workInfo.workArea.value,
+              workInfo.workAreaIdMap,
+            );
+            formDataMap['OccupationAddressLine1'] =
+                workInfo.workAddressLine1Ctrl.text;
+            formDataMap['OccupationAddressLine2'] =
+                workInfo.workAddressLine2Ctrl.text;
             formDataMap['OccupationLandmark'] = workInfo.workLandmarkCtrl.text;
             formDataMap['OccupationPincode'] = workInfo.workPincodeCtrl.text;
 
             if (contactInfo.addresses.isNotEmpty) {
-              final addr = contactInfo.addresses.firstWhere((a) => a.isPrimary, orElse: () => contactInfo.addresses.first);
-              formDataMap['AddressTypeId'] = getId(addr.type, contactInfo.addressTypeIdMap) ?? addr.typeId ?? 0;
-              formDataMap['AddressLine1'] = addr.line1.isEmpty ? null : addr.line1;
-              formDataMap['AddressLine2'] = addr.line2.isEmpty ? null : addr.line2;
-              formDataMap['Landmark'] = addr.landmark.isEmpty ? null : addr.landmark;
-              formDataMap['Pincode'] = addr.pincode.isEmpty ? null : addr.pincode;
-              formDataMap['AreaId'] = getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
-              formDataMap['TalukaId'] = getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId ?? 0;
+              final addr = contactInfo.addresses.firstWhere(
+                (a) => a.isPrimary,
+                orElse: () => contactInfo.addresses.first,
+              );
+              formDataMap['AddressTypeId'] =
+                  getId(addr.type, contactInfo.addressTypeIdMap) ??
+                  addr.typeId ??
+                  0;
+              formDataMap['AddressLine1'] = addr.line1.isEmpty
+                  ? null
+                  : addr.line1;
+              formDataMap['AddressLine2'] = addr.line2.isEmpty
+                  ? null
+                  : addr.line2;
+              formDataMap['Landmark'] = addr.landmark.isEmpty
+                  ? null
+                  : addr.landmark;
+              formDataMap['Pincode'] = addr.pincode.isEmpty
+                  ? null
+                  : addr.pincode;
+              formDataMap['AreaId'] =
+                  getId(addr.area, workInfo.globalAreaIdMap) ??
+                  addr.areaId ??
+                  0;
+              formDataMap['TalukaId'] =
+                  getId(addr.taluka, workInfo.globalTalukaIdMap) ??
+                  addr.talukaId ??
+                  0;
             }
-
-            // Education fields are no longer sent in the main create/upsert API
-            // They are sent via /api/v1/MemberEducation/mobile/upsert instead
 
             formDataMap['IsHead'] = false;
             formDataMap['IsDemised'] = false;
@@ -1422,7 +2043,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             if (personalInfo.profileImage.value != null) {
               final file = personalInfo.profileImage.value!;
               final fileName = file.path.split('/').last;
-              formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(file.path, filename: fileName);
+              formDataMap['ProfileImage'] = await dio.MultipartFile.fromFile(
+                file.path,
+                filename: fileName,
+              );
             } else if (personalInfo.isPhotoRemoved.value) {
               formDataMap['ProfileImage'] = null;
               formDataMap['ProfilePhotoPath'] = null;
@@ -1437,28 +2061,34 @@ class ProfileFormController extends GetxController with FormStateMixin {
               }
               return MapEntry(key, value);
             });
-           
+
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
-              isEdit ? '/api/v1/MemberUpdateRequest/create' : '/api/v1/member/mobile/upsert',
+              isEdit
+                  ? '/api/v1/MemberUpdateRequest/create'
+                  : '/api/v1/member/mobile/upsert',
               data: formData,
-            );        
-            
-            if (response.data != null && response.data is Map<String, dynamic>) {
+            );
+
+            if (response.data != null &&
+                response.data is Map<String, dynamic>) {
               final msg = response.data['message'] as String?;
               if (msg != null && msg.isNotEmpty) {
                 successMessage = msg.tr;
               }
             }
 
-            if (!isEdit && response.data != null && response.data is Map<String, dynamic>) {
+            if (!isEdit &&
+                response.data != null &&
+                response.data is Map<String, dynamic>) {
               int? newMemberId;
               final resData = response.data['data'];
               if (resData is int) {
                 newMemberId = resData;
               } else if (resData is Map<String, dynamic>) {
-                newMemberId = resData['memberId'] as int? ?? resData['id'] as int?;
+                newMemberId =
+                    resData['memberId'] as int? ?? resData['id'] as int?;
               }
 
               if (newMemberId != null) {
@@ -1474,24 +2104,44 @@ class ProfileFormController extends GetxController with FormStateMixin {
                       return {
                         "memberAddressId": 0,
                         "memberId": newMemberId,
-                        "addressTypeId": safeGetId(addr.type, contactInfo.addressTypeIdMap) ?? 0,
-                        "stateId": safeGetId(addr.state, workInfo.globalStateIdMap) ?? 0,
-                        "districtId": safeGetId(addr.district, workInfo.globalDistrictIdMap) ?? 0,
-                        "talukaId": safeGetId(addr.taluka, workInfo.globalTalukaIdMap) ?? 0,
-                        "areaId": safeGetId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0,
+                        "addressTypeId":
+                            safeGetId(
+                              addr.type,
+                              contactInfo.addressTypeIdMap,
+                            ) ??
+                            0,
+                        "stateId":
+                            safeGetId(addr.state, workInfo.globalStateIdMap) ??
+                            0,
+                        "districtId":
+                            safeGetId(
+                              addr.district,
+                              workInfo.globalDistrictIdMap,
+                            ) ??
+                            0,
+                        "talukaId":
+                            safeGetId(
+                              addr.taluka,
+                              workInfo.globalTalukaIdMap,
+                            ) ??
+                            0,
+                        "areaId":
+                            safeGetId(addr.area, workInfo.globalAreaIdMap) ??
+                            addr.areaId ??
+                            0,
                         "addressLine1": addr.line1,
                         "addressLine2": addr.line2,
                         "landmark": addr.landmark,
                         "pincode": addr.pincode,
                         "isPrimary": addr.isPrimary,
-                        "isActive": true
+                        "isActive": true,
                       };
-                    }).toList()
+                    }).toList(),
                   };
                   await apiClient.post(
                     '/api/v1/member-address/mobile/upsert',
                     data: addressesPayload,
-                  );    
+                  );
                 } catch (_) {}
 
                 try {
@@ -1501,19 +2151,22 @@ class ProfileFormController extends GetxController with FormStateMixin {
                       return {
                         "memberEducationId": 0,
                         "memberId": newMemberId,
-                        "educationalQualificationId": contactInfo.educationIdMap[edu.qualification] ?? edu.qualificationId ?? 0,
+                        "educationalQualificationId":
+                            contactInfo.educationIdMap[edu.qualification] ??
+                            edu.qualificationId ??
+                            0,
                         "description": edu.description,
                         "institutionName": edu.institute,
                         "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
                         "percentage": double.tryParse(edu.percentage) ?? 0,
                         "grade": edu.grade,
                         "isHighestQualification": edu.isHighest,
-                        "isActive": true
+                        "isActive": true,
                       };
-                    }).toList()
+                    }).toList(),
                   };
                   await apiClient.post(
-                    '/api/v1/MemberEducation/mobile/upsert',                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                    '/api/v1/MemberEducation/mobile/upsert',
                     data: educationsPayload,
                   );
                 } catch (_) {}
@@ -1527,7 +2180,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   data: {
                     'memberId': _currentMember!.memberId,
                     'profileUpdateComment': editRequestCommentCtrl.text.trim(),
-                    'rejectedReasonCommentByAdmin': null
+                    'rejectedReasonCommentByAdmin': null,
                   },
                 );
               } catch (_) {}
@@ -1540,12 +2193,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 data: {
                   'memberId': _currentMember!.memberId,
                   'profileUpdateComment': editRequestCommentCtrl.text.trim(),
-                  'rejectedReasonCommentByAdmin': null
+                  'rejectedReasonCommentByAdmin': null,
                 },
               );
             } catch (_) {}
           }
-          
+
           bool hasProfileUpdates = formDataMap.isNotEmpty;
           bool hasEducationUpdates = false;
 
@@ -1554,7 +2207,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
               educationList.map((e) => e.toJson()).toList(),
             );
             if (currentEduJson != _initialEducationJson) {
-              final newEducations = contactInfo.educationList.where((e) => e.isNew).toList();
+              final newEducations = contactInfo.educationList
+                  .where((e) => e.isNew)
+                  .toList();
               if (newEducations.isNotEmpty) {
                 hasEducationUpdates = true;
                 final apiClient = Get.find<ApiClient>();
@@ -1588,7 +2243,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
             }
           }
 
-          String snackbarMsg = isEdit ? LK.editProfileRequestSent.tr : LK.memberAddedSuccessfully.tr;
+          String snackbarMsg = isEdit
+              ? LK.editProfileRequestSent.tr
+              : LK.memberAddedSuccessfully.tr;
           if (isEdit) {
             if (hasProfileUpdates && hasEducationUpdates) {
               snackbarMsg = LK.profileAndEducationUpdated.tr;
@@ -1603,18 +2260,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
             backgroundColor: AppColors.green,
             colorText: AppColors.white,
           );
-          
+
           if (Get.isRegistered<DrawerUserController>()) {
             Get.find<DrawerUserController>().fetchUser();
           }
-          
+
           await Future<void>.delayed(const Duration(milliseconds: 1500));
           await Get.offAllNamed<void>(AppRouter.home);
         } catch (e) {
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
             errorMessage = e.message;
-          } 
+          }
           Get.snackbar(
             LK.error.tr,
             errorMessage,

@@ -137,7 +137,10 @@ class _ProfileHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.grey.withValues(alpha: 0.15), width: 1.w),
+        border: Border.all(
+          color: AppColors.grey.withValues(alpha: 0.15),
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.03),
@@ -184,11 +187,17 @@ class _ProfileHeader extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.12), width: 1.w),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      width: 1.w,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -368,7 +377,9 @@ class _MemberDetailsSection extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.grey,
+                  ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -408,11 +419,17 @@ class _AddressSection extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: 1.w),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.15),
+                          width: 1.w,
+                        ),
                       ),
                       child: Text(
                         addr.addressTypeName,
@@ -443,7 +460,10 @@ class _AddressSection extends StatelessWidget {
                 if (controller.memberAddresses.last != addr)
                   Padding(
                     padding: EdgeInsets.only(top: 12.h),
-                    child: Divider(height: 1.h, color: AppColors.grey.withValues(alpha: 0.15)),
+                    child: Divider(
+                      height: 1.h,
+                      color: AppColors.grey.withValues(alpha: 0.15),
+                    ),
                   ),
               ],
             ),
@@ -512,7 +532,9 @@ class _AssetLifeSection extends StatelessWidget {
                       const Spacer(),
                       if (value1 is bool)
                         Icon(
-                          value1 ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                          value1
+                              ? Icons.check_circle_rounded
+                              : Icons.cancel_rounded,
                           size: 18.sp,
                           color: value1 ? AppColors.green : AppColors.red,
                         )
@@ -534,7 +556,9 @@ class _AssetLifeSection extends StatelessWidget {
               children: [
                 Text(
                   label2,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.grey,
+                  ),
                 ),
                 const Spacer(),
                 Icon(
@@ -636,7 +660,9 @@ class _SocialMediaSection extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.grey,
+                  ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -671,7 +697,10 @@ class _SectionContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.grey.withValues(alpha: 0.15), width: 1.w),
+        border: Border.all(
+          color: AppColors.grey.withValues(alpha: 0.15),
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.02),
@@ -737,11 +766,17 @@ class _EducationSection extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15), width: 1.w),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.15),
+                          width: 1.w,
+                        ),
                       ),
                       child: Text(
                         edu.qualification,
@@ -761,7 +796,10 @@ class _EducationSection extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.green.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: AppColors.green.withValues(alpha: 0.15), width: 1.w),
+                          border: Border.all(
+                            color: AppColors.green.withValues(alpha: 0.15),
+                            width: 1.w,
+                          ),
                         ),
                         child: Text(
                           LK.highest.tr,
@@ -803,7 +841,10 @@ class _EducationSection extends StatelessWidget {
                 if (index != controller.memberEducations.length - 1)
                   Padding(
                     padding: EdgeInsets.only(top: 12.h),
-                    child: Divider(height: 1.h, color: AppColors.grey.withValues(alpha: 0.15)),
+                    child: Divider(
+                      height: 1.h,
+                      color: AppColors.grey.withValues(alpha: 0.15),
+                    ),
                   ),
               ],
             ),

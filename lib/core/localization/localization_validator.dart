@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
@@ -23,6 +22,7 @@ class LocalizationValidator {
       final Map<String, dynamic> enMap = enDecoded;
       final Map<String, dynamic> guMap = guDecoded;
 
+      // ignore: unused_local_variable
       int errorCount = 0;
 
       for (final key in LK.allValues) {

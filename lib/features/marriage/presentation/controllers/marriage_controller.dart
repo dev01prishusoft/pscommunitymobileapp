@@ -440,21 +440,16 @@ class MarriageController extends GetxController {
     isAdvancedFiltersOpen.value = true;
   }
 
-  void _updateDynamicLists(List<Member> members) {
-    // Left empty if no other lists need dynamic updates from members list
-  }
+  void _updateDynamicLists(List<Member> members) {}
 
   Future<void> loadAllDropdowns() async {
     final samajId = Get.find<TokenManager>().samajId;
-    final gotraPath = samajId != null ? '/Gotra/dropdown?samajId=$samajId' : '/Gotra/dropdown';
+    final gotraPath = samajId != null
+        ? '/Gotra/dropdown?samajId=$samajId'
+        : '/Gotra/dropdown';
 
     await Future.wait([
-      _fetchDropdown(
-        gotraPath,
-        dynamicGotras,
-        [],
-        firstItem: 'Any',
-      ),
+      _fetchDropdown(gotraPath, dynamicGotras, [], firstItem: 'Any'),
       _fetchDropdown(
         '/EducationalQualification/mobile/dropdown',
         dynamicEducations,
@@ -505,43 +500,51 @@ class MarriageController extends GetxController {
                 [];
           }
           if (idMap != null && clearMap) idMap.clear();
-          final items = list.map((e) {
-            final map = e as Map<String, dynamic>;
-            String text = '';
-            int? id;
-            
-            for (final key in ['text', 'Text', 'name', 'Name', 'value', 'Value']) {
-              if (map.containsKey(key) && map[key] != null) {
-                text = map[key].toString().trim();
-                break;
-              }
-            }
-            
-            if (text.isEmpty) {
-              for (final entry in map.entries) {
-                if (!entry.key.toLowerCase().contains('id')) {
-                  text = entry.value.toString().trim();
-                  break;
+          final items = list
+              .map((e) {
+                final map = e as Map<String, dynamic>;
+                String text = '';
+                int? id;
+
+                for (final key in [
+                  'text',
+                  'Text',
+                  'name',
+                  'Name',
+                  'value',
+                  'Value',
+                ]) {
+                  if (map.containsKey(key) && map[key] != null) {
+                    text = map[key].toString().trim();
+                    break;
+                  }
                 }
-              }
-            }
 
-            for (final entry in map.entries) {
-              if (entry.key.toLowerCase().contains('id')) {
-                id = int.tryParse(entry.value.toString());
-                break;
-              }
-            }
+                if (text.isEmpty) {
+                  for (final entry in map.entries) {
+                    if (!entry.key.toLowerCase().contains('id')) {
+                      text = entry.value.toString().trim();
+                      break;
+                    }
+                  }
+                }
 
-            if (idMap != null && text.isNotEmpty && id != null) {
-              idMap[text] = id;
-            }
+                for (final entry in map.entries) {
+                  if (entry.key.toLowerCase().contains('id')) {
+                    id = int.tryParse(entry.value.toString());
+                    break;
+                  }
+                }
 
-            return text;
-          })
-          .where((s) => s.isNotEmpty)
-          .toSet()
-          .toList();
+                if (idMap != null && text.isNotEmpty && id != null) {
+                  idMap[text] = id;
+                }
+
+                return text;
+              })
+              .where((s) => s.isNotEmpty)
+              .toSet()
+              .toList();
 
           if (items.isNotEmpty) {
             targetList.assignAll([firstItem, ...items]);
