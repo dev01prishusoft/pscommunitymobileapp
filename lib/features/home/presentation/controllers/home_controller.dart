@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/localization/localization_service.dart
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/model/app_link_model.dart';
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
@@ -112,19 +113,16 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       final apiClient = Get.find<ApiClient>();
       final result = await apiClient.getPaginated<MemberNotification>(
         ApiEndpoints.notifications,
-        queryParameters: {
-          'Page': 1,
-          'PageSize': 1,
-        },
+        queryParameters: {'Page': 1, 'PageSize': 1},
         listKey: 'data',
-        fromJsonT: (json) => MemberNotification.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            MemberNotification.fromJson(json as Map<String, dynamic>),
       );
 
       if (result.isSuccess) {
         unreadNotificationCount.value = result.dataOrNull?.unreadCount ?? 0;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   void changeLocale(LocalizationService loc, String? code) {
@@ -161,12 +159,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               }
               await SecureStorageService().setBool(LK.wentForUpdate, false);
               if (Get.context!.mounted) {
-                ScaffoldMessenger.of(Get.context!).showSnackBar(
-                  SnackBar(
-                    content: Text(LK.appUpdatedSuccessfully.tr),
-                    duration: const Duration(seconds: 2),
+                PSDelightToastBar(
+                  snackbarDuration: const Duration(seconds: 3),
+                  builder: (context) => ToastCard(
+                    title: LK.appUpdatedSuccessfully.tr,
+                    leading: Icons.check_circle,
                   ),
-                );
+                ).show();
               }
               return;
             }

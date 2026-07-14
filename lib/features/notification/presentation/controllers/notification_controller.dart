@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 import 'package:pscommunitymobileapp/features/notification/data/repositories/notification_repository.dart';
 import 'package:pscommunitymobileapp/features/notification/presentation/services/notification_navigation_service.dart';
@@ -42,11 +43,16 @@ class NotificationController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
 
-    final result = await _repository.getNotifications(_currentPage, _pageSize, cancelToken: _cancelToken);
-    
+    final result = await _repository.getNotifications(
+      _currentPage,
+      _pageSize,
+      cancelToken: _cancelToken,
+    );
+
     if (result.isFailure) {
       if (result.failureOrNull?.message != 'canceled') {
-        errorMessage.value = result.failureOrNull?.message ?? LK.unknownError.tr;
+        errorMessage.value =
+            result.failureOrNull?.message ?? LK.unknownError.tr;
         notifications.clear();
       }
     } else if (result.isSuccess) {
@@ -66,16 +72,29 @@ class NotificationController extends GetxController {
     isLoadingMore.value = true;
     _currentPage++;
 
-    final result = await _repository.getNotifications(_currentPage, _pageSize, cancelToken: _cancelToken);
+    final result = await _repository.getNotifications(
+      _currentPage,
+      _pageSize,
+      cancelToken: _cancelToken,
+    );
     if (result.isFailure) {
       if (result.failureOrNull?.message != 'canceled') {
         _currentPage--;
-        Get.snackbar(LK.error.tr, result.failureOrNull?.message ?? LK.unknownError.tr);
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: result.failureOrNull?.message ?? LK.unknownError.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
       }
     } else if (result.isSuccess) {
       final response = result.dataOrNull!;
       for (var notification in response.data) {
-        if (!notifications.any((n) => n.memberNotificationId == notification.memberNotificationId)) {
+        if (!notifications.any(
+          (n) => n.memberNotificationId == notification.memberNotificationId,
+        )) {
           notifications.add(notification);
         }
       }
@@ -89,23 +108,35 @@ class NotificationController extends GetxController {
 
   Future<void> handleNotificationClick(MemberNotification notification) async {
     if (!notification.isRead) {
-      final index = notifications.indexWhere((n) => n.memberNotificationId == notification.memberNotificationId);
+      final index = notifications.indexWhere(
+        (n) => n.memberNotificationId == notification.memberNotificationId,
+      );
       MemberNotification? oldNotification;
       if (index != -1) {
         oldNotification = notifications[index];
         final updatedNotification = oldNotification.copyWith(isRead: true);
         notifications[index] = updatedNotification;
       }
-      
-      final result = await _repository.markAsRead(notification.memberNotificationId, cancelToken: _cancelToken);
+
+      final result = await _repository.markAsRead(
+        notification.memberNotificationId,
+        cancelToken: _cancelToken,
+      );
       if (result.isFailure) {
         if (index != -1 && oldNotification != null) {
           notifications[index] = oldNotification;
         }
         if (result.failureOrNull?.message != 'canceled') {
-          Get.snackbar(LK.error.tr, result.failureOrNull?.message ?? LK.unknownError.tr);
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) => ToastCard(
+              title: LK.error.tr,
+              subtitle: result.failureOrNull?.message ?? LK.unknownError.tr,
+              isErrorMessage: true,
+            ),
+          ).show();
         }
-        return; 
+        return;
       }
     }
 

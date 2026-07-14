@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/domain/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/marriage/domain/entities/unmarried_count.dart';
@@ -426,11 +427,13 @@ class MarriageController extends GetxController {
         ageError.value,
         heightError.value,
       ].where((e) => e.isNotEmpty).first;
-      Get.rawSnackbar(
-        message: errorMsg,
-        backgroundColor: Colors.red,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: errorMsg,
+          isErrorMessage: true,
+        ),
+      ).show();
       return;
     }
     isAdvancedFiltersOpen.value = false;

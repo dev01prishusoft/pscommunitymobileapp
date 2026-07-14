@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/config/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/model/app_link_model.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:share_plus/share_plus.dart';
@@ -63,11 +64,11 @@ class ShareController extends GetxController {
   void copyLink() {
     Clipboard.setData(ClipboardData(text: _allLinksText));
 
-    Get.snackbar(
-      LK.linkCopied.tr,
-      LK.linkCopied.tr,
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    PSDelightToastBar(
+      snackbarDuration: const Duration(seconds: 3),
+      builder: (context) =>
+          ToastCard(title: LK.linkCopied.tr, subtitle: LK.linkCopied.tr),
+    ).show();
   }
 
   Future<void> shareViaWhatsApp() async {

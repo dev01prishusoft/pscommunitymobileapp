@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj.dart';
@@ -295,16 +296,13 @@ class BankDetailsPage extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: value));
-                    Get.snackbar(
-                      LK.success.tr,
-                      '$label copied to clipboard',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.primary,
-                      colorText: AppColors.white,
-                      margin: const EdgeInsets.all(16),
-                      borderRadius: 12,
-                      duration: const Duration(seconds: 2),
-                    );
+                    PSDelightToastBar(
+                      snackbarDuration: const Duration(seconds: 3),
+                      builder: (context) => ToastCard(
+                        title: '$label copied to clipboard',
+                        subtitle: value,
+                      ),
+                    ).show();
                   },
                   borderRadius: BorderRadius.circular(4),
                   child: Padding(
@@ -312,7 +310,7 @@ class BankDetailsPage extends StatelessWidget {
                     child: Icon(
                       Icons.copy_rounded,
                       size: 14.sp,
-                      color: AppColors.primary,
+                      color: AppColors.chart4,
                     ),
                   ),
                 ),

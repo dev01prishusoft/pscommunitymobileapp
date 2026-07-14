@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -2781,15 +2782,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 InkWell(
                   onTap: edu.isHighest
                       ? () {
-                          Get.snackbar(
-                            LK.error.tr,
-                            LK.atLeastOneHighestQualification.tr,
-                            backgroundColor: AppColors.red,
-                            colorText: AppColors.white,
-                            snackPosition: SnackPosition.TOP,
-                            margin: const EdgeInsets.all(16),
-                            borderRadius: 8,
-                          );
+                          PSDelightToastBar(
+                            snackbarDuration: const Duration(seconds: 3),
+                            builder: (context) => ToastCard(
+                              title: LK.error.tr,
+                              subtitle: LK.atLeastOneHighestQualification.tr,
+                              isErrorMessage: true,
+                            ),
+                          ).show();
                         }
                       : null,
                   borderRadius: BorderRadius.circular(8),
@@ -2813,15 +2813,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             value: edu.isHighest,
                             onChanged: edu.isHighest
                                 ? (value) {
-                                    Get.snackbar(
-                                      LK.error.tr,
-                                      LK.atLeastOneHighestQualification.tr,
-                                      backgroundColor: AppColors.red,
-                                      colorText: AppColors.white,
-                                      snackPosition: SnackPosition.TOP,
-                                      margin: const EdgeInsets.all(16),
-                                      borderRadius: 8,
-                                    );
+                                    PSDelightToastBar(
+                                      snackbarDuration: const Duration(
+                                        seconds: 3,
+                                      ),
+                                      builder: (context) => ToastCard(
+                                        title: LK.error.tr,
+                                        subtitle: LK
+                                            .atLeastOneHighestQualification
+                                            .tr,
+                                        isErrorMessage: true,
+                                      ),
+                                    ).show();
                                   }
                                 : null,
                             activeColor: AppColors.primary,

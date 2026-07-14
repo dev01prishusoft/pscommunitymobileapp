@@ -20,8 +20,6 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
   final AddedMembersController _controller = Get.put(AddedMembersController());
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final FocusNode _searchFocusNode = FocusNode();
-  bool _isSearchFocused = false;
 
   @override
   void initState() {
@@ -32,18 +30,12 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
         _controller.fetchMembers();
       }
     });
-    _searchFocusNode.addListener(() {
-      setState(() {
-        _isSearchFocused = _searchFocusNode.hasFocus;
-      });
-    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _scrollController.dispose();
-    _searchFocusNode.dispose();
     Get.delete<AddedMembersController>();
     super.dispose();
   }

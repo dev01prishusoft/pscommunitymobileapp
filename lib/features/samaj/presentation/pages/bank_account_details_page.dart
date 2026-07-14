@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_bank_details_model.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -403,16 +404,13 @@ class BankAccountDetailsPage extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: value));
-                      Get.snackbar(
-                        LK.success.tr,
-                        '$label copied to clipboard',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: AppColors.primary,
-                        colorText: AppColors.white,
-                        margin: const EdgeInsets.all(16),
-                        borderRadius: 12,
-                        duration: const Duration(seconds: 2),
-                      );
+                      PSDelightToastBar(
+                        snackbarDuration: const Duration(seconds: 3),
+                        builder: (context) => ToastCard(
+                          title: LK.success.tr,
+                          subtitle: '$label copied to clipboard',
+                        ),
+                      ).show();
                     },
                     borderRadius: BorderRadius.circular(4),
                     child: Padding(

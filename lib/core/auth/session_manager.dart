@@ -5,7 +5,7 @@ import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 
 class SessionManager extends GetxController {
   SessionManager(this._authState);
-  
+
   final AuthState _authState;
   Timer? _inactivityTimer;
 
@@ -22,28 +22,12 @@ class SessionManager extends GetxController {
     });
   }
 
-  void _startTimer() {
-  }
+  void _startTimer() {}
 
   void _stopTimer() {
     _inactivityTimer?.cancel();
     _inactivityTimer = null;
   }
-
-  /*
-  void _onTimeout() {
-    if (_authState.isAuthenticated.value) {
-      _authState.logoutAndRedirect();
-      Get.snackbar(
-        LK.sessionExpired.tr,
-        LK.sessionExpiredBody.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
-    }
-  }
-  */
 
   void userInteracted() {
     _startTimer();

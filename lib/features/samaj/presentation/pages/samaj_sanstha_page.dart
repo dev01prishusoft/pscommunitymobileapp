@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_sanstha.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_sanstha_controller.dart';
@@ -362,17 +363,16 @@ class _SansthaCardState extends State<_SansthaCard> {
                                     Clipboard.setData(
                                       ClipboardData(text: copyContent),
                                     ).then((_) {
-                                      Get.snackbar(
-                                        LK.success.tr,
-                                        'Organization details copied to clipboard.',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: AppColors.black
-                                            .withValues(alpha: 0.8),
-                                        colorText: AppColors.white,
-                                        margin: const EdgeInsets.all(16),
-                                        borderRadius: 8,
-                                        duration: const Duration(seconds: 2),
-                                      );
+                                      PSDelightToastBar(
+                                        snackbarDuration: const Duration(
+                                          seconds: 3,
+                                        ),
+                                        builder: (context) => ToastCard(
+                                          title: LK.success.tr,
+                                          subtitle:
+                                              'Organization details copied to clipboard.',
+                                        ),
+                                      ).show();
                                     });
                                   },
                                   style: OutlinedButton.styleFrom(

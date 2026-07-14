@@ -13,6 +13,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/profile_form_controller.dart';
 
@@ -1675,15 +1676,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 InkWell(
                   onTap: () {
                     if (edu.isHighest) {
-                      Get.snackbar(
-                        LK.error.tr,
-                        LK.atLeastOneHighestQualification.tr,
-                        backgroundColor: AppColors.red,
-                        colorText: AppColors.white,
-                        snackPosition: SnackPosition.TOP,
-                        margin: const EdgeInsets.all(16),
-                        borderRadius: 8,
-                      );
+                      PSDelightToastBar(
+                        snackbarDuration: const Duration(seconds: 3),
+                        builder: (context) => ToastCard(
+                          title: LK.error.tr,
+                          subtitle: LK.atLeastOneHighestQualification.tr,
+                          isErrorMessage: true,
+                        ),
+                      ).show();
                     } else {
                       for (var e in controller.educationList) {
                         e.isHighest = false;
@@ -1714,15 +1714,15 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             value: edu.isHighest,
                             onChanged: (value) {
                               if (edu.isHighest && value == false) {
-                                Get.snackbar(
-                                  LK.error.tr,
-                                  LK.atLeastOneHighestQualification.tr,
-                                  backgroundColor: AppColors.red,
-                                  colorText: AppColors.white,
-                                  snackPosition: SnackPosition.TOP,
-                                  margin: const EdgeInsets.all(16),
-                                  borderRadius: 8,
-                                );
+                                PSDelightToastBar(
+                                  snackbarDuration: const Duration(seconds: 3),
+                                  builder: (context) => ToastCard(
+                                    title: LK.error.tr,
+                                    subtitle:
+                                        LK.atLeastOneHighestQualification.tr,
+                                    isErrorMessage: true,
+                                  ),
+                                ).show();
                               } else if (!edu.isHighest && value == true) {
                                 for (var e in controller.educationList) {
                                   e.isHighest = false;

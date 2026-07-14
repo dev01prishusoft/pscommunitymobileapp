@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
@@ -31,7 +32,11 @@ class PaymentController extends GetxController {
   bool get isAmountFixed {
     final cat = selectedCategory.value;
     if (cat != null && cat.defaultAmount > 0) return true;
-    if (cat != null && cat.minAmount > 0 && cat.maxAmount > 0 && cat.minAmount == cat.maxAmount) return true;
+    if (cat != null &&
+        cat.minAmount > 0 &&
+        cat.maxAmount > 0 &&
+        cat.minAmount == cat.maxAmount)
+      return true;
     return false;
   }
 
@@ -39,7 +44,8 @@ class PaymentController extends GetxController {
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
   final RxString selectedYear = ''.obs;
-  final RxList<Map<String, dynamic>> paymentStatuses = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> paymentStatuses =
+      <Map<String, dynamic>>[].obs;
   final Rxn<Map<String, dynamic>> selectedStatus = Rxn<Map<String, dynamic>>();
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
   final RxList<PaymentCategory> historyCategories = <PaymentCategory>[].obs;
@@ -60,7 +66,7 @@ class PaymentController extends GetxController {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-    
+
     Future.wait([
       loadDashboard(),
       loadPaymentTypes(),
@@ -178,12 +184,18 @@ class PaymentController extends GetxController {
     }
 
     if (adminPaymentRequestId == null) {
-      if ((selectedCategory.value?.minAmount ?? 0) > 0 && amount < selectedCategory.value!.minAmount) {
-        _showErrorSnackbar('${LK.amountMustBeAtLeast.tr}${selectedCategory.value!.minAmount.toInt()}');
+      if ((selectedCategory.value?.minAmount ?? 0) > 0 &&
+          amount < selectedCategory.value!.minAmount) {
+        _showErrorSnackbar(
+          '${LK.amountMustBeAtLeast.tr}${selectedCategory.value!.minAmount.toInt()}',
+        );
         return;
       }
-      if ((selectedCategory.value?.maxAmount ?? 0) > 0 && amount > selectedCategory.value!.maxAmount) {
-        _showErrorSnackbar('${LK.amountCannotExceed.tr}${selectedCategory.value!.maxAmount.toInt()}');
+      if ((selectedCategory.value?.maxAmount ?? 0) > 0 &&
+          amount > selectedCategory.value!.maxAmount) {
+        _showErrorSnackbar(
+          '${LK.amountCannotExceed.tr}${selectedCategory.value!.maxAmount.toInt()}',
+        );
         return;
       }
       if (amount <= 0) {
@@ -206,13 +218,20 @@ class PaymentController extends GetxController {
       final memberId = tokenManager.memberId ?? 0;
 
       if (memberId == 0) {
-        Get.snackbar(LK.error.tr, LK.couldNotDetermineMemberId.tr);
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.couldNotDetermineMemberId.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
         return;
       }
 
       final int paymentModeId = selectedMode.value?.id ?? 0;
       final int paymentStatusId = 0;
-      
+
       final order = await _repository.createOrder(
         amount: amount,
         paymentTypeId: typeId ?? 0,
@@ -228,12 +247,19 @@ class PaymentController extends GetxController {
       const envKey = String.fromEnvironment('RAZORPAY_KEY');
       final key = envKey.isNotEmpty ? envKey : order.keyId;
       if (key.isEmpty) {
-        Get.snackbar(LK.error.tr, LK.paymentGatewayMissing.tr);
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.paymentGatewayMissing.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
         isProcessingPayment.value = false;
         return;
       }
 
-      final String samajName = Get.isRegistered<SamajController>() 
+      final String samajName = Get.isRegistered<SamajController>()
           ? (Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr)
           : LK.samajName.tr;
 
@@ -247,16 +273,23 @@ class PaymentController extends GetxController {
         'name': samajName,
         'description': LK.paymentForCommunity.tr,
         'timeout': 300,
-        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty) 'image': samajLogoUrl,
+        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
+          'image': samajLogoUrl,
         'prefill': {
-          'contact': (tokenManager.userPhone?.isNotEmpty ?? false) ? tokenManager.userPhone : '+919999999999', 
-          'email': (tokenManager.userEmail?.isNotEmpty ?? false) ? tokenManager.userEmail : 'test@example.com'
+          'contact': (tokenManager.userPhone?.isNotEmpty ?? false)
+              ? tokenManager.userPhone
+              : '+919999999999',
+          'email': (tokenManager.userEmail?.isNotEmpty ?? false)
+              ? tokenManager.userEmail
+              : 'test@example.com',
         },
         'theme': {'color': '#1E3A8A'},
         'currency': 'INR',
       };
 
-      if (isRecurring && order.subscriptionId != null && order.subscriptionId!.isNotEmpty) {
+      if (isRecurring &&
+          order.subscriptionId != null &&
+          order.subscriptionId!.isNotEmpty) {
         options['subscription_id'] = order.subscriptionId!;
       } else {
         options['order_id'] = order.orderId;
@@ -265,10 +298,16 @@ class PaymentController extends GetxController {
       _razorpay.open(options);
     } catch (e) {
       final errorMessage = e.toString();
-      Get.snackbar(
-        LK.error.tr,
-        errorMessage.isNotEmpty ? errorMessage : LK.paymentFailed.tr,
-      );
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: LK.error.tr,
+          subtitle: errorMessage.isNotEmpty
+              ? errorMessage
+              : LK.paymentFailed.tr,
+          isErrorMessage: true,
+        ),
+      ).show();
       isProcessingPayment.value = false;
       _pendingAdminRequestId = null;
     }
@@ -283,7 +322,10 @@ class PaymentController extends GetxController {
         ),
       );
 
-      final orderIdToUse = response.orderId ?? response.data?['razorpay_subscription_id']?.toString() ?? '';
+      final orderIdToUse =
+          response.orderId ??
+          response.data?['razorpay_subscription_id']?.toString() ??
+          '';
 
       final result = await _repository.verifyPayment(
         razorpayOrderId: orderIdToUse,
@@ -313,40 +355,58 @@ class PaymentController extends GetxController {
       } else {
         Get.back<void>();
         resetPaymentForm();
-        Get.snackbar(LK.success.tr, LK.paymentSuccessful.tr);
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.success.tr,
+            subtitle: LK.paymentSuccessful.tr,
+          ),
+        ).show();
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back<void>();
-      Get.snackbar(LK.error.tr, LK.verificationFailed.tr);
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) =>
+            ToastCard(
+              title: LK.error.tr,
+              subtitle: LK.verificationFailed.tr,
+              isErrorMessage: true,
+            ),
+      ).show();
     } finally {
       isProcessingPayment.value = false;
       _pendingAdminRequestId = null;
     }
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {    
+  void _handlePaymentError(PaymentFailureResponse response) {
     String message = response.message ?? LK.paymentFailed.tr;
     bool shouldRedirectBack = false;
-    
+
     if (message.toLowerCase().contains('timeout')) {
       message = LK.paymentTimedOut.tr;
       shouldRedirectBack = true;
-    } else if (response.code == Razorpay.PAYMENT_CANCELLED || 
+    } else if (response.code == Razorpay.PAYMENT_CANCELLED ||
         message.toLowerCase().contains('undefined')) {
       message = LK.paymentCancelled.tr;
     }
-    
+
     if (shouldRedirectBack) {
       Get.back<void>();
     }
-    
+
     _showErrorSnackbar(message);
     isProcessingPayment.value = false;
     _pendingAdminRequestId = null;
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    Get.snackbar(LK.info.tr, LK.externalWalletSelected.tr);
+    PSDelightToastBar(
+      snackbarDuration: const Duration(seconds: 3),
+      builder: (context) =>
+          ToastCard(title: LK.info.tr, subtitle: LK.externalWalletSelected.tr),
+    ).show();
   }
 
   void resetHistoryFilters() {
@@ -372,7 +432,7 @@ class PaymentController extends GetxController {
     if (type != null) {
       await fetchHistoryCategories(type.id);
     }
-    
+
     await loadHistory(
       paymentTypeId: type?.id,
       year: int.tryParse(selectedYear.value),
@@ -459,14 +519,13 @@ class PaymentController extends GetxController {
   }
 
   void _showErrorSnackbar(String message) {
-    Get.snackbar(
-      LK.error.tr,
-      message,
-      backgroundColor: Colors.red.shade600,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(16),
-      borderRadius: 8,
-    );
+    PSDelightToastBar(
+      snackbarDuration: const Duration(seconds: 3),
+      builder: (context) => ToastCard(
+        title: LK.error.tr,
+        subtitle: message,
+        isErrorMessage: true,
+      ),
+    ).show();
   }
 }

@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
 
@@ -62,21 +63,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       await controller.resetPassword(phone, phone, newPasswordController.text);
 
       if (controller.isFormSuccess) {
-        Get.snackbar(
-          LK.success,
-          LK.successUpdate,
-          backgroundColor: AppColors.green,
-          colorText: AppColors.white,
-        );
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) =>
+              ToastCard(title: LK.success, subtitle: LK.successUpdate),
+        ).show();
         await Get.find<LocalizationService>().restoreSavedLocale();
         Get.offNamed<void>(AppRouter.postLoginSplash);
       } else if (controller.isFormError && controller.formError.value != null) {
-        Get.snackbar(
-          LK.errorServer,
-          controller.formError.value!,
-          backgroundColor: AppColors.red,
-          colorText: AppColors.white,
-        );
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.errorServer,
+            subtitle: controller.formError.value!,
+            isErrorMessage: true,
+          ),
+        ).show();
       }
     }
 

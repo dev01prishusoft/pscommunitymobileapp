@@ -9,9 +9,9 @@ import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -2254,12 +2254,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
             }
           }
 
-          Get.snackbar(
-            LK.success.tr,
-            snackbarMsg,
-            backgroundColor: AppColors.green,
-            colorText: AppColors.white,
-          );
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) =>
+                ToastCard(title: LK.success.tr, subtitle: snackbarMsg),
+          ).show();
 
           if (Get.isRegistered<DrawerUserController>()) {
             Get.find<DrawerUserController>().fetchUser();
@@ -2272,24 +2271,28 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (e is Failure) {
             errorMessage = e.message;
           }
-          Get.snackbar(
-            LK.error.tr,
-            errorMessage,
-            backgroundColor: AppColors.red,
-            colorText: AppColors.white,
-          );
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) => ToastCard(
+              title: LK.error.tr,
+              subtitle: errorMessage,
+              isErrorMessage: true,
+            ),
+          ).show();
         } finally {
           personalInfo.uploadProgress.value = 0.0;
         }
       });
     } else {
       showListErrors.value = true;
-      Get.snackbar(
-        LK.errorValidation.tr,
-        LK.pleaseFillRequiredFields.tr,
-        backgroundColor: AppColors.red,
-        colorText: AppColors.white,
-      );
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: LK.errorValidation.tr,
+          subtitle: LK.pleaseFillRequiredFields.tr,
+          isErrorMessage: true,
+        ),
+      ).show();
     }
   }
 }

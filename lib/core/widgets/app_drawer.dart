@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -18,13 +19,13 @@ import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/sam
 class DrawerUserController extends GetxController {
   final Rx<Member?> member = Rx<Member?>(null);
   final RxBool isLoading = true.obs;
-  
+
   @override
   void onInit() {
     super.onInit();
     fetchUser();
   }
-  
+
   Future<void> fetchUser() async {
     try {
       isLoading.value = true;
@@ -44,6 +45,7 @@ class DrawerUserController extends GetxController {
     }
   }
 }
+
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -81,8 +83,11 @@ class AppDrawer extends StatelessWidget {
                     ),
                   );
                 }
-                final userPic = userController.member.value?.profilePhotoFullUrl;
-                final logoUrl = userPic?.isNotEmpty == true ? userPic : samajController.samaj.value?.logoUrl;
+                final userPic =
+                    userController.member.value?.profilePhotoFullUrl;
+                final logoUrl = userPic?.isNotEmpty == true
+                    ? userPic
+                    : samajController.samaj.value?.logoUrl;
                 return Container(
                   width: 64.w,
                   height: 64.h,
@@ -121,8 +126,8 @@ class AppDrawer extends StatelessWidget {
                   );
                 }
                 final member = userController.member.value;
-                final name = member != null 
-                    ? '${member.firstName} ${member.lastName}' 
+                final name = member != null
+                    ? '${member.firstName} ${member.lastName}'
                     : (samajController.samaj.value?.name ?? LK.samajName.tr);
                 return Text(
                   name,
@@ -317,11 +322,13 @@ class AppDrawer extends StatelessWidget {
             onPressed: () {
               Get.back<void>();
               authState.deleteAccountAndRedirect();
-              Get.snackbar(
-                LK.accountDeleted.tr,
-                LK.accountDeletedBody.tr,
-                snackPosition: SnackPosition.BOTTOM,
-              );
+              PSDelightToastBar(
+                snackbarDuration: const Duration(seconds: 3),
+                builder: (context) => ToastCard(
+                  title: LK.accountDeleted.tr,
+                  subtitle: LK.accountDeletedBody.tr,
+                ),
+              ).show();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.red,
