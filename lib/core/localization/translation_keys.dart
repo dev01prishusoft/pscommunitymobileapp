@@ -11,7 +11,8 @@ class LK {
   static String passwordHint = '........';
   static String forgotPassword = 'Forgot Password?';
   static String adminWarning = 'Use your admin credentials to continue.';
-  static const String resetPasswordFail = 'Reset password failed. Please try again.';
+  static const String resetPasswordFail =
+      'Reset password failed. Please try again.';
   static const String notifications = 'Notifications';
   static const String noNotificationsFound = 'No notifications found';
   static const String newLabel = 'New';
@@ -177,7 +178,8 @@ class LK {
   static String noAddressesYet = 'No addresses yet.';
   static String addressRequiredError = 'Please add at least one address.';
   static String noEducationRecordsYet = 'No education records yet.';
-  static String educationRequiredError = 'Please add at least one education record.';
+  static String educationRequiredError =
+      'Please add at least one education record.';
 
   static String addressTypeRequired = 'Address Type is required';
   static String stateRequired = 'State is required';
@@ -474,7 +476,8 @@ class LK {
   static String editRequestComment = 'Edit Request Comment';
 
   static String educationAddedSuccessfully = 'Education Added Successfully';
-  static String profileAndEducationUpdated = 'Profile update requested and education added successfully';
+  static String profileAndEducationUpdated =
+      'Profile update requested and education added successfully';
   static String adminAnnouncement = 'Admin Announcement';
   static String samajAnnouncement = 'Samaj Announcement';
 
@@ -482,14 +485,17 @@ class LK {
   static String requested = 'Requested';
   static String camera = 'Camera';
   static String gallery = 'Gallery';
-  static String atLeastOneHighestQualification = 'At least one qualification must be marked as highest';
-  
+  static String atLeastOneHighestQualification =
+      'At least one qualification must be marked as highest';
+
   static String wentForUpdate = 'went_for_update';
   static String newUpdateAvailable = 'newUpdateAvailable';
   static String updateDescription = 'updateDescription';
   static String update = 'update';
   static String notNow = 'notNow';
   static String appUpdatedSuccessfully = 'app_updated_successfully';
+  static String community = 'community';
+  static String samajSansthaDescription = 'samaj_sanstha_description';
 
   static List<String> allValues = [
     appTitle,
@@ -961,9 +967,8 @@ class LK {
     update,
     notNow,
     appUpdatedSuccessfully,
-    atLeastOneHighestQualification
+    atLeastOneHighestQualification,
+    community,
+    samajSansthaDescription,
   ];
 }
-
-
-
