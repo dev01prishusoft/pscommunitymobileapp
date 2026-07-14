@@ -496,6 +496,8 @@ class LK {
   static String appUpdatedSuccessfully = 'app_updated_successfully';
   static String community = 'community';
   static String samajSansthaDescription = 'samaj_sanstha_description';
+  static String next = 'Next';
+  static String back = 'Back';
 
   static List<String> allValues = [
     appTitle,
@@ -970,5 +972,7 @@ class LK {
     atLeastOneHighestQualification,
     community,
     samajSansthaDescription,
+    next,
+    back,
   ];
 }
