@@ -19,62 +19,61 @@ class MemberAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallbackNameStr = fallbackName?.trim() ?? '';
-    final avatarColors = _getAvatarColors(gender ?? '', fallbackNameStr);
     final memCacheSize = (radius * 3).toInt();
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return ClipOval(
-        child: SizedBox(
-          width: radius * 2,
-          height: radius * 2,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: CircleAvatar(
+          radius: radius,
+          backgroundColor: AppColors.white,
           child: CachedImg(
             url: imageUrl!,
             memCacheHeight: memCacheSize,
             memCacheWidth: memCacheSize,
             placeholder: (context, url) =>
-                _buildFallback(avatarColors, fallbackNameStr, isLoading: true),
-            errorWidget: (context, url, error) => _buildFallback(avatarColors, fallbackNameStr),
+                _buildFallback(fallbackNameStr, isLoading: true),
+            errorWidget: (context, url, error) =>
+                _buildFallback(fallbackNameStr),
           ),
         ),
       );
     }
 
-    return _buildFallback(avatarColors, fallbackNameStr);
+    return _buildFallback(fallbackNameStr);
   }
 
-  Widget _buildFallback(
-    ({Color background, Color icon}) colors, 
-    String name, {
-    bool isLoading = false,
-  }) {
+  Widget _buildFallback(String name, {bool isLoading = false}) {
     if (isLoading) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: colors.background,
-        child: CircularProgressIndicator(strokeWidth: 2, color: colors.icon),
-      );
+      return CircularProgressIndicator();
     }
 
     if (name.isNotEmpty) {
       final initials = _getInitials(name);
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: colors.background,
-        child: Text(
-          initials,
-          style: AppTextStyles.labelLarge.copyWith(
-            color: colors.icon,
-            fontSize: radius * 0.8,
-            fontWeight: FontWeight.w600,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: CircleAvatar(
+          radius: radius - 1,
+          backgroundColor: AppColors.white,
+          child: Text(
+            initials,
+            style: AppTextStyles.labelLarge.copyWith(
+              color: AppColors.primary,
+              fontSize: radius * 0.8,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       );
     }
 
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: colors.background,
-      child: Icon(Icons.person, color: colors.icon, size: radius),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.white,
+        child: Icon(Icons.person, color: AppColors.primary),
+      ),
     );
   }
 
@@ -85,12 +84,5 @@ class MemberAvatar extends StatelessWidget {
       return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
     }
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
-  }
-
-  ({Color background, Color icon}) _getAvatarColors(String gender, String name) {
-    if (gender.toLowerCase() == 'female') {
-      return (background: Color(0xFFFCE4EC), icon: Colors.pink);
-    }
-    return (background: AppColors.primary.withValues(alpha: 0.1), icon: AppColors.primary);
   }
 }

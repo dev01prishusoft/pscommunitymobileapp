@@ -227,7 +227,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColors.grey.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
               color: AppColors.black.withValues(alpha: 0.03),
@@ -243,7 +243,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               onTap: () => controller.toggleGroup(role),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                color: AppColors.grey.withValues(alpha: 0.1),
+                color: AppColors.grey.withValues(alpha: 0.2),
                 child: Row(
                   children: [
                     Container(
