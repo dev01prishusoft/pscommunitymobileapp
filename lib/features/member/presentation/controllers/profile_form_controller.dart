@@ -1816,11 +1816,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
     final isEdit = _currentMember != null;
     bool hasListErrors = false;
 
-    if (!isEdit) {
-      if (addresses.isEmpty) {
-        hasListErrors = true;
-      }
-    }
     showListErrors.value = hasListErrors;
 
     if (!hasListErrors && (formKey.currentState?.validate() ?? false)) {

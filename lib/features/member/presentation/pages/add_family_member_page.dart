@@ -29,6 +29,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   final ScrollController _scrollController = ScrollController();
   final ScrollController _headerScrollController = ScrollController();
   final List<GlobalKey> _stepKeys = List.generate(6, (index) => GlobalKey());
+  final List<GlobalKey<FormState>> _stepFormKeys = List.generate(
+    6,
+    (index) => GlobalKey<FormState>(),
+  );
   late final PageController _pageController;
   int _currentStep = 0;
   late String controllerTag;
@@ -52,6 +56,29 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   }
 
   void _animateToStep(int index) {
+    if (index < _currentStep) {
+      _pageController.jumpToPage(index);
+      return;
+    }
+
+    for (int i = _currentStep; i < index; i++) {
+      final stepFormState = _stepFormKeys[i].currentState;
+      if (stepFormState == null) {
+        if (i != _currentStep) {
+          _pageController.jumpToPage(i);
+        }
+        return;
+      }
+
+      final isValid = stepFormState.validate();
+      if (!isValid) {
+        if (i != _currentStep) {
+          _pageController.jumpToPage(i);
+        }
+        return;
+      }
+    }
+
     _pageController.jumpToPage(index);
   }
 
@@ -89,12 +116,42 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     });
                   },
                   children: [
-                    KeepAliveStepWrapper(child: _buildStepPersonal()),
-                    KeepAliveStepWrapper(child: _buildStepContact()),
-                    KeepAliveStepWrapper(child: _buildStepFamily()),
-                    KeepAliveStepWrapper(child: _buildStepAddresses()),
-                    KeepAliveStepWrapper(child: _buildStepEducation()),
-                    KeepAliveStepWrapper(child: _buildStepWork()),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[0],
+                        child: _buildStepPersonal(),
+                      ),
+                    ),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[1],
+                        child: _buildStepContact(),
+                      ),
+                    ),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[2],
+                        child: _buildStepFamily(),
+                      ),
+                    ),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[3],
+                        child: _buildStepAddresses(),
+                      ),
+                    ),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[4],
+                        child: _buildStepEducation(),
+                      ),
+                    ),
+                    KeepAliveStepWrapper(
+                      child: Form(
+                        key: _stepFormKeys[5],
+                        child: _buildStepWork(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -340,13 +397,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
                 const Divider(height: 24),
                 AppFormTextField(
-                  controller: controller.memberNoCtrl,
-                  label: LK.memberNo.tr,
-                  hint: 'Auto Generated Code',
-                  readOnly: true,
-                ),
-                AppSpacing.vM,
-                AppFormTextField(
                   controller: controller.firstNameCtrl,
                   label: LK.firstName.tr,
                   isRequired: true,
@@ -369,7 +419,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     maxLength: 100,
                   ),
                 ),
-                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.firstNameEnCtrl,
@@ -386,7 +435,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     maxLength: 100,
                   ),
                 ),
-                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormDatePicker(
                     controller: controller.dobCtrl,
@@ -398,7 +446,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     label: LK.birthTime.tr,
                   ),
                 ),
-                AppSpacing.vM,
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
@@ -828,7 +875,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
               ),
             ),
-            AppSpacing.vM,
             Obx(() {
               final stateList = controller.workStateList;
               return AppFormDropdown<String>(
@@ -958,6 +1004,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 label: LK.mothersArea.tr,
               );
             }),
+            const SizedBox(height: 8),
             Obx(() {
               if (controller.shouldHideLookingForMarriage) {
                 return const SizedBox.shrink();
@@ -1639,7 +1686,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 },
               ),
             ),
-            AppSpacing.vM,
             _buildFieldPair(
               AppFormTextField(
                 initialValue: edu.grade,
@@ -1660,7 +1706,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 },
               ),
             ),
-            AppSpacing.vM,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1948,7 +1993,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                         controller.workInfo.otherOccupation.value = v,
                   ),
                 ),
-                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.companyNameCtrl,
@@ -1965,7 +2009,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     onChanged: (v) => controller.businessName.value = v,
                   ),
                 ),
-                AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,
@@ -2266,69 +2309,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ],
             ),
           ),
-          AppSpacing.vL,
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller.memberNoCtrl,
-            builder: (context, value, child) {
-              if (value.text.isEmpty) return const SizedBox.shrink();
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.badge_outlined,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          LK.memberNo.tr.toUpperCase(),
-                          style: TextStyle(
-                            color: AppColors.primary.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                            fontSize: 9,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          value.text,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          AppSpacing.vM,
         ],
       ),
     );
