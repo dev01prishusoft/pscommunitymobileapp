@@ -379,10 +379,13 @@ class _MarriageMemberCard extends StatelessWidget {
         color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16.r),
-          onTap: () => Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': member.memberId},
-          ),
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            Get.toNamed<void>(
+              AppRouter.memberProfile,
+              arguments: {'memberId': member.memberId},
+            );
+          },
           child: Padding(
             padding: EdgeInsets.all(14.w),
             child: Row(
