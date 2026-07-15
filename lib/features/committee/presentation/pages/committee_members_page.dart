@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -121,22 +122,10 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         Expanded(
           child: groups.isEmpty
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person_off_rounded,
-                        size: 64.r,
-                        color: AppColors.grey.withValues(alpha: 0.3),
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        LK.noMembersFound.tr,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ],
+                  child: AppEmptyState(
+                    icon: Icons.search_off_rounded,
+                    title: LK.noResultsFound.tr,
+                    subtitle: '',
                   ),
                 )
               : ListView.separated(
