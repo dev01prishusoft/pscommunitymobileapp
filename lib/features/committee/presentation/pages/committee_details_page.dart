@@ -371,7 +371,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
-                  '$count ${LK.membersCount.tr.toLowerCase()}',
+                  '${LK.memberCount.tr}: $count',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: typeColor,
                     fontWeight: FontWeight.bold,
