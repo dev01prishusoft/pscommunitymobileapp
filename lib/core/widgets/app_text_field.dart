@@ -82,6 +82,15 @@ class AppTextField extends StatelessWidget {
           onChanged: onChanged,
           maxLength: maxLength,
           inputFormatters: inputFormatters,
+          contextMenuBuilder: (BuildContext context, EditableTextState editableTextState) {
+            return Localizations.override(
+              context: context,
+              locale: const Locale('en', 'US'),
+              child: AdaptiveTextSelectionToolbar.editableText(
+                editableTextState: editableTextState,
+              ),
+            );
+          },
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppColors.black,
             fontSize: 14.0.sp,
