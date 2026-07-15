@@ -131,8 +131,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
           SizedBox(height: 16.h),
           if (detail.roles.isNotEmpty)
             _buildSection(
-              title:
-                  '${LK.roles.tr} ${LK.at.tr.toUpperCase()} (${detail.roles.length})',
+              title: '${LK.roles.tr} (${detail.roles.length})',
               icon: Icons.verified_user_rounded,
               child: ListView.builder(
                 shrinkWrap: true,
