@@ -109,9 +109,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ),
                         ),
                       )
-                    : TextButton(
+                    : OutlinedButton(
                         onPressed: () => controller.submitForm(
                           successMessage: LK.editProfileRequestSent.tr,
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                         ),
                         child: Text(
                           LK.saveChanges.tr,
