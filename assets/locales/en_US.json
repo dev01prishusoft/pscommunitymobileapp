@@ -477,5 +477,7 @@
   "Samaj Announcement": "Samaj Announcement",
   "New": "New",
   "Next": "Next",
-  "Back": "Back"
+  "Back": "Back",
+  "Review & Save changes": "Review & Save changes",
+  "reviewAndSaveChangesDesc": "Please verify all details across all steps before submitting your profile updates. Any changes will be submitted for approval by the Samaj administrators."
 }

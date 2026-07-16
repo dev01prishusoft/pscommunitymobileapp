@@ -1,4 +1,7 @@
 class LK {
+  static String reviewAndSaveChanges = 'Review & Save changes';
+  static String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
+  
   static String appTitle = 'PS Community';
   static String welcome = 'Welcome to PrishuSoft Samaj';
   static String welcomesYou = 'welcomes you';
@@ -976,5 +979,7 @@ class LK {
     samajSansthaDescription,
     next,
     back,
+    reviewAndSaveChanges,
+    reviewAndSaveChangesDesc,
   ];
 }
