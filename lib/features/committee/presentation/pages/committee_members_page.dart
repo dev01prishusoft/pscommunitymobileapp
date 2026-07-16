@@ -418,6 +418,18 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       LK.role.tr,
                       member.roleName,
                     ),
+                    if (member.reportsToName != null && member.reportsToName!.isNotEmpty) ...[
+                      Divider(
+                        height: 24.h,
+                        thickness: 0.5,
+                        color: AppColors.grey.withValues(alpha: 0.1),
+                      ),
+                      _buildDetailsItem(
+                        Icons.supervisor_account_rounded,
+                        LK.reportsToColon.tr.replaceAll(':', '').trim(),
+                        member.reportsToName!,
+                      ),
+                    ],
                     Divider(
                       height: 24.h,
                       thickness: 0.5,

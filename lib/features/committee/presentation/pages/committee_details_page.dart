@@ -131,8 +131,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
           SizedBox(height: 16.h),
           if (detail.roles.isNotEmpty)
             _buildSection(
-              title:
-                  '${LK.roles.tr} ${LK.at.tr.toUpperCase()} (${detail.roles.length})',
+              title: '${LK.roles.tr} (${detail.roles.length})',
               icon: Icons.verified_user_rounded,
               child: ListView.builder(
                 shrinkWrap: true,
@@ -151,7 +150,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             ),
           SizedBox(height: 16.h),
           _buildSection(
-            title: '${LK.membersCount.tr} (${detail.members.length})',
+            title: '${detail.members.length == 1 ? LK.member.tr : LK.membersCount.tr} (${detail.members.length})',
             icon: Icons.groups_rounded,
             child: Column(
               children: [
@@ -371,7 +370,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
-                  '${LK.memberCount.tr}: $count',
+                  '$count ${count == 1 ? LK.member.tr.toLowerCase() : LK.membersCount.tr.toLowerCase()}',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: typeColor,
                     fontWeight: FontWeight.bold,

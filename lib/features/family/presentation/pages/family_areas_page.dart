@@ -535,7 +535,7 @@ class _AreasList extends StatelessWidget {
                                   ),
                                   SizedBox(width: 4.w),
                                   Text(
-                                    '${area.members} ${LK.membersCount.tr}',
+                                    '${area.members} ${area.members == 1 ? LK.member.tr : LK.membersCount.tr}',
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.secondary,
                                       fontWeight: FontWeight.w600,

@@ -98,7 +98,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
               ),
             ),
           ),
-
+          10.verticalSpace,
           Obx(
             () => Row(
               children: [

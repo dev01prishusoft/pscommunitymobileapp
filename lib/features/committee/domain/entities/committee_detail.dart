@@ -72,6 +72,7 @@ class CommitteeMember {
     this.startDate,
     this.endDate,
     this.imageUrl,
+    this.reportsToName,
   });
 
   factory CommitteeMember.fromJson(Map<String, dynamic> json) {
@@ -87,7 +88,8 @@ class CommitteeMember {
       committeeRoleId: json['committeeRoleId'] as int?,
       startDate: json['startDate'] as String?,
       endDate: json['endDate'] as String?,
-      imageUrl: json['imageUrl'] as String?
+      imageUrl: json['imageUrl'] as String?,
+      reportsToName: json['reportsToMemberName'] as String? ?? json['reportsToName'] as String? ?? json['reportsTo'] as String?,
     );
   }
   final int memberId;
@@ -98,4 +100,5 @@ class CommitteeMember {
   final String? startDate;
   final String? endDate;
   final String? imageUrl;
+  final String? reportsToName;
 }
