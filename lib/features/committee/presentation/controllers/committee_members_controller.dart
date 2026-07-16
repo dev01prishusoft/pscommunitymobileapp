@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
@@ -33,6 +34,14 @@ class CommitteeMembersController extends GetxController {
     _fetchMembers(node.id);
     _fetchRoles();
     expandedGroups.clear();
+
+    // Re-fetch roles whenever the locale changes so the dropdown stays in the correct language
+    if (Get.isRegistered<LocalizationService>()) {
+      ever(Get.find<LocalizationService>().currentLocale, (_) {
+        availableRoles.clear();
+        _fetchRoles();
+      });
+    }
   }
 
   Future<void> _fetchRoles() async {

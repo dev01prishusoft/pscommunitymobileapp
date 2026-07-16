@@ -81,6 +81,7 @@ class LK {
   static String searchHint = 'Search...';
   static String showing = 'Showing';
   static String membersCount = 'Members';
+  static String member = 'Member';
   static String courtesy = 'Courtesy';
   static String social = 'Social';
   static String devotion = 'Devotion';
@@ -241,7 +242,7 @@ class LK {
   static String releaseNotes = 'Release Notes';
   static String ignore = 'Ignore';
   static String successUpdate = 'Password updated successfully';
-  static String committeeInfo = 'COMMITTEE INFO';
+  static String committeeInfo = 'COMMITTEE NAME';
   static String roles = 'ROLES';
   static String members = 'MEMBERS';
   static String oldPassword = 'Old Password';
@@ -571,6 +572,7 @@ class LK {
     searchHint,
     showing,
     membersCount,
+    member,
     courtesy,
     social,
     devotion,
