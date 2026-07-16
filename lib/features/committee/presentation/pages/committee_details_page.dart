@@ -151,7 +151,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             ),
           SizedBox(height: 16.h),
           _buildSection(
-            title: '${LK.membersCount.tr} (${detail.members.length})',
+            title: '${detail.members.length == 1 ? LK.member.tr : LK.membersCount.tr} (${detail.members.length})',
             icon: Icons.groups_rounded,
             child: Column(
               children: [
@@ -371,7 +371,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
-                  '$count ${LK.membersCount.tr.toLowerCase()}',
+                  '$count ${count == 1 ? LK.member.tr.toLowerCase() : LK.membersCount.tr.toLowerCase()}',
                   style: AppTextStyles.labelSmall.copyWith(
                     color: typeColor,
                     fontWeight: FontWeight.bold,

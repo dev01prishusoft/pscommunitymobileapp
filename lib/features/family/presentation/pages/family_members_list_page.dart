@@ -73,7 +73,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
             ),
             SizedBox(height: 2.h),
             Text(
-              '$_membersCount ${LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
+              '$_membersCount ${_membersCount == 1 ? LK.member.tr : LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
               style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w400,
               ),

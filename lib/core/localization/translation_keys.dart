@@ -81,6 +81,7 @@ class LK {
   static String searchHint = 'Search...';
   static String showing = 'Showing';
   static String membersCount = 'Members';
+  static String member = 'Member';
   static String courtesy = 'Courtesy';
   static String social = 'Social';
   static String devotion = 'Devotion';
@@ -571,6 +572,7 @@ class LK {
     searchHint,
     showing,
     membersCount,
+    member,
     courtesy,
     social,
     devotion,
