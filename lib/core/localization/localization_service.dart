@@ -157,6 +157,14 @@ class LocalizationService {
           final remoteKeys = data.map(
             (key, value) => MapEntry(key, value.toString()),
           );
+          
+          if (langCode.toLowerCase() == 'gu') {
+            if (remoteKeys.containsKey('Family')) remoteKeys['Family'] = 'પરિવાર';
+            if (remoteKeys.containsKey('Find Member')) remoteKeys['Find Member'] = 'સભ્ય શોધો';
+            if (remoteKeys.containsKey('Committee')) remoteKeys['Committee'] = 'સમિતિ';
+            if (remoteKeys.containsKey('Payment')) remoteKeys['Payment'] = 'ચૂકવણી';
+          }
+
           final localeKey = keys.keys.firstWhere(
             (k) => k.startsWith(langCode),
             orElse: () => '${langCode}_US',
