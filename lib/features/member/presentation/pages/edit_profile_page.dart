@@ -1075,7 +1075,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
             ),
-            AppSpacing.vM,
             Obx(() {
               final stateList = controller.workStateList;
               return AppFormDropdown<String>(
@@ -1227,6 +1226,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               );
             }),
+            AppSpacing.vM,
             Obx(() {
               if (controller.shouldHideLookingForMarriage) {
                 return const SizedBox.shrink();
@@ -1877,7 +1877,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Review & Save changes',
+                        LK.reviewAndSaveChanges.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -1885,7 +1885,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       AppSpacing.vS,
                       Text(
-                        'Please verify all details across all steps before submitting your profile updates. Any changes will be submitted for approval by the Samaj administrators.',
+                        LK.reviewAndSaveChangesDesc.tr,
                         style: AppTextStyles.bodyMedium,
                       ),
                     ],
@@ -2574,7 +2574,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
           title: Text(
-            '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (Highest)' : ''}',
+            '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (${LK.highest.tr})' : ''}',
             style: AppTextStyles.labelMedium,
           ),
           children: [
