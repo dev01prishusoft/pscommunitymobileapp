@@ -1,6 +1,6 @@
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 
 class MemberAvatar extends StatelessWidget {
@@ -54,7 +54,7 @@ class MemberAvatar extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         child: CircleAvatar(
           radius: radius - 1,
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.primary.withValues(alpha: 0.05),
           child: Text(
             initials,
             style: AppTextStyles.labelLarge.copyWith(
