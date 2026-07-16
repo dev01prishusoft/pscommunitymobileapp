@@ -1901,7 +1901,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Widget _buildFieldPair(Widget child1, Widget child2) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.m),
+      padding: EdgeInsets.only(bottom: AppSpacing.s),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

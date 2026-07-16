@@ -2343,7 +2343,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
 
   Widget _buildFieldPair(Widget child1, Widget child2) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.m),
+      padding: EdgeInsets.only(bottom: AppSpacing.s),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
