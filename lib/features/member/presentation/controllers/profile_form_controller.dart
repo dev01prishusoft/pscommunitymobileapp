@@ -2264,7 +2264,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
         } catch (e) {
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
-            errorMessage = e.message;
+            if (e.message == 'No member changes found.') {
+              errorMessage = e.message.tr;
+            } else {
+              errorMessage = e.message;
+            }
           }
           PSDelightToastBar(
             snackbarDuration: const Duration(seconds: 3),
