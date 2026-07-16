@@ -71,6 +71,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
               }),
             ),
           ),
+          10.verticalSpace,
           Obx(
             () => Row(
               children: [
@@ -290,7 +291,7 @@ class _FindMemberCard extends StatelessWidget {
                         SizedBox(height: 6.h),
                         Wrap(
                           spacing: 6.w,
-                          runSpacing: 4.h,
+                          runSpacing: 8.h,
                           children: [
                             if (member.isHead == true) _buildHeadBadge(),
                             if (member.isLookingforMarriage == true)
