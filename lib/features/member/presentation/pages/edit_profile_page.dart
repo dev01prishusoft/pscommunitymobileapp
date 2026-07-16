@@ -1877,7 +1877,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Review & Save changes',
+                        LK.reviewAndSaveChanges.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -1885,7 +1885,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       AppSpacing.vS,
                       Text(
-                        'Please verify all details across all steps before submitting your profile updates. Any changes will be submitted for approval by the Samaj administrators.',
+                        LK.reviewAndSaveChangesDesc.tr,
                         style: AppTextStyles.bodyMedium,
                       ),
                     ],
