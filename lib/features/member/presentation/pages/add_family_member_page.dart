@@ -1004,7 +1004,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 label: LK.mothersArea.tr,
               );
             }),
-            const SizedBox(height: 8),
+            AppSpacing.vM,
             Obx(() {
               if (controller.shouldHideLookingForMarriage) {
                 return const SizedBox.shrink();

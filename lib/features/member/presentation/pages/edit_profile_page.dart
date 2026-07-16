@@ -1075,7 +1075,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
             ),
-            AppSpacing.vM,
             Obx(() {
               final stateList = controller.workStateList;
               return AppFormDropdown<String>(
@@ -1227,6 +1226,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               );
             }),
+            AppSpacing.vM,
             Obx(() {
               if (controller.shouldHideLookingForMarriage) {
                 return const SizedBox.shrink();
