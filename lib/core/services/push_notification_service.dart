@@ -170,7 +170,9 @@ class PushNotificationService {
       case 'share app':
         targetRoute = AppRouter.shareApp;
         break;
+      case 'samaj':
       case 'samaj profile':
+      case 'samaj info':
         targetRoute = AppRouter.bankDetails;
         break;
       case 'support':
@@ -190,12 +192,16 @@ class PushNotificationService {
       if (Get.currentRoute == targetRoute) {
         Get.offNamed<void>(targetRoute);
       } else {
-        Get.offAllNamed<void>(
-          AppRouter.home,
-          arguments: {'targetRoute': targetRoute},
-        );
+        // Push target route on top of home screen so the back button appears
+        Get.offAllNamed<void>(AppRouter.home);
+        // Add a small delay to allow the Home route transition to begin 
+        // before pushing the target route, preventing GetX navigation collisions.
+        Future.delayed(const Duration(milliseconds: 250), () {
+          Get.toNamed<void>(targetRoute!);
+        });
       }
     } else {
+      // No specific target, fallback to home screen
       Get.offAllNamed<void>(AppRouter.home);
     }
   }
