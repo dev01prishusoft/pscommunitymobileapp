@@ -27,6 +27,11 @@ class AppTheme {
     useMaterial3: true,
     dividerColor: AppColors.grey,
     primaryColor: AppColors.primary,
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: AppColors.primary,
+      selectionColor: AppColors.primary.withValues(alpha: 0.3),
+      selectionHandleColor: AppColors.primary,
+    ),
     scaffoldBackgroundColor: AppColors.sfBackground,
     splashColor: AppColors.primary.withValues(alpha: 0.1),
     highlightColor: AppColors.primary.withValues(alpha: 0.05),
