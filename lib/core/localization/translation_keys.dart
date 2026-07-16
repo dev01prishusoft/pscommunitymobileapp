@@ -242,7 +242,7 @@ class LK {
   static String releaseNotes = 'Release Notes';
   static String ignore = 'Ignore';
   static String successUpdate = 'Password updated successfully';
-  static String committeeInfo = 'COMMITTEE INFO';
+  static String committeeInfo = 'COMMITTEE NAME';
   static String roles = 'ROLES';
   static String members = 'MEMBERS';
   static String oldPassword = 'Old Password';
