@@ -203,10 +203,13 @@ class _OccupationMemberCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16.r),
-        onTap: () => Get.toNamed<void>(
-          AppRouter.memberProfile,
-          arguments: {'memberId': member.memberId},
-        ),
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          Get.toNamed<void>(
+            AppRouter.memberProfile,
+            arguments: {'memberId': member.memberId},
+          );
+        },
         child: Padding(
           padding: EdgeInsets.all(16.r),
           child: Row(

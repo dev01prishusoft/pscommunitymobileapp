@@ -257,10 +257,13 @@ class _FindMemberCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.r),
         child: InkWell(
-          onTap: () => Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': member.memberId},
-          ),
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            Get.toNamed<void>(
+              AppRouter.memberProfile,
+              arguments: {'memberId': member.memberId},
+            );
+          },
           child: Padding(
             padding: EdgeInsets.all(10.w),
             child: IntrinsicHeight(

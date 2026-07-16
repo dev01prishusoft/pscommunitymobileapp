@@ -29,10 +29,13 @@ class MemberTile extends StatelessWidget {
             color: AppColors.grey.withValues(alpha: 0.12),
           ),
         InkWell(
-          onTap: () => Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': int.tryParse(member.id) ?? 0},
-          ),
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            Get.toNamed<void>(
+              AppRouter.memberProfile,
+              arguments: {'memberId': int.tryParse(member.id) ?? 0},
+            );
+          },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Row(

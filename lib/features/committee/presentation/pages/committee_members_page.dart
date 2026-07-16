@@ -294,6 +294,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   }
 
   void _showMemberDetails(CommitteeMember member) {
+    FocusManager.instance.primaryFocus?.unfocus();
     AdaptiveBottomSheet.show<void>(
       context: context,
       isScrollControlled: true,

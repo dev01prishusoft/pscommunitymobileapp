@@ -38,6 +38,7 @@ class CommitteeCard extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
             Get.toNamed<void>(
               AppRouter.committeeDetails,
               arguments: currentNode,
