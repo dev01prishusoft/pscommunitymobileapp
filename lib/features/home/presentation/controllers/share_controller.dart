@@ -67,7 +67,7 @@ class ShareController extends GetxController {
     PSDelightToastBar(
       snackbarDuration: const Duration(seconds: 3),
       builder: (context) =>
-          ToastCard(title: LK.linkCopied.tr, subtitle: LK.linkCopied.tr),
+          ToastCard(title: LK.linkCopied.tr),
     ).show();
   }
 

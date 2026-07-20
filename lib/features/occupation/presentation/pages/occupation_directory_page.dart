@@ -256,7 +256,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               AppRouter.occupationProfile,
               arguments: {'occupationId': occ.id, 'occupationName': occ.name},
             );
-            _controller.loadOccupations();
+            FocusManager.instance.primaryFocus?.unfocus();
+            _controller.loadOccupations(refresh: true);
           },
           child: Padding(
             padding: EdgeInsets.all(10.r),
