@@ -95,10 +95,13 @@ class MarriageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final List<RxInterface<dynamic>> filterObservables = [
+    final List<RxInterface<dynamic>> basicFilters = [
       searchQuery,
       lookingForMarriage,
       selectedGender,
+    ];
+
+    final List<RxInterface<dynamic>> advancedFilters = [
       selectedAgeFrom,
       selectedAgeTo,
       selectedHeightFrom,
@@ -126,18 +129,17 @@ class MarriageController extends GetxController {
       _validateIncome();
     });
 
-    everAll(filterObservables, (_) {
+    everAll(basicFilters, (_) {
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(Duration(milliseconds: 300), () {
+        applyFilters();
+      });
+    });
+
+    everAll(advancedFilters, (_) {
       _validateAge();
       _validateHeight();
       _validateIncome();
-      _debounceTimer?.cancel();
-      _debounceTimer = Timer(Duration(milliseconds: 300), () {
-        if (ageError.value.isEmpty &&
-            heightError.value.isEmpty &&
-            incomeError.value.isEmpty) {
-          applyFilters();
-        }
-      });
     });
 
     scrollController.addListener(() {
@@ -294,7 +296,7 @@ class MarriageController extends GetxController {
         _memberRepository.searchMembers(
           query: searchQuery.value,
           genderId: genderId,
-          lookingForMarriage: lookingForMarriage.value,
+          lookingForMarriage: lookingForMarriage.value ? true : null,
           pageNumber: _currentPage,
           pageSize: _pageSize,
         ),
@@ -441,6 +443,49 @@ class MarriageController extends GetxController {
 
   void openAdvancedFilters() {
     isAdvancedFiltersOpen.value = true;
+  }
+
+  Map<String, dynamic> _savedFilters = {};
+
+  void backupFilters() {
+    _savedFilters = {
+      'ageFrom': selectedAgeFrom.value,
+      'ageTo': selectedAgeTo.value,
+      'heightFrom': selectedHeightFrom.value,
+      'heightTo': selectedHeightTo.value,
+      'gotra': selectedGotra.value,
+      'excludeSameGotra': excludeSameGotra.value,
+      'maritalStatus': selectedMaritalStatus.value,
+      'state': selectedState.value,
+      'district': selectedDistrict.value,
+      'taluka': selectedTaluka.value,
+      'area': selectedArea.value,
+      'education': selectedEducation.value,
+      'occupation': selectedOccupation.value,
+      'incomeFrom': selectedIncomeFrom.value,
+      'incomeTo': selectedIncomeTo.value,
+    };
+  }
+
+  void restoreFilters() {
+    if (_savedFilters.isEmpty) return;
+    selectedAgeFrom.value = _savedFilters['ageFrom'];
+    selectedAgeTo.value = _savedFilters['ageTo'];
+    selectedHeightFrom.value = _savedFilters['heightFrom'];
+    selectedHeightTo.value = _savedFilters['heightTo'];
+    selectedGotra.value = _savedFilters['gotra'];
+    excludeSameGotra.value = _savedFilters['excludeSameGotra'];
+    selectedMaritalStatus.value = _savedFilters['maritalStatus'];
+    selectedState.value = _savedFilters['state'];
+    selectedDistrict.value = _savedFilters['district'];
+    selectedTaluka.value = _savedFilters['taluka'];
+    selectedArea.value = _savedFilters['area'];
+    selectedEducation.value = _savedFilters['education'];
+    selectedOccupation.value = _savedFilters['occupation'];
+    selectedIncomeFrom.value = _savedFilters['incomeFrom'];
+    selectedIncomeTo.value = _savedFilters['incomeTo'];
+    incomeFromCtrl.text = _savedFilters['incomeFrom'];
+    incomeToCtrl.text = _savedFilters['incomeTo'];
   }
 
   void _updateDynamicLists(List<Member> members) {}
