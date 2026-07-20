@@ -480,5 +480,12 @@
   "Back": "Back",
   "No member changes found.": "No member changes found.",
   "Review & Save changes": "Review & Save changes",
-  "reviewAndSaveChangesDesc": "Please verify all details across all steps before submitting your profile updates. Any changes will be submitted for approval by the Samaj administrators."
+  "reviewAndSaveChangesDesc": "Please verify all details across all steps before submitting your profile updates. Any changes will be submitted for approval by the Samaj administrators.",
+  "Tap to expand details": "Tap to expand details",
+  "Tap to collapse": "Tap to collapse",
+  "Account Holder": "Account Holder",
+  "Bank Name": "Bank Name",
+  "Scan this QR code with any UPI app to pay": "Scan this QR code with any UPI app to pay",
+  "copied to clipboard": "copied to clipboard",
+  "Organization details copied to clipboard.": "Organization details copied to clipboard."
 }

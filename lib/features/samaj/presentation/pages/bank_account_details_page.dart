@@ -116,8 +116,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'ACCOUNT HOLDER',
+                              Text(
+                                LK.accountHolder.tr.toUpperCase(),
                                 style: TextStyle(
                                   color: Colors.white60,
                                   fontSize: 9,
@@ -142,8 +142,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              'BANK NAME',
+                            Text(
+                              LK.bankName.tr.toUpperCase(),
                               style: TextStyle(
                                 color: Colors.white60,
                                 fontSize: 9,
@@ -336,7 +336,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     if (upiUri != null) ...[
                       SizedBox(height: 12.h),
                       Text(
-                        'Scan this QR code with any UPI app to pay',
+                        LK.scanQrToPay.tr,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade500,
@@ -408,7 +408,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                         snackbarDuration: const Duration(seconds: 3),
                         builder: (context) => ToastCard(
                           title: LK.success.tr,
-                          subtitle: '$label copied to clipboard',
+                          subtitle: '$label ${LK.copiedToClipboard.tr}',
                         ),
                       ).show();
                     },

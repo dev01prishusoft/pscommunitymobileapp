@@ -250,12 +250,14 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.r),
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             FocusManager.instance.primaryFocus?.unfocus();
-            Get.toNamed<void>(
+            await Get.toNamed<void>(
               AppRouter.occupationProfile,
               arguments: {'occupationId': occ.id, 'occupationName': occ.name},
             );
+            FocusManager.instance.primaryFocus?.unfocus();
+            _controller.loadOccupations(refresh: true);
           },
           child: Padding(
             padding: EdgeInsets.all(10.r),

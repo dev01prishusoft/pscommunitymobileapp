@@ -299,7 +299,7 @@ class BankDetailsPage extends StatelessWidget {
                     PSDelightToastBar(
                       snackbarDuration: const Duration(seconds: 3),
                       builder: (context) => ToastCard(
-                        title: '$label copied to clipboard',
+                        title: '$label ${LK.copiedToClipboard.tr}',
                         subtitle: value,
                       ),
                     ).show();
@@ -420,8 +420,8 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                           const SizedBox(height: 2),
                           Text(
                             _isExpanded
-                                ? 'Tap to collapse'
-                                : 'Tap to expand details',
+                                ? LK.tapToCollapse.tr
+                                : LK.tapToExpandDetails.tr,
                             style: TextStyle(
                               fontSize: 11,
                               color: AppColors.primary.withValues(alpha: 0.8),
