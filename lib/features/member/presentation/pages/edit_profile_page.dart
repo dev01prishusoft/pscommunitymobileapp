@@ -1597,7 +1597,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.occupationDescriptionCtrl,
                     label: LK.occupationDescriptionLabel.tr,
-                    maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    minLines: 3,
                     maxLength: 500,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationDescription',
@@ -1741,6 +1743,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: LK.occupationAddressLine1Label.tr,
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     maxLength: 300,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    minLines: 3,
                     onChanged: (v) => controller.workAddressLine1.value = v,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationAddressLine1',
@@ -1754,6 +1759,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: LK.occupationAddressLine2Label.tr,
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     maxLength: 300,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    minLines: 3,
                     onChanged: (v) => controller.workAddressLine2.value = v,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationAddressLine2',
@@ -2391,6 +2399,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               label: LK.addressLine1.tr,
               isRequired: true,
               maxLength: 300,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              minLines: 3,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine1')
                   : null,
@@ -2405,6 +2416,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               label: LK.addressLine2.tr,
               isRequired: true,
               maxLength: 300,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              minLines: 3,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine2')
                   : null,

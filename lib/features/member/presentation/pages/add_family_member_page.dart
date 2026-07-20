@@ -1272,6 +1272,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           label: LK.addressLine1.tr,
           isRequired: true,
           maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          minLines: 3,
           onChanged: (v) {
             addr.line1 = v;
             controller.addresses.refresh();
@@ -1283,6 +1286,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           label: LK.addressLine2.tr,
           isRequired: true,
           maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          minLines: 3,
           onChanged: (v) {
             addr.line2 = v;
             controller.addresses.refresh();
@@ -2012,7 +2018,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,
-                  maxLines: 3,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   maxLength: 500,
                 ),
                 AppSpacing.vM,
@@ -2129,6 +2137,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.occupationAddressLine1Label.tr,
                   prefixIcon: const Icon(Icons.location_on_outlined),
                   maxLength: 300,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   onChanged: (v) => controller.workAddressLine1.value = v,
                 ),
                 AppSpacing.vM,
@@ -2137,6 +2148,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.occupationAddressLine2Label.tr,
                   prefixIcon: const Icon(Icons.location_on_outlined),
                   maxLength: 300,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   onChanged: (v) => controller.workAddressLine2.value = v,
                 ),
                 AppSpacing.vM,
