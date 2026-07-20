@@ -58,6 +58,8 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: AppColors.white),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => Get.back<void>(),
@@ -69,13 +71,15 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               _areaName,
               style: AppTextStyles.titleLarge.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.white,
               ),
             ),
             SizedBox(height: 2.h),
             Text(
-              '$_membersCount ${_membersCount == 1 ? LK.member.tr : LK.membersCount.tr}  |  $_familiesCount ${LK.familiesCount.tr}',
+              '$_membersCount ${_membersCount <= 1 ? LK.member.tr : LK.membersCount.tr}  |  $_familiesCount ${_familiesCount <= 1 ? LK.family.tr : LK.familiesCount.tr}',
               style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w400,
+                color: AppColors.white.withValues(alpha: 0.9),
               ),
             ),
           ],
@@ -229,7 +233,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                                           ),
                                         ),
                                         child: Text(
-                                          '${family.members.length} ${family.members.length == 1 ? "Member" : "Members"}',
+                                          '${family.members.length} ${family.members.length <= 1 ? LK.member.tr : LK.membersCount.tr}',
                                           style: AppTextStyles.labelSmall
                                               .copyWith(
                                                 color: AppColors.primary,
