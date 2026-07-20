@@ -78,13 +78,7 @@ class TokenManager {
 
   Future<void> clearTokens() async {
     try {
-      await Future.wait([
-        _storage.delete(_accessKey),
-        _storage.delete(_refreshKey),
-        _storage.delete(_defaultPwdKey),
-        _storage.delete(_mobileKey),
-        _storage.delete(_deviceUniqueKey),
-      ]);
+      await _storage.deleteAll();
       authState.value = TokenPair();
       userPhoneRx.value = '';
     } catch (e) {

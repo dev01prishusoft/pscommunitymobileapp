@@ -1,3 +1,5 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
@@ -33,6 +35,8 @@ class AuthState {
     final locService = Get.find<LocalizationService>();
     locService.clearLanguages();
     locService.resetToDefaultLocale();
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
   }
 
   Future<void> _revokeTokenCall() async {
@@ -60,6 +64,10 @@ class AuthState {
         }
       } catch (_) {}
     }
+
+    try {
+      await FirebaseMessaging.instance.deleteToken();
+    } catch (_) {}
   }
 
   Future<void> logoutAndRedirect() async {
@@ -77,6 +85,8 @@ class AuthState {
       final locService = Get.find<LocalizationService>();
       locService.clearLanguages();
       await locService.resetToDefaultLocale();
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
       if (Get.currentRoute != AppRouter.login) {
         await Get.offAllNamed<void>(AppRouter.login);
       }

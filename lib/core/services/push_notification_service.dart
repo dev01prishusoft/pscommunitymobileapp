@@ -139,12 +139,20 @@ class PushNotificationService {
 
   void _handleMessageTap(RemoteMessage message) async {
     final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
-    final String memberNotificationId = message.data['memberNotificationId'].toString();
-    if(memberNotificationId.isNotEmpty) {
-      await _apiClient.post(
-        ApiEndpoints.markNotificationRead(int.parse(memberNotificationId)),
-        cancelToken: CancelToken(),
-      );
+    final String memberNotificationId = message.data['memberNotificationId']?.toString() ?? '';
+    
+    if (memberNotificationId.isNotEmpty && memberNotificationId != 'null') {
+      try {
+        final id = int.tryParse(memberNotificationId);
+        if (id != null) {
+          await _apiClient.post(
+            ApiEndpoints.markNotificationRead(id),
+            cancelToken: CancelToken(),
+          );
+        }
+      } catch (e) {
+        // Ignore API errors so navigation still happens
+      }
     }
 
     String? targetRoute;
@@ -191,17 +199,16 @@ class PushNotificationService {
     if (targetRoute != null) {
       if (Get.currentRoute == targetRoute) {
         Get.offNamed<void>(targetRoute);
+      } else if (Get.currentRoute == AppRouter.postLoginSplash) {
+        // Pass targetRoute as an argument so HomeController.onReady catches it reliably!
+        Get.offAllNamed<void>(AppRouter.home, arguments: {'targetRoute': targetRoute});
       } else {
-        // Push target route on top of home screen so the back button appears
         Get.offAllNamed<void>(AppRouter.home);
-        // Add a small delay to allow the Home route transition to begin 
-        // before pushing the target route, preventing GetX navigation collisions.
-        Future.delayed(const Duration(milliseconds: 250), () {
+        Future.delayed(const Duration(milliseconds: 600), () {
           Get.toNamed<void>(targetRoute!);
         });
       }
     } else {
-      // No specific target, fallback to home screen
       Get.offAllNamed<void>(AppRouter.home);
     }
   }
