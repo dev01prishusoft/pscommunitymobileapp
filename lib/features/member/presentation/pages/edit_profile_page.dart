@@ -1605,7 +1605,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.occupationDescriptionCtrl,
                     label: LK.occupationDescriptionLabel.tr,
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    maxLines: 5,
                     minLines: 3,
                     maxLength: 500,
                     updateStatus: controller.getUpdateStatus(
@@ -1751,7 +1751,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     maxLength: 300,
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    maxLines: 5,
                     minLines: 3,
                     onChanged: (v) => controller.workAddressLine1.value = v,
                     updateStatus: controller.getUpdateStatus(
@@ -1767,7 +1767,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     prefixIcon: const Icon(Icons.location_on_outlined),
                     maxLength: 300,
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    maxLines: 5,
                     minLines: 3,
                     onChanged: (v) => controller.workAddressLine2.value = v,
                     updateStatus: controller.getUpdateStatus(
@@ -2407,7 +2407,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               isRequired: true,
               maxLength: 300,
               keyboardType: TextInputType.multiline,
-              maxLines: null,
+              maxLines: 5,
               minLines: 3,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine1')
@@ -2424,7 +2424,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               isRequired: true,
               maxLength: 300,
               keyboardType: TextInputType.multiline,
-              maxLines: null,
+              maxLines: 5,
               minLines: 3,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine2')
