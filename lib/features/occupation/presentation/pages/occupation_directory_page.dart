@@ -250,12 +250,13 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.r),
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             FocusManager.instance.primaryFocus?.unfocus();
-            Get.toNamed<void>(
+            await Get.toNamed<void>(
               AppRouter.occupationProfile,
               arguments: {'occupationId': occ.id, 'occupationName': occ.name},
             );
+            _controller.loadOccupations();
           },
           child: Padding(
             padding: EdgeInsets.all(10.r),
@@ -359,7 +360,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             ),
           ),
           Text(
-            'Members',
+            (count == null || count <= 1) ? LK.member.tr : LK.membersCount.tr,
             textAlign: TextAlign.center,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.primary,
