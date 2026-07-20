@@ -370,7 +370,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                                         builder: (context) => ToastCard(
                                           title: LK.success.tr,
                                           subtitle:
-                                              'Organization details copied to clipboard.',
+                                              LK.orgDetailsCopied.tr,
                                         ),
                                       ).show();
                                     });

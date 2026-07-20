@@ -299,7 +299,7 @@ class BankDetailsPage extends StatelessWidget {
                     PSDelightToastBar(
                       snackbarDuration: const Duration(seconds: 3),
                       builder: (context) => ToastCard(
-                        title: '$label copied to clipboard',
+                        title: '$label ${LK.copiedToClipboard.tr}',
                         subtitle: value,
                       ),
                     ).show();
