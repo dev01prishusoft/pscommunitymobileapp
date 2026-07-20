@@ -1564,7 +1564,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: controller.companyNameCtrl,
                       label: LK.companyNameLabel.tr,
                       prefixIcon: const Icon(Icons.business),
-                      maxLength: 100,
+                      maxLength: 300,
                       onChanged: (v) => controller.companyName.value = v,
                       updateStatus: controller.getUpdateStatus('CompanyName'),
                     ),
@@ -1574,7 +1574,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: controller.businessNameCtrl,
                       label: LK.businessName.tr,
                       prefixIcon: const Icon(Icons.business_center),
-                      maxLength: 100,
+                      maxLength: 300,
                       onChanged: (v) => controller.businessName.value = v,
                       updateStatus: controller.getUpdateStatus('BusinessName'),
                     ),
@@ -1740,7 +1740,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.workAddressLine1Ctrl,
                     label: LK.occupationAddressLine1Label.tr,
                     prefixIcon: const Icon(Icons.location_on_outlined),
-                    maxLength: 200,
+                    maxLength: 300,
                     onChanged: (v) => controller.workAddressLine1.value = v,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationAddressLine1',
@@ -1753,7 +1753,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: controller.workAddressLine2Ctrl,
                     label: LK.occupationAddressLine2Label.tr,
                     prefixIcon: const Icon(Icons.location_on_outlined),
-                    maxLength: 200,
+                    maxLength: 300,
                     onChanged: (v) => controller.workAddressLine2.value = v,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationAddressLine2',
@@ -2390,7 +2390,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               initialValue: addr.line1,
               label: LK.addressLine1.tr,
               isRequired: true,
-              maxLength: 200,
+              maxLength: 300,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine1')
                   : null,
@@ -2404,7 +2404,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               initialValue: addr.line2,
               label: LK.addressLine2.tr,
               isRequired: true,
-              maxLength: 200,
+              maxLength: 300,
               updateStatus: addr.isPrimary
                   ? controller.getUpdateStatus('AddressLine2')
                   : null,
@@ -2621,7 +2621,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               updateStatus: (isHighest && !isNew)
                   ? controller.getUpdateStatus('InstitutionName')
                   : null,
-              maxLength: 200,
+              maxLength: 300,
               readOnly: !isHighest,
               onChanged: isHighest
                   ? (v) {
