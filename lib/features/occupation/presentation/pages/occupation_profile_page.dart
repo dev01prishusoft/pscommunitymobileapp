@@ -123,7 +123,9 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                   ),
                 ),
                 Text(
-                  LK.membersCount.tr,
+                  controller.occupationMembers.length <= 1
+                      ? LK.member.tr
+                      : LK.membersCount.tr,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.grey.shade600,
                     fontWeight: FontWeight.w500,
@@ -182,7 +184,8 @@ class _OccupationMemberCard extends StatelessWidget {
         GenderMapper.getLabelKey(member.gender)?.tr ?? member.gender;
     final isFemale =
         member.gender.toLowerCase().contains('fem') ||
-        member.gender.toLowerCase().contains('stri');
+        member.gender.toLowerCase().contains('stri') ||
+        member.gender.contains('સ્ત્રી');
 
     return Container(
       margin: EdgeInsets.only(bottom: 5.h),

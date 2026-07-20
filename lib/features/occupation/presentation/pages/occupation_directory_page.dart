@@ -359,7 +359,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             ),
           ),
           Text(
-            'Members',
+            (count == null || count <= 1) ? LK.member.tr : LK.membersCount.tr,
             textAlign: TextAlign.center,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.primary,
