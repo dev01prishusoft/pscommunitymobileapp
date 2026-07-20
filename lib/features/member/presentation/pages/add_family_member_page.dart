@@ -1273,7 +1273,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           isRequired: true,
           maxLength: 300,
           keyboardType: TextInputType.multiline,
-          maxLines: null,
+          maxLines: 5,
           minLines: 3,
           onChanged: (v) {
             addr.line1 = v;
@@ -1287,7 +1287,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           isRequired: true,
           maxLength: 300,
           keyboardType: TextInputType.multiline,
-          maxLines: null,
+          maxLines: 5,
           minLines: 3,
           onChanged: (v) {
             addr.line2 = v;
@@ -2019,7 +2019,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,
                   keyboardType: TextInputType.multiline,
-                  maxLines: null,
+                  maxLines: 5,
                   minLines: 3,
                   maxLength: 500,
                 ),
@@ -2138,7 +2138,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Icons.location_on_outlined),
                   maxLength: 300,
                   keyboardType: TextInputType.multiline,
-                  maxLines: null,
+                  maxLines: 5,
                   minLines: 3,
                   onChanged: (v) => controller.workAddressLine1.value = v,
                 ),
@@ -2149,7 +2149,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Icons.location_on_outlined),
                   maxLength: 300,
                   keyboardType: TextInputType.multiline,
-                  maxLines: null,
+                  maxLines: 5,
                   minLines: 3,
                   onChanged: (v) => controller.workAddressLine2.value = v,
                 ),
