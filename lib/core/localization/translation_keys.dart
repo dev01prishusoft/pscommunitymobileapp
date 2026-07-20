@@ -300,6 +300,13 @@ class LK {
   static String incomeRangeLabel = 'Income Range:';
   static String applyFilters = 'Apply Filters';
   static String clearAll = 'Clear All';
+  static String copiedToClipboard = 'copied to clipboard';
+  static String orgDetailsCopied = 'Organization details copied to clipboard.';
+  static String ourSupportTeamDesc = 'Our support team is here to assist you.';
+  static String supportMembers = 'Support Members';
+  static String representative = 'Representative';
+  static String whatsAppSupport = 'WhatsApp Support';
+  static String emailSupport = 'Email Support';
   static String to = 'to';
   static String linkCopied = 'Link copied to clipboard';
   static String shareAppViaWhatsApp = 'Share App via WhatsApp';
@@ -510,6 +517,11 @@ class LK {
   static String copiedToClipboard = 'copied to clipboard';
   static String orgDetailsCopied = 'Organization details copied to clipboard.';
 
+  static String tapToExpandDetails = 'Tap to expand details';
+  static String tapToCollapse = 'Tap to collapse';
+  static String accountHolder = 'Account Holder';
+  static String bankName = 'Bank Name';
+  static String scanQrToPay = 'Scan this QR code with any UPI app to pay';
   static List<String> allValues = [
     appTitle,
     welcome,
@@ -762,6 +774,13 @@ class LK {
     incomeRangeLabel,
     applyFilters,
     clearAll,
+    copiedToClipboard,
+    orgDetailsCopied,
+    ourSupportTeamDesc,
+    supportMembers,
+    representative,
+    whatsAppSupport,
+    emailSupport,
     to,
     linkCopied,
     shareAppViaWhatsApp,
