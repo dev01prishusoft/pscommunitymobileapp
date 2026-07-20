@@ -1,7 +1,7 @@
 class LK {
   static String reviewAndSaveChanges = 'Review & Save changes';
   static String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
-  
+
   static String appTitle = 'PS Community';
   static String welcome = 'Welcome to PrishuSoft Samaj';
   static String welcomesYou = 'welcomes you';
@@ -509,7 +509,6 @@ class LK {
   static String samajSansthaDescription = 'samaj_sanstha_description';
   static String next = 'Next';
   static String back = 'Back';
-
   static String tapToExpandDetails = 'Tap to expand details';
   static String tapToCollapse = 'Tap to collapse';
   static String accountHolder = 'Account Holder';
@@ -1000,5 +999,12 @@ class LK {
     back,
     reviewAndSaveChanges,
     reviewAndSaveChangesDesc,
+    tapToExpandDetails,
+    tapToCollapse,
+    accountHolder,
+    bankName,
+    scanQrToPay,
+    copiedToClipboard,
+    orgDetailsCopied,
   ];
 }
