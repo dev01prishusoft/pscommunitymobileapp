@@ -1271,7 +1271,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           initialValue: addr.line1,
           label: LK.addressLine1.tr,
           isRequired: true,
-          maxLength: 200,
+          maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          minLines: 3,
           onChanged: (v) {
             addr.line1 = v;
             controller.addresses.refresh();
@@ -1282,7 +1285,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           initialValue: addr.line2,
           label: LK.addressLine2.tr,
           isRequired: true,
-          maxLength: 200,
+          maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          minLines: 3,
           onChanged: (v) {
             addr.line2 = v;
             controller.addresses.refresh();
@@ -1589,7 +1595,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             AppFormTextField(
               initialValue: edu.institute,
               label: LK.instituteNameLabel.tr,
-              maxLength: 200,
+              maxLength: 300,
               onChanged: (v) {
                 edu.institute = v;
                 controller.educationList.refresh();
@@ -1998,21 +2004,23 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller: controller.companyNameCtrl,
                     label: LK.companyNameLabel.tr,
                     prefixIcon: const Icon(Icons.business),
-                    maxLength: 100,
+                    maxLength: 300,
                     onChanged: (v) => controller.companyName.value = v,
                   ),
                   AppFormTextField(
                     controller: controller.businessNameCtrl,
                     label: LK.businessName.tr,
                     prefixIcon: const Icon(Icons.business_center),
-                    maxLength: 100,
+                    maxLength: 300,
                     onChanged: (v) => controller.businessName.value = v,
                   ),
                 ),
                 AppFormTextField(
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,
-                  maxLines: 3,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   maxLength: 500,
                 ),
                 AppSpacing.vM,
@@ -2128,7 +2136,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.workAddressLine1Ctrl,
                   label: LK.occupationAddressLine1Label.tr,
                   prefixIcon: const Icon(Icons.location_on_outlined),
-                  maxLength: 200,
+                  maxLength: 300,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   onChanged: (v) => controller.workAddressLine1.value = v,
                 ),
                 AppSpacing.vM,
@@ -2136,7 +2147,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.workAddressLine2Ctrl,
                   label: LK.occupationAddressLine2Label.tr,
                   prefixIcon: const Icon(Icons.location_on_outlined),
-                  maxLength: 200,
+                  maxLength: 300,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  minLines: 3,
                   onChanged: (v) => controller.workAddressLine2.value = v,
                 ),
                 AppSpacing.vM,
