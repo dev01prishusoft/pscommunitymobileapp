@@ -260,6 +260,22 @@ class _FilterDialogState extends State<_FilterDialog> {
                       ),
                     ),
                   ),
+                  InkWell(
+                    onTap: () => Get.back<void>(),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: AppColors.grey.shade600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 24.h),
@@ -309,13 +325,17 @@ class _FilterDialogState extends State<_FilterDialog> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 4.h),
                 SizedBox(
                   width: double.infinity,
-                  child: TextButton(
+                  child: OutlinedButton(
                     onPressed: _resetFilters,
-                    style: TextButton.styleFrom(
+                    style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.grey.shade700,
+                      side: BorderSide(color: AppColors.grey.shade400, width: 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                     ),
                     child: Text(
@@ -498,7 +518,7 @@ class _AreasList extends StatelessWidget {
                                   ),
                                   SizedBox(width: 4.w),
                                   Text(
-                                    '${area.families} ${LK.familiesCount.tr}',
+                                    '${area.families} ${area.families <= 1 ? LK.family.tr : LK.familiesCount.tr}',
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
@@ -535,7 +555,7 @@ class _AreasList extends StatelessWidget {
                                   ),
                                   SizedBox(width: 4.w),
                                   Text(
-                                    '${area.members} ${area.members == 1 ? LK.member.tr : LK.membersCount.tr}',
+                                    '${area.members} ${area.members <= 1 ? LK.member.tr : LK.membersCount.tr}',
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.secondary,
                                       fontWeight: FontWeight.w600,
