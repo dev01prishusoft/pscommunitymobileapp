@@ -1,7 +1,7 @@
 class LK {
   static String reviewAndSaveChanges = 'Review & Save changes';
   static String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
-  
+
   static String appTitle = 'PS Community';
   static String welcome = 'Welcome to PrishuSoft Samaj';
   static String welcomesYou = 'welcomes you';
@@ -509,14 +509,6 @@ class LK {
   static String samajSansthaDescription = 'samaj_sanstha_description';
   static String next = 'Next';
   static String back = 'Back';
-  static String tapToExpandDetails = 'Tap to expand details';
-  static String tapToCollapse = 'Tap to collapse';
-  static String accountHolder = 'Account Holder';
-  static String bankName = 'Bank Name';
-  static String scanQrToPay = 'Scan this QR code with any UPI app to pay';
-  static String copiedToClipboard = 'copied to clipboard';
-  static String orgDetailsCopied = 'Organization details copied to clipboard.';
-
   static String tapToExpandDetails = 'Tap to expand details';
   static String tapToCollapse = 'Tap to collapse';
   static String accountHolder = 'Account Holder';
