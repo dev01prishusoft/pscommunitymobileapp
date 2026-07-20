@@ -971,6 +971,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: IgnorePointer(
                         child: AppFormTextField(
+                          maxLength: 100,
                           controller: TextEditingController(
                             text: controller
                                 .personalInfo
