@@ -191,11 +191,14 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                 m.approveStatus?.toLowerCase() != 'rejected',
           )
           .length;
+      final rejected = _controller.members
+          .where((m) => m.approveStatus?.toLowerCase() == 'rejected')
+          .length;
 
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 4.w),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(14.r),
@@ -215,7 +218,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildStatItem(
-                title: LK.membersCount.tr,
+                title: total == 1 ? LK.member.tr : LK.membersCount.tr,
                 value: '$total',
                 icon: Icons.people_alt_rounded,
                 color: AppColors.primary,
@@ -224,7 +227,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
               Container(
                 height: 30.h,
                 width: 1,
-                margin: EdgeInsets.all(5.w),
+                margin: EdgeInsets.symmetric(horizontal: 2.w),
                 decoration: BoxDecoration(
                   color: AppColors.grey.withValues(alpha: 0.2),
                 ),
@@ -239,17 +242,32 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
               Container(
                 height: 30.h,
                 width: 1,
-                margin: EdgeInsets.all(5.w),
+                margin: EdgeInsets.symmetric(horizontal: 2.w),
                 decoration: BoxDecoration(
                   color: AppColors.grey.withValues(alpha: 0.2),
                 ),
               ),
               _buildStatItem(
-                title: 'Pending'.tr,
+                title: 'Requested'.tr,
                 value: '$pending',
                 icon: Icons.pending_rounded,
                 color: const Color(0xFFEF6C00),
                 bgColor: const Color(0xFFFFF3E0),
+              ),
+              Container(
+                height: 30.h,
+                width: 1,
+                margin: EdgeInsets.symmetric(horizontal: 2.w),
+                decoration: BoxDecoration(
+                  color: AppColors.grey.withValues(alpha: 0.2),
+                ),
+              ),
+              _buildStatItem(
+                title: 'Rejected'.tr,
+                value: '$rejected',
+                icon: Icons.cancel_rounded,
+                color: const Color(0xFFC62828),
+                bgColor: const Color(0xFFFFEBEE),
               ),
             ],
           ),
@@ -267,13 +285,14 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
   }) {
     return Expanded(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: EdgeInsets.all(6.r),
             decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor),
             child: Icon(icon, color: color, size: 16.sp),
           ),
-          SizedBox(width: 10.w),
+          SizedBox(width: 4.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +320,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
             ),
           ),
         ],
-      ).paddingOnly(left: 5),
+      ),
     );
   }
 }

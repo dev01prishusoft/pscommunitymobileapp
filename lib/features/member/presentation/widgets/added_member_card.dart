@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AddedMemberCard extends StatelessWidget {
@@ -16,6 +17,7 @@ class AddedMemberCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaleOnTap(
       onTap: () {
+        FocusScope.of(context).unfocus();
         Get.toNamed<void>(
           AppRouter.memberProfile,
           arguments: {'memberId': member.memberId},
@@ -82,19 +84,6 @@ class AddedMemberCard extends StatelessWidget {
                         ),
                         SizedBox(width: 8.w),
                         _buildCallButton(),
-                        SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.all(6.r),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.grey.withValues(alpha: 0.05),
-                          ),
-                          child: Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: AppColors.secondary.withValues(alpha: 0.8),
-                            size: 12.sp,
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -179,11 +168,11 @@ class AddedMemberCard extends StatelessWidget {
 
     final ageVal = member.age;
     if (ageVal > 0) {
-      parts.add('$ageVal વર્ષ');
+      parts.add('$ageVal ${LK.ageYears.tr}');
     }
 
     if (member.gotraName != null && member.gotraName!.isNotEmpty) {
-      parts.add('ગોત્ર: ${member.gotraName}');
+      parts.add('${LK.gotraLabel.tr} ${member.gotraName}');
     }
 
     if (parts.isEmpty) return const SizedBox.shrink();
