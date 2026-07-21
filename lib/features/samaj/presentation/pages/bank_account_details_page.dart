@@ -386,13 +386,13 @@ class BankAccountDetailsPage extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
                     value,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.left,
                     style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.secondary,
                       fontWeight: FontWeight.w700,
