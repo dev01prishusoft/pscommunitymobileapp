@@ -98,6 +98,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       floatingActionButton: GestureDetector(
         onTap: () async {
           await Get.toNamed<void>(AppRouter.makePayment);
+          controller.resetHistoryFilters();
           _refreshHistory();
         },
         child: Container(
@@ -217,7 +218,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                     SizedBox(width: 10.w),
                     Expanded(
                       child: Text(
-                        'Payment Filters',
+                        LK.paymentFilters.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.secondary,
@@ -230,13 +231,13 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                       child: Container(
                         padding: EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: AppColors.grey.shade100,
+                          color: AppColors.primary.withValues(alpha: 0.08),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.close_rounded,
                           size: 18,
-                          color: AppColors.grey.shade600,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -586,24 +587,8 @@ class _PaymentCard extends StatelessWidget {
                             'planName': payment.planName,
                           },
                         );
-                        await Get.find<PaymentController>().loadHistory(
-                          paymentTypeId: Get.find<PaymentController>()
-                              .historyFilterType
-                              .value
-                              ?.id,
-                          categoryId: Get.find<PaymentController>()
-                              .historyFilterCategory
-                              .value
-                              ?.id,
-                          year: int.tryParse(
-                            Get.find<PaymentController>().selectedYear.value,
-                          ),
-                          status:
-                              Get.find<PaymentController>()
-                                      .selectedStatus
-                                      .value?['name']
-                                  as String?,
-                        );
+                        Get.find<PaymentController>().resetHistoryFilters();
+                        await Get.find<PaymentController>().loadHistory();
                       },
                       borderRadius: BorderRadius.circular(20),
                       child: Container(

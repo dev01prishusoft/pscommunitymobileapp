@@ -1,4 +1,4 @@
-{
+{\n  " Total Amount\: \કુલ રકમ\,
   "........": "........",
   "A community for Patel families": "પટેલ પરિવારો માટે એક સમુદાય",
   "A new version is available!": "નવી આવૃત્તિ ઉપલબ્ધ છે!",
@@ -24,6 +24,7 @@
   "Addresses": "સરનામાં",
   "Admin Sent": "એડમિન દ્વારા મોકલેલ",
   "Advanced Filters": "અદ્યતન ફિલ્ટર્સ",
+  "Payment Filters": "ચુકવણી ફિલ્ટર્સ",
   "Age Range:": "વય મર્યાદા:",
   "Age:": "ઉંમર:",
   "Agriculture": "કૃષિ",
@@ -248,6 +249,9 @@
   "Payment successful": "ચુકવણી સફળ",
   "Payment verification failed": "ચુકવણી ચકાસણી નિષ્ફળ",
   "Payments": "ચુકવણીઓ",
+  "Community Portal": "કોમ્યુનિટી પોર્ટલ",
+  "Initiated Payments": "શરૂ કરેલ ચુકવણીઓ",
+  "Completed Payments": "પૂર્ણ કરેલ ચુકવણીઓ",
   "Pending": "પેન્ડિંગ",
   "Percentage": "ટકાવારી",
   "Personal": "વ્યક્તિગત",

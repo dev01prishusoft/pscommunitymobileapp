@@ -585,7 +585,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                   icon: Container(
                     padding: EdgeInsets.all(4.r),
                     decoration: BoxDecoration(
-                      color: AppColors.grey.withValues(alpha: 0.1),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

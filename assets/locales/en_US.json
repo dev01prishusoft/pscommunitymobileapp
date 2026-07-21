@@ -1,4 +1,4 @@
-{
+{\n  " Total Amount\: \Total Amount\,
   "........": "........",
   "A community for Patel families": "A community for Patel families",
   "A new version is available!": "A new version is available!",
@@ -24,6 +24,7 @@
   "Addresses": "Addresses",
   "Admin Sent": "Admin Sent",
   "Advanced Filters": "Advanced Filters",
+  "Payment Filters": "Payment Filters",
   "Age Range:": "Age Range:",
   "Age:": "Age:",
   "Agriculture": "Agriculture",
@@ -247,6 +248,9 @@
   "Payment successful": "Payment successful",
   "Payment verification failed": "Payment verification failed",
   "Payments": "Payments",
+  "Community Portal": "Community Portal",
+  "Initiated Payments": "Initiated Payments",
+  "Completed Payments": "Completed Payments",
   "Pending": "Pending",
   "Percentage": "Percentage",
   "Personal": "Personal",
