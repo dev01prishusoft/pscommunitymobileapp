@@ -296,7 +296,7 @@ class MarriageController extends GetxController {
         _memberRepository.searchMembers(
           query: searchQuery.value,
           genderId: genderId,
-          lookingForMarriage: lookingForMarriage.value ? true : null,
+          lookingForMarriage: lookingForMarriage.value,
           pageNumber: _currentPage,
           pageSize: _pageSize,
         ),
