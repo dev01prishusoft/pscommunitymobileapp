@@ -15,6 +15,7 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
     this.emptyIcon,
     this.padding = const EdgeInsets.all(16.0),
     this.onRetry,
+    this.headerWidget,
   });
 
   final Widget Function(BuildContext, int, T) itemBuilder;
@@ -23,6 +24,7 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
   final IconData? emptyIcon;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onRetry;
+  final Widget? headerWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +49,31 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
       }
 
       if (controller.items.isEmpty) {
-        return Center(
+        final emptyState = Center(
           child: AppEmptyState(
             icon: emptyIcon ?? Icons.search_off_rounded,
             secondaryIcon: emptyIcon != null ? null : Icons.search,
             title: emptyMessage ?? LK.noResultsFound.tr,
             subtitle: LK.trySelectingDifferentFilters.tr,
+          ),
+        );
+
+        if (headerWidget == null) return emptyState;
+
+        return RefreshIndicator(
+          onRefresh: () => controller.refreshData(showInitialLoading: false),
+          color: AppColors.primary,
+          child: ListView(
+            controller: controller.scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: padding,
+            children: [
+              headerWidget!,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: emptyState,
+              ),
+            ],
           ),
         );
       }
@@ -64,11 +85,26 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
           controller: controller.scrollController,
           padding: padding,
           physics: const AlwaysScrollableScrollPhysics(),
-          itemCount:
-              controller.items.length + (controller.hasMore.value ? 1 : 0),
-          separatorBuilder:
-              separatorBuilder ?? (_, __) => const SizedBox.shrink(),
+          itemCount: controller.items.length +
+              (controller.hasMore.value ? 1 : 0) +
+              (headerWidget != null ? 1 : 0),
+          separatorBuilder: (context, index) {
+            if (headerWidget != null && index == 0) {
+              return const SizedBox.shrink();
+            }
+            if (separatorBuilder != null) {
+              return separatorBuilder!(
+                context,
+                headerWidget != null ? index - 1 : index,
+              );
+            }
+            return const SizedBox.shrink();
+          },
           itemBuilder: (context, index) {
+            if (headerWidget != null) {
+              if (index == 0) return headerWidget!;
+              index -= 1;
+            }
             if (index == controller.items.length) {
               return _buildPaginationLoader();
             }
@@ -100,10 +136,8 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
                   ),
                 ],
               )
-            : const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            : const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
       ),
     );

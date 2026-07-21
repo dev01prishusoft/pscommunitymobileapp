@@ -95,10 +95,10 @@ class MarriageFilterApplicator {
 
     if (filters.selectedMaritalStatus != 'All') {
       result = result.where((m) {
-        final statusRaw = (m.maritalStatusName ?? '').toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
-        final selectedRaw = filters.selectedMaritalStatus.toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').trim();
+        final statusRaw = (m.maritalStatusName ?? '').toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').replaceAll('-', '').trim();
+        final selectedRaw = filters.selectedMaritalStatus.toLowerCase().replaceAll(RegExp(r'\s*\([^)]*\)'), '').replaceAll('-', '').trim();
         if (selectedRaw == 'unmarried' || selectedRaw == 'single') {
-          return statusRaw == 'unmarried' || statusRaw == 'single';
+          return statusRaw == 'unmarried' || statusRaw == 'single' || statusRaw.isEmpty;
         }
         return statusRaw == selectedRaw;
       }).toList();

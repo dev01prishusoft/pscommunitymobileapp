@@ -143,6 +143,7 @@ class MemberTile extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(width: 8.w),
                 Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.grey.shade400,

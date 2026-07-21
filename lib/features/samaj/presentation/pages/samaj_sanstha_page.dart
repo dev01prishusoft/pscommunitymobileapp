@@ -24,18 +24,12 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(LK.samajSansthas.tr)),
-      body: Column(
-        children: [
-          _buildHeader(_controller),
-          Expanded(
-            child: PaginatedListView<SamajSanstha, SamajSansthaController>(
-              padding: EdgeInsets.zero,
-              emptyMessage: 'No items found',
-              itemBuilder: (context, index, sanstha) =>
-                  _SansthaCard(sanstha: sanstha),
-            ),
-          ),
-        ],
+      body: PaginatedListView<SamajSanstha, SamajSansthaController>(
+        headerWidget: _buildHeader(_controller),
+        padding: const EdgeInsets.only(bottom: 40),
+        emptyMessage: 'No items found',
+        itemBuilder: (context, index, sanstha) =>
+            _SansthaCard(sanstha: sanstha),
       ),
     );
   }
@@ -148,19 +142,24 @@ class _SansthaCardState extends State<_SansthaCard> {
 
   @override
   Widget build(BuildContext context) {
-    final initials = _getInitials(widget.sanstha.name);
-    final hasDescription =
-        widget.sanstha.description.isNotEmpty ||
-        widget.sanstha.descriptionEnglish.isNotEmpty;
+    final isEnglish = Get.locale?.languageCode == 'en';
+    
+    String displayName = isEnglish && widget.sanstha.nameEnglish.isNotEmpty 
+        ? widget.sanstha.nameEnglish 
+        : widget.sanstha.name;
+    if (displayName.isEmpty) {
+      displayName = isEnglish ? widget.sanstha.name : widget.sanstha.nameEnglish;
+    }
 
-    final descriptionText = widget.sanstha.description.isNotEmpty
-        ? widget.sanstha.description
-        : widget.sanstha.descriptionEnglish;
+    String displayDescription = isEnglish && widget.sanstha.descriptionEnglish.isNotEmpty 
+        ? widget.sanstha.descriptionEnglish 
+        : widget.sanstha.description;
+    if (displayDescription.isEmpty) {
+      displayDescription = isEnglish ? widget.sanstha.description : widget.sanstha.descriptionEnglish;
+    }
 
-    final showEnglishSubtitle =
-        widget.sanstha.nameEnglish.isNotEmpty &&
-        widget.sanstha.nameEnglish.toLowerCase() !=
-            widget.sanstha.name.toLowerCase();
+    final initials = _getInitials(displayName);
+    final hasDescription = displayDescription.isNotEmpty;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -237,24 +236,13 @@ class _SansthaCardState extends State<_SansthaCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.sanstha.name,
+                            displayName,
                             style: AppTextStyles.titleLarge.copyWith(
                               color: AppColors.secondary,
                               fontWeight: FontWeight.w800,
                               height: 1.2,
                             ),
                           ),
-                          if (showEnglishSubtitle) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.sanstha.nameEnglish,
-                              style: TextStyle(
-                                color: AppColors.grey.shade500,
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     ),
@@ -262,43 +250,6 @@ class _SansthaCardState extends State<_SansthaCard> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (widget.sanstha.isActive)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.green.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.green.shade100,
-                                width: 0.5,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.green,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Active',
-                                  style: TextStyle(
-                                    color: AppColors.green.shade700,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         if (hasDescription) ...[
                           const SizedBox(height: 6),
                           AnimatedRotation(
@@ -331,35 +282,20 @@ class _SansthaCardState extends State<_SansthaCard> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                descriptionText,
+                                displayDescription,
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.grey.shade700,
                                   height: 1.5,
                                 ),
                               ),
-                              if (widget
-                                      .sanstha
-                                      .descriptionEnglish
-                                      .isNotEmpty &&
-                                  widget.sanstha.descriptionEnglish !=
-                                      widget.sanstha.description) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  widget.sanstha.descriptionEnglish,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.grey.shade500,
-                                    fontStyle: FontStyle.italic,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
+                              // removed english subtitle
                               const SizedBox(height: 10),
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: OutlinedButton.icon(
                                   onPressed: () {
                                     final copyContent =
-                                        '${widget.sanstha.name}\n\n$descriptionText';
+                                        '${displayName}\n\n$displayDescription';
                                     Clipboard.setData(
                                       ClipboardData(text: copyContent),
                                     ).then((_) {
@@ -370,7 +306,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                                         builder: (context) => ToastCard(
                                           title: LK.success.tr,
                                           subtitle:
-                                              'Organization details copied to clipboard.',
+                                              LK.orgDetailsCopied.tr,
                                         ),
                                       ).show();
                                     });

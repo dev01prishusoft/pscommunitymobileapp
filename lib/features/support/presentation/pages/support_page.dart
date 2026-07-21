@@ -95,8 +95,8 @@ class SupportPage extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    const Text(
-                                      'Our support team is here to assist you.',
+                                    Text(
+                                      LK.ourSupportTeamDesc.tr,
                                       style: TextStyle(
                                         color: Colors.white70,
                                         fontSize: 12,
@@ -124,7 +124,7 @@ class SupportPage extends StatelessWidget {
                         SizedBox(height: 28.h),
                         if (support.members.isNotEmpty) ...[
                           Text(
-                            'Support Members',
+                            LK.supportMembers.tr,
                             style: AppTextStyles.titleLarge.copyWith(
                               color: AppColors.secondary,
                               fontWeight: FontWeight.w800,
@@ -197,7 +197,7 @@ class SupportPage extends StatelessWidget {
                                                 ),
                                                 const SizedBox(height: 2),
                                                 Text(
-                                                  'Representative',
+                                                  LK.representative.tr,
                                                   style: TextStyle(
                                                     fontSize: 11.sp,
                                                     color: Colors.grey.shade500,
@@ -278,7 +278,7 @@ class SupportPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isWhatsApp ? 'WhatsApp Support' : 'Email Support',
+                        isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 13,

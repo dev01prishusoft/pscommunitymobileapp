@@ -185,39 +185,41 @@ class _ProfileHeader extends StatelessWidget {
                     fontFamily: 'monospace',
                   ),
                 ),
-                SizedBox(height: 8.h),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      width: 1.w,
+                if (member.jobPositionName != null && member.jobPositionName!.trim().isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        width: 1.w,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.workspace_premium_rounded,
+                          size: 14.sp,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 6.w),
+                        Text(
+                          member.jobPositionName!,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.workspace_premium_rounded,
-                        size: 14.sp,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        member.jobPositionName ?? 'Member',
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ],
             ),
           ),
@@ -441,10 +443,26 @@ class _AddressSection extends StatelessWidget {
                     ),
                     if (addr.isPrimary) ...[
                       SizedBox(width: 8.w),
-                      const Icon(
-                        Icons.check_circle_rounded,
-                        size: 16,
-                        color: AppColors.green,
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6.r),
+                          border: Border.all(
+                            color: AppColors.green.withValues(alpha: 0.2),
+                            width: 1.w,
+                          ),
+                        ),
+                        child: Text(
+                          LK.primary.tr,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.green,
+                          ),
+                        ),
                       ),
                     ],
                   ],
@@ -531,12 +549,12 @@ class _AssetLifeSection extends StatelessWidget {
                       ),
                       const Spacer(),
                       if (value1 is bool)
-                        Icon(
-                          value1
-                              ? Icons.check_circle_rounded
-                              : Icons.cancel_rounded,
-                          size: 18.sp,
-                          color: value1 ? AppColors.green : AppColors.red,
+                        Text(
+                          value1 ? LK.yes.tr : LK.no.tr,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: value1 ? AppColors.green : AppColors.red,
+                          ),
                         )
                       else
                         Text(
@@ -561,10 +579,12 @@ class _AssetLifeSection extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Icon(
-                  value2 ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                  size: 18.sp,
-                  color: value2 ? AppColors.green : AppColors.red,
+                Text(
+                  value2 ? LK.yes.tr : LK.no.tr,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: value2 ? AppColors.green : AppColors.red,
+                  ),
                 ),
               ],
             ),

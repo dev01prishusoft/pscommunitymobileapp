@@ -19,12 +19,16 @@ class MarriagePage extends GetView<MarriageController> {
   const MarriagePage({super.key});
 
   void _showAdvancedFilters(BuildContext context) {
+    controller.backupFilters();
     controller.isAdvancedFiltersOpen.value = true;
-    AdaptiveBottomSheet.show<void>(
+    AdaptiveBottomSheet.show<bool>(
       context: context,
       isScrollControlled: true,
       child: _AdvancedFiltersBottomSheet(controller: controller),
-    ).then((_) {
+    ).then((applied) {
+      if (applied != true) {
+        controller.restoreFilters();
+      }
       controller.isAdvancedFiltersOpen.value = false;
     });
   }
@@ -84,7 +88,8 @@ class MarriagePage extends GetView<MarriageController> {
         controller: controller.scrollController,
         slivers: [
           Obx(() {
-            if (controller.state.value == AppState.data) {
+            if (controller.state.value == AppState.data || 
+                controller.state.value == AppState.empty) {
               return SliverToBoxAdapter(child: _buildFilterControlsCard());
             } else {
               return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -807,7 +812,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                             if (controller.incomeError.value.isEmpty &&
                                 controller.ageError.value.isEmpty &&
                                 controller.heightError.value.isEmpty) {
-                              Get.back<void>();
+                              controller.applyFilters();
+                              Get.back<bool>(result: true);
                             }
                           },
                           style: ElevatedButton.styleFrom(

@@ -96,10 +96,7 @@ class CommitteeMembersController extends GetxController {
   }
 
   List<DropdownItem?> getRoles(List<CommitteeMember> members) {
-    if (availableRoles.isNotEmpty) {
-      return [null, ...availableRoles];
-    }
-    final roles = members.map((m) => m.roleName).toSet();
+    final roles = members.map((m) => m.roleName).where((r) => r.isNotEmpty).toSet();
     return [null, ...roles.map((r) => DropdownItem(id: 0, text: r))];
   }
 
