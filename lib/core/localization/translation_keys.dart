@@ -65,9 +65,14 @@ class LK {
   static String instagram = 'Instagram';
   static String whatsapp = 'WhatsApp';
   static String makePayment = 'Make Payment';
+  static String payments = 'Payments';
+  static String communityPortal = 'Community Portal';
+  static String initiatedPayments = 'Initiated Payments';
+  static String completedPayments = 'Completed Payments';
   static String paymentHistory = 'Payment History';
   static String paymentReceipt = 'Payment Receipt';
   static String amount = 'Amount';
+  static String totalAmount = 'Total Amount';
   static String updateAvailable = 'Update Available';
   static String updateNow = 'Update Now';
   static String updateLater = 'Update Later';
@@ -290,6 +295,7 @@ class LK {
   static String maxAmountLabel = 'Max: ₹50,000';
   static String showLabel = 'Show :';
   static String advancedFilters = 'Advanced Filters';
+  static String paymentFilters = 'Payment Filters';
   static String ageRangeLabel = 'Age Range:';
   static String heightRangeLabel = 'Height Range:';
   static String gotraLabel = 'Gotra:';
@@ -356,7 +362,6 @@ class LK {
   static String fourWheeler = 'Four Wheeler';
   static String twitterX = 'Twitter / X';
   static String businessInfo = 'Business Information';
-  static String payments = 'Payments';
   static String dueSummary = 'DUE SUMMARY';
   static String totalDue = 'Total Due:';
   static String payAll = 'Pay All';
@@ -571,6 +576,7 @@ class LK {
     paymentHistory,
     paymentReceipt,
     amount,
+    totalAmount,
     updateAvailable,
     updateNow,
     updateLater,
@@ -751,6 +757,7 @@ class LK {
     maxAmountLabel,
     showLabel,
     advancedFilters,
+    paymentFilters,
     ageRangeLabel,
     heightRangeLabel,
     gotraLabel,
@@ -817,6 +824,9 @@ class LK {
     twitterX,
     businessInfo,
     payments,
+    communityPortal,
+    initiatedPayments,
+    completedPayments,
     dueSummary,
     totalDue,
     payAll,
@@ -1008,3 +1018,4 @@ class LK {
     orgDetailsCopied,
   ];
 }
+

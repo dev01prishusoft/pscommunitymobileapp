@@ -10,6 +10,7 @@ import 'package:printing/printing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
@@ -162,7 +163,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   'N/A')
               .tr,
       'status':
-          ((data['status'] ?? data['paymentStatus'])?.toString() ?? 'N/A').tr,
+          ((data['status'] ?? data['paymentStatus'] ?? data['subscriptionStatus'] ?? data['paymentStatusName'])?.toString() ?? 'N/A'),
       'transactionId':
           (data['transactionId'] ??
                   data['paymentTransactionId'] ??
@@ -178,12 +179,6 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
 
   Widget _buildContent(Map<String, dynamic> rawData) {
     final data = _getParsedData(rawData);
-    final status = data['status'] ?? 'N/A';
-    final isSuccess =
-        status.toLowerCase() == 'success' ||
-        status.toLowerCase() == 'completed' ||
-        status.toLowerCase() == 'successful';
-
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -208,30 +203,57 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   padding: const EdgeInsets.only(top: 24, bottom: 20),
                   child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isSuccess
-                              ? Colors.green.shade50
-                              : Colors.orange.shade50,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          isSuccess
-                              ? Icons.check_circle_rounded
-                              : Icons.pending_rounded,
-                          color: isSuccess ? AppColors.green : AppColors.orange,
-                          size: 56,
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        isSuccess ? 'Payment Successful' : 'Payment Pending',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: isSuccess ? AppColors.green : AppColors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Obx(() {
+                        final logoUrl = samajController.samaj.value?.logoUrl;
+                        final name =
+                            samajController.samaj.value?.name ??
+                            LK.samajName.tr;
+                        return Column(
+                          children: [
+                            Container(
+                              width: 80.w,
+                              height: 80.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.white,
+                                border: Border.all(
+                                  color: AppColors.grey.shade200,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: logoUrl != null && logoUrl.isNotEmpty
+                                    ? CachedImg(
+                                        url: logoUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) => Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        errorWidget: (_, __, ___) => Image.asset(
+                                          'assets/images/prishusoft_logo.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Image.asset(
+                                        'assets/images/prishusoft_logo.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                            ),
+                            SizedBox(height: 12.h),
+                            Text(
+                              name,
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.titleMedium.copyWith(
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                       SizedBox(height: 8.h),
                       Text(
                         '₹${data['amount']}',
@@ -289,11 +311,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         child: Divider(height: 1, color: Colors.black12),
                       ),
                       _buildReceiptSectionHeader(LK.paymentDetailsLabel.tr),
-                      if (data['isRecurring'] != 'N/A')
-                        _buildInfoRow(
-                          '${LK.recurring.tr}:',
-                          data['isRecurring']!,
-                        ),
+
                       if (data['recurringPaymentType'] != 'N/A' &&
                           data['recurringPaymentType']!.isNotEmpty)
                         _buildInfoRow(
@@ -302,6 +320,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         ),
                       _buildInfoRow(LK.typeLabel.tr, data['type']!),
                       _buildInfoRow(LK.modeLabel.tr, data['mode']!),
+                      _buildInfoRow(LK.statusLabel.tr, data['status']!),
                       if (data['transactionId'] != 'N/A' &&
                           data['transactionId']!.isNotEmpty)
                         _buildInfoRow(
@@ -613,8 +632,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   ),
                   _buildPdfTableCell(LK.typeLabel.tr, data['type']!),
                   _buildPdfTableCell(LK.modeLabel.tr, data['mode']!),
-                  if (data['isRecurring'] != 'N/A')
-                    _buildPdfTableCell(LK.recurring.tr, data['isRecurring']!),
+
                   if (data['recurringPaymentType'] != 'N/A' &&
                       data['recurringPaymentType']!.isNotEmpty)
                     _buildPdfTableCell(
@@ -649,7 +667,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                     mainAxisSize: pw.MainAxisSize.min,
                     children: [
                       pw.Text(
-                        'Total Paid:  ',
+                        '${LK.totalAmount.tr}:  ',
                         style: pw.TextStyle(
                           fontSize: 12,
                           fontWeight: pw.FontWeight.bold,

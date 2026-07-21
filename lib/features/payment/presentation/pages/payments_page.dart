@@ -170,9 +170,20 @@ class _PaymentsPageState extends State<PaymentsPage> {
   }
 
   Widget _buildOverviewCard() {
-    final pendingCount =
-        controller.dashboard.value?.pendingPayments.length ?? 0;
-    final paidCount = controller.dashboard.value?.paidPayments.length ?? 0;
+    final initiatedCount = controller.dashboard.value?.paidPayments
+            .where((p) =>
+                p.status.toLowerCase() != 'success' &&
+                p.status.toLowerCase() != 'completed' &&
+                p.status.toLowerCase() != 'successful')
+            .length ??
+        0;
+    final paidCount = controller.dashboard.value?.paidPayments
+            .where((p) =>
+                p.status.toLowerCase() == 'success' ||
+                p.status.toLowerCase() == 'completed' ||
+                p.status.toLowerCase() == 'successful')
+            .length ??
+        0;
 
     return Container(
       width: double.infinity,
@@ -213,7 +224,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Community Portal',
+                    LK.communityPortal.tr,
                     style: TextStyle(
                       color: AppColors.white.withValues(alpha: 0.7),
                       fontSize: 10.sp,
@@ -236,23 +247,31 @@ class _PaymentsPageState extends State<PaymentsPage> {
               GestureDetector(
                 onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                   decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Row(
-                    spacing: 3.w,
+                    spacing: 4.w,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.history_rounded,
-                        color: AppColors.white,
-                        size: 18,
+                        color: AppColors.primary,
+                        size: 16.sp,
                       ),
                       Text(
                         LK.paymentHistory.tr,
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.white,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -266,8 +285,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildStatItem(
-                'Pending Requests',
-                '$pendingCount',
+                LK.initiatedPayments.tr.toUpperCase(),
+                '$initiatedCount',
                 AppColors.orange,
               ),
               Container(
@@ -276,7 +295,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 color: AppColors.white.withValues(alpha: 0.2),
               ),
               _buildStatItem(
-                'Completed Payments',
+                LK.completedPayments.tr.toUpperCase(),
                 '$paidCount',
                 AppColors.green,
               ),

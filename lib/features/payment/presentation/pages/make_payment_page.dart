@@ -21,6 +21,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
   final controller = Get.find<PaymentController>();
   late final TextEditingController amountController;
   late final Worker _amountListener;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -55,11 +56,14 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(LK.makePayment.tr)),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -149,7 +153,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                             Expanded(
                               child: Obx(() {
                                 final isFixed = controller.isAmountFixed;
-                                return TextField(
+                                return TextFormField(
                                   controller: amountController,
                                   readOnly: isFixed,
                                   keyboardType:
@@ -187,6 +191,17 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                   onChanged: (val) =>
                                       controller.enteredAmount.value =
                                           double.tryParse(val) ?? 0,
+                                  validator: (val) {
+                                    if (val == null || val.isEmpty) return LK.fieldRequired.tr;
+                                    final amt = double.tryParse(val);
+                                    if (amt == null || amt <= 0) return LK.amountMustBeGreaterThanZero.tr;
+                                    final cat = controller.selectedCategory.value;
+                                    if (cat != null && !controller.isAmountFixed) {
+                                      if (cat.minAmount > 0 && amt < cat.minAmount) return '${LK.amountMustBeAtLeast.tr}${cat.minAmount.toInt()}';
+                                      if (cat.maxAmount > 0 && amt > cat.maxAmount) return '${LK.amountCannotExceed.tr}${cat.maxAmount.toInt()}';
+                                    }
+                                    return null;
+                                  },
                                   style: AppTextStyles.displaySmall.copyWith(
                                     color: isFixed
                                         ? AppColors.grey.shade600
@@ -197,6 +212,8 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
                                     filled: false,
                                     contentPadding: EdgeInsets.zero,
                                     hintText: '0',
@@ -258,7 +275,11 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                   GestureDetector(
                     onTap: controller.isProcessingPayment.value
                         ? null
-                        : () => controller.initiatePayment(),
+                        : () {
+                            if (_formKey.currentState?.validate() ?? false) {
+                              controller.initiatePayment();
+                            }
+                          },
                     child: Container(
                       padding: EdgeInsets.all(12),
                       alignment: Alignment.center,
@@ -297,7 +318,11 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                     GestureDetector(
                       onTap: controller.isProcessingPayment.value
                           ? null
-                          : () => controller.initiatePayment(isRecurring: true),
+                          : () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                controller.initiatePayment(isRecurring: true);
+                              }
+                            },
                       child: Container(
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -321,6 +346,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
             ),
           ],
         ),
+       ),
       ),
     );
   }
@@ -403,45 +429,60 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
     required String Function(T) itemLabel,
     bool isEnabled = true,
   }) {
-    return Container(
-      height: 48.h,
-      padding: EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: isEnabled ? AppColors.grey.shade50 : AppColors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.grey.shade200),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<T>(
-          value: value,
-          hint: Text(
-            hint,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.grey.shade400,
-            ),
-          ),
-          isExpanded: true,
-          dropdownColor: AppColors.white,
-          borderRadius: BorderRadius.circular(14),
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: AppColors.primary,
-            size: 20,
-          ),
-          items: items.map((T item) {
-            return DropdownMenuItem<T>(
-              value: item,
-              child: Text(
-                itemLabel(item),
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            );
-          }).toList(),
-          onChanged: isEnabled ? onChanged : null,
+    return DropdownButtonFormField<T>(
+      initialValue: value,
+      hint: Text(
+        hint,
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.grey.shade400,
         ),
       ),
+      isExpanded: true,
+      dropdownColor: AppColors.white,
+      borderRadius: BorderRadius.circular(14),
+      icon: Icon(
+        Icons.keyboard_arrow_down_rounded,
+        color: AppColors.primary,
+        size: 20,
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: isEnabled ? AppColors.grey.shade50 : AppColors.grey.shade100,
+        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.grey.shade200),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.grey.shade200),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.grey.shade200),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary),
+        ),
+      ),
+      validator: (val) => val == null ? LK.fieldRequired.tr : null,
+      items: items.map((T item) {
+        return DropdownMenuItem<T>(
+          value: item,
+          child: Text(
+            itemLabel(item),
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      }).toList(),
+      onChanged: isEnabled ? onChanged : null,
     );
   }
 }
