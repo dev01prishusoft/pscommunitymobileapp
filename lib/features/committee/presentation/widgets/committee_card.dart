@@ -144,7 +144,7 @@ class CommitteeCard extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          '${currentNode.memberCount} ${currentNode.memberCount == 1 ? LK.member.tr.toLowerCase() : LK.membersCount.tr.toLowerCase()}',
+                          '${currentNode.memberCount} ${currentNode.memberCount == 1 ? LK.member.tr : LK.membersCount.tr}',
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,

@@ -96,7 +96,9 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   ),
                 ),
                 Text(
-                  LK.membersCount.tr,
+                  _controller.items.length == 1
+                      ? LK.member.tr
+                      : LK.membersCount.tr,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.grey.shade600,
                     fontWeight: FontWeight.w500,
