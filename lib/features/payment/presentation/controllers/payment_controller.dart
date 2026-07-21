@@ -29,16 +29,7 @@ class PaymentController extends GetxController {
   final Rxn<PaymentCategory> selectedCategory = Rxn<PaymentCategory>();
   final RxDouble enteredAmount = 0.0.obs;
 
-  bool get isAmountFixed {
-    final cat = selectedCategory.value;
-    if (cat != null && cat.defaultAmount > 0) return true;
-    if (cat != null &&
-        cat.minAmount > 0 &&
-        cat.maxAmount > 0 &&
-        cat.minAmount == cat.maxAmount)
-      return true;
-    return false;
-  }
+  bool get isAmountFixed => selectedCategory.value?.isAmountFixed ?? false;
 
   final RxBool isProcessingPayment = false.obs;
   final Rx<AppState> historyState = AppState.loading.obs;
@@ -183,7 +174,7 @@ class PaymentController extends GetxController {
       }
     }
 
-    if (adminPaymentRequestId == null) {
+    if (adminPaymentRequestId == null && !isAmountFixed) {
       if ((selectedCategory.value?.minAmount ?? 0) > 0 &&
           amount < selectedCategory.value!.minAmount) {
         _showErrorSnackbar(
