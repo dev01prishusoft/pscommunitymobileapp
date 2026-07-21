@@ -28,9 +28,15 @@ class SplashController extends GetxController {
 
   void _navigateToHome() {
     if (!isClosed) {
-      if (Get.isRegistered<PushNotificationService>() &&
-          Get.find<PushNotificationService>().hasInitialMessage) {
-        Get.find<PushNotificationService>().handleInitialMessage();
+      final pushService = Get.isRegistered<PushNotificationService>()
+          ? Get.find<PushNotificationService>()
+          : null;
+
+      if (pushService != null && pushService.hasInitialMessage) {
+        Get.offNamed<void>(AppRouter.home);
+        Future.delayed(const Duration(milliseconds: 300), () {
+          pushService.handleInitialMessage();
+        });
       } else {
         Get.offNamed<void>(AppRouter.home);
       }
