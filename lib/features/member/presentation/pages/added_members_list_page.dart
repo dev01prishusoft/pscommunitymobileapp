@@ -287,12 +287,13 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(width: 2.w),
           Container(
-            padding: EdgeInsets.all(6.r),
+            padding: EdgeInsets.all(4.r),
             decoration: BoxDecoration(shape: BoxShape.circle, color: bgColor),
-            child: Icon(icon, color: color, size: 16.sp),
+            child: Icon(icon, color: color, size: 14.sp),
           ),
-          SizedBox(width: 4.w),
+          SizedBox(width: 6.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +302,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
