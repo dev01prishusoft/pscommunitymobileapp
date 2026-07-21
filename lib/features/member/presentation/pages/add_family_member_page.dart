@@ -27,6 +27,8 @@ class AddFamilyMemberPage extends StatefulWidget {
 class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   late final ProfileFormController controller;
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _addressScrollController = ScrollController();
+  final ScrollController _educationScrollController = ScrollController();
   final ScrollController _headerScrollController = ScrollController();
   final List<GlobalKey> _stepKeys = List.generate(6, (index) => GlobalKey());
   final List<GlobalKey<FormState>> _stepFormKeys = List.generate(
@@ -49,6 +51,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _addressScrollController.dispose();
+    _educationScrollController.dispose();
     _headerScrollController.dispose();
     _pageController.dispose();
     Get.delete<ProfileFormController>(tag: controllerTag);
@@ -207,9 +211,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       text: text,
                       height: 50.h,
                       onPressed: isLastStep
-                          ? () => controller.submitForm(
-                              successMessage: LK.memberAddedSuccessfully.tr,
-                            )
+                          ? () {
+                              final isValid = _stepFormKeys[5].currentState?.validate() ?? false;
+                              if (isValid) {
+                                controller.submitForm(
+                                  successMessage: LK.memberAddedSuccessfully.tr,
+                                );
+                              }
+                            }
                           : () {
                               _animateToStep(_currentStep + 1);
                             },
@@ -1020,8 +1029,23 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     );
   }
 
+  void _addAddressAndScroll() {
+    controller.addAddress();
+    // Wait for the new address widgets to be laid out, then scroll to bottom
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_addressScrollController.hasClients) {
+        _addressScrollController.animateTo(
+          _addressScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   Widget _buildStepAddresses() {
     return SingleChildScrollView(
+      controller: _addressScrollController,
       padding: AppSpacing.pM,
       child: Obx(() {
         if (controller.addresses.isEmpty) {
@@ -1056,7 +1080,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ],
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: controller.addAddress,
+                    onPressed: _addAddressAndScroll,
                     icon: const Icon(Icons.add),
                     label: Text(LK.addAddress.tr),
                     style: ElevatedButton.styleFrom(
@@ -1085,7 +1109,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: controller.addAddress,
+                  onPressed: _addAddressAndScroll,
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(LK.addAddress.tr),
                 ),
@@ -1434,8 +1458,22 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     );
   }
 
+  void _addEducationAndScroll() {
+    controller.addEducation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_educationScrollController.hasClients) {
+        _educationScrollController.animateTo(
+          _educationScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   Widget _buildStepEducation() {
     return SingleChildScrollView(
+      controller: _educationScrollController,
       padding: AppSpacing.pM,
       child: Obx(() {
         if (controller.educationList.isEmpty) {
@@ -1470,7 +1508,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ],
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
-                    onPressed: controller.addEducation,
+                    onPressed: _addEducationAndScroll,
                     icon: const Icon(Icons.add),
                     label: Text(LK.addEducation.tr),
                     style: ElevatedButton.styleFrom(
@@ -1499,7 +1537,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: controller.addEducation,
+                  onPressed: _addEducationAndScroll,
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(LK.addEducation.tr),
                 ),
@@ -1547,7 +1585,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             bottom: 16,
           ),
           title: Text(
-            '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (Highest)' : ''}',
+            '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (${LK.highest.tr})' : ''}',
             style: AppTextStyles.labelMedium,
           ),
           trailing: IconButton(
