@@ -170,18 +170,24 @@ class _PaymentsPageState extends State<PaymentsPage> {
   }
 
   Widget _buildOverviewCard() {
-    final initiatedCount = controller.dashboard.value?.paidPayments
-            .where((p) =>
-                p.status.toLowerCase() != 'success' &&
-                p.status.toLowerCase() != 'completed' &&
-                p.status.toLowerCase() != 'successful')
+    final initiatedCount =
+        controller.dashboard.value?.paidPayments
+            .where(
+              (p) =>
+                  p.status.toLowerCase() != 'success' &&
+                  p.status.toLowerCase() != 'completed' &&
+                  p.status.toLowerCase() != 'successful',
+            )
             .length ??
         0;
-    final paidCount = controller.dashboard.value?.paidPayments
-            .where((p) =>
-                p.status.toLowerCase() == 'success' ||
-                p.status.toLowerCase() == 'completed' ||
-                p.status.toLowerCase() == 'successful')
+    final paidCount =
+        controller.dashboard.value?.paidPayments
+            .where(
+              (p) =>
+                  p.status.toLowerCase() == 'success' ||
+                  p.status.toLowerCase() == 'completed' ||
+                  p.status.toLowerCase() == 'successful',
+            )
             .length ??
         0;
 
@@ -247,7 +253,10 @@ class _PaymentsPageState extends State<PaymentsPage> {
               GestureDetector(
                 onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -280,10 +289,16 @@ class _PaymentsPageState extends State<PaymentsPage> {
               ),
             ],
           ),
-          SizedBox(height: 15.h),
+          Container(
+            height: 1,
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(vertical: 15.h),
+            color: AppColors.white.withValues(alpha: 0.2),
+          ).paddingSymmetric(horizontal: 40.w),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              /*
               _buildStatItem(
                 LK.initiatedPayments.tr.toUpperCase(),
                 '$initiatedCount',
@@ -294,6 +309,16 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 height: 36,
                 color: AppColors.white.withValues(alpha: 0.2),
               ),
+              */
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.verified, color: AppColors.white),
+              ),
+              10.horizontalSpace,
               _buildStatItem(
                 LK.completedPayments.tr.toUpperCase(),
                 '$paidCount',
