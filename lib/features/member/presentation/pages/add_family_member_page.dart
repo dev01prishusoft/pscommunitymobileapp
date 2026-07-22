@@ -1625,8 +1625,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.qualificationLabel.tr,
-                isRequired: true,
-                requiredErrorMessage: LK.qualificationRequired.tr,
               ),
             ),
             AppSpacing.vM,
@@ -1898,15 +1896,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller.personalInfo.fourWheeler,
                   ),
                 ),
-                AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.personalInfo.monthlyIncomeCtrl,
-                  label: LK.monthlyIncomeLabel.tr,
-                  prefixIcon: const Icon(Icons.currency_rupee),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: 8,
-                ),
+
               ],
             ),
           ),
@@ -2021,35 +2011,26 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   );
                 }),
                 AppSpacing.vM,
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.otherJobPositionCtrl,
-                    label: LK.otherJobPositionLabel.tr,
-                    maxLength: 100,
-                    onChanged: (v) =>
-                        controller.workInfo.otherJobPosition.value = v,
-                  ),
-                  AppFormTextField(
-                    controller: controller.otherOccupationCtrl,
-                    label: LK.otherOccupationLabel.tr,
-                    maxLength: 100,
-                    onChanged: (v) =>
-                        controller.workInfo.otherOccupation.value = v,
-                  ),
+                AppFormTextField(
+                  controller: controller.otherOccupationCtrl,
+                  label: LK.otherOccupationLabel.tr,
+                  maxLength: 200,
+                  onChanged: (v) =>
+                      controller.workInfo.otherOccupation.value = v,
                 ),
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.companyNameCtrl,
                     label: LK.companyNameLabel.tr,
                     prefixIcon: const Icon(Icons.business),
-                    maxLength: 300,
+                    maxLength: 200,
                     onChanged: (v) => controller.companyName.value = v,
                   ),
                   AppFormTextField(
                     controller: controller.businessNameCtrl,
                     label: LK.businessName.tr,
                     prefixIcon: const Icon(Icons.business_center),
-                    maxLength: 300,
+                    maxLength: 200,
                     onChanged: (v) => controller.businessName.value = v,
                   ),
                 ),
@@ -2059,7 +2040,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   keyboardType: TextInputType.multiline,
                   maxLines: 5,
                   minLines: 3,
-                  maxLength: 500,
+                  maxLength: 600,
                 ),
                 AppSpacing.vM,
                 Obx(
