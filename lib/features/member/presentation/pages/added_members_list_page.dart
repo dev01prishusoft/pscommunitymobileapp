@@ -42,9 +42,11 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(LK.addedMembers.tr)),
-      body: Column(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(title: Text(LK.addedMembers.tr)),
+        body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           15.verticalSpace,
@@ -142,6 +144,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
             fontSize: 14.sp,
           ),
         ),
+        ),
       ),
     );
   }
@@ -176,7 +179,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
 
   Widget _buildStatsPanel() {
     return Obx(() {
-      if (_controller.members.isEmpty && !_controller.isLoading.value) {
+      if (_controller.members.isEmpty) {
         return const SizedBox.shrink();
       }
 
