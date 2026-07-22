@@ -302,16 +302,17 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
     double? normDouble(double? v) => (v == null || v == 0.0) ? null : v;
 
-    addIfChanged(
-      'Weight',
-      normDouble(double.tryParse(personalInfo.weight.value)),
-      normDouble(m.weight?.toDouble()),
-    );
-    addIfChanged(
-      'Height',
-      normDouble(double.tryParse(personalInfo.height.value)),
-      normDouble(m.height?.toDouble()),
-    );
+    final parsedWeight = normDouble(double.tryParse(personalInfo.weight.value));
+    final origWeight = normDouble(m.weight?.toDouble());
+    if (parsedWeight != origWeight) {
+      formDataMap['Weight'] = parsedWeight ?? 0;
+    }
+
+    final parsedHeight = normDouble(double.tryParse(personalInfo.height.value));
+    final origHeight = normDouble(m.height?.toDouble());
+    if (parsedHeight != origHeight) {
+      formDataMap['Height'] = parsedHeight ?? 0;
+    }
     void addDropdown(
       String key,
       RxString rxStr,
@@ -591,9 +592,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
         if (qualId != initialQualId && qualId != 0)
           formDataMap['EducationalQualificationId'] = qualId;
 
-        void addEdu(String key, String current, String? initial) {
+        void addEdu(String key, String current, String? initial, {bool isNumber = false}) {
           if (current != (initial ?? '')) {
-            formDataMap[key] = current.isEmpty ? null : current;
+            if (current.isEmpty) {
+              formDataMap[key] = isNumber ? 0 : '""';
+            } else {
+              formDataMap[key] = current;
+            }
           }
         }
 
@@ -606,11 +611,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
           'YearOfPassing',
           edu.passingYear,
           initialEdu?['passingYear'] as String?,
+          isNumber: true,
         );
         addEdu(
           'Percentage',
           edu.percentage,
           initialEdu?['percentage'] as String?,
+          isNumber: true,
         );
         addEdu('Grade', edu.grade, initialEdu?['grade'] as String?);
         addEdu(
@@ -1882,11 +1889,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['LastNameEnglish'] = personalInfo.lastNameEnCtrl.text;
             formDataMap['DateOfBirth'] = formatDob(personalInfo.dob.value);
             formDataMap['DateOfBirthTime'] = personalInfo.tob.value;
-            formDataMap['Weight'] = double.tryParse(
-              personalInfo.weightCtrl.text,
-            );
-            formDataMap['Height'] =
-                double.tryParse(personalInfo.heightCtrl.text) ?? 999.99;
+            formDataMap['Weight'] = personalInfo.weightCtrl.text;
+            formDataMap['Height'] = personalInfo.heightCtrl.text;
             formDataMap['GenderId'] = getId(
               personalInfo.gender.value,
               personalInfo.genderIdMap,
@@ -2057,6 +2061,16 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (formDataMap.isNotEmpty) {
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
 
+            print('=== MEMBER UPDATE API PAYLOAD ===');
+            final printablePayload = formDataMap.map((key, value) {
+              if (value is dio.MultipartFile) {
+                return MapEntry(key, 'MultipartFile(${value.filename})');
+              }
+              return MapEntry(key, value);
+            });
+            print(printablePayload);
+            print('=================================');
+
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
@@ -2065,6 +2079,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   : '/api/v1/member/mobile/upsert',
               data: formData,
             );
+
+            print('=== MEMBER UPDATE API RESPONSE ===');
+            print(response.data);
+            print('==================================');
 
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {

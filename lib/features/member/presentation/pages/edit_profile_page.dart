@@ -1385,16 +1385,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 AppSpacing.vM,
-                Obx(
-                  () => AppFormTextField(
-                    controller: controller.monthlyIncomeCtrl,
-                    label: LK.monthlyIncomeLabel.tr,
-                    prefixIcon: const Icon(Icons.currency_rupee),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 8,
-                    updateStatus: controller.getUpdateStatus('MonthlyIncome'),
-                  ),
+                AppFormTextField(
+                  controller: controller.monthlyIncomeCtrl,
+                  label: LK.monthlyIncomeLabel.tr,
+                  prefixIcon: const Icon(Icons.currency_rupee),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 8,
+                  updateStatus: controller.getUpdateStatus('MonthlyIncome'),
                 ),
               ],
             ),
@@ -1582,7 +1580,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     keyboardType: TextInputType.multiline,
                     maxLines: 5,
                     minLines: 3,
-                    maxLength: 600,
+                    maxLength: 500,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationDescription',
                     ),
@@ -2764,7 +2762,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               keyboardType: TextInputType.multiline,
               maxLines: 5,
               minLines: 3,
-              maxLength: 600,
+              maxLength: 500,
               readOnly: !isHighest,
               onChanged: isHighest
                   ? (v) {
