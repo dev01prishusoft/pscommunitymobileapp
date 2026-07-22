@@ -1755,7 +1755,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               keyboardType: TextInputType.multiline,
               maxLines: 5,
               minLines: 3,
-              maxLength: 500,
+              maxLength: 600,
               onChanged: (v) {
                 edu.description = v;
                 controller.educationList.refresh();
