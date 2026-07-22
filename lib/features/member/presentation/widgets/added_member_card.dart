@@ -17,7 +17,7 @@ class AddedMemberCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaleOnTap(
       onTap: () {
-        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed<void>(
           AppRouter.memberProfile,
           arguments: {'memberId': member.memberId},
