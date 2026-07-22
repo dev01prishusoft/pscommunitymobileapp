@@ -645,7 +645,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                       LK.transactionIdLabel.tr,
                       data['transactionId']!,
                     ),
-                  _buildPdfTableCell('Status', data['status']!, isStatus: true),
+                  _buildPdfTableCell(
+                    LK.statusLabel.tr.replaceAll(':', ''),
+                    data['status']!,
+                    isStatus: true,
+                  ),
                 ],
               ),
               pw.SizedBox(height: 20),
