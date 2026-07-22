@@ -2764,7 +2764,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               keyboardType: TextInputType.multiline,
               maxLines: 5,
               minLines: 3,
-              maxLength: 500,
+              maxLength: 600,
               readOnly: !isHighest,
               onChanged: isHighest
                   ? (v) {
