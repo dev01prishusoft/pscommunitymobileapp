@@ -2061,15 +2061,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (formDataMap.isNotEmpty) {
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
 
-            print('=== MEMBER UPDATE API PAYLOAD ===');
-            final printablePayload = formDataMap.map((key, value) {
-              if (value is dio.MultipartFile) {
-                return MapEntry(key, 'MultipartFile(${value.filename})');
-              }
-              return MapEntry(key, value);
-            });
-            print(printablePayload);
-            print('=================================');
 
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
@@ -2080,9 +2071,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               data: formData,
             );
 
-            print('=== MEMBER UPDATE API RESPONSE ===');
-            print(response.data);
-            print('==================================');
+
 
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
