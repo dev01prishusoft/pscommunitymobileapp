@@ -240,7 +240,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 (originalValue is String && originalValue.isEmpty))) {
           return;
         }
-        formDataMap[key] = currentValue;
+        formDataMap[key] =
+            (currentValue is String && currentValue.isEmpty) ? '""' : currentValue;
       }
     }
 
@@ -648,7 +649,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
         void addAddr(String key, String current, String? initial) {
           if (current != (initial ?? '')) {
-            formDataMap[key] = current.isEmpty ? null : current;
+            formDataMap[key] = current.isEmpty ? '""' : current;
           }
         }
 
@@ -2054,15 +2055,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
           if (formDataMap.isNotEmpty) {
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
-            print('=== MEMBER UPDATE API PAYLOAD ===');
-            final printablePayload = formDataMap.map((key, value) {
-              if (value is dio.MultipartFile) {
-                return MapEntry(key, 'MultipartFile(${value.filename})');
-              }
-              return MapEntry(key, value);
-            });
-            print(printablePayload.toString());
-            print('=================================');
+
 
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
@@ -2073,9 +2066,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
               data: formData,
             );
 
-            print('=== MEMBER UPDATE API RESPONSE ===');
-            print(response.data?.toString());
-            print('==================================');
+
 
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {

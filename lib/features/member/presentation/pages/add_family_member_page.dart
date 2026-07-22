@@ -1896,7 +1896,17 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller.personalInfo.fourWheeler,
                   ),
                 ),
-
+                AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.personalInfo.monthlyIncomeCtrl,
+                    label: LK.monthlyIncomeLabel.tr,
+                    prefixIcon: const Icon(Icons.currency_rupee),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 8,
+                  ),
+                ),
               ],
             ),
           ),
@@ -2034,6 +2044,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     onChanged: (v) => controller.businessName.value = v,
                   ),
                 ),
+                AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,

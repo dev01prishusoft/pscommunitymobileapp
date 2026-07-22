@@ -1384,7 +1384,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                 ),
-
+                AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.monthlyIncomeCtrl,
+                    label: LK.monthlyIncomeLabel.tr,
+                    prefixIcon: const Icon(Icons.currency_rupee),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 8,
+                    updateStatus: controller.getUpdateStatus('MonthlyIncome'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -1564,7 +1575,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 AppSpacing.vM,
-
                 Obx(
                   () => AppFormTextField(
                     controller: controller.occupationDescriptionCtrl,
