@@ -1625,8 +1625,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.qualificationLabel.tr,
-                isRequired: true,
-                requiredErrorMessage: LK.qualificationRequired.tr,
               ),
             ),
             AppSpacing.vM,
@@ -1640,116 +1638,130 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               },
             ),
             AppSpacing.vM,
-            _buildFieldPair(
-              AppFormTextField(
-                initialValue: edu.passingYear,
-                label: LK.passingYearLabel.tr,
-                hint: 'YYYY',
-                keyboardType: TextInputType.phone,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 4,
-                validator: (v) {
-                  if (v == null || v.isEmpty) return null;
-                  if (v.length != 4) {
-                    return 'Passing Year must be exactly 4 digits';
-                  }
-                  final year = int.tryParse(v);
-                  if (year != null) {
-                    final currentYear = DateTime.now().year;
-                    if (year > currentYear) {
-                      return 'Passing Year cannot be greater than the current year';
-                    }
-
-                    final dobStr = controller.dobCtrl.text;
-                    if (dobStr.isNotEmpty) {
-                      try {
-                        DateTime? dobDate;
-                        if (dobStr.contains('-') &&
-                            dobStr.split('-')[0].length == 2) {
-                          final parts = dobStr.split('-');
-                          dobDate = DateTime(
-                            int.parse(parts[2]),
-                            int.parse(parts[1]),
-                            int.parse(parts[0]),
-                          );
-                        } else {
-                          dobDate = DateTime.tryParse(dobStr);
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.passingYear,
+                    label: LK.passingYearLabel.tr,
+                    hint: 'YYYY',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 4,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return null;
+                      if (v.length != 4) {
+                        return 'Passing Year must be exactly 4 digits';
+                      }
+                      final year = int.tryParse(v);
+                      if (year != null) {
+                        final currentYear = DateTime.now().year;
+                        if (year > currentYear) {
+                          return 'Passing Year cannot be greater than the current year';
                         }
 
-                        if (dobDate != null && year < dobDate.year) {
-                          return 'Passing Year cannot be before year of birth';
+                        final dobStr = controller.dobCtrl.text;
+                        if (dobStr.isNotEmpty) {
+                          try {
+                            DateTime? dobDate;
+                            if (dobStr.contains('-') &&
+                                dobStr.split('-')[0].length == 2) {
+                              final parts = dobStr.split('-');
+                              dobDate = DateTime(
+                                int.parse(parts[2]),
+                                int.parse(parts[1]),
+                                int.parse(parts[0]),
+                              );
+                            } else {
+                              dobDate = DateTime.tryParse(dobStr);
+                            }
+
+                            if (dobDate != null && year < dobDate.year) {
+                              return 'Passing Year cannot be before year of birth';
+                            }
+                          } catch (_) {}
                         }
-                      } catch (_) {}
-                    }
-                  }
-                  return null;
-                },
-                onChanged: (v) {
-                  edu.passingYear = v;
-                  controller.educationList.refresh();
-                },
-              ),
-              AppFormTextField(
-                initialValue: edu.percentage,
-                label: LK.percentageLabel.tr,
-                hint: '00',
-                suffixIcon: Padding(
-                  padding: EdgeInsets.only(top: 14.h, right: 16.w),
-                  child: Text(
-                    '%',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.grey,
-                    ),
+                      }
+                      return null;
+                    },
+                    onChanged: (v) {
+                      edu.passingYear = v;
+                      controller.educationList.refresh();
+                    },
                   ),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.percentage,
+                    label: LK.percentageLabel.tr,
+                    hint: '00',
+                    suffixIcon: Padding(
+                      padding: EdgeInsets.only(top: 14.h, right: 16.w),
+                      child: Text(
+                        '%',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        if (newValue.text.isEmpty) return newValue;
+                        final numVal = double.tryParse(newValue.text);
+                        if (numVal != null && numVal > 100) return oldValue;
+                        return newValue;
+                      }),
+                    ],
+                    maxLength: 6,
+                    validator: (v) {
+                      if (v != null && v.isNotEmpty) {
+                        final numVal = double.tryParse(v);
+                        if (numVal != null && numVal > 100) {
+                          return 'Cannot exceed 100';
+                        }
+                      }
+                      return null;
+                    },
+                    onChanged: (v) {
+                      edu.percentage = v;
+                      controller.educationList.refresh();
+                    },
+                  ),
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    if (newValue.text.isEmpty) return newValue;
-                    final numVal = double.tryParse(newValue.text);
-                    if (numVal != null && numVal > 100) return oldValue;
-                    return newValue;
-                  }),
-                ],
-                maxLength: 20,
-                validator: (v) {
-                  if (v != null && v.isNotEmpty) {
-                    final numVal = double.tryParse(v);
-                    if (numVal != null && numVal > 100) {
-                      return 'Cannot exceed 100';
-                    }
-                  }
-                  return null;
-                },
-                onChanged: (v) {
-                  edu.percentage = v;
-                  controller.educationList.refresh();
-                },
-              ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.grade,
+                    label: 'Grade',
+                    maxLength: 10,
+                    onChanged: (v) {
+                      edu.grade = v;
+                      controller.educationList.refresh();
+                    },
+                  ),
+                ),
+              ],
             ),
-            _buildFieldPair(
-              AppFormTextField(
-                initialValue: edu.grade,
-                label: 'Grade',
-                maxLength: 10,
-                onChanged: (v) {
-                  edu.grade = v;
-                  controller.educationList.refresh();
-                },
-              ),
-              AppFormTextField(
-                initialValue: edu.description,
-                label: 'Description',
-                maxLength: 500,
-                onChanged: (v) {
-                  edu.description = v;
-                  controller.educationList.refresh();
-                },
-              ),
+            AppSpacing.vM,
+            AppFormTextField(
+              initialValue: edu.description,
+              label: 'Description',
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
+              minLines: 3,
+              maxLength: 500,
+              onChanged: (v) {
+                edu.description = v;
+                controller.educationList.refresh();
+              },
             ),
+            AppSpacing.vM,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1899,13 +1911,15 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.personalInfo.monthlyIncomeCtrl,
-                  label: LK.monthlyIncomeLabel.tr,
-                  prefixIcon: const Icon(Icons.currency_rupee),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: 8,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.personalInfo.monthlyIncomeCtrl,
+                    label: LK.monthlyIncomeLabel.tr,
+                    prefixIcon: const Icon(Icons.currency_rupee),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 8,
+                  ),
                 ),
               ],
             ),
@@ -2021,45 +2035,37 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   );
                 }),
                 AppSpacing.vM,
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.otherJobPositionCtrl,
-                    label: LK.otherJobPositionLabel.tr,
-                    maxLength: 100,
-                    onChanged: (v) =>
-                        controller.workInfo.otherJobPosition.value = v,
-                  ),
-                  AppFormTextField(
-                    controller: controller.otherOccupationCtrl,
-                    label: LK.otherOccupationLabel.tr,
-                    maxLength: 100,
-                    onChanged: (v) =>
-                        controller.workInfo.otherOccupation.value = v,
-                  ),
+                AppFormTextField(
+                  controller: controller.otherOccupationCtrl,
+                  label: LK.otherOccupationLabel.tr,
+                  maxLength: 200,
+                  onChanged: (v) =>
+                      controller.workInfo.otherOccupation.value = v,
                 ),
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.companyNameCtrl,
                     label: LK.companyNameLabel.tr,
                     prefixIcon: const Icon(Icons.business),
-                    maxLength: 300,
+                    maxLength: 200,
                     onChanged: (v) => controller.companyName.value = v,
                   ),
                   AppFormTextField(
                     controller: controller.businessNameCtrl,
                     label: LK.businessName.tr,
                     prefixIcon: const Icon(Icons.business_center),
-                    maxLength: 300,
+                    maxLength: 200,
                     onChanged: (v) => controller.businessName.value = v,
                   ),
                 ),
+                AppSpacing.vM,
                 AppFormTextField(
                   controller: controller.occupationDescriptionCtrl,
                   label: LK.occupationDescriptionLabel.tr,
                   keyboardType: TextInputType.multiline,
                   maxLines: 5,
                   minLines: 3,
-                  maxLength: 500,
+                  maxLength: 600,
                 ),
                 AppSpacing.vM,
                 Obx(

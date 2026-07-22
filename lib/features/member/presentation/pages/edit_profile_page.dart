@@ -1387,7 +1387,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 AppSpacing.vM,
                 Obx(
                   () => AppFormTextField(
-                    controller: controller.personalInfo.monthlyIncomeCtrl,
+                    controller: controller.monthlyIncomeCtrl,
                     label: LK.monthlyIncomeLabel.tr,
                     prefixIcon: const Icon(Icons.currency_rupee),
                     keyboardType: TextInputType.number,
@@ -1539,29 +1539,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   );
                 }),
                 AppSpacing.vM,
-                _buildFieldPair(
-                  Obx(
-                    () => AppFormTextField(
-                      controller: controller.otherJobPositionCtrl,
-                      label: LK.otherJobPositionLabel.tr,
-                      maxLength: 100,
-                      onChanged: (v) =>
-                          controller.workInfo.otherJobPosition.value = v,
-                      updateStatus: controller.getUpdateStatus(
-                        'OtherJobPosition',
-                      ),
-                    ),
-                  ),
-                  Obx(
-                    () => AppFormTextField(
-                      controller: controller.otherOccupationCtrl,
-                      label: LK.otherOccupationLabel.tr,
-                      maxLength: 100,
-                      onChanged: (v) =>
-                          controller.workInfo.otherOccupation.value = v,
-                      updateStatus: controller.getUpdateStatus(
-                        'OtherOccupation',
-                      ),
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.otherOccupationCtrl,
+                    label: LK.otherOccupationLabel.tr,
+                    maxLength: 200,
+                    onChanged: (v) =>
+                        controller.workInfo.otherOccupation.value = v,
+                    updateStatus: controller.getUpdateStatus(
+                      'OtherOccupation',
                     ),
                   ),
                 ),
@@ -1572,7 +1558,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: controller.companyNameCtrl,
                       label: LK.companyNameLabel.tr,
                       prefixIcon: const Icon(Icons.business),
-                      maxLength: 300,
+                      maxLength: 200,
                       onChanged: (v) => controller.companyName.value = v,
                       updateStatus: controller.getUpdateStatus('CompanyName'),
                     ),
@@ -1582,22 +1568,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: controller.businessNameCtrl,
                       label: LK.businessName.tr,
                       prefixIcon: const Icon(Icons.business_center),
-                      maxLength: 300,
+                      maxLength: 200,
                       onChanged: (v) => controller.businessName.value = v,
                       updateStatus: controller.getUpdateStatus('BusinessName'),
                     ),
-                  ),
-                ),
-                AppSpacing.vM,
-                Obx(
-                  () => AppFormTextField(
-                    controller: controller.monthlyIncomeCtrl,
-                    label: LK.monthlyIncomeLabel.tr,
-                    prefixIcon: const Icon(Icons.currency_rupee),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 8,
-                    updateStatus: controller.getUpdateStatus('MonthlyIncome'),
                   ),
                 ),
                 AppSpacing.vM,
@@ -1608,7 +1582,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     keyboardType: TextInputType.multiline,
                     maxLines: 5,
                     minLines: 3,
-                    maxLength: 500,
+                    maxLength: 600,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationDescription',
                     ),
@@ -2627,7 +2601,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       }
                     : null,
                 label: LK.qualificationLabel.tr,
-                isRequired: true,
                 updateStatus: (isHighest && !isNew)
                     ? controller.getUpdateStatus(
                         'EducationalQualificationId',
@@ -2653,140 +2626,152 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   : null,
             ),
             AppSpacing.vM,
-            _buildFieldPair(
-              AppFormTextField(
-                initialValue: edu.passingYear,
-                label: LK.passingYearLabel.tr,
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('YearOfPassing')
-                    : null,
-                hint: 'YYYY',
-                keyboardType: TextInputType.phone,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 4,
-                validator: (v) {
-                  if (v == null || v.isEmpty) return null;
-                  if (v.length != 4) {
-                    return 'Passing Year must be exactly 4 digits';
-                  }
-                  final year = int.tryParse(v);
-                  if (year != null) {
-                    final currentYear = DateTime.now().year;
-                    if (year > currentYear) {
-                      return 'Passing Year cannot be greater than the current year';
-                    }
-
-                    final dobStr = controller.dobCtrl.text;
-                    if (dobStr.isNotEmpty) {
-                      try {
-                        DateTime? dobDate;
-                        if (dobStr.contains('-') &&
-                            dobStr.split('-')[0].length == 2) {
-                          final parts = dobStr.split('-');
-                          dobDate = DateTime(
-                            int.parse(parts[2]),
-                            int.parse(parts[1]),
-                            int.parse(parts[0]),
-                          );
-                        } else {
-                          dobDate = DateTime.tryParse(dobStr);
-                        }
-
-                        if (dobDate != null && year < dobDate.year) {
-                          return 'Passing Year cannot be before year of birth';
-                        }
-                      } catch (_) {}
-                    }
-                  }
-                  return null;
-                },
-                readOnly: !isHighest,
-                onChanged: isHighest
-                    ? (v) {
-                        edu.passingYear = v;
-                        controller.educationList.refresh();
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.passingYear,
+                    label: LK.passingYearLabel.tr,
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('YearOfPassing')
+                        : null,
+                    hint: 'YYYY',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 4,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return null;
+                      if (v.length != 4) {
+                        return 'Passing Year must be exactly 4 digits';
                       }
-                    : null,
-              ),
-              AppFormTextField(
-                initialValue: edu.percentage,
-                label: LK.percentageLabel.tr,
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('Percentage')
-                    : null,
-                hint: '00',
-                suffixIcon: Padding(
-                  padding: EdgeInsets.only(top: 14.h, right: 16.w),
-                  child: Text(
-                    '%',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.grey,
-                    ),
+                      final year = int.tryParse(v);
+                      if (year != null) {
+                        final currentYear = DateTime.now().year;
+                        if (year > currentYear) {
+                          return 'Passing Year cannot be greater than the current year';
+                        }
+
+                        final dobStr = controller.dobCtrl.text;
+                        if (dobStr.isNotEmpty) {
+                          try {
+                            DateTime? dobDate;
+                            if (dobStr.contains('-') &&
+                                dobStr.split('-')[0].length == 2) {
+                              final parts = dobStr.split('-');
+                              dobDate = DateTime(
+                                int.parse(parts[2]),
+                                int.parse(parts[1]),
+                                int.parse(parts[0]),
+                              );
+                            } else {
+                              dobDate = DateTime.tryParse(dobStr);
+                            }
+
+                            if (dobDate != null && year < dobDate.year) {
+                              return 'Passing Year cannot be before year of birth';
+                            }
+                          } catch (_) {}
+                        }
+                      }
+                      return null;
+                    },
+                    readOnly: !isHighest,
+                    onChanged: isHighest
+                        ? (v) {
+                            edu.passingYear = v;
+                            controller.educationList.refresh();
+                          }
+                        : null,
                   ),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    if (newValue.text.isEmpty) return newValue;
-                    final numVal = double.tryParse(newValue.text);
-                    if (numVal != null && numVal > 100) return oldValue;
-                    return newValue;
-                  }),
-                ],
-                maxLength: 20,
-                validator: (v) {
-                  if (v != null && v.isNotEmpty) {
-                    final numVal = double.tryParse(v);
-                    if (numVal != null && numVal > 100) {
-                      return 'Cannot exceed 100';
-                    }
-                  }
-                  return null;
-                },
-                readOnly: !isHighest,
-                onChanged: isHighest
-                    ? (v) {
-                        edu.percentage = v;
-                        controller.educationList.refresh();
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.percentage,
+                    label: LK.percentageLabel.tr,
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Percentage')
+                        : null,
+                    hint: '00',
+                    suffixIcon: Padding(
+                      padding: EdgeInsets.only(top: 14.h, right: 16.w),
+                      child: Text(
+                        '%',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        if (newValue.text.isEmpty) return newValue;
+                        final numVal = double.tryParse(newValue.text);
+                        if (numVal != null && numVal > 100) return oldValue;
+                        return newValue;
+                      }),
+                    ],
+                    maxLength: 6,
+                    validator: (v) {
+                      if (v != null && v.isNotEmpty) {
+                        final numVal = double.tryParse(v);
+                        if (numVal != null && numVal > 100) {
+                          return 'Cannot exceed 100';
+                        }
                       }
-                    : null,
-              ),
+                      return null;
+                    },
+                    readOnly: !isHighest,
+                    onChanged: isHighest
+                        ? (v) {
+                            edu.percentage = v;
+                            controller.educationList.refresh();
+                          }
+                        : null,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: AppFormTextField(
+                    initialValue: edu.grade,
+                    label: 'Grade',
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Grade')
+                        : null,
+                    maxLength: 10,
+                    readOnly: !isHighest,
+                    onChanged: isHighest
+                        ? (v) {
+                            edu.grade = v;
+                            controller.educationList.refresh();
+                          }
+                        : null,
+                  ),
+                ),
+              ],
             ),
             AppSpacing.vM,
-            _buildFieldPair(
-              AppFormTextField(
-                initialValue: edu.grade,
-                label: 'Grade',
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('Grade')
-                    : null,
-                maxLength: 10,
-                readOnly: !isHighest,
-                onChanged: isHighest
-                    ? (v) {
-                        edu.grade = v;
-                        controller.educationList.refresh();
-                      }
-                    : null,
-              ),
-              AppFormTextField(
-                initialValue: edu.description,
-                label: 'Description',
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('Description')
-                    : null,
-                maxLength: 500,
-                readOnly: !isHighest,
-                onChanged: isHighest
-                    ? (v) {
-                        edu.description = v;
-                        controller.educationList.refresh();
-                      }
-                    : null,
-              ),
+            AppFormTextField(
+              initialValue: edu.description,
+              label: 'Description',
+              updateStatus: (isHighest && !isNew)
+                  ? controller.getUpdateStatus('Description')
+                  : null,
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
+              minLines: 3,
+              maxLength: 500,
+              readOnly: !isHighest,
+              onChanged: isHighest
+                  ? (v) {
+                      edu.description = v;
+                      controller.educationList.refresh();
+                    }
+                  : null,
             ),
             AppSpacing.vM,
             Column(

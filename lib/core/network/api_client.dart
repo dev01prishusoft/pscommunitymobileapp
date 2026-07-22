@@ -53,6 +53,7 @@ class ApiClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
+    Options? options,
   }) async {
     await _checkConnectivity();
     try {
@@ -61,7 +62,7 @@ class ApiClient {
         data: data,
         queryParameters: queryParameters,
         cancelToken: cancelToken,
-        options: Options(method: method),
+        options: (options ?? Options()).copyWith(method: method),
       );
     } catch (e) {
       throw NetworkExceptionMapper.map(e);
@@ -80,8 +81,9 @@ class ApiClient {
     String path, {
     dynamic data,
     CancelToken? cancelToken,
+    Options? options,
   }) {
-    return request(path, method: 'POST', data: data, cancelToken: cancelToken);
+    return request(path, method: 'POST', data: data, cancelToken: cancelToken, options: options);
   }
 
   Future<Response<dynamic>> put(
