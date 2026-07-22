@@ -240,8 +240,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 (originalValue is String && originalValue.isEmpty))) {
           return;
         }
-        formDataMap[key] =
-            (currentValue is String && currentValue.isEmpty) ? '""' : currentValue;
+        formDataMap[key] = (currentValue is String && currentValue.isEmpty)
+            ? '""'
+            : currentValue;
       }
     }
 
@@ -2056,7 +2057,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (formDataMap.isNotEmpty) {
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
 
-
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
@@ -2065,8 +2065,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   : '/api/v1/member/mobile/upsert',
               data: formData,
             );
-
-
 
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
@@ -2264,9 +2262,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           await Future<void>.delayed(const Duration(milliseconds: 1500));
           await Get.offAllNamed<void>(AppRouter.home);
         } catch (e) {
-          print('=== MEMBER UPDATE API ERROR ===');
-          print(e.toString());
-          print('===============================');
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
             if (e.message == 'No member changes found.') {
