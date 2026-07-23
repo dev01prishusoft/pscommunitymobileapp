@@ -1755,7 +1755,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               keyboardType: TextInputType.multiline,
               maxLines: 5,
               minLines: 3,
-              maxLength: 600,
+              maxLength: 500,
               onChanged: (v) {
                 edu.description = v;
                 controller.educationList.refresh();
@@ -1911,15 +1911,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 AppSpacing.vM,
-                Obx(
-                  () => AppFormTextField(
-                    controller: controller.personalInfo.monthlyIncomeCtrl,
-                    label: LK.monthlyIncomeLabel.tr,
-                    prefixIcon: const Icon(Icons.currency_rupee),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 8,
-                  ),
+                AppFormTextField(
+                  controller: controller.personalInfo.monthlyIncomeCtrl,
+                  label: LK.monthlyIncomeLabel.tr,
+                  prefixIcon: const Icon(Icons.currency_rupee),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 8,
                 ),
               ],
             ),
@@ -2065,7 +2063,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   keyboardType: TextInputType.multiline,
                   maxLines: 5,
                   minLines: 3,
-                  maxLength: 600,
+                  maxLength: 500,
                 ),
                 AppSpacing.vM,
                 Obx(

@@ -17,6 +17,9 @@ class NetworkExceptionMapper {
         case DioExceptionType.badResponse:
           final response = error.response;
           if (response != null) {
+            print('=== RAW API ERROR RESPONSE ===');
+            print(response.data);
+            print('==============================');
             final statusCode = response.statusCode;
             final parsedMessage = ApiErrorParser.parseMessage(response.data);
 

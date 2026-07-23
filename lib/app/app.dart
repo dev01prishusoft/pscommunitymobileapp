@@ -52,7 +52,11 @@ class PsCommunityApp extends StatelessWidget {
                 navigatorObservers: [AppRouter.routeObserver],
                 getPages: AppRouter.pages,
                 builder: (context, child) {
-                  return child ?? const SizedBox.shrink();
+                  return Localizations.override(
+                    context: context,
+                    locale: const Locale('en', 'US'),
+                    child: child ?? const SizedBox.shrink(),
+                  );
                 },
               ),
             ),
