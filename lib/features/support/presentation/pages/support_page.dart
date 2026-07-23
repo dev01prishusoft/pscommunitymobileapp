@@ -165,23 +165,10 @@ class SupportPage extends StatelessWidget {
                                       padding: const EdgeInsets.all(12),
                                       child: Row(
                                         children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: AppColors.primary.withValues(alpha: 0.1),
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                            child: CircleAvatar(
-                                              backgroundColor: Colors.transparent,
-                                              radius: 24,
-                                              child: MemberAvatar(
-                                                imageUrl: member.profileImage,
-                                                fallbackName: _getInitials(member.displayName),
-                                                radius: 24,
-                                              ),
-                                            ),
+                                          MemberAvatar(
+                                            imageUrl: member.profileImage,
+                                            fallbackName: _getInitials(member.displayName),
+                                            radius: 24,
                                           ),
                                           const SizedBox(width: 14),
                                           Expanded(

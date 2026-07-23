@@ -118,10 +118,6 @@ class _HeaderCard extends GetView<SamajController> {
                     offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  width: 2.5,
-                ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),

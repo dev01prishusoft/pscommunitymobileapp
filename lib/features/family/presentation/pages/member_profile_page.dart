@@ -151,18 +151,11 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(3.w),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary, width: 2.w),
-            ),
-            child: MemberAvatar(
-              imageUrl: member.profilePhotoFullUrl,
-              gender: member.gender,
-              fallbackName: member.fullName,
-              radius: 40.r,
-            ),
+          MemberAvatar(
+            imageUrl: member.profilePhotoFullUrl,
+            gender: member.gender,
+            fallbackName: member.fullName,
+            radius: 40.r,
           ),
           SizedBox(width: 20.w),
           Expanded(

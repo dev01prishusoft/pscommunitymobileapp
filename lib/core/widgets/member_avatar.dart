@@ -21,60 +21,42 @@ class MemberAvatar extends StatelessWidget {
     final fallbackNameStr = fallbackName?.trim() ?? '';
     final memCacheSize = (radius * 3).toInt();
 
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: CircleAvatar(
-          radius: radius,
-          backgroundColor: AppColors.white,
-          child: CachedImg(
-            url: imageUrl!,
-            memCacheHeight: memCacheSize,
-            memCacheWidth: memCacheSize,
-            placeholder: (context, url) =>
-                _buildFallback(fallbackNameStr, isLoading: true),
-            errorWidget: (context, url, error) =>
-                _buildFallback(fallbackNameStr),
-          ),
-        ),
-      );
-    }
-
-    return _buildFallback(fallbackNameStr);
-  }
-
-  Widget _buildFallback(String name, {bool isLoading = false}) {
-    if (isLoading) {
-      return CircularProgressIndicator();
-    }
-
-    if (name.isNotEmpty) {
-      final initials = _getInitials(name);
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: CircleAvatar(
-          radius: radius - 1,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.05),
-          child: Text(
-            initials,
-            style: AppTextStyles.labelLarge.copyWith(
-              color: AppColors.primary,
-              fontSize: radius * 0.8,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      );
-    }
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: CircleAvatar(
         radius: radius,
-        backgroundColor: AppColors.white,
-        child: Icon(Icons.person, color: AppColors.primary),
+        backgroundColor: AppColors.primary.withValues(alpha: 0.05),
+        child: _buildContent(fallbackNameStr, memCacheSize),
       ),
     );
+  }
+
+  Widget _buildContent(String name, int memCacheSize) {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedImg(
+        url: imageUrl!,
+        memCacheHeight: memCacheSize,
+        memCacheWidth: memCacheSize,
+        placeholder: (context, url) => const CircularProgressIndicator(),
+        errorWidget: (context, url, error) => _buildInitialsOrIcon(name),
+      );
+    }
+    return _buildInitialsOrIcon(name);
+  }
+
+  Widget _buildInitialsOrIcon(String name) {
+    if (name.isNotEmpty) {
+      final initials = _getInitials(name);
+      return Text(
+        initials,
+        style: AppTextStyles.labelLarge.copyWith(
+          color: AppColors.primary,
+          fontSize: radius * 0.8,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+    return Icon(Icons.person, color: AppColors.primary);
   }
 
   String _getInitials(String name) {
