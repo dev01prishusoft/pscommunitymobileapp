@@ -801,66 +801,78 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 28.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            controller.closeAdvancedFilters();
-                            if (controller.incomeError.value.isEmpty &&
-                                controller.ageError.value.isEmpty &&
-                                controller.heightError.value.isEmpty) {
-                              controller.applyFilters();
-                              Get.back<bool>(result: true);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: AppColors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                          ),
-                          child: Text(
-                            LK.applyFilters.tr,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => controller.clearFilters(),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: AppColors.grey.withValues(alpha: 0.4),
-                              width: 1.w,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            foregroundColor: AppColors.primary,
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                          ),
-                          child: Text(
-                            LK.clearAll.tr,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      controller.closeAdvancedFilters();
+                      if (controller.incomeError.value.isEmpty &&
+                          controller.ageError.value.isEmpty &&
+                          controller.heightError.value.isEmpty) {
+                        controller.applyFilters();
+                        Get.back<bool>(result: true);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                    ),
+                    child: Text(
+                      LK.applyFilters.tr,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => controller.clearFilters(),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: AppColors.grey.withValues(alpha: 0.4),
+                        width: 1.w,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      foregroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                    ),
+                    child: Text(
+                      LK.clearAll.tr,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
