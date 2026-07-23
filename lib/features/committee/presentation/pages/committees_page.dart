@@ -70,7 +70,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
             child: PaginatedListView<CommitteeNode, CommitteeController>(
               itemBuilder: (context, index, node) => CommitteeCard(node: node),
               separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 24.h),
             ),
           ),
         ],
