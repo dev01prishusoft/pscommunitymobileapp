@@ -46,49 +46,7 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: Obx(
-        () => _controller.memberDetailState.value == AppState.data
-            ? SafeArea(
-                child: Container(
-                  padding: EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: AppColors.grey.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: Offset(0, -5),
-                      ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () => Get.back<void>(),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 54),
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      LK.close.tr,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            : SizedBox.shrink(),
-      ),
+
     );
   }
 }

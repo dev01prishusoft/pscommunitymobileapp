@@ -309,12 +309,33 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                LK.memberDetails.tr,
-                style: AppTextStyles.titleLarge.copyWith(
-                  color: AppColors.secondary,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 40),
+                  Text(
+                    LK.memberDetails.tr,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: AppColors.secondary,
+                        size: 18.r,
+                      ),
+                    ),
+                    onPressed: () => Get.back<void>(),
+                  ),
+                ],
               ),
               SizedBox(height: 16.h),
               MemberAvatar(
