@@ -383,10 +383,6 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                             offset: const Offset(0, 2),
                           ),
                         ],
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          width: 2,
-                        ),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(100),

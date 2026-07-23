@@ -542,19 +542,10 @@ class _PaymentCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          width: 2,
-                        ),
-                      ),
-                      child: MemberAvatar(
-                        imageUrl: null,
-                        fallbackName: payment.title,
-                        radius: 22,
-                      ),
+                    MemberAvatar(
+                      imageUrl: null,
+                      fallbackName: payment.title,
+                      radius: 22,
                     ),
                     SizedBox(width: 14.w),
                     Expanded(

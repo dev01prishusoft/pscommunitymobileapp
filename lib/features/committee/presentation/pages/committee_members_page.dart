@@ -338,20 +338,10 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ],
               ),
               SizedBox(height: 16.h),
-              Container(
-                padding: EdgeInsets.all(4.r),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    width: 2.5,
-                  ),
-                ),
-                child: MemberAvatar(
-                  imageUrl: member.imageUrl,
-                  fallbackName: member.name,
-                  radius: 44.r,
-                ),
+              MemberAvatar(
+                imageUrl: member.imageUrl,
+                fallbackName: member.name,
+                radius: 44.r,
               ),
               SizedBox(height: 16.h),
               Text(
@@ -536,20 +526,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  width: 1.5,
-                ),
-              ),
-              child: MemberAvatar(
+              MemberAvatar(
                 imageUrl: member.imageUrl,
                 fallbackName: member.name,
                 radius: 20.r,
               ),
-            ),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(

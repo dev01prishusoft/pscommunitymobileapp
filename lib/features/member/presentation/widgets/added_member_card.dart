@@ -97,21 +97,11 @@ class AddedMemberCard extends StatelessWidget {
   }
 
   Widget _buildAvatarContainer() {
-    return Container(
-      padding: EdgeInsets.all(2.w),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.5.w,
-        ),
-      ),
-      child: MemberAvatar(
-        imageUrl: member.profilePhotoFullUrl,
-        gender: member.genderName,
-        fallbackName: member.fullName,
-        radius: 28.r,
-      ),
+    return MemberAvatar(
+      imageUrl: member.profilePhotoFullUrl,
+      gender: member.genderName,
+      fallbackName: member.fullName,
+      radius: 28.r,
     );
   }
 

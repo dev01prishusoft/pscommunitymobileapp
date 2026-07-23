@@ -411,19 +411,10 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
           padding: EdgeInsets.all(12.r),
           child: Row(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    width: 2,
-                  ),
-                ),
-                child: MemberAvatar(
-                  imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
-                  fallbackName: name,
-                  radius: 20.r,
-                ),
+              MemberAvatar(
+                imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+                fallbackName: name,
+                radius: 20.r,
               ),
               SizedBox(width: 14.w),
               Expanded(
