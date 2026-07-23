@@ -49,6 +49,7 @@ class PaymentItem {
     this.notes = '',
     this.isRecurring = false,
     this.planName = '',
+    this.memberImageUrl = '',
   });
 
   factory PaymentItem.fromJson(Map<String, dynamic> json) {
@@ -64,6 +65,7 @@ class PaymentItem {
       notes: json['notes'] as String? ?? '',
       isRecurring: json['isRecurring'] as bool? ?? false,
       planName: json['planName'] as String? ?? '',
+      memberImageUrl: json['memberImageUrl'] as String? ?? '',
     );
   }
   final int id;
@@ -77,4 +79,5 @@ class PaymentItem {
   final String notes;
   final bool isRecurring;
   final String planName;
+  final String memberImageUrl;
 }

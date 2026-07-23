@@ -543,7 +543,9 @@ class _PaymentCard extends StatelessWidget {
                 Row(
                   children: [
                     MemberAvatar(
-                      imageUrl: null,
+                      imageUrl: payment.memberImageUrl.isNotEmpty
+                          ? payment.memberImageUrl
+                          : null,
                       fallbackName: payment.title,
                       radius: 22,
                     ),
