@@ -10,15 +10,19 @@ class SupportController extends GetxController {
 
   final ApiClient _apiClient;
 
-  final RxBool isLoading = false.obs;
+  final RxBool isLoading = true.obs;
   final RxnString supportError = RxnString();
 
   final Rxn<SamajSupportTeam> supportData = Rxn<SamajSupportTeam>();
 
+  bool _isFirstFetch = true;
+
   Future<void> fetchCustomerSupportDetail() async {
-    if (isLoading.value) return;
+    if (isLoading.value && !_isFirstFetch) return;
+    _isFirstFetch = false;
 
     isLoading.value = true;
+    update();
     supportError.value = null;
 
     try {
@@ -33,6 +37,7 @@ class SupportController extends GetxController {
       supportError.value = e.toString();
     } finally {
       isLoading.value = false;
+      update();
     }
   }
 
