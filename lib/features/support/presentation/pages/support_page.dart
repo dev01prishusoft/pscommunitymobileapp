@@ -21,15 +21,6 @@ class SupportPage extends StatelessWidget {
       },
       builder: (controller) {
         final support = controller.supportData.value;
-
-        if (controller.isLoading.value) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -41,9 +32,11 @@ class SupportPage extends StatelessWidget {
           ),
           body: Container(
             color: AppColors.sfBackground,
-            child: support == null
-                ? const Center(child: Text('No Data Found'))
-                : SingleChildScrollView(
+            child: controller.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : support == null
+                    ? const Center(child: Text('No Data Found'))
+                    : SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     child: Column(
