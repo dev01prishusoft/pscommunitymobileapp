@@ -16,14 +16,29 @@ import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
-class DrawerUserController extends GetxController {
+class DrawerUserController extends GetxController with WidgetsBindingObserver {
   final Rx<Member?> member = Rx<Member?>(null);
   final RxBool isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     fetchUser();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (Get.context == null) return;
+      fetchUser();
+    }
   }
 
   Future<void> fetchUser() async {
