@@ -738,7 +738,7 @@ class _PaymentCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.autorenew_rounded,
                               size: 12,
                               color: AppColors.primary,

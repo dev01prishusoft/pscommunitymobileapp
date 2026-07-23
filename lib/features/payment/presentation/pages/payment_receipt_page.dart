@@ -451,8 +451,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       theme: pw.ThemeData.withFont(base: font, bold: boldFont),
     );
 
-    final primaryColor = PdfColor.fromInt(0xFF8F0500);
-    final secondaryColor = PdfColor.fromInt(0xFF4A0200);
+    final primaryColor = PdfColor.fromInt(AppColors.primary.value);
+    final secondaryColor = PdfColor.fromInt(AppColors.secondary.value);
     final lightGrey = PdfColor.fromInt(0xFFF9F9F9);
     final borderGrey = PdfColor.fromInt(0xFFE5E5E5);
 

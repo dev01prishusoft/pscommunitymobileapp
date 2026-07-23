@@ -146,7 +146,7 @@ class _HeaderCard extends GetView<SamajController> {
             return Text(
               samajName,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: AppColors.secondary,
@@ -243,7 +243,7 @@ class _AppLinkCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.copy_rounded,
                           size: 14,
                           color: AppColors.primary,
@@ -251,7 +251,7 @@ class _AppLinkCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           LK.copyLink.tr,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
@@ -407,7 +407,7 @@ class _QrCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.share_rounded,
                       size: 16,
                       color: AppColors.primary,
@@ -415,7 +415,7 @@ class _QrCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       LK.shareQR.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                         fontSize: 14,

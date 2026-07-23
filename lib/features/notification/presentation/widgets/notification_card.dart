@@ -135,7 +135,7 @@ class _NotificationCardState extends State<NotificationCard> {
           Container(
             width: 4.w,
             height: 4.w,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),

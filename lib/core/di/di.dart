@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
@@ -45,6 +47,12 @@ class DI {
         Get.put(secureStorage, permanent: true);
         final tokenManager = TokenManager(secureStorage);
         await tokenManager.bootstrap();
+        
+        AppColors.updateColors(
+          tokenManager.authState.value.primaryColor,
+          tokenManager.authState.value.secondaryColor,
+        );
+        
         Get.put(tokenManager, permanent: true);
 
         final connectivityPlugin = Connectivity();

@@ -44,7 +44,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [AppColors.primary, AppColors.secondary],
@@ -269,7 +269,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.qr_code_scanner_rounded,
                           color: AppColors.primary,
                           size: 20,

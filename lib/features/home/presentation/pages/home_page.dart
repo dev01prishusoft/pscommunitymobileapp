@@ -238,7 +238,7 @@ class _MenuCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.labelMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
+                        color: AppColors.primary,
                         height: 1.2,
                       ),
                     ),

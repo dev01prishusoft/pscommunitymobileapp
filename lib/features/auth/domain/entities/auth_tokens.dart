@@ -11,6 +11,8 @@ class AuthTokens {
     this.lastName,
     this.email,
     this.deviceUniqueId,
+    this.primaryColor,
+    this.secondaryColor,
   });
   final String accessToken;
   final String refreshToken;
@@ -23,4 +25,6 @@ class AuthTokens {
   final String? lastName;
   final String? email;
   final String? deviceUniqueId;
+  final String? primaryColor;
+  final String? secondaryColor;
 }

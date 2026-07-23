@@ -268,7 +268,7 @@ class MarriagePage extends GetView<MarriageController> {
             Divider(color: AppColors.grey.withValues(alpha: 0.1), height: 16.h),
             _buildSummaryCard2(
               icon: Iconsax.heart,
-              iconColor: AppColors.red,
+              iconColor: AppColors.primary,
               label: LK.lookingForMarriage.tr,
               widget: Obx(
                 () => SizedBox(
@@ -280,7 +280,7 @@ class MarriagePage extends GetView<MarriageController> {
                       onChanged: (val) {
                         controller.lookingForMarriage.value = val;
                       },
-                      activeThumbColor: AppColors.red,
+                      activeColor: AppColors.primary,
                     ),
                   ),
                 ),
