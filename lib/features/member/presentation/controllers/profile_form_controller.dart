@@ -1977,7 +1977,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
               personalInfo.monthlyIncomeCtrl.text,
             );
             formDataMap['OccupationDescription'] =
-                workInfo.occupationDescription.value;
+                workInfo.occupationDescription.value.length > 500
+                    ? workInfo.occupationDescription.value.substring(0, 500)
+                    : workInfo.occupationDescription.value;
 
             formDataMap['IsOwnLand'] = personalInfo.ownLand.value;
             formDataMap['IsOwnHouse'] = personalInfo.ownHouse.value;
@@ -1993,9 +1995,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
               workInfo.workAreaIdMap,
             );
             formDataMap['OccupationAddressLine1'] =
-                workInfo.workAddressLine1Ctrl.text;
+                workInfo.workAddressLine1Ctrl.text.length > 300
+                    ? workInfo.workAddressLine1Ctrl.text.substring(0, 300)
+                    : workInfo.workAddressLine1Ctrl.text;
             formDataMap['OccupationAddressLine2'] =
-                workInfo.workAddressLine2Ctrl.text;
+                workInfo.workAddressLine2Ctrl.text.length > 300
+                    ? workInfo.workAddressLine2Ctrl.text.substring(0, 300)
+                    : workInfo.workAddressLine2Ctrl.text;
             formDataMap['OccupationLandmark'] = workInfo.workLandmarkCtrl.text;
             formDataMap['OccupationPincode'] = workInfo.workPincodeCtrl.text;
 
