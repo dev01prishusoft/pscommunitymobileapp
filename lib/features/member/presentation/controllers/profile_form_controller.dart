@@ -489,8 +489,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     );
     addIfChanged(
       'MonthlyIncome',
-      normDouble(double.tryParse(personalInfo.monthlyIncome.value)),
-      normDouble(m.monthlyIncome?.toDouble()),
+      personalInfo.monthlyIncome.value.isEmpty
+          ? 0.0
+          : normDouble(double.tryParse(personalInfo.monthlyIncome.value)),
+      m.monthlyIncome == null ? 0.0 : normDouble(m.monthlyIncome?.toDouble()),
     );
     addIfChanged(
       'OccupationDescription',
@@ -1973,9 +1975,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 workInfo.otherJobPositionEnglish.value;
             formDataMap['CompanyName'] = workInfo.companyNameCtrl.text;
             formDataMap['BusinessName'] = workInfo.businessNameCtrl.text;
-            formDataMap['MonthlyIncome'] = double.tryParse(
-              personalInfo.monthlyIncomeCtrl.text,
-            );
+            final mIncome = personalInfo.monthlyIncomeCtrl.text;
+            formDataMap['MonthlyIncome'] =
+                mIncome.isEmpty ? 0 : (double.tryParse(mIncome) ?? 0);
             formDataMap['OccupationDescription'] =
                 workInfo.occupationDescription.value;
 
