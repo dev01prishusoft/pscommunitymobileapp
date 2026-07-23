@@ -1496,16 +1496,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       color: AppColors.grey,
                     ),
                   ),
-                  if (controller.showListErrors.value) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      LK.educationRequiredError.tr,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.red,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: _addEducationAndScroll,
