@@ -17,14 +17,13 @@ class NetworkExceptionMapper {
         case DioExceptionType.badResponse:
           final response = error.response;
           if (response != null) {
-            print('=== RAW API ERROR RESPONSE ===');
-            print(response.data);
-            print('==============================');
             final statusCode = response.statusCode;
             final parsedMessage = ApiErrorParser.parseMessage(response.data);
 
             if (statusCode == 401) {
-              return UnauthorizedFailure(parsedMessage ?? 'Unauthorized access');
+              return UnauthorizedFailure(
+                parsedMessage ?? 'Unauthorized access',
+              );
             } else if (statusCode == 403) {
               return ForbiddenFailure(parsedMessage ?? 'Access Forbidden');
             } else if (statusCode == 404) {
@@ -66,16 +65,20 @@ class NetworkExceptionMapper {
 class ApiErrorParser {
   static String? parseMessage(dynamic data) {
     if (data == null) return null;
-    
+
     if (data is String) {
       return data.isNotEmpty ? data : null;
     }
 
     if (data is Map<String, dynamic>) {
-      if (data.containsKey('message') && data['message'] != null && data['message'].toString().isNotEmpty) {
+      if (data.containsKey('message') &&
+          data['message'] != null &&
+          data['message'].toString().isNotEmpty) {
         return data['message'].toString();
       }
-      if (data.containsKey('detail') && data['detail'] != null && data['detail'].toString().isNotEmpty) {
+      if (data.containsKey('detail') &&
+          data['detail'] != null &&
+          data['detail'].toString().isNotEmpty) {
         return data['detail'].toString();
       }
       if (data.containsKey('errors') && data['errors'] is Map) {
@@ -89,7 +92,9 @@ class ApiErrorParser {
           }
         }
       }
-      if (data.containsKey('title') && data['title'] != null && data['title'].toString().isNotEmpty) {
+      if (data.containsKey('title') &&
+          data['title'] != null &&
+          data['title'].toString().isNotEmpty) {
         return data['title'].toString();
       }
     }
