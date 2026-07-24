@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -2278,82 +2279,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ),
           AppSpacing.vM,
           Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary,
-                        AppColors.primary.withValues(alpha: 0.4),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                Obx(() {
-                  final file = controller.profileImage.value;
-                  return Container(
-                    width: 112,
-                    height: 112,
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.white, width: 3),
-                      image: file != null
-                          ? DecorationImage(
-                              image: FileImage(file),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: file == null
-                        ? Icon(Icons.person, size: 56, color: AppColors.grey)
-                        : null,
-                  );
-                }),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.15),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: CircleAvatar(
-                      backgroundColor: AppColors.primary,
-                      radius: 18,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          size: 16,
-                          color: AppColors.white,
-                        ),
-                        onPressed: controller.pickProfilePhoto,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            child: Obx(() {
+              return AppImagePicker(
+                imageFile: controller.profileImage.value,
+                onPickImage: controller.pickProfilePhoto,
+              );
+            }),
           ),
           AppSpacing.vM,
         ],
