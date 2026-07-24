@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
@@ -383,21 +384,11 @@ class _PaymentsPageState extends State<PaymentsPage> {
   }
 
   Widget _buildPaidPaymentCard(PaidPaymentRequest req) {
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: 14),
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      elevation: 0.02,
+      border: Border.all(color: Colors.grey.shade200),
       child: Row(
         children: [
           Container(

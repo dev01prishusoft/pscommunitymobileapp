@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
@@ -239,36 +240,22 @@ class _FindMemberCard extends StatelessWidget {
       occupationText += ' @ ${member.businessName}';
     }
 
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      padding: EdgeInsets.all(10.w),
+      elevation: 0.02,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.15),
+        width: 1.w,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: InkWell(
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            Get.toNamed<void>(
-              AppRouter.memberProfile,
-              arguments: {'memberId': member.memberId},
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.all(10.w),
-            child: IntrinsicHeight(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      child: IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -372,9 +359,6 @@ class _FindMemberCard extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

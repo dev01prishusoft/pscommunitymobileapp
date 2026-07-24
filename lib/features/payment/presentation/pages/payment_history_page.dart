@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -518,21 +519,11 @@ class _PaymentCard extends StatelessWidget {
         ? DateFormat('dd/MM/yyyy hh:mm a').format(date)
         : payment.date;
 
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: 10),
       padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      elevation: 0.02,
+      border: Border.all(color: Colors.grey.shade200),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

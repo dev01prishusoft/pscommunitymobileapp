@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_sanstha.dart';
@@ -161,44 +162,26 @@ class _SansthaCardState extends State<_SansthaCard> {
     final initials = _getInitials(displayName);
     final hasDescription = displayDescription.isNotEmpty;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+    return AppCard(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: _isExpanded
-                ? AppColors.primary.withValues(alpha: 0.08)
-                : AppColors.black.withValues(alpha: 0.03),
-            blurRadius: _isExpanded ? 16 : 8,
-            offset: _isExpanded ? const Offset(0, 8) : const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-          color: _isExpanded
-              ? AppColors.primary.withValues(alpha: 0.25)
-              : AppColors.grey.shade100,
-          width: _isExpanded ? 1.5 : 1,
-        ),
+      padding: const EdgeInsets.all(16.0),
+      elevation: _isExpanded ? 0.08 : 0.03,
+      border: Border.all(
+        color: _isExpanded
+            ? AppColors.primary.withValues(alpha: 0.25)
+            : AppColors.grey.shade100,
+        width: _isExpanded ? 1.5 : 1,
       ),
-      child: Material(
-        color: AppColors.transparent,
-        child: InkWell(
-          onTap: hasDescription
-              ? () {
-                  setState(() {
-                    _isExpanded = !_isExpanded;
-                  });
-                }
-              : null,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      onTap: hasDescription
+          ? () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            }
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -349,9 +332,6 @@ class _SansthaCardState extends State<_SansthaCard> {
                   ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 }

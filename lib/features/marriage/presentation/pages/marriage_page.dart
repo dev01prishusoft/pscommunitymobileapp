@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -223,19 +224,16 @@ class MarriagePage extends GetView<MarriageController> {
   }
 
   Widget _buildFilterControlsCard() {
-    return Card(
+    return AppCard(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.2.w,
-        ),
+      borderRadius: 16.r,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.15),
+        width: 1.2.w,
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-        child: Column(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Obx(() {
@@ -280,7 +278,7 @@ class MarriagePage extends GetView<MarriageController> {
                       onChanged: (val) {
                         controller.lookingForMarriage.value = val;
                       },
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ),
                 ),
@@ -351,7 +349,6 @@ class MarriagePage extends GetView<MarriageController> {
             ),
           ],
         ),
-      ),
     );
   }
 }
@@ -363,37 +360,22 @@ class _MarriageMemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      elevation: 0.03,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.15),
+        width: 1.w,
       ),
-      child: Material(
-        color: AppColors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16.r),
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            Get.toNamed<void>(
-              AppRouter.memberProfile,
-              arguments: {'memberId': member.memberId},
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.all(14.w),
-            child: Row(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      padding: EdgeInsets.all(14.w),
+      child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MemberAvatar(
@@ -518,9 +500,6 @@ class _MarriageMemberCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 
