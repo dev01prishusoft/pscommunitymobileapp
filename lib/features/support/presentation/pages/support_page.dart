@@ -5,7 +5,6 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
 
@@ -26,7 +25,10 @@ class SupportPage extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               LK.support.tr,
-              style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+              ),
             ),
             elevation: 0,
             centerTitle: true,
@@ -36,10 +38,13 @@ class SupportPage extends StatelessWidget {
             child: controller.isLoading.value
                 ? const Center(child: CircularProgressIndicator())
                 : support == null
-                    ? const Center(child: Text('No Data Found'))
-                    : SingleChildScrollView(
+                ? const Center(child: Text('No Data Found'))
+                : SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -55,7 +60,9 @@ class SupportPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.25),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.25,
+                                ),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
@@ -82,11 +89,12 @@ class SupportPage extends StatelessWidget {
                                   children: [
                                     Text(
                                       LK.needHelp.tr,
-                                      style: AppTextStyles.displaySmall.copyWith(
-                                        color: Colors.white,
-                                        fontSize: 22.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: AppTextStyles.displaySmall
+                                          .copyWith(
+                                            color: Colors.white,
+                                            fontSize: 22.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -104,24 +112,16 @@ class SupportPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _contactCard(
-                                controller: controller,
-                                isWhatsApp: false,
-                                contactDetails: support.contactEmail ?? '-',
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Expanded(
-                              child: _contactCard(
-                                controller: controller,
-                                isWhatsApp: true,
-                                contactDetails: support.whatsAppNumber ?? '-',
-                              ),
-                            ),
-                          ],
+                        _contactCard(
+                          controller: controller,
+                          isWhatsApp: false,
+                          contactDetails: support.contactEmail ?? '-',
+                        ),
+                        SizedBox(height: 12.h),
+                        _contactCard(
+                          controller: controller,
+                          isWhatsApp: true,
+                          contactDetails: support.whatsAppNumber ?? '-',
                         ),
                         SizedBox(height: 28.h),
                         if (support.members.isNotEmpty) ...[
@@ -137,37 +137,66 @@ class SupportPage extends StatelessWidget {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: support.members.length,
-                            separatorBuilder: (context, index) => SizedBox(height: 10.h),
+                            separatorBuilder: (context, index) =>
+                                SizedBox(height: 10.h),
                             itemBuilder: (context, index) {
                               final member = support.members[index];
-                              return AppCard(
-                                elevation: 0.03,
-                                border: Border.all(color: Colors.grey.shade100),
-                                onTap: () {
-                                  Get.toNamed<void>(
-                                    AppRouter.memberProfile,
-                                    arguments: {'memberId': member.memberId},
-                                  );
-                                },
-                                padding: const EdgeInsets.all(12),
-                                child: Row(
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.03,
+                                      ),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                  border: Border.all(
+                                    color: Colors.grey.shade100,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.toNamed<void>(
+                                        AppRouter.memberProfile,
+                                        arguments: {
+                                          'memberId': member.memberId,
+                                        },
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
                                         children: [
                                           MemberAvatar(
                                             imageUrl: member.profileImage,
-                                            fallbackName: _getInitials(member.displayName),
+                                            fallbackName: _getInitials(
+                                              member.displayName,
+                                            ),
                                             radius: 24,
                                           ),
                                           const SizedBox(width: 14),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   member.displayName,
-                                                  style: AppTextStyles.titleMedium.copyWith(
-                                                    color: AppColors.secondary,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
+                                                  style: AppTextStyles
+                                                      .titleMedium
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors.secondary,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                      ),
                                                 ),
                                                 const SizedBox(height: 2),
                                                 Text(
@@ -188,7 +217,10 @@ class SupportPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                  );
+                                    ),
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         ],
@@ -206,17 +238,20 @@ class SupportPage extends StatelessWidget {
     required bool isWhatsApp,
     required String contactDetails,
   }) {
-    final Color themeColor = isWhatsApp ? const Color(0xFF25D366) : AppColors.primary;
+    final Color themeColor = isWhatsApp
+        ? const Color(0xFF25D366)
+        : AppColors.primary;
 
-    return AppCard(
-      color: themeColor.withValues(alpha: 0.05),
-      border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
-      onTap: contactDetails.isNotEmpty && contactDetails != '-'
-          ? () {
-              if (isWhatsApp) {
-                controller.openWhatsApp(contactDetails);
-              } else {
-                controller.openEmail(contactDetails);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: contactDetails.isNotEmpty && contactDetails != '-'
+            ? () {
+                if (isWhatsApp) {
+                  controller.openWhatsApp(contactDetails);
+                } else {
+                  controller.openEmail(contactDetails);
+                }
               }
             : null,
         borderRadius: BorderRadius.circular(16),
@@ -224,75 +259,76 @@ class SupportPage extends StatelessWidget {
           decoration: BoxDecoration(
             color: themeColor.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
+            border: Border.all(
+              color: themeColor.withValues(alpha: 0.25),
+              width: 1.5,
+            ),
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: themeColor.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isWhatsApp ? Icons.chat_bubble_rounded : Icons.mail_rounded,
-                        color: themeColor,
-                        size: 24,
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: themeColor,
-                      size: 16,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                      color: themeColor,
-                    ),
-                    maxLines: 1,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: themeColor.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isWhatsApp ? Icons.chat_bubble_rounded : Icons.mail_rounded,
+                    color: themeColor,
+                    size: 24,
                   ),
                 ),
-                const SizedBox(height: 6),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    contactDetails,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                    ),
-                    maxLines: 1,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: themeColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        contactDetails,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: themeColor,
+                  size: 16,
                 ),
               ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }
 
 String _getInitials(String name) {
   final cleanName = name.split('(').first.trim();
-  final parts = cleanName.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+  final parts = cleanName
+      .split(RegExp(r'\s+'))
+      .where((e) => e.isNotEmpty)
+      .toList();
   if (parts.isEmpty) return '';
   if (parts.length == 1) {
-    return parts.first.substring(0, parts.first.length >= 2 ? 2 : 1).toUpperCase();
+    return parts.first
+        .substring(0, parts.first.length >= 2 ? 2 : 1)
+        .toUpperCase();
   }
   return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
 }
