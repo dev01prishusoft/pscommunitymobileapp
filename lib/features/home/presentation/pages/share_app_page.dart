@@ -46,9 +46,7 @@ class ShareAppPage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _HeaderCard(),
-                  const SizedBox(height: 20),
-                  _AppLinkCard(ctrl: controller),
+                  _TopCombinedCard(shareCtrl: controller),
                   const SizedBox(height: 16),
                   _QrCard(ctrl: controller),
                   const SizedBox(height: 24),
@@ -94,7 +92,10 @@ BoxDecoration _cardDecoration({double radius = 20}) => BoxDecoration(
   border: Border.all(color: Colors.grey.shade100, width: 1),
 );
 
-class _HeaderCard extends GetView<SamajController> {
+class _TopCombinedCard extends GetView<SamajController> {
+  const _TopCombinedCard({required this.shareCtrl});
+  final ShareController shareCtrl;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -163,106 +164,98 @@ class _HeaderCard extends GetView<SamajController> {
               fontWeight: FontWeight.w500,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AppLinkCard extends StatelessWidget {
-  const _AppLinkCard({required this.ctrl});
-
-  final ShareController ctrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration(radius: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          
+          const SizedBox(height: 32),
+          
+          // App Link Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.link_rounded, color: AppColors.primary, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                LK.appLinkLabel.tr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
+              Row(
+                children: [
+                  Icon(Icons.link_rounded, color: AppColors.primary, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    LK.appLinkLabel.tr,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        shareCtrl.appLink,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: shareCtrl.copyLink,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.copy_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              LK.copyLink.tr,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    ctrl.appLink,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: ctrl.copyLink,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.copy_rounded,
-                          size: 14,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          LK.copyLink.tr,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
