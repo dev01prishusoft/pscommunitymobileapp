@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/entities/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
 enum LoginResult { success, requirePasswordReset, failure }
@@ -69,6 +70,11 @@ class LoginController extends GetxController with FormStateMixin {
     );
     
     if (result is Success<AuthTokens>) {
+      AppColors.updateColors(
+        result.data.primaryColor,
+        result.data.secondaryColor,
+      );
+      Get.changeTheme(AppTheme.light);
       await Get.find<SamajController>().fetchSamajDetail();
       return result.data.isDefaultPassword
           ? LoginResult.requirePasswordReset

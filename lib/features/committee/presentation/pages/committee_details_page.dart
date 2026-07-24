@@ -56,7 +56,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             padding: EdgeInsets.all(20.r),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.secondary, AppColors.primary],
+                colors: [AppColors.primary, AppColors.secondary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -306,23 +306,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
     String subtitle,
     int count,
   ) {
-    Color typeColor;
-    Color bgTint;
-
-    final subLower = subtitle.toLowerCase();
-    if (subLower.contains('head') || subLower.contains('leadership')) {
-      typeColor = AppColors.chart5;
-      bgTint = AppColors.chart5.withValues(alpha: 0.1);
-    } else if (subLower.contains('financial') || subLower.contains('finance')) {
-      typeColor = AppColors.green;
-      bgTint = AppColors.green.withValues(alpha: 0.1);
-    } else if (subLower.contains('admin')) {
-      typeColor = AppColors.blue;
-      bgTint = AppColors.blue.withValues(alpha: 0.1);
-    } else {
-      typeColor = AppColors.primary;
-      bgTint = AppColors.primary.withValues(alpha: 0.1);
-    }
+    Color typeColor = AppColors.primary;
+    Color bgTint = AppColors.primary.withValues(alpha: 0.1);
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),

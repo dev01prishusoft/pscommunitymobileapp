@@ -170,16 +170,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
   }
 
   Widget _buildOverviewCard() {
-    final initiatedCount =
-        controller.dashboard.value?.paidPayments
-            .where(
-              (p) =>
-                  p.status.toLowerCase() != 'success' &&
-                  p.status.toLowerCase() != 'completed' &&
-                  p.status.toLowerCase() != 'successful',
-            )
-            .length ??
-        0;
+
     final paidCount =
         controller.dashboard.value?.paidPayments
             .where(

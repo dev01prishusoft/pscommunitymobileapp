@@ -99,7 +99,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: isFormLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(

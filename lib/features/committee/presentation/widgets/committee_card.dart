@@ -92,11 +92,9 @@ class CommitteeCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    color:
-                        (currentDepth == 0
-                                ? AppColors.primary
-                                : AppColors.secondary)
-                            .withValues(alpha: 0.08),
+                    color: AppColors.primary.withValues(
+                      alpha: currentDepth == 0 ? 0.08 : 0.04,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

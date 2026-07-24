@@ -1,15 +1,25 @@
 import 'dart:convert';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 
 class TokenPair {
-  TokenPair({this.accessToken, this.refreshToken, this.deviceUniqueId, this.isDefaultPassword = false});
+  TokenPair({
+    this.accessToken,
+    this.refreshToken,
+    this.deviceUniqueId,
+    this.isDefaultPassword = false,
+    this.primaryColor,
+    this.secondaryColor,
+  });
   final String? accessToken;
   final String? refreshToken;
   final String? deviceUniqueId;
   final bool isDefaultPassword;
+  final String? primaryColor;
+  final String? secondaryColor;
 }
 
 class TokenManager {
@@ -25,6 +35,8 @@ class TokenManager {
   static final _deviceUniqueKey = 'device_unique_id';
   static final _defaultPwdKey = 'is_default_pwd';
   static final _mobileKey = 'user_mobile';
+  static final _primaryColorKey = 'primary_color';
+  static final _secondaryColorKey = 'secondary_color';
 
   Future<void> bootstrap() async {
     try {
@@ -34,12 +46,16 @@ class TokenManager {
         _storage.read(_defaultPwdKey),
         _storage.read(_mobileKey),
         _storage.read(_deviceUniqueKey),
+        _storage.read(_primaryColorKey),
+        _storage.read(_secondaryColorKey),
       ]);
       authState.value = TokenPair(
         accessToken: results[0],
         refreshToken: results[1],
         isDefaultPassword: results[2] == 'true',
         deviceUniqueId: results[4],
+        primaryColor: results[5],
+        secondaryColor: results[6],
       );
       userPhoneRx.value = results[3] ?? '';
     } catch (e) {
@@ -48,7 +64,15 @@ class TokenManager {
     }
   }
 
-  Future<void> saveTokens(String access, String refresh, {bool isDefaultPassword = false, String? mobile, String? deviceUniqueId}) async {
+  Future<void> saveTokens(
+    String access,
+    String refresh, {
+    bool isDefaultPassword = false,
+    String? mobile,
+    String? deviceUniqueId,
+    String? primaryColor,
+    String? secondaryColor,
+  }) async {
     try {
       final futures = <Future<void>>[
         _storage.write(_accessKey, access),
@@ -62,6 +86,12 @@ class TokenManager {
       if (deviceUniqueId != null) {
         futures.add(_storage.write(_deviceUniqueKey, deviceUniqueId));
       }
+      if (primaryColor != null) {
+        futures.add(_storage.write(_primaryColorKey, primaryColor));
+      }
+      if (secondaryColor != null) {
+        futures.add(_storage.write(_secondaryColorKey, secondaryColor));
+      }
       await Future.wait(futures);
 
       authState.value = TokenPair(
@@ -69,6 +99,8 @@ class TokenManager {
         refreshToken: refresh,
         isDefaultPassword: isDefaultPassword,
         deviceUniqueId: deviceUniqueId ?? authState.value.deviceUniqueId,
+        primaryColor: primaryColor ?? authState.value.primaryColor,
+        secondaryColor: secondaryColor ?? authState.value.secondaryColor,
       );
     } catch (e) {
       if (kDebugMode) {}
@@ -81,6 +113,9 @@ class TokenManager {
       await _storage.deleteAll();
       authState.value = TokenPair();
       userPhoneRx.value = '';
+      
+      AppColors.updateColors(null, null);
+      Get.changeTheme(AppTheme.light);
     } catch (e) {
       if (kDebugMode) {}
       rethrow;
@@ -98,6 +133,9 @@ class TokenManager {
       accessToken: authState.value.accessToken,
       refreshToken: authState.value.refreshToken,
       isDefaultPassword: false,
+      deviceUniqueId: authState.value.deviceUniqueId,
+      primaryColor: authState.value.primaryColor,
+      secondaryColor: authState.value.secondaryColor,
     );
   }
 

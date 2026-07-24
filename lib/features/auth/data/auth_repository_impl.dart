@@ -37,6 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
         isDefaultPassword: tokens.isDefaultPassword,
         mobile: mobile,
         deviceUniqueId: tokens.deviceUniqueId,
+        primaryColor: tokens.primaryColor,
+        secondaryColor: tokens.secondaryColor,
       );
       return Success(tokens);
     } else {
@@ -85,6 +87,8 @@ class AuthRepositoryImpl implements AuthRepository {
         isDefaultPassword: tokens.isDefaultPassword,
         mobile: mobile,
         deviceUniqueId: tokens.deviceUniqueId,
+        primaryColor: tokens.primaryColor,
+        secondaryColor: tokens.secondaryColor,
       );
       return Success(tokens);
     } else {
@@ -177,6 +181,8 @@ class AuthRepositoryImpl implements AuthRepository {
       lastName: authData['lastName']?.toString(),
       email: authData['email']?.toString(),
       deviceUniqueId: authData['deviceUniqueId']?.toString(),
+      primaryColor: authData['primaryColor']?.toString(),
+      secondaryColor: authData['secondaryColor']?.toString(),
     );
   }
 }

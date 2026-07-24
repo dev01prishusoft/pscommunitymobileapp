@@ -13,8 +13,36 @@ class AppColors {
   static const transparent = Colors.transparent;
   static Color red = Colors.red.shade900;
   static const orange = Color(0xFFFDBA13);
-  static const primary = Color(0xFF8F0500);
-  static const secondary = Color(0xFF4A0200);
+  static Color primary = const Color(0xFF8F0500);
+  static Color secondary = const Color(0xFF4A0200);
+
+  static const Color defaultPrimary = Color(0xFF8F0500);
+  static const Color defaultSecondary = Color(0xFF4A0200);
+
+  static void updateColors(String? primaryHex, String? secondaryHex) {
+    if (primaryHex != null && primaryHex.isNotEmpty) {
+      primary = _hexToColor(primaryHex) ?? defaultPrimary;
+    } else {
+      primary = defaultPrimary;
+    }
+
+    if (secondaryHex != null && secondaryHex.isNotEmpty) {
+      secondary = _hexToColor(secondaryHex) ?? defaultSecondary;
+    } else {
+      secondary = defaultSecondary;
+    }
+  }
+
+  static Color? _hexToColor(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) {
+      buffer.write('ff');
+    }
+    buffer.write(hexString.replaceFirst('#', ''));
+    final val = int.tryParse(buffer.toString(), radix: 16);
+    if (val == null) return null;
+    return Color(val);
+  }
   static const chart1 = Color(0xFF1AA3E8);
   static const chart2 = Color(0xFF3F6BB8);
   static const chart3 = Color(0xFF0F2444);
@@ -23,7 +51,7 @@ class AppColors {
 }
 
 class AppTheme {
-  static ThemeData light = ThemeData(
+  static ThemeData get light => ThemeData(
     useMaterial3: true,
     dividerColor: AppColors.grey,
     primaryColor: AppColors.primary,

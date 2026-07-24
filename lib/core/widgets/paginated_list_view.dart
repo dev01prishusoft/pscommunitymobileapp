@@ -30,7 +30,7 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isInitialLoading.value) {
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
@@ -136,7 +136,7 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
                   ),
                 ],
               )
-            : const CircularProgressIndicator(
+            : CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
       ),

@@ -160,7 +160,7 @@ class BankDetailsPage extends StatelessWidget {
                       color: AppColors.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.account_balance_rounded,
                       color: AppColors.primary,
                       size: 24,
@@ -246,7 +246,7 @@ class BankDetailsPage extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 4.w),
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward_rounded,
                               color: AppColors.primary,
                               size: 16,

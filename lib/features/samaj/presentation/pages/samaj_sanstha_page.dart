@@ -40,7 +40,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [AppColors.primary, AppColors.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -207,7 +207,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                       height: 48.h,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [AppColors.primary, AppColors.secondary],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -328,12 +328,12 @@ class _SansthaCardState extends State<_SansthaCard> {
                                     tapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
                                   ),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.copy_rounded,
                                     size: 14,
                                     color: AppColors.primary,
                                   ),
-                                  label: const Text(
+                                  label: Text(
                                     'Copy',
                                     style: TextStyle(
                                       fontSize: 11,
