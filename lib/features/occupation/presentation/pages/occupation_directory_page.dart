@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
@@ -231,36 +232,23 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   }
 
   Widget _buildOccupationCard(OccupationItem occ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.08),
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 10),
-          ),
-        ],
+    return AppCard(
+      borderRadius: 20.r,
+      padding: EdgeInsets.all(10.r),
+      elevation: 0.04,
+      border: Border.all(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        width: 1.w,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
-        child: InkWell(
-          onTap: () async {
-            FocusManager.instance.primaryFocus?.unfocus();
-            await Get.toNamed<void>(
-              AppRouter.occupationProfile,
-              arguments: {'occupationId': occ.id, 'occupationName': occ.name},
-            );
-            FocusManager.instance.primaryFocus?.unfocus();
-            _controller.loadOccupations(refresh: true);
-          },
-          child: Padding(
-            padding: EdgeInsets.all(10.r),
+      onTap: () async {
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Get.toNamed<void>(
+          AppRouter.occupationProfile,
+          arguments: {'occupationId': occ.id, 'occupationName': occ.name},
+        );
+        FocusManager.instance.primaryFocus?.unfocus();
+        _controller.loadOccupations(refresh: true);
+      },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -334,9 +322,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 

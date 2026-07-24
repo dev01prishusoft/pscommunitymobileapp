@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
@@ -131,22 +132,12 @@ class BankDetailsPage extends StatelessWidget {
   }
 
   Widget _buildBankCard(BuildContext context, SamajBankDetais bank) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
+    return AppCard(
+      borderRadius: 20,
+      padding: EdgeInsets.zero,
+      elevation: 0.04,
+      border: Border.all(color: Colors.grey.shade100),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -261,7 +252,6 @@ class BankDetailsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -339,31 +329,18 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
   Widget build(BuildContext context) {
     final hasDescription = widget.samaj.description.isNotEmpty;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: hasDescription
-            ? () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              }
-            : null,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-            border: Border.all(color: Colors.grey.shade100),
-          ),
+    return AppCard(
+      borderRadius: 20,
+      padding: const EdgeInsets.all(20),
+      elevation: 0.04,
+      border: Border.all(color: Colors.grey.shade100),
+      onTap: hasDescription
+          ? () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            }
+          : null,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -465,8 +442,6 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                 ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

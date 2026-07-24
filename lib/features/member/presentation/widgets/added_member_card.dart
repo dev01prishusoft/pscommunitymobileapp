@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
@@ -23,73 +24,59 @@ class AddedMemberCard extends StatelessWidget {
           arguments: {'memberId': member.memberId},
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.04),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        margin: EdgeInsets.zero,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.r),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.w),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildAvatarContainer(),
-                        SizedBox(width: 14.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      member.fullName,
-                                      style: AppTextStyles.titleMedium.copyWith(
-                                        color: AppColors.secondary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+      child: AppCard(
+        padding: EdgeInsets.zero,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildAvatarContainer(),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    member.fullName,
+                                    style: AppTextStyles.titleMedium.copyWith(
+                                      color: AppColors.secondary,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  if (member.approveStatus != null &&
-                                      member.approveStatus!.isNotEmpty) ...[
-                                    SizedBox(width: 8.w),
-                                    _buildStatusBadge(member.approveStatus!),
-                                  ],
+                                ),
+                                if (member.approveStatus != null &&
+                                    member.approveStatus!.isNotEmpty) ...[
+                                  SizedBox(width: 8.w),
+                                  _buildStatusBadge(member.approveStatus!),
                                 ],
-                              ),
-                              SizedBox(height: 6.h),
-                              _buildSubtitle(),
-                              _buildOccupation(),
-                              _buildLocation(),
-                            ],
-                          ),
+                              ],
+                            ),
+                            SizedBox(height: 6.h),
+                            _buildSubtitle(),
+                            _buildOccupation(),
+                            _buildLocation(),
+                          ],
                         ),
-                        SizedBox(width: 8.w),
-                        _buildCallButton(),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 8.w),
+                      _buildCallButton(),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
