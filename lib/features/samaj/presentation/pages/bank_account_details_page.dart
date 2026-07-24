@@ -374,11 +374,16 @@ class BankAccountDetailsPage extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: Text(
-              label,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                label,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
               ),
             ),
           ),
@@ -390,12 +395,18 @@ class BankAccountDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    value,
-                    textAlign: TextAlign.left,
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.w700,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.left,
+                      maxLines: 1,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ),

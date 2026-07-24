@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool isUpdateSheetOpen = false;
@@ -41,14 +42,10 @@ void showAppUpdateBottomSheet(
                   SizedBox(
                     height: 70,
                     width: 70,
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Icon(Icons.system_update_rounded),
-                      ),
+                    child: AppCard(
+                      borderRadius: 12,
+                      padding: EdgeInsets.zero,
+                      child: Center(child: Icon(Icons.system_update_rounded)),
                     ),
                   ),
                   SizedBox(width: 15),

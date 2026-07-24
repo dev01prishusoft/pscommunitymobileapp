@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
 
@@ -131,32 +132,17 @@ class SupportPage extends StatelessWidget {
                             separatorBuilder: (context, index) => SizedBox(height: 10.h),
                             itemBuilder: (context, index) {
                               final member = support.members[index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.03),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                  border: Border.all(color: Colors.grey.shade100),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Get.toNamed<void>(
-                                        AppRouter.memberProfile,
-                                        arguments: {'memberId': member.memberId},
-                                      );
-                                    },
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Row(
+                              return AppCard(
+                                elevation: 0.03,
+                                border: Border.all(color: Colors.grey.shade100),
+                                onTap: () {
+                                  Get.toNamed<void>(
+                                    AppRouter.memberProfile,
+                                    arguments: {'memberId': member.memberId},
+                                  );
+                                },
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
                                         children: [
                                           MemberAvatar(
                                             imageUrl: member.profileImage,
@@ -194,10 +180,7 @@ class SupportPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              );
+                                  );
                             },
                           ),
                         ],
@@ -217,28 +200,20 @@ class SupportPage extends StatelessWidget {
   }) {
     final Color themeColor = isWhatsApp ? const Color(0xFF25D366) : AppColors.primary;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: contactDetails.isNotEmpty && contactDetails != '-'
-            ? () {
-                if (isWhatsApp) {
-                  controller.openWhatsApp(contactDetails);
-                } else {
-                  controller.openEmail(contactDetails);
-                }
+    return AppCard(
+      color: themeColor.withValues(alpha: 0.05),
+      border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
+      onTap: contactDetails.isNotEmpty && contactDetails != '-'
+          ? () {
+              if (isWhatsApp) {
+                controller.openWhatsApp(contactDetails);
+              } else {
+                controller.openEmail(contactDetails);
               }
-            : null,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: themeColor.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+            }
+          : null,
+      padding: const EdgeInsets.all(16),
+      child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
@@ -283,9 +258,6 @@ class SupportPage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 }

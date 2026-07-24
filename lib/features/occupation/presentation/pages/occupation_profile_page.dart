@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -187,35 +188,21 @@ class _OccupationMemberCard extends StatelessWidget {
         member.gender.toLowerCase().contains('stri') ||
         member.gender.contains('સ્ત્રી');
 
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: 5.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.12),
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      elevation: 0.02,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.12),
+        width: 1.w,
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16.r),
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': member.memberId},
-          );
-        },
-        child: Padding(
-          padding: EdgeInsets.all(16.r),
-          child: Row(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               MemberAvatar(
@@ -310,8 +297,6 @@ class _OccupationMemberCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 
