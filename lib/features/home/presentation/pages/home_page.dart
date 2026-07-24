@@ -58,15 +58,22 @@ class _HomePageState extends State<HomePage> with RouteAware {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            AppSpacing.vL,
-            _HomeHeader(),
-            AppSpacing.vL,
-            Expanded(
-              child: _HomeMenuGrid(controller: Get.find<HomeController>()),
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            await Get.find<SamajController>().fetchAll();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                AppSpacing.vL,
+                _HomeHeader(),
+                AppSpacing.vL,
+                _HomeMenuGrid(controller: Get.find<HomeController>()),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -136,11 +143,9 @@ class _HomeMenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-        child: LayoutBuilder(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+      child: LayoutBuilder(
           builder: (context, constraints) {
             final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
               context,
@@ -163,7 +168,6 @@ class _HomeMenuGrid extends StatelessWidget {
             );
           },
         ),
-      ),
     );
   }
 }
