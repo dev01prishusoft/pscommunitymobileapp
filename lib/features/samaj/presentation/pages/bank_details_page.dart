@@ -388,13 +388,13 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                         borderRadius: BorderRadius.circular(100),
                         child: CachedImg(
                           url: widget.samaj.logoUrl,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                           placeholder: (_, __) => const Center(
                             child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                           errorWidget: (_, __, ___) => Image.asset(
                             'assets/images/prishusoft_logo.png',
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),

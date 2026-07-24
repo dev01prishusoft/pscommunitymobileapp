@@ -115,18 +115,18 @@ class AppDrawer extends StatelessWidget {
                     child: logoUrl != null && logoUrl.isNotEmpty
                         ? CachedImg(
                             url: logoUrl,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
                               'assets/images/prishusoft_logo.png',
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                             ),
                           )
                         : Image.asset(
                             'assets/images/prishusoft_logo.png',
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                           ),
                   ),
                 );
