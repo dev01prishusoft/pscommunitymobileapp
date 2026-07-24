@@ -2181,6 +2181,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: () => controller.fetchCurrentLocation(addr),
+                  icon: const Icon(Icons.my_location, size: 18),
+                  label: const Text('Use Current Location'),
+                ),
+              ],
+            ),
             AppSpacing.vS,
             Obx(() {
               final typeList = controller.contactInfo.addressTypeList;
@@ -2359,7 +2369,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               );
             }),
             AppSpacing.vM,
-            AppFormTextField(
+            Obx(() => AppFormTextField(
+              key: ValueKey('pincode_${index}_${controller.locationFetchTrigger.value}'),
               initialValue: addr.pincode,
               label: LK.pincode.tr,
               keyboardType: TextInputType.number,
@@ -2372,9 +2383,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 addr.pincode = v;
                 controller.addresses.refresh();
               },
-            ),
+            )),
             AppSpacing.vM,
-            AppFormTextField(
+            Obx(() => AppFormTextField(
+              key: ValueKey('line1_${index}_${controller.locationFetchTrigger.value}'),
               initialValue: addr.line1,
               label: LK.addressLine1.tr,
               isRequired: true,
@@ -2389,9 +2401,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 addr.line1 = v;
                 controller.addresses.refresh();
               },
-            ),
+            )),
             AppSpacing.vM,
-            AppFormTextField(
+            Obx(() => AppFormTextField(
+              key: ValueKey('line2_${index}_${controller.locationFetchTrigger.value}'),
               initialValue: addr.line2,
               label: LK.addressLine2.tr,
               isRequired: true,
@@ -2406,9 +2419,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 addr.line2 = v;
                 controller.addresses.refresh();
               },
-            ),
+            )),
             AppSpacing.vM,
-            AppFormTextField(
+            Obx(() => AppFormTextField(
+              key: ValueKey('landmark_${index}_${controller.locationFetchTrigger.value}'),
               initialValue: addr.landmark,
               label: LK.landmarkLabel.tr,
               maxLength: 200,
@@ -2419,7 +2433,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 addr.landmark = v;
                 controller.addresses.refresh();
               },
-            ),
+            )),
             AppSpacing.vM,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

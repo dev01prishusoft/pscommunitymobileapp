@@ -57,6 +57,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires access to your location to auto-populate your address details.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires access to your location to auto-populate your address details.</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>

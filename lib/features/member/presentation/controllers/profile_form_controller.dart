@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/errors/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/services/location_service.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
@@ -29,6 +30,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       <String, ProfileUpdateStatus>{}.obs;
   final TextEditingController editRequestCommentCtrl = TextEditingController();
   final RxString editRequestComment = ''.obs;
+  final RxInt locationFetchTrigger = 0.obs;
 
   late final PersonalInfoController personalInfo;
   late final ContactController contactInfo;
@@ -2304,6 +2306,118 @@ class ProfileFormController extends GetxController with FormStateMixin {
         builder: (context) => ToastCard(
           title: LK.errorValidation.tr,
           subtitle: LK.pleaseFillRequiredFields.tr,
+          isErrorMessage: true,
+        ),
+      ).show();
+    }
+  }
+
+  String _findBestMatch(Iterable<String> list, String? target) {
+    if (target == null || target.trim().isEmpty) return '';
+    final tNorm = target.trim().toLowerCase();
+    
+    // Exact match first
+    for (final s in list) {
+      if (s.trim().toLowerCase() == tNorm) return s;
+    }
+    // Contains match
+    for (final s in list) {
+      final sNorm = s.trim().toLowerCase();
+      if (sNorm.contains(tNorm) || tNorm.contains(sNorm)) return s;
+    }
+    return '';
+  }
+
+  Future<void> fetchCurrentLocation(AddressModel addr) async {
+    try {
+      final placemark = await LocationService.getCurrentPlacemark();
+      if (placemark != null) {
+        // Attempt to match state
+        final stateName = placemark.administrativeArea;
+        final matchedState = _findBestMatch(workStateList, stateName);
+
+        if (matchedState.isNotEmpty) {
+          addr.state = matchedState;
+          addr.district = '';
+          addr.taluka = '';
+          addr.area = '';
+
+          // Fetch districts for this state
+          final districts = await workInfo.getAddressDistrictsAsync(matchedState);
+          final districtName = (placemark.subAdministrativeArea?.isNotEmpty == true) 
+              ? placemark.subAdministrativeArea 
+              : placemark.locality;
+          final matchedDistrict = _findBestMatch(districts, districtName);
+
+          if (matchedDistrict.isNotEmpty) {
+            addr.district = matchedDistrict;
+            
+            // Fetch talukas for this district
+            final talukas = await workInfo.getAddressTalukasAsync(matchedDistrict);
+            final talukaName = (placemark.subLocality?.isNotEmpty == true) 
+                ? placemark.subLocality 
+                : placemark.locality;
+            final matchedTaluka = _findBestMatch(talukas, talukaName);
+
+            if (matchedTaluka.isNotEmpty) {
+              addr.taluka = matchedTaluka;
+
+              // Fetch areas for this taluka
+              final areas = await workInfo.getAddressAreasAsync(matchedTaluka);
+              final areaName = (placemark.subLocality?.isNotEmpty == true) 
+                  ? placemark.subLocality 
+                  : placemark.thoroughfare;
+              final matchedArea = _findBestMatch(areas, areaName);
+
+              if (matchedArea.isNotEmpty) {
+                 addr.area = matchedArea;
+              }
+            }
+          }
+        }
+
+        addr.pincode = placemark.postalCode ?? '';
+        
+        final street = placemark.street ?? '';
+        final name = placemark.name ?? '';
+        
+        addr.line1 = street.isNotEmpty ? street : name;
+        
+        if (name.isNotEmpty && name != street && !street.contains(name)) {
+           addr.landmark = name;
+        } else if (placemark.thoroughfare?.isNotEmpty == true && placemark.thoroughfare != street) {
+           addr.landmark = placemark.thoroughfare!;
+        } else {
+           addr.landmark = '';
+        }
+
+        final subLocality = placemark.subLocality ?? '';
+        final locality = placemark.locality ?? '';
+        if (subLocality.isNotEmpty && locality.isNotEmpty && subLocality != locality) {
+           addr.line2 = '$subLocality, $locality';
+        } else if (locality.isNotEmpty) {
+           addr.line2 = locality;
+        } else if (subLocality.isNotEmpty) {
+           addr.line2 = subLocality;
+        }
+
+        locationFetchTrigger.value++;
+        contactInfo.addresses.refresh();
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 2),
+          builder: (context) => ToastCard(
+            title: LK.success.tr,
+            subtitle: 'Location fetched successfully.',
+            isErrorMessage: false,
+          ),
+        ).show();
+      }
+    } catch (e) {
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: LK.error.tr,
+          subtitle: e.toString(),
           isErrorMessage: true,
         ),
       ).show();

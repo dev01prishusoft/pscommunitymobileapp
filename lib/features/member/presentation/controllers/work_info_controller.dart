@@ -260,6 +260,22 @@ class WorkInfoController extends GetxController {
     return list;
   }
 
+  Future<RxList<String>> getAddressDistrictsAsync(String stateName) async {
+    if (stateName.isEmpty) return <String>[].obs;
+    if (!addressDistrictCache.containsKey(stateName)) {
+      addressDistrictCache[stateName] = <String>[].obs;
+    }
+    final list = addressDistrictCache[stateName]!;
+    if (!_fetchedStatesForDistricts.contains(stateName)) {
+      _fetchedStatesForDistricts.add(stateName);
+      final stateId = globalStateIdMap[stateName] ?? workStateIdMap[stateName];
+      if (stateId != null) {
+        await fetchDropdown('/district/dropdown?stateId=$stateId', list, [], idMap: globalDistrictIdMap, clearMap: false);
+      }
+    }
+    return list;
+  }
+
   final _fetchedDistrictsForTalukas = <String>{};
   RxList<String> getAddressTalukas(String districtName) {
     if (districtName.isEmpty) return <String>[].obs;
@@ -277,6 +293,22 @@ class WorkInfoController extends GetxController {
     return list;
   }
 
+  Future<RxList<String>> getAddressTalukasAsync(String districtName) async {
+    if (districtName.isEmpty) return <String>[].obs;
+    if (!addressTalukaCache.containsKey(districtName)) {
+      addressTalukaCache[districtName] = <String>[].obs;
+    }
+    final list = addressTalukaCache[districtName]!;
+    if (!_fetchedDistrictsForTalukas.contains(districtName)) {
+      _fetchedDistrictsForTalukas.add(districtName);
+      final districtId = globalDistrictIdMap[districtName] ?? workDistrictIdMap[districtName];
+      if (districtId != null) {
+        await fetchDropdown('/taluka/dropdown?districtId=$districtId', list, [], idMap: globalTalukaIdMap, clearMap: false);
+      }
+    }
+    return list;
+  }
+
   final _fetchedTalukasForAreas = <String>{};
   RxList<String> getAddressAreas(String talukaName) {
     if (talukaName.isEmpty) return <String>[].obs;
@@ -289,6 +321,22 @@ class WorkInfoController extends GetxController {
       final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
       if (talukaId != null) {
         fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap, clearMap: false);
+      }
+    }
+    return list;
+  }
+
+  Future<RxList<String>> getAddressAreasAsync(String talukaName) async {
+    if (talukaName.isEmpty) return <String>[].obs;
+    if (!addressAreaCache.containsKey(talukaName)) {
+      addressAreaCache[talukaName] = <String>[].obs;
+    }
+    final list = addressAreaCache[talukaName]!;
+    if (!_fetchedTalukasForAreas.contains(talukaName)) {
+      _fetchedTalukasForAreas.add(talukaName);
+      final talukaId = globalTalukaIdMap[talukaName] ?? workTalukaIdMap[talukaName];
+      if (talukaId != null) {
+        await fetchDropdown('/Area/dropdown?talukaId=$talukaId', list, [], idMap: globalAreaIdMap, clearMap: false);
       }
     }
     return list;
