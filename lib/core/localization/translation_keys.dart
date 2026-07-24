@@ -25,6 +25,7 @@ class LK {
   static String updatePassword = 'Update Password';
   static String passwordsDoNotMatch = 'Passwords do not match';
   static String error = 'Error';
+  static String enter = 'Enter';
   static String errorServer = 'Server Error';
   static String errorNoInternet = 'No Internet Connection';
   static String errorUnauthorized = 'Unauthorized';
@@ -766,6 +767,9 @@ class LK {
     mothersTaluka,
     mothersArea,
     mothersGotra,
+    entryPersonMobile,
+    error,
+    enter,
     excludeSameGotra,
     maritalStatusLabel,
     residenceLabel,
