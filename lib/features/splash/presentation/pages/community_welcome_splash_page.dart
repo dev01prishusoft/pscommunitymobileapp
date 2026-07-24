@@ -106,7 +106,7 @@ class _AnimatedLogo extends StatelessWidget {
         url: logoUrl,
         width: 300.w,
         memCacheWidth: 600,
-        fit: BoxFit.cover,
+        fit: BoxFit.contain,
         placeholder: (context, url) => SizedBox(
           width: 300.w,
           height: 100.h,

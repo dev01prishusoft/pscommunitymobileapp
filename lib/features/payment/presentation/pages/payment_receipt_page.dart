@@ -225,7 +225,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                 child: logoUrl != null && logoUrl.isNotEmpty
                                     ? CachedImg(
                                         url: logoUrl,
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                         placeholder: (_, __) => Center(
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
@@ -233,12 +233,12 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                         ),
                                         errorWidget: (_, __, ___) => Image.asset(
                                           'assets/images/prishusoft_logo.png',
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.contain,
                                         ),
                                       )
                                     : Image.asset(
                                         'assets/images/prishusoft_logo.png',
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                       ),
                               ),
                             ),
