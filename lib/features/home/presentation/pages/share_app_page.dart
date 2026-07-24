@@ -103,159 +103,123 @@ class _TopCombinedCard extends GetView<SamajController> {
       padding: const EdgeInsets.all(24),
       decoration: _cardDecoration(),
       child: Column(
+        spacing: 15.w,
         children: [
-          Obx(() {
-            final logoUrl = controller.samaj.value?.logoUrl;
-            return Container(
-              width: 76.w,
-              height: 76.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: logoUrl != null && logoUrl.isNotEmpty
-                    ? CachedImg(
-                        url: logoUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/prishusoft_logo.png',
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/images/prishusoft_logo.png',
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            );
-          }),
-          const SizedBox(height: 18),
-          Obx(() {
-            final samajName = controller.samaj.value?.name ?? LK.samajName.tr;
-            return Text(
-              samajName,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppColors.secondary,
-                letterSpacing: 0.2,
-              ),
-            );
-          }),
-          const SizedBox(height: 6),
-          Text(
-            LK.joinCommunity.tr,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // App Link Section
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            spacing: 15.w,
             children: [
-              Row(
+              Obx(() {
+                final logoUrl = controller.samaj.value?.logoUrl;
+                return Container(
+                  width: 76.w,
+                  height: 76.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: logoUrl != null && logoUrl.isNotEmpty
+                        ? CachedImg(
+                            url: logoUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/prishusoft_logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/images/prishusoft_logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                );
+              }),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.link_rounded, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 8),
+                  Obx(() {
+                    final samajName =
+                        controller.samaj.value?.name ?? LK.samajName.tr;
+                    return Text(
+                      samajName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.secondary,
+                        letterSpacing: 0.2,
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 6),
                   Text(
-                    LK.appLinkLabel.tr,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
+                    LK.joinCommunity.tr,
+                    style: TextStyle(
                       fontSize: 14,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        shareCtrl.appLink,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: shareCtrl.copyLink,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.copy_rounded,
-                              size: 14,
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              LK.copyLink.tr,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    shareCtrl.appLink,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                InkWell(
+                  onTap: shareCtrl.copyLink,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.copy_rounded,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        LK.copyLink.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
