@@ -104,16 +104,24 @@ class SupportPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
-                        _contactCard(
-                          controller: controller,
-                          isWhatsApp: false,
-                          contactDetails: support.contactEmail ?? '-',
-                        ),
-                        SizedBox(height: 12.h),
-                        _contactCard(
-                          controller: controller,
-                          isWhatsApp: true,
-                          contactDetails: support.whatsAppNumber ?? '-',
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _contactCard(
+                                controller: controller,
+                                isWhatsApp: false,
+                                contactDetails: support.contactEmail ?? '-',
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: _contactCard(
+                                controller: controller,
+                                isWhatsApp: true,
+                                contactDetails: support.whatsAppNumber ?? '-',
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 28.h),
                         if (support.members.isNotEmpty) ...[
@@ -210,51 +218,68 @@ class SupportPage extends StatelessWidget {
               } else {
                 controller.openEmail(contactDetails);
               }
-            }
-          : null,
-      padding: const EdgeInsets.all(16),
-      child: Row(
+            : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: themeColor.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: themeColor.withValues(alpha: 0.25), width: 1.5),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: themeColor.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    isWhatsApp ? Icons.chat_bubble_rounded : Icons.mail_rounded,
-                    color: themeColor,
-                    size: 24,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: themeColor.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isWhatsApp ? Icons.chat_bubble_rounded : Icons.mail_rounded,
+                        color: themeColor,
+                        size: 24,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: themeColor,
+                      size: 16,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                      color: themeColor,
+                    ),
+                    maxLines: 1,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
-                          color: themeColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        contactDetails,
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 6),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    contactDetails,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: themeColor,
-                  size: 16,
                 ),
               ],
             ),
