@@ -46,7 +46,7 @@ class ShareAppPage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _TopCombinedCard(shareCtrl: controller),
+                  _AppLinkCard(ctrl: controller),
                   const SizedBox(height: 16),
                   _QrCard(ctrl: controller),
                   const SizedBox(height: 24),
@@ -92,86 +92,7 @@ BoxDecoration _cardDecoration({double radius = 20}) => BoxDecoration(
   border: Border.all(color: Colors.grey.shade100, width: 1),
 );
 
-class _TopCombinedCard extends GetView<SamajController> {
-  const _TopCombinedCard({required this.shareCtrl});
-  final ShareController shareCtrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: _cardDecoration(),
-      child: Column(
-        spacing: 15.w,
-        children: [
-          Obx(() {
-            final logoUrl = controller.samaj.value?.logoUrl;
-            return Container(
-              width: 76.w,
-              height: 76.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: logoUrl != null && logoUrl.isNotEmpty
-                    ? CachedImg(
-                        url: logoUrl,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/prishusoft_logo.png',
-                          fit: BoxFit.contain,
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/images/prishusoft_logo.png',
-                        fit: BoxFit.contain,
-                      ),
-              ),
-            );
-          }),
-          const SizedBox(height: 18),
-          Obx(() {
-            final samajName = controller.samaj.value?.name ?? LK.samajName.tr;
-            return Text(
-              samajName,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppColors.secondary,
-                letterSpacing: 0.2,
-              ),
-            );
-          }),
-          const SizedBox(height: 6),
-          Text(
-            LK.joinCommunity.tr,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AppLinkCard extends StatelessWidget {
+class _AppLinkCard extends GetView<SamajController> {
   const _AppLinkCard({required this.ctrl});
 
   final ShareController ctrl;
@@ -183,6 +104,7 @@ class _AppLinkCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: _cardDecoration(radius: 16),
       child: Column(
+        spacing: 15.w,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -266,7 +188,7 @@ class _AppLinkCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    shareCtrl.appLink,
+                    ctrl.appLink,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -276,7 +198,7 @@ class _AppLinkCard extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: shareCtrl.copyLink,
+                  onTap: ctrl.copyLink,
                   borderRadius: BorderRadius.circular(8),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
