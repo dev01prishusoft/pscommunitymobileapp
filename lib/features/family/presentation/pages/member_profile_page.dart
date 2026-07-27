@@ -47,7 +47,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           ),
         ),
       ),
-
     );
   }
 }
@@ -142,18 +141,20 @@ class _ProfileHeader extends StatelessWidget {
                   style: AppTextStyles.titleLarge.copyWith(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   member.memberNo ?? '',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
                   ),
                 ),
-                if (member.jobPositionName != null && member.jobPositionName!.trim().isNotEmpty) ...[
+                if (member.jobPositionName != null &&
+                    member.jobPositionName!.trim().isNotEmpty) ...[
                   SizedBox(height: 8.h),
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -348,7 +349,7 @@ class _MemberDetailsSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -512,7 +513,7 @@ class _AssetLifeSection extends StatelessWidget {
                       Text(
                         label1,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey,
+                          color: AppColors.black,
                         ),
                       ),
                       const Spacer(),
@@ -543,7 +544,7 @@ class _AssetLifeSection extends StatelessWidget {
                 Text(
                   label2,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 const Spacer(),
@@ -649,7 +650,7 @@ class _SocialMediaSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -717,7 +718,7 @@ class _SectionContainer extends StatelessWidget {
                     title!,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
+                      color: AppColors.black,
                     ),
                   ),
                 ),
@@ -848,7 +849,7 @@ class _EducationSection extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           text: '$label: ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           children: [
             TextSpan(
               text: value,
@@ -869,7 +870,7 @@ class _EducationSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
         ),
         SizedBox(height: 2.h),
         Text(
@@ -955,7 +956,7 @@ class _OccupationSection extends StatelessWidget {
       children: [
         Text(
           label.replaceAll(':', ''),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
         ),
         SizedBox(height: 2.h),
         Text(
