@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,6 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
@@ -56,8 +56,53 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(LK.paymentHistory.tr),
+        title: Obx(() {
+          if (controller.isSearchVisible.value) {
+            return CupertinoTextField(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+              prefix: Icon(
+                Iconsax.search_normal_copy,
+                size: 15,
+              ).paddingOnly(left: 10),
+              suffix: GestureDetector(
+                onTap: () {
+                  _searchController.clear();
+                  controller.searchHistory('');
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                },
+                child: Icon(
+                  Iconsax.close_circle_copy,
+                  size: 20,
+                ).paddingOnly(right: 10),
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.grey.withValues(alpha: 0.5),
+                  width: 1.w,
+                ),
+              ),
+              placeholder: LK.searchHint.tr,
+              controller: _searchController,
+              onChanged: (val) => controller.searchHistory(val),
+            );
+          }
+          return Text(LK.paymentHistory.tr);
+        }),
         actions: [
+          Obx(() {
+            if (controller.isSearchVisible.value) {
+              return const SizedBox.shrink();
+            }
+
+            return IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                controller.isSearchVisible.value = true;
+              },
+            );
+          }),
           IconButton(
             icon: const Icon(Iconsax.filter_search_copy),
             tooltip: 'Filters',
@@ -84,61 +129,22 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 }
                 return false;
               },
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(14.w, 10.h, 14.w, 0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(14.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.04),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: AppTextField(
-                        hint: LK.searchHint.tr,
-                        controller: _searchController,
-                        icon: Iconsax.search_normal_copy,
-                        onChanged: (val) => controller.searchHistory(val),
-                        suffixIcon: Obx(() {
-                          return controller.historySearchQuery.value.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.close, color: AppColors.grey),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    controller.searchHistory('');
-                                  },
-                                )
-                              : const SizedBox.shrink();
-                        }),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                      itemCount:
-                          controller.payments.length +
-                          (controller.isLoadingMore.value ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == controller.payments.length) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Center(child: AppLoadingIndicator(size: 24)),
-                          );
-                        }
-                        final payment = controller.payments[index];
-                        return _PaymentCard(payment: payment);
-                      },
-                    ),
-                  ),
-                ],
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                itemCount:
+                    controller.payments.length +
+                    (controller.isLoadingMore.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == controller.payments.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Center(child: AppLoadingIndicator(size: 24)),
+                    );
+                  }
+                  final payment = controller.payments[index];
+                  return _PaymentCard(payment: payment);
+                },
               ),
             ),
           ),
@@ -432,7 +438,10 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                       onPressed: _resetFilters,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.grey.shade700,
-                        side: BorderSide(color: AppColors.grey.shade400, width: 1),
+                        side: BorderSide(
+                          color: AppColors.grey.shade400,
+                          width: 1,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),

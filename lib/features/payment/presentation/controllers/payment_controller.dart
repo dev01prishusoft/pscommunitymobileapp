@@ -29,7 +29,7 @@ class PaymentController extends GetxController {
   final Rxn<PaymentMode> selectedMode = Rxn<PaymentMode>();
   final Rxn<PaymentCategory> selectedCategory = Rxn<PaymentCategory>();
   final RxDouble enteredAmount = 0.0.obs;
-
+  final RxBool isSearchVisible = false.obs;
   bool get isAmountFixed => selectedCategory.value?.isAmountFixed ?? false;
 
   final RxBool isProcessingPayment = false.obs;
@@ -50,10 +50,10 @@ class PaymentController extends GetxController {
     final query = dashboardSearchQuery.value.toLowerCase().trim();
     final allPayments = dashboard.value?.paidPayments ?? [];
     if (query.isEmpty) return allPayments;
-    
+
     return allPayments.where((p) {
       return p.title.toLowerCase().contains(query) ||
-             p.memberName.toLowerCase().contains(query);
+          p.memberName.toLowerCase().contains(query);
     }).toList();
   }
 
@@ -374,12 +374,11 @@ class PaymentController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back<void>();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
-        builder: (context) =>
-            ToastCard(
-              title: LK.error.tr,
-              subtitle: LK.verificationFailed.tr,
-              isErrorMessage: true,
-            ),
+        builder: (context) => ToastCard(
+          title: LK.error.tr,
+          subtitle: LK.verificationFailed.tr,
+          isErrorMessage: true,
+        ),
       ).show();
     } finally {
       isProcessingPayment.value = false;
