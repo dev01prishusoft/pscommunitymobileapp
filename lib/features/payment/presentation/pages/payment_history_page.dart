@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -25,6 +27,13 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   final controller = Get.find<PaymentController>();
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -48,8 +57,53 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(LK.paymentHistory.tr),
+        title: Obx(() {
+          if (controller.isSearchVisible.value) {
+            return CupertinoTextField(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+              prefix: Icon(
+                Iconsax.search_normal_copy,
+                size: 15,
+              ).paddingOnly(left: 10),
+              suffix: GestureDetector(
+                onTap: () {
+                  _searchController.clear();
+                  controller.searchHistory('');
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                },
+                child: Icon(
+                  Iconsax.close_circle_copy,
+                  size: 20,
+                ).paddingOnly(right: 10),
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.grey.withValues(alpha: 0.5),
+                  width: 1.w,
+                ),
+              ),
+              placeholder: LK.searchHint.tr,
+              controller: _searchController,
+              onChanged: (val) => controller.searchHistory(val),
+            );
+          }
+          return Text(LK.paymentHistory.tr);
+        }),
         actions: [
+          Obx(() {
+            if (controller.isSearchVisible.value) {
+              return const SizedBox.shrink();
+            }
+
+            return IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                controller.isSearchVisible.value = true;
+              },
+            );
+          }),
           IconButton(
             icon: const Icon(Iconsax.filter_search_copy),
             tooltip: 'Filters',
@@ -385,7 +439,10 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                       onPressed: _resetFilters,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.grey.shade700,
-                        side: BorderSide(color: AppColors.grey.shade400, width: 1),
+                        side: BorderSide(
+                          color: AppColors.grey.shade400,
+                          width: 1,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
