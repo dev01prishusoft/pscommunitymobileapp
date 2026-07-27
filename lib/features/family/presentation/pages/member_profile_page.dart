@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -109,11 +110,27 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          MemberAvatar(
-            imageUrl: member.profilePhotoFullUrl,
-            gender: member.gender,
-            fallbackName: member.fullName,
-            radius: 40.r,
+          GestureDetector(
+            onTap: () {
+              if (member.profilePhotoFullUrl != null &&
+                  member.profilePhotoFullUrl!.isNotEmpty) {
+                Get.to(
+                  () => FullScreenImageViewer(
+                    imageUrl: member.profilePhotoFullUrl!,
+                    heroTag: 'profile_image_${member.memberId}',
+                  ),
+                );
+              }
+            },
+            child: Hero(
+              tag: 'profile_image_${member.memberId}',
+              child: MemberAvatar(
+                imageUrl: member.profilePhotoFullUrl,
+                gender: member.gender,
+                fallbackName: member.fullName,
+                radius: 40.r,
+              ),
+            ),
           ),
           SizedBox(width: 20.w),
           Expanded(

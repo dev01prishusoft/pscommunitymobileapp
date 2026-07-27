@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -338,10 +339,25 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ],
               ),
               SizedBox(height: 16.h),
-              MemberAvatar(
-                imageUrl: member.imageUrl,
-                fallbackName: member.name,
-                radius: 44.r,
+              GestureDetector(
+                onTap: () {
+                  if (member.imageUrl != null && member.imageUrl!.isNotEmpty) {
+                    Get.to(
+                      () => FullScreenImageViewer(
+                        imageUrl: member.imageUrl!,
+                        heroTag: 'committee_member_${member.hashCode}',
+                      ),
+                    );
+                  }
+                },
+                child: Hero(
+                  tag: 'committee_member_${member.hashCode}',
+                  child: MemberAvatar(
+                    imageUrl: member.imageUrl,
+                    fallbackName: member.name,
+                    radius: 44.r,
+                  ),
+                ),
               ),
               SizedBox(height: 16.h),
               Text(
