@@ -13,6 +13,7 @@ import 'package:pscommunitymobileapp/core/services/location_service.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/education_model.dart';
@@ -21,6 +22,9 @@ import 'package:pscommunitymobileapp/features/member/domain/entities/profile_upd
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/work_info_controller.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
@@ -32,6 +36,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final TextEditingController editRequestCommentCtrl = TextEditingController();
   final RxString editRequestComment = ''.obs;
   final RxInt locationFetchTrigger = 0.obs;
+  final RxBool isFetchingLocation = false.obs;
 
   late final PersonalInfoController personalInfo;
   late final ContactController contactInfo;
@@ -597,7 +602,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
         if (qualId != initialQualId && qualId != 0)
           formDataMap['EducationalQualificationId'] = qualId;
 
-        void addEdu(String key, String current, String? initial, {bool isNumber = false}) {
+        void addEdu(
+          String key,
+          String current,
+          String? initial, {
+          bool isNumber = false,
+        }) {
           if (current != (initial ?? '')) {
             if (current.isEmpty) {
               formDataMap[key] = isNumber ? 0 : '""';
@@ -1979,12 +1989,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['CompanyName'] = workInfo.companyNameCtrl.text;
             formDataMap['BusinessName'] = workInfo.businessNameCtrl.text;
             final mIncome = personalInfo.monthlyIncomeCtrl.text;
-            formDataMap['MonthlyIncome'] =
-                mIncome.isEmpty ? 0 : (double.tryParse(mIncome) ?? 0);
+            formDataMap['MonthlyIncome'] = mIncome.isEmpty
+                ? 0
+                : (double.tryParse(mIncome) ?? 0);
             formDataMap['OccupationDescription'] =
                 workInfo.occupationDescription.value.length > 500
-                    ? workInfo.occupationDescription.value.substring(0, 500)
-                    : workInfo.occupationDescription.value;
+                ? workInfo.occupationDescription.value.substring(0, 500)
+                : workInfo.occupationDescription.value;
 
             formDataMap['IsOwnLand'] = personalInfo.ownLand.value;
             formDataMap['IsOwnHouse'] = personalInfo.ownHouse.value;
@@ -2001,12 +2012,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
             );
             formDataMap['OccupationAddressLine1'] =
                 workInfo.workAddressLine1Ctrl.text.length > 300
-                    ? workInfo.workAddressLine1Ctrl.text.substring(0, 300)
-                    : workInfo.workAddressLine1Ctrl.text;
+                ? workInfo.workAddressLine1Ctrl.text.substring(0, 300)
+                : workInfo.workAddressLine1Ctrl.text;
             formDataMap['OccupationAddressLine2'] =
                 workInfo.workAddressLine2Ctrl.text.length > 300
-                    ? workInfo.workAddressLine2Ctrl.text.substring(0, 300)
-                    : workInfo.workAddressLine2Ctrl.text;
+                ? workInfo.workAddressLine2Ctrl.text.substring(0, 300)
+                : workInfo.workAddressLine2Ctrl.text;
             formDataMap['OccupationLandmark'] = workInfo.workLandmarkCtrl.text;
             formDataMap['OccupationPincode'] = workInfo.workPincodeCtrl.text;
 
@@ -2072,7 +2083,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (formDataMap.isNotEmpty) {
             formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
 
-
             final formData = dio.FormData.fromMap(formDataMap);
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
@@ -2081,8 +2091,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   : '/api/v1/member/mobile/upsert',
               data: formData,
             );
-
-
 
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
@@ -2316,7 +2324,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   String _findBestMatch(Iterable<String> list, String? target) {
     if (target == null || target.trim().isEmpty) return '';
     final tNorm = target.trim().toLowerCase();
-    
+
     // Exact match first
     for (final s in list) {
       if (s.trim().toLowerCase() == tNorm) return s;
@@ -2331,6 +2339,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
   Future<void> fetchCurrentLocation(AddressModel addr) async {
     try {
+      isFetchingLocation.value = true;
       final placemark = await LocationService.getCurrentPlacemark();
       if (placemark != null) {
         // Attempt to match state
@@ -2344,19 +2353,24 @@ class ProfileFormController extends GetxController with FormStateMixin {
           addr.area = '';
 
           // Fetch districts for this state
-          final districts = await workInfo.getAddressDistrictsAsync(matchedState);
-          final districtName = (placemark.subAdministrativeArea?.isNotEmpty == true) 
-              ? placemark.subAdministrativeArea 
+          final districts = await workInfo.getAddressDistrictsAsync(
+            matchedState,
+          );
+          final districtName =
+              (placemark.subAdministrativeArea?.isNotEmpty == true)
+              ? placemark.subAdministrativeArea
               : placemark.locality;
           final matchedDistrict = _findBestMatch(districts, districtName);
 
           if (matchedDistrict.isNotEmpty) {
             addr.district = matchedDistrict;
-            
+
             // Fetch talukas for this district
-            final talukas = await workInfo.getAddressTalukasAsync(matchedDistrict);
-            final talukaName = (placemark.subLocality?.isNotEmpty == true) 
-                ? placemark.subLocality 
+            final talukas = await workInfo.getAddressTalukasAsync(
+              matchedDistrict,
+            );
+            final talukaName = (placemark.subLocality?.isNotEmpty == true)
+                ? placemark.subLocality
                 : placemark.locality;
             final matchedTaluka = _findBestMatch(talukas, talukaName);
 
@@ -2365,41 +2379,44 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
               // Fetch areas for this taluka
               final areas = await workInfo.getAddressAreasAsync(matchedTaluka);
-              final areaName = (placemark.subLocality?.isNotEmpty == true) 
-                  ? placemark.subLocality 
+              final areaName = (placemark.subLocality?.isNotEmpty == true)
+                  ? placemark.subLocality
                   : placemark.thoroughfare;
               final matchedArea = _findBestMatch(areas, areaName);
 
               if (matchedArea.isNotEmpty) {
-                 addr.area = matchedArea;
+                addr.area = matchedArea;
               }
             }
           }
         }
 
         addr.pincode = placemark.postalCode ?? '';
-        
+
         final street = placemark.street ?? '';
         final name = placemark.name ?? '';
-        
+
         addr.line1 = street.isNotEmpty ? street : name;
-        
+
         if (name.isNotEmpty && name != street && !street.contains(name)) {
-           addr.landmark = name;
-        } else if (placemark.thoroughfare?.isNotEmpty == true && placemark.thoroughfare != street) {
-           addr.landmark = placemark.thoroughfare!;
+          addr.landmark = name;
+        } else if (placemark.thoroughfare?.isNotEmpty == true &&
+            placemark.thoroughfare != street) {
+          addr.landmark = placemark.thoroughfare!;
         } else {
-           addr.landmark = '';
+          addr.landmark = '';
         }
 
         final subLocality = placemark.subLocality ?? '';
         final locality = placemark.locality ?? '';
-        if (subLocality.isNotEmpty && locality.isNotEmpty && subLocality != locality) {
-           addr.line2 = '$subLocality, $locality';
+        if (subLocality.isNotEmpty &&
+            locality.isNotEmpty &&
+            subLocality != locality) {
+          addr.line2 = '$subLocality, $locality';
         } else if (locality.isNotEmpty) {
-           addr.line2 = locality;
+          addr.line2 = locality;
         } else if (subLocality.isNotEmpty) {
-           addr.line2 = subLocality;
+          addr.line2 = subLocality;
         }
 
         locationFetchTrigger.value++;
@@ -2415,16 +2432,80 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     } catch (e) {
       if (e.toString().contains('permanently denied')) {
-        Get.defaultDialog(
-          title: 'Permission Denied',
-          middleText: 'Location permission is permanently denied. Please go to app settings to enable it so we can fetch your address.',
-          textConfirm: 'Go to Settings',
-          textCancel: 'Cancel',
-          confirmTextColor: Colors.white,
-          onConfirm: () async {
-            Get.back();
-            await Geolocator.openAppSettings();
-          },
+        Get.dialog<void>(
+          Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.red.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.location_off_rounded,
+                      color: AppColors.red,
+                      size: 40.w,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'Permission Denied',
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    'Location permission is permanently denied. Please go to app settings to enable it so we can fetch your address.',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.grey.shade700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Get.back<void>(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.grey.shade800,
+                            side: BorderSide(color: Colors.grey.shade300),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: AppTextStyles.titleMedium,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: AppPrimaryButton(
+                          onPressed: () async {
+                            Get.back<void>();
+                            await Geolocator.openAppSettings();
+                          },
+                          text: "Settings",
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       } else {
         PSDelightToastBar(
@@ -2436,6 +2517,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
           ),
         ).show();
       }
+    } finally {
+      isFetchingLocation.value = false;
     }
   }
 }
