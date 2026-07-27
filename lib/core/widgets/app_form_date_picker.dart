@@ -92,7 +92,7 @@ class AppFormDatePicker extends StatelessWidget {
           onTap: () => _selectDate(context),
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           decoration: InputDecoration(
-            hintText: hint,
+            hintText: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
             prefixIcon: Icon(Icons.calendar_today, size: 20, color: AppColors.grey),
           ),
           validator: (value) {
