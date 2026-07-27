@@ -569,8 +569,22 @@ class _SocialMediaSection extends StatelessWidget {
   final Member member;
   final FamilyController controller;
 
+  bool _hasValidUrl(String? url) {
+    if (url == null || url.trim().isEmpty) return false;
+    final lower = url.trim().toLowerCase();
+    if (lower == 'na' || lower == 'n/a' || lower == 'null') return false;
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_hasValidUrl(member.facebookUrl) &&
+        !_hasValidUrl(member.instagramUrl) &&
+        !_hasValidUrl(member.whatsappUrl) &&
+        !_hasValidUrl(member.twitterUrl)) {
+      return const SizedBox.shrink();
+    }
+
     return _SectionContainer(
       title: LK.socialMedia.tr,
       icon: Icons.share_outlined,
