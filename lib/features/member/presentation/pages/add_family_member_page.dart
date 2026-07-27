@@ -2079,6 +2079,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   onChanged: (v) =>
                       controller.workInfo.otherOccupation.value = v,
                 ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   AppFormTextField(
                     controller: controller.companyNameCtrl,
