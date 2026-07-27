@@ -396,7 +396,7 @@ class _MarriageMemberCard extends StatelessWidget {
                             child: Text(
                               member.name,
                               style: AppTextStyles.titleMedium.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

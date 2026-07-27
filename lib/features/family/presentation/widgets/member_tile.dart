@@ -52,7 +52,7 @@ class MemberTile extends StatelessWidget {
                             child: Text(
                               member.name,
                               style: AppTextStyles.labelLarge.copyWith(
-                                color: AppColors.secondary,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.w700,
                               ),
                               overflow: TextOverflow.ellipsis,
