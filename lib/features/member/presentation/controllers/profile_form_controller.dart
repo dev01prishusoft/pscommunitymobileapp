@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/services/location_service.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/address_model.dart';
@@ -2413,14 +2414,28 @@ class ProfileFormController extends GetxController with FormStateMixin {
         ).show();
       }
     } catch (e) {
-      PSDelightToastBar(
-        snackbarDuration: const Duration(seconds: 3),
-        builder: (context) => ToastCard(
-          title: LK.error.tr,
-          subtitle: e.toString(),
-          isErrorMessage: true,
-        ),
-      ).show();
+      if (e.toString().contains('permanently denied')) {
+        Get.defaultDialog(
+          title: 'Permission Denied',
+          middleText: 'Location permission is permanently denied. Please go to app settings to enable it so we can fetch your address.',
+          textConfirm: 'Go to Settings',
+          textCancel: 'Cancel',
+          confirmTextColor: Colors.white,
+          onConfirm: () async {
+            Get.back();
+            await Geolocator.openAppSettings();
+          },
+        );
+      } else {
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: e.toString(),
+            isErrorMessage: true,
+          ),
+        ).show();
+      }
     }
   }
 }
