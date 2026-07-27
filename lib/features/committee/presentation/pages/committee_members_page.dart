@@ -316,7 +316,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                   Text(
                     LK.memberDetails.tr,
                     style: AppTextStyles.titleLarge.copyWith(
-                      color: AppColors.secondary,
+                      color: AppColors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
