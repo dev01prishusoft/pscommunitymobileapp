@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -50,7 +51,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         title: Text(LK.paymentHistory.tr),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
+            icon: const Icon(Iconsax.filter_search_copy),
             tooltip: 'Filters',
             onPressed: () async {
               await Get.dialog<void>(
