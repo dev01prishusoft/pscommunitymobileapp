@@ -46,7 +46,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           ),
         ),
       ),
-
     );
   }
 }
@@ -132,11 +131,13 @@ class _ProfileHeader extends StatelessWidget {
                 Text(
                   member.memberNo ?? '',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
                   ),
                 ),
-                if (member.jobPositionName != null && member.jobPositionName!.trim().isNotEmpty) ...[
+                if (member.jobPositionName != null &&
+                    member.jobPositionName!.trim().isNotEmpty) ...[
                   SizedBox(height: 8.h),
                   Container(
                     padding: EdgeInsets.symmetric(
