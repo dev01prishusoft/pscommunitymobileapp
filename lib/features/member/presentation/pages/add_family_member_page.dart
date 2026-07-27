@@ -213,7 +213,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       height: 50.h,
                       onPressed: isLastStep
                           ? () {
-                              final isValid = _stepFormKeys[5].currentState?.validate() ?? false;
+                              final isValid =
+                                  _stepFormKeys[5].currentState?.validate() ??
+                                  false;
                               if (isValid) {
                                 controller.submitForm(
                                   successMessage: LK.memberAddedSuccessfully.tr,
@@ -1133,6 +1135,32 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     final fieldsWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Obx(() {
+              final isFetching = controller.isFetchingLocation.value;
+              return TextButton.icon(
+                onPressed: isFetching
+                    ? null
+                    : () => controller.fetchCurrentLocation(addr),
+                icon: isFetching
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : const Icon(Icons.my_location, size: 18),
+                label: Text(
+                  isFetching ? 'Fetching Address...' : 'Use Current Location',
+                ),
+              );
+            }),
+          ],
+        ),
         AppSpacing.vS,
         Obx(() {
           final typeList = controller.addressTypeList;
@@ -1280,54 +1308,74 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           );
         }),
         AppSpacing.vM,
-        AppFormTextField(
-          initialValue: addr.pincode,
-          label: LK.pincode.tr,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          maxLength: 6,
-          onChanged: (v) {
-            addr.pincode = v;
-            controller.addresses.refresh();
-          },
+        Obx(
+          () => AppFormTextField(
+            key: ValueKey(
+              'pincode_${index}_${controller.locationFetchTrigger.value}',
+            ),
+            initialValue: addr.pincode,
+            label: LK.pincode.tr,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            maxLength: 6,
+            onChanged: (v) {
+              addr.pincode = v;
+              controller.addresses.refresh();
+            },
+          ),
         ),
         AppSpacing.vM,
-        AppFormTextField(
-          initialValue: addr.line1,
-          label: LK.addressLine1.tr,
-          isRequired: true,
-          maxLength: 300,
-          keyboardType: TextInputType.multiline,
-          maxLines: 5,
-          minLines: 3,
-          onChanged: (v) {
-            addr.line1 = v;
-            controller.addresses.refresh();
-          },
+        Obx(
+          () => AppFormTextField(
+            key: ValueKey(
+              'line1_${index}_${controller.locationFetchTrigger.value}',
+            ),
+            initialValue: addr.line1,
+            label: LK.addressLine1.tr,
+            isRequired: true,
+            maxLength: 300,
+            keyboardType: TextInputType.multiline,
+            maxLines: 5,
+            minLines: 3,
+            onChanged: (v) {
+              addr.line1 = v;
+              controller.addresses.refresh();
+            },
+          ),
         ),
         AppSpacing.vM,
-        AppFormTextField(
-          initialValue: addr.line2,
-          label: LK.addressLine2.tr,
-          isRequired: true,
-          maxLength: 300,
-          keyboardType: TextInputType.multiline,
-          maxLines: 5,
-          minLines: 3,
-          onChanged: (v) {
-            addr.line2 = v;
-            controller.addresses.refresh();
-          },
+        Obx(
+          () => AppFormTextField(
+            key: ValueKey(
+              'line2_${index}_${controller.locationFetchTrigger.value}',
+            ),
+            initialValue: addr.line2,
+            label: LK.addressLine2.tr,
+            isRequired: true,
+            maxLength: 300,
+            keyboardType: TextInputType.multiline,
+            maxLines: 5,
+            minLines: 3,
+            onChanged: (v) {
+              addr.line2 = v;
+              controller.addresses.refresh();
+            },
+          ),
         ),
         AppSpacing.vM,
-        AppFormTextField(
-          initialValue: addr.landmark,
-          label: LK.landmarkLabel.tr,
-          maxLength: 200,
-          onChanged: (v) {
-            addr.landmark = v;
-            controller.addresses.refresh();
-          },
+        Obx(
+          () => AppFormTextField(
+            key: ValueKey(
+              'landmark_${index}_${controller.locationFetchTrigger.value}',
+            ),
+            initialValue: addr.landmark,
+            label: LK.landmarkLabel.tr,
+            maxLength: 200,
+            onChanged: (v) {
+              addr.landmark = v;
+              controller.addresses.refresh();
+            },
+          ),
         ),
         AppSpacing.vM,
         InkWell(
