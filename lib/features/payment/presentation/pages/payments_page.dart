@@ -3,11 +3,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 
@@ -21,6 +23,7 @@ class PaymentsPage extends StatefulWidget {
 class _PaymentsPageState extends State<PaymentsPage> {
   final controller = Get.find<PaymentController>();
   late final ScrollController _scrollController;
+  final TextEditingController _searchController = TextEditingController();
   bool _isVisible = true;
 
   @override
@@ -34,6 +37,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -75,6 +79,37 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(14.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.black.withValues(alpha: 0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: AppTextField(
+                        hint: LK.searchHint.tr,
+                        controller: _searchController,
+                        icon: Iconsax.search_normal_copy,
+                        onChanged: (val) => controller.searchDashboard(val),
+                        suffixIcon: Obx(() {
+                          return controller.dashboardSearchQuery.value.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close, color: AppColors.grey),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    controller.searchDashboard('');
+                                  },
+                                )
+                              : const SizedBox.shrink();
+                        }),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
                     _buildOverviewCard(),
                     SizedBox(height: 20.h),
                     if (controller.dashboard.value?.paidPayments.isNotEmpty ??
@@ -84,7 +119,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                         subtitle: '(${LK.adminSent.tr})',
                       ),
                       SizedBox(height: 12.h),
-                      ...controller.dashboard.value!.paidPayments.map(
+                      ...controller.filteredDashboardPayments.map(
                         (req) => _buildPaidPaymentCard(req),
                       ),
                     ],

@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_dashboard.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
+import 'package:pscommunitymobileapp/features/payment/domain/entities/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_mode.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/repositories/payment_repository.dart';
@@ -41,6 +42,20 @@ class PaymentController extends GetxController {
   final Rxn<PaymentType> historyFilterType = Rxn<PaymentType>();
   final RxList<PaymentCategory> historyCategories = <PaymentCategory>[].obs;
   final Rxn<PaymentCategory> historyFilterCategory = Rxn<PaymentCategory>();
+  final RxString historySearchQuery = ''.obs;
+  final RxString dashboardSearchQuery = ''.obs;
+  Timer? _searchDebouncer;
+
+  List<PaidPaymentRequest> get filteredDashboardPayments {
+    final query = dashboardSearchQuery.value.toLowerCase().trim();
+    final allPayments = dashboard.value?.paidPayments ?? [];
+    if (query.isEmpty) return allPayments;
+    
+    return allPayments.where((p) {
+      return p.title.toLowerCase().contains(query) ||
+             p.memberName.toLowerCase().contains(query);
+    }).toList();
+  }
 
   int _currentPage = 1;
   final int _pageSize = 20;
@@ -69,6 +84,7 @@ class PaymentController extends GetxController {
 
   @override
   void onClose() {
+    _searchDebouncer?.cancel();
     _razorpay.clear();
     super.onClose();
   }
@@ -406,6 +422,23 @@ class PaymentController extends GetxController {
     historyFilterType.value = null;
     historyFilterCategory.value = null;
     historyCategories.clear();
+    historySearchQuery.value = '';
+  }
+
+  void searchHistory(String query) {
+    historySearchQuery.value = query;
+    _searchDebouncer?.cancel();
+    _searchDebouncer = Timer(const Duration(milliseconds: 500), () {
+      loadHistory(
+        paymentTypeId: historyFilterType.value?.id,
+        year: int.tryParse(selectedYear.value),
+        status: selectedStatus.value?['name'] as String?,
+      );
+    });
+  }
+
+  void searchDashboard(String query) {
+    dashboardSearchQuery.value = query;
   }
 
   Future<void> fetchHistoryCategories(int typeId) async {
@@ -448,6 +481,7 @@ class PaymentController extends GetxController {
         categoryId: categoryId,
         year: year,
         status: status,
+        search: historySearchQuery.value,
       );
       if (result.isFailure) {
         historyState.value = AppState.error;
@@ -477,6 +511,7 @@ class PaymentController extends GetxController {
         paymentTypeId: historyFilterType.value?.id,
         year: int.tryParse(selectedYear.value),
         status: selectedStatus.value?['name'] as String?,
+        search: historySearchQuery.value,
       );
       if (result.isFailure) {
         _currentPage--;

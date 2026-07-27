@@ -3,12 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_category.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_item.dart';
@@ -24,6 +26,13 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   final controller = Get.find<PaymentController>();
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -50,7 +59,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         title: Text(LK.paymentHistory.tr),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
+            icon: const Icon(Iconsax.filter_search_copy),
             tooltip: 'Filters',
             onPressed: () async {
               await Get.dialog<void>(
@@ -75,22 +84,61 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 }
                 return false;
               },
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                itemCount:
-                    controller.payments.length +
-                    (controller.isLoadingMore.value ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == controller.payments.length) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Center(child: AppLoadingIndicator(size: 24)),
-                    );
-                  }
-                  final payment = controller.payments[index];
-                  return _PaymentCard(payment: payment);
-                },
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(14.w, 10.h, 14.w, 0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(14.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.black.withValues(alpha: 0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: AppTextField(
+                        hint: LK.searchHint.tr,
+                        controller: _searchController,
+                        icon: Iconsax.search_normal_copy,
+                        onChanged: (val) => controller.searchHistory(val),
+                        suffixIcon: Obx(() {
+                          return controller.historySearchQuery.value.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close, color: AppColors.grey),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    controller.searchHistory('');
+                                  },
+                                )
+                              : const SizedBox.shrink();
+                        }),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                      itemCount:
+                          controller.payments.length +
+                          (controller.isLoadingMore.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == controller.payments.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: AppLoadingIndicator(size: 24)),
+                          );
+                        }
+                        final payment = controller.payments[index];
+                        return _PaymentCard(payment: payment);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
