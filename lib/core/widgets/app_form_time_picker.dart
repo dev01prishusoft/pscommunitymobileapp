@@ -159,8 +159,14 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
           onTap: () => _selectTime(context),
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           decoration: InputDecoration(
-            hintText: widget.hint,
-            prefixIcon: Icon(Icons.access_time, size: 20, color: AppColors.grey),
+            hintText:
+                widget.hint ??
+                '${LK.enter.tr} ${widget.label.replaceAll('*', '').trim()}',
+            prefixIcon: Icon(
+              Icons.access_time,
+              size: 20,
+              color: AppColors.black,
+            ),
           ),
           validator: (value) {
             if (widget.isRequired && (value == null || value.trim().isEmpty)) {

@@ -96,6 +96,11 @@ class AppTheme {
       fillColor: AppColors.white,
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       errorMaxLines: 5,
+      hintStyle: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.grey,
+        overflow: TextOverflow.ellipsis,
+      ),
+      hintMaxLines: 1,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(
