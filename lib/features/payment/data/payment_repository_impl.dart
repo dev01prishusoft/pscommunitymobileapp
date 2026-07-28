@@ -213,6 +213,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     int? categoryId,
     int? year,
     String? status,
+    String? search,
   }) async {
     try {
       final queryParameters = <String, dynamic>{
@@ -222,6 +223,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
         if (categoryId != null) 'CategoryId': categoryId,
         if (year != null) 'Year': year,
         if (status != null && status.isNotEmpty) 'Status': status,
+        if (search != null && search.isNotEmpty) 'Search': search,
       };
 
       return await _apiClient.getPaginated<PaymentItem>(

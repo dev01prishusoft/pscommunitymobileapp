@@ -332,7 +332,10 @@ class _FilterDialogState extends State<_FilterDialog> {
                     onPressed: _resetFilters,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.grey.shade700,
-                      side: BorderSide(color: AppColors.grey.shade400, width: 1),
+                      side: BorderSide(
+                        color: AppColors.grey.shade400,
+                        width: 1,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14.r),
                       ),
@@ -381,7 +384,6 @@ class _ResultsHeader extends GetView<FamilyController> {
                         'count': controller.areas.length.toString(),
                       }),
                 style: AppTextStyles.titleSmall.copyWith(
-                  color: AppColors.secondary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -460,7 +462,6 @@ class _AreasList extends StatelessWidget {
                         Text(
                           area.title,
                           style: AppTextStyles.titleMedium.copyWith(
-                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 1,

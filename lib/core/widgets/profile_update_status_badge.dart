@@ -53,8 +53,12 @@ class _ProfileUpdateStatusBadgeState extends State<ProfileUpdateStatusBadge>
         ? AppColors.red.withValues(alpha: 0.08)
         : AppColors.orange.withValues(alpha: 0.08);
 
+    final displayValue = (widget.status.newValue?.isEmpty ?? true) 
+        ? 'Empty'
+        : widget.status.newValue;
+
     final statusText = widget.showValue
-        ? '${isRejected ? LK.rejected.tr : LK.requested.tr}: ${widget.status.newValue}'
+        ? '${isRejected ? LK.rejected.tr : LK.requested.tr}: $displayValue'
         : isRejected
         ? LK.rejected.tr
         : LK.requested.tr;

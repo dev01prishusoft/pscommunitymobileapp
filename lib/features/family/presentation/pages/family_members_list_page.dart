@@ -69,6 +69,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
               _areaName,
               style: AppTextStyles.titleLarge.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.black,
               ),
             ),
             SizedBox(height: 2.h),
@@ -212,7 +213,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                                           style: AppTextStyles.titleMedium
                                               .copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                color: AppColors.secondary,
+                                                color: AppColors.black,
                                               ),
                                         ),
                                       ),

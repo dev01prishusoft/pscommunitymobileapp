@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/features/notification/data/models/member_notification.dart';
 
 class NotificationCard extends StatefulWidget {
@@ -158,25 +159,21 @@ class _NotificationCardState extends State<NotificationCard> {
   Widget build(BuildContext context) {
     final bool isLongText = widget.notification.message.length > 80;
 
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: AppSpacing.s.h),
-      decoration: BoxDecoration(
+      padding: EdgeInsets.zero,
+      elevation: 0,
+      color: widget.notification.isRead
+          ? AppColors.white
+          : AppColors.primary.withValues(alpha: 0.025),
+      border: Border.all(
         color: widget.notification.isRead
-            ? AppColors.white
-            : AppColors.primary.withValues(alpha: 0.025),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: widget.notification.isRead
-              ? AppColors.grey.withValues(alpha: 0.12)
-              : AppColors.primary.withValues(alpha: 0.2),
-          width: 1.w,
-        ),
+            ? AppColors.grey.withValues(alpha: 0.12)
+            : AppColors.primary.withValues(alpha: 0.2),
+        width: 1.w,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.r),
-        child: InkWell(
-          onTap: widget.onTap,
-          child: IntrinsicHeight(
+      onTap: widget.onTap,
+      child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -287,8 +284,6 @@ class _NotificationCardState extends State<NotificationCard> {
               ],
             ),
           ),
-        ),
-      ),
     );
   }
 }

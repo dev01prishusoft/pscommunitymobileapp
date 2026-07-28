@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class LocalizationValidator {
   static Future<void> validate() async {
@@ -17,21 +16,6 @@ class LocalizationValidator {
       }
       if (guDecoded is! Map<String, dynamic>) {
         throw Exception('Invalid localization JSON structure in gu_IN.json');
-      }
-
-      final Map<String, dynamic> enMap = enDecoded;
-      final Map<String, dynamic> guMap = guDecoded;
-
-      // ignore: unused_local_variable
-      int errorCount = 0;
-
-      for (final key in LK.allValues) {
-        if (!enMap.containsKey(key)) {
-          errorCount++;
-        }
-        if (!guMap.containsKey(key)) {
-          errorCount++;
-        }
       }
     } catch (_) {}
   }

@@ -43,6 +43,7 @@ abstract class PaymentRepository {
     int? categoryId,
     int? year,
     String? status,
+    String? search,
   });
   Future<Map<String, dynamic>> getReceipt(int receiptId);
 }

@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -40,7 +41,7 @@ class MarriagePage extends GetView<MarriageController> {
         title: Obx(() {
           if (controller.isSearchVisible.value) {
             return CupertinoTextField(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
               prefix: Icon(
                 Iconsax.search_normal_copy,
                 size: 15,
@@ -52,7 +53,17 @@ class MarriagePage extends GetView<MarriageController> {
                   FocusManager.instance.primaryFocus?.unfocus();
                   controller.isSearchVisible.value = false;
                 },
-                child: Icon(Iconsax.close_circle_copy).paddingOnly(right: 10),
+                child: Icon(
+                  Iconsax.close_circle_copy,
+                  size: 20,
+                ).paddingOnly(right: 10),
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.grey.withValues(alpha: 0.5),
+                  width: 1.w,
+                ),
               ),
               placeholder: LK.searchByFirstNameHint.tr,
               controller: controller.searchTextController,
@@ -88,7 +99,7 @@ class MarriagePage extends GetView<MarriageController> {
         controller: controller.scrollController,
         slivers: [
           Obx(() {
-            if (controller.state.value == AppState.data || 
+            if (controller.state.value == AppState.data ||
                 controller.state.value == AppState.empty) {
               return SliverToBoxAdapter(child: _buildFilterControlsCard());
             } else {
@@ -223,134 +234,127 @@ class MarriagePage extends GetView<MarriageController> {
   }
 
   Widget _buildFilterControlsCard() {
-    return Card(
+    return AppCard(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.2.w,
-        ),
+      borderRadius: 16.r,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.15),
+        width: 1.2.w,
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Obx(() {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _buildSummaryCard(
-                      label: LK.unmarriedMale.tr,
-                      count: controller.unmarriedMaleCount.toString(),
-                      icon: Iconsax.man_copy,
-                      iconColor: AppColors.blue,
-                      textColor: AppColors.blue,
-                      isMale: true,
-                    ),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Obx(() {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _buildSummaryCard(
+                    label: LK.unmarriedMale.tr,
+                    count: controller.unmarriedMaleCount.toString(),
+                    icon: Iconsax.man_copy,
+                    iconColor: AppColors.blue,
+                    textColor: AppColors.blue,
+                    isMale: true,
                   ),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      label: LK.unmarriedFemale.tr,
-                      count: controller.unmarriedFemaleCount.toString(),
-                      icon: Iconsax.woman_copy,
-                      iconColor: Colors.pink,
-                      textColor: Colors.pink,
-                      isMale: false,
-                    ),
+                ),
+                Expanded(
+                  child: _buildSummaryCard(
+                    label: LK.unmarriedFemale.tr,
+                    count: controller.unmarriedFemaleCount.toString(),
+                    icon: Iconsax.woman_copy,
+                    iconColor: Colors.pink,
+                    textColor: Colors.pink,
+                    isMale: false,
                   ),
-                ],
-              );
-            }),
-            Divider(color: AppColors.grey.withValues(alpha: 0.1), height: 16.h),
-            _buildSummaryCard2(
-              icon: Iconsax.heart,
-              iconColor: AppColors.primary,
-              label: LK.lookingForMarriage.tr,
-              widget: Obx(
-                () => SizedBox(
-                  height: 25.h,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Switch(
-                      value: controller.lookingForMarriage.value,
-                      onChanged: (val) {
-                        controller.lookingForMarriage.value = val;
-                      },
-                      activeColor: AppColors.primary,
-                    ),
+                ),
+              ],
+            );
+          }),
+          Divider(color: AppColors.grey.withValues(alpha: 0.1), height: 16.h),
+          _buildSummaryCard2(
+            icon: Iconsax.heart,
+            iconColor: AppColors.primary,
+            label: LK.lookingForMarriage.tr,
+            widget: Obx(
+              () => SizedBox(
+                height: 25.h,
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: Switch(
+                    value: controller.lookingForMarriage.value,
+                    onChanged: (val) {
+                      controller.lookingForMarriage.value = val;
+                    },
+                    activeThumbColor: AppColors.primary,
                   ),
                 ),
               ),
             ),
-            Divider(color: AppColors.grey.withValues(alpha: 0.1), height: 16.h),
-            _buildSummaryCard2(
-              label: LK.gender.tr,
-              icon: Iconsax.user_copy,
-              iconColor: AppColors.primary,
-              widget: Obx(
-                () => Wrap(
-                  runSpacing: 5.h,
-                  children: ['All', 'Male', 'Female'].map((gender) {
-                    final isSelected =
-                        controller.selectedGender.value == gender;
-                    final displayLabel = gender == 'All'
-                        ? LK.all.tr
-                        : (gender == 'Male' ? LK.male.tr : LK.female.tr);
-                    return Container(
-                      margin: EdgeInsets.only(right: 6.w),
-                      child: ChoiceChip(
-                        showCheckmark: false,
-                        visualDensity: VisualDensity(
-                          horizontal: VisualDensity.minimumDensity,
-                          vertical: VisualDensity.minimumDensity,
-                        ),
-                        padding: EdgeInsets.zero,
-                        label: Text(
-                          displayLabel,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: isSelected
-                                ? AppColors.white
-                                : AppColors.primary,
-                            fontSize: 10.sp,
-                          ),
-                        ),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            controller.selectedGender.value = gender;
-                          }
-                        },
-                        selectedColor: AppColors.primary,
-                        backgroundColor: AppColors.grey.withValues(alpha: 0.1),
-                        labelStyle: AppTextStyles.bodySmall.copyWith(
+          ),
+          Divider(color: AppColors.grey.withValues(alpha: 0.1), height: 16.h),
+          _buildSummaryCard2(
+            label: LK.gender.tr,
+            icon: Iconsax.user_copy,
+            iconColor: AppColors.primary,
+            widget: Obx(
+              () => Wrap(
+                runSpacing: 5.h,
+                children: ['All', 'Male', 'Female'].map((gender) {
+                  final isSelected = controller.selectedGender.value == gender;
+                  final displayLabel = gender == 'All'
+                      ? LK.all.tr
+                      : (gender == 'Male' ? LK.male.tr : LK.female.tr);
+                  return Container(
+                    margin: EdgeInsets.only(right: 6.w),
+                    child: ChoiceChip(
+                      showCheckmark: false,
+                      visualDensity: VisualDensity(
+                        horizontal: VisualDensity.minimumDensity,
+                        vertical: VisualDensity.minimumDensity,
+                      ),
+                      padding: EdgeInsets.zero,
+                      label: Text(
+                        displayLabel,
+                        style: AppTextStyles.bodySmall.copyWith(
                           color: isSelected
                               ? AppColors.white
                               : AppColors.primary,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                          fontSize: 10.sp,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.r),
-                          side: BorderSide(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.transparent,
-                          ),
-                        ),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                    );
-                  }).toList(),
-                ),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          controller.selectedGender.value = gender;
+                        }
+                      },
+                      selectedColor: AppColors.primary,
+                      backgroundColor: AppColors.grey.withValues(alpha: 0.1),
+                      labelStyle: AppTextStyles.bodySmall.copyWith(
+                        color: isSelected ? AppColors.white : AppColors.primary,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.transparent,
+                        ),
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  );
+                }).toList(),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -363,163 +367,145 @@ class _MarriageMemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.grey.withValues(alpha: 0.15),
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      elevation: 0.03,
+      border: Border.all(
+        color: AppColors.grey.withValues(alpha: 0.15),
+        width: 1.w,
       ),
-      child: Material(
-        color: AppColors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16.r),
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            Get.toNamed<void>(
-              AppRouter.memberProfile,
-              arguments: {'memberId': member.memberId},
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.all(14.w),
-            child: Row(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.memberProfile,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      padding: EdgeInsets.all(14.w),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MemberAvatar(
+            imageUrl: member.profilePhotoFullUrl,
+            gender: member.gender,
+            fallbackName: member.name,
+            radius: 28.r,
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MemberAvatar(
-                  imageUrl: member.profilePhotoFullUrl,
-                  gender: member.gender,
-                  fallbackName: member.name,
-                  radius: 28.r,
-                ),
-                SizedBox(width: 14.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              member.name,
-                              style: AppTextStyles.titleMedium.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: AppColors.grey.shade400,
-                            size: 20.sp,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Wrap(
-                        spacing: 6.w,
-                        runSpacing: 6.h,
-                        children: [
-                          if (member.age > 0)
-                            _buildBadge(
-                              '${member.age} ${LK.ageYears.tr}',
-                              Icons.cake_outlined,
-                              AppColors.primary,
-                            ),
-                          if (member.gotra.isNotEmpty)
-                            _buildBadge(
-                              member.gotra,
-                              Iconsax.hierarchy_copy,
-                              AppColors.chart2,
-                            ),
-                          if (member.occupation.isNotEmpty)
-                            _buildBadge(
-                              member.occupation,
-                              Iconsax.briefcase_copy,
-                              AppColors.chart5,
-                            ),
-                        ],
-                      ),
-                      if (member.area.isNotEmpty) ...[
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on_rounded,
-                              size: 14.sp,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 4.w),
-                            Expanded(
-                              child: Text(
-                                member.area,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.grey.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        member.name,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                      SizedBox(height: 8.h),
-                      Row(
-                        children: [
-                          Text(
-                            '${LK.lookingForMarriage.tr}: ',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.grey,
-                            ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.grey.shade400,
+                      size: 20.sp,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Wrap(
+                  spacing: 6.w,
+                  runSpacing: 6.h,
+                  children: [
+                    if (member.age > 0)
+                      _buildBadge(
+                        '${member.age} ${LK.ageYears.tr}',
+                        Icons.cake_outlined,
+                        AppColors.primary,
+                      ),
+                    if (member.gotra.isNotEmpty)
+                      _buildBadge(
+                        member.gotra,
+                        Iconsax.hierarchy_copy,
+                        AppColors.chart2,
+                      ),
+                    if (member.occupation.isNotEmpty)
+                      _buildBadge(
+                        member.occupation,
+                        Iconsax.briefcase_copy,
+                        AppColors.chart5,
+                      ),
+                  ],
+                ),
+                if (member.area.isNotEmpty) ...[
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_rounded,
+                        size: 14.sp,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          member.area,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.grey.shade700,
+                            fontWeight: FontWeight.w500,
                           ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 2.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: (member.isLookingforMarriage == true)
-                                  ? AppColors.green.withValues(alpha: 0.08)
-                                  : AppColors.red.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(6.r),
-                              border: Border.all(
-                                color: (member.isLookingforMarriage == true)
-                                    ? AppColors.green.withValues(alpha: 0.15)
-                                    : AppColors.red.withValues(alpha: 0.15),
-                                width: 1.w,
-                              ),
-                            ),
-                            child: Text(
-                              (member.isLookingforMarriage == true)
-                                  ? LK.yes.tr
-                                  : LK.no.tr,
-                              style: AppTextStyles.labelSmall.copyWith(
-                                color: (member.isLookingforMarriage == true)
-                                    ? AppColors.green
-                                    : AppColors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
+                ],
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Text(
+                      '${LK.lookingForMarriage.tr}: ',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 2.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: (member.isLookingforMarriage == true)
+                            ? AppColors.green.withValues(alpha: 0.08)
+                            : AppColors.red.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(6.r),
+                        border: Border.all(
+                          color: (member.isLookingforMarriage == true)
+                              ? AppColors.green.withValues(alpha: 0.15)
+                              : AppColors.red.withValues(alpha: 0.15),
+                          width: 1.w,
+                        ),
+                      ),
+                      child: Text(
+                        (member.isLookingforMarriage == true)
+                            ? LK.yes.tr
+                            : LK.no.tr,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: (member.isLookingforMarriage == true)
+                              ? AppColors.green
+                              : AppColors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }

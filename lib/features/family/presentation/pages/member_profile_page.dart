@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -46,7 +47,6 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
           ),
         ),
       ),
-
     );
   }
 }
@@ -109,11 +109,27 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          MemberAvatar(
-            imageUrl: member.profilePhotoFullUrl,
-            gender: member.gender,
-            fallbackName: member.fullName,
-            radius: 40.r,
+          GestureDetector(
+            onTap: () {
+              if (member.profilePhotoFullUrl != null &&
+                  member.profilePhotoFullUrl!.isNotEmpty) {
+                Get.to(
+                  () => FullScreenImageViewer(
+                    imageUrl: member.profilePhotoFullUrl!,
+                    heroTag: 'profile_image_${member.memberId}',
+                  ),
+                );
+              }
+            },
+            child: Hero(
+              tag: 'profile_image_${member.memberId}',
+              child: MemberAvatar(
+                imageUrl: member.profilePhotoFullUrl,
+                gender: member.gender,
+                fallbackName: member.fullName,
+                radius: 40.r,
+              ),
+            ),
           ),
           SizedBox(width: 20.w),
           Expanded(
@@ -125,18 +141,20 @@ class _ProfileHeader extends StatelessWidget {
                   style: AppTextStyles.titleLarge.copyWith(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   member.memberNo ?? '',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
                   ),
                 ),
-                if (member.jobPositionName != null && member.jobPositionName!.trim().isNotEmpty) ...[
+                if (member.jobPositionName != null &&
+                    member.jobPositionName!.trim().isNotEmpty) ...[
                   SizedBox(height: 8.h),
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -331,7 +349,7 @@ class _MemberDetailsSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -495,7 +513,7 @@ class _AssetLifeSection extends StatelessWidget {
                       Text(
                         label1,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey,
+                          color: AppColors.black,
                         ),
                       ),
                       const Spacer(),
@@ -526,7 +544,7 @@ class _AssetLifeSection extends StatelessWidget {
                 Text(
                   label2,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 const Spacer(),
@@ -551,8 +569,22 @@ class _SocialMediaSection extends StatelessWidget {
   final Member member;
   final FamilyController controller;
 
+  bool _hasValidUrl(String? url) {
+    if (url == null || url.trim().isEmpty) return false;
+    final lower = url.trim().toLowerCase();
+    if (lower == 'na' || lower == 'n/a' || lower == 'null') return false;
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_hasValidUrl(member.facebookUrl) &&
+        !_hasValidUrl(member.instagramUrl) &&
+        !_hasValidUrl(member.whatsappUrl) &&
+        !_hasValidUrl(member.twitterUrl)) {
+      return const SizedBox.shrink();
+    }
+
     return _SectionContainer(
       title: LK.socialMedia.tr,
       icon: Icons.share_outlined,
@@ -632,7 +664,7 @@ class _SocialMediaSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
+                    color: AppColors.black,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -700,7 +732,7 @@ class _SectionContainer extends StatelessWidget {
                     title!,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
+                      color: AppColors.black,
                     ),
                   ),
                 ),
@@ -831,7 +863,7 @@ class _EducationSection extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           text: '$label: ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
           children: [
             TextSpan(
               text: value,
@@ -852,7 +884,7 @@ class _EducationSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
         ),
         SizedBox(height: 2.h),
         Text(
@@ -938,7 +970,7 @@ class _OccupationSection extends StatelessWidget {
       children: [
         Text(
           label.replaceAll(':', ''),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
         ),
         SizedBox(height: 2.h),
         Text(
