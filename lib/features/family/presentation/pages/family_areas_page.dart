@@ -256,7 +256,7 @@ class _FilterDialogState extends State<_FilterDialog> {
                       LK.locationFilters.tr,
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
+                        color: AppColors.black,
                       ),
                     ),
                   ),
@@ -272,7 +272,7 @@ class _FilterDialogState extends State<_FilterDialog> {
                       child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: AppColors.grey.shade600,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -371,7 +371,7 @@ class _ResultsHeader extends GetView<FamilyController> {
         padding: EdgeInsets.only(bottom: 12.h),
         child: Row(
           children: [
-            Icon(Icons.map_rounded, size: 18.sp, color: AppColors.primary),
+            Icon(Icons.map_rounded, size: 18.sp),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -385,6 +385,7 @@ class _ResultsHeader extends GetView<FamilyController> {
                       }),
                 style: AppTextStyles.titleSmall.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppColors.black,
                 ),
               ),
             ),
@@ -409,7 +410,6 @@ class _AreasList extends StatelessWidget {
       itemBuilder: (context, index) {
         final area = areas[index];
         return Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16.r),
@@ -463,6 +463,7 @@ class _AreasList extends StatelessWidget {
                           area.title,
                           style: AppTextStyles.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: AppColors.black,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -580,7 +581,7 @@ class _AreasList extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.chevron_right_rounded,
-                      color: AppColors.secondary,
+                      color: AppColors.primary,
                       size: 20.sp,
                     ),
                   ),
@@ -688,7 +689,7 @@ class _CustomDropdown extends StatelessWidget {
                 )
               : Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: isEnabled ? AppColors.secondary : AppColors.grey,
+                  color: AppColors.grey,
                   size: 20.sp,
                 ),
           items: options.isEmpty

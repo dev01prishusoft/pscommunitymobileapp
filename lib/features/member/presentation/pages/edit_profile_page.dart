@@ -2533,7 +2533,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
           title: Text(
             '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (${LK.highest.tr})' : ''}',
-            style: AppTextStyles.labelMedium,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: AppColors.primary,
+            ),
           ),
           children: [
             Obx(

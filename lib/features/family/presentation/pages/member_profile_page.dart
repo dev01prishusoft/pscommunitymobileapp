@@ -145,12 +145,23 @@ class _ProfileHeader extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                Text(
-                  member.memberNo ?? '',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      width: 1.w,
+                    ),
+                  ),
+                  child: Text(
+                    member.memberNo ?? '',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
+                    ),
                   ),
                 ),
                 if (member.jobPositionName != null &&
@@ -349,7 +360,7 @@ class _MemberDetailsSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.black,
+                    color: AppColors.grey,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -357,7 +368,7 @@ class _MemberDetailsSection extends StatelessWidget {
                   value,
                   style: AppTextStyles.labelMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                     decoration: onTap != null ? TextDecoration.underline : null,
                   ),
                 ),
@@ -439,8 +450,9 @@ class _AddressSection extends StatelessWidget {
                 SizedBox(height: 12.h),
                 Text(
                   addr.fullAddress,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.black,
+                    fontWeight: FontWeight.bold,
                     height: 1.4,
                   ),
                 ),
@@ -512,15 +524,15 @@ class _AssetLifeSection extends StatelessWidget {
                     children: [
                       Text(
                         label1,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.black,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.grey,
                         ),
                       ),
                       const Spacer(),
                       if (value1 is bool)
                         Text(
                           value1 ? LK.yes.tr : LK.no.tr,
-                          style: AppTextStyles.bodyMedium.copyWith(
+                          style: AppTextStyles.bodySmall.copyWith(
                             fontWeight: FontWeight.bold,
                             color: value1 ? AppColors.green : AppColors.red,
                           ),
@@ -528,9 +540,9 @@ class _AssetLifeSection extends StatelessWidget {
                       else
                         Text(
                           value1.toString(),
-                          style: AppTextStyles.bodyMedium.copyWith(
+                          style: AppTextStyles.bodySmall.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
+                            color: AppColors.black,
                           ),
                         ),
                     ],
@@ -543,14 +555,14 @@ class _AssetLifeSection extends StatelessWidget {
               children: [
                 Text(
                   label2,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.black,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.grey,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   value2 ? LK.yes.tr : LK.no.tr,
-                  style: AppTextStyles.bodyMedium.copyWith(
+                  style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.bold,
                     color: value2 ? AppColors.green : AppColors.red,
                   ),
@@ -664,15 +676,15 @@ class _SocialMediaSection extends StatelessWidget {
                 Text(
                   label,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.black,
+                    color: AppColors.grey,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   handle,
-                  style: AppTextStyles.labelMedium.copyWith(
+                  style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.blue,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -818,8 +830,10 @@ class _EducationSection extends StatelessWidget {
                 SizedBox(height: 12.h),
                 if (edu.institute.isNotEmpty)
                   _buildRowItem(LK.instituteNameLabel.tr, edu.institute),
-                if (edu.description.isNotEmpty)
+                if (edu.description.isNotEmpty) ...[
+                  SizedBox(height: 12.h),
                   _buildRowItem(LK.description.tr, edu.description),
+                ],
                 SizedBox(height: 8.h),
                 Row(
                   children: [
@@ -863,13 +877,13 @@ class _EducationSection extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           text: '$label: ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
           children: [
             TextSpan(
               text: value,
-              style: AppTextStyles.bodyMedium.copyWith(
+              style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.secondary,
+                color: AppColors.black,
               ),
             ),
           ],
@@ -884,14 +898,14 @@ class _EducationSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.secondary,
+            color: AppColors.black,
           ),
         ),
       ],
@@ -970,14 +984,14 @@ class _OccupationSection extends StatelessWidget {
       children: [
         Text(
           label.replaceAll(':', ''),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.secondary,
+            color: AppColors.black,
           ),
         ),
       ],

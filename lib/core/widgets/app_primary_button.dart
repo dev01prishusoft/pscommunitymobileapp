@@ -11,15 +11,19 @@ class AppPrimaryButton extends StatelessWidget {
     this.isLoading = false,
     this.width,
     this.height = 56,
+    this.color,
   });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
   final double? width;
   final double height;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final buttonColor = color ?? AppColors.primary;
+
     return Container(
       width: width ?? double.infinity,
       height: height,
@@ -28,7 +32,7 @@ class AppPrimaryButton extends StatelessWidget {
         boxShadow: [
           if (onPressed != null && !isLoading)
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.25),
+              color: buttonColor.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: Offset(0, 6),
             ),
@@ -37,9 +41,9 @@ class AppPrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: buttonColor,
           foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+          disabledBackgroundColor: buttonColor.withValues(alpha: 0.4),
           disabledForegroundColor: AppColors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(

@@ -192,7 +192,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       return Text(
                         resolvedText,
                         style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 11.sp,
                         ),
@@ -233,7 +233,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               onTap: () => controller.toggleGroup(role),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                color: AppColors.grey.withValues(alpha: 0.2),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 child: Row(
                   children: [
                     Container(
@@ -330,7 +330,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       ),
                       child: Icon(
                         Icons.close_rounded,
-                        color: AppColors.secondary,
+                        color: AppColors.black,
                         size: 18.r,
                       ),
                     ),
@@ -413,7 +413,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       LK.role.tr,
                       member.roleName,
                     ),
-                    if (member.reportsToName != null && member.reportsToName!.isNotEmpty) ...[
+                    if (member.reportsToName != null &&
+                        member.reportsToName!.isNotEmpty) ...[
                       Divider(
                         height: 24.h,
                         thickness: 0.5,
@@ -524,7 +525,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               Text(
                 value,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.secondary,
+                  color: AppColors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -542,11 +543,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-              MemberAvatar(
-                imageUrl: member.imageUrl,
-                fallbackName: member.name,
-                radius: 20.r,
-              ),
+            MemberAvatar(
+              imageUrl: member.imageUrl,
+              fallbackName: member.name,
+              radius: 20.r,
+            ),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(

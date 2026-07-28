@@ -11,7 +11,7 @@ class AppColors {
   static const pink = Colors.pink;
   static Color sfBackground = Colors.grey.shade50;
   static const transparent = Colors.transparent;
-  static Color red = Colors.red.shade900;
+  static const Color red = Color(0xFFD32F2F);
   static const orange = Color(0xFFFDBA13);
   static Color primary = const Color(0xFF8F0500);
   static Color secondary = const Color(0xFF4A0200);
@@ -103,12 +103,15 @@ class AppTheme {
       hintMaxLines: 1,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: AppColors.primary.withValues(alpha: 0.5),
+          width: 1.w,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(
-          color: AppColors.grey.withValues(alpha: 0.5),
+          color: AppColors.primary.withValues(alpha: 0.5),
           width: 1.w,
         ),
       ),
@@ -122,7 +125,7 @@ class AppTheme {
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: AppColors.primary, width: 1.w),
+        borderSide: BorderSide(color: AppColors.red, width: 1.5.w),
       ),
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

@@ -38,39 +38,22 @@ class _FindMemberPageState extends State<FindMemberPage> {
       body: Column(
         children: [
           15.verticalSpace,
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(14.r),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: AppTextField(
-              hint: LK.searchHint.tr,
-              icon: Iconsax.search_normal_copy,
-              controller: _searchController,
-              onChanged: _controller.updateSearch,
-              suffixIcon: Obx(() {
-                return _controller.searchQuery.value.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.cancel_rounded,
-                          color: AppColors.grey,
-                          size: 20.sp,
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                          _controller.clearSearch();
-                        },
-                      )
-                    : const SizedBox.shrink();
-              }),
-            ),
+          AppTextField(
+            hint: LK.searchHint.tr,
+            icon: Iconsax.search_normal_copy,
+            controller: _searchController,
+            onChanged: _controller.updateSearch,
+            suffixIcon: Obx(() {
+              return _controller.searchQuery.value.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.cancel_outlined, size: 20.sp),
+                      onPressed: () {
+                        _searchController.clear();
+                        _controller.clearSearch();
+                      },
+                    )
+                  : const SizedBox.shrink();
+            }),
           ),
           10.verticalSpace,
           Obx(
@@ -256,109 +239,109 @@ class _FindMemberCard extends StatelessWidget {
         );
       },
       child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: MemberAvatar(
+                imageUrl: member.profilePhotoFullUrl,
+                gender: member.gender,
+                fallbackName: member.name,
+                radius: 26.r,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: MemberAvatar(
-                      imageUrl: member.profilePhotoFullUrl,
-                      gender: member.gender,
-                      fallbackName: member.name,
-                      radius: 26.r,
+                  Text(
+                    member.name,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.sp,
                     ),
                   ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  SizedBox(height: 6.h),
+                  Wrap(
+                    spacing: 6.w,
+                    runSpacing: 8.h,
+                    children: [
+                      if (member.isHead == true) _buildHeadBadge(),
+                      if (member.isLookingforMarriage == true)
+                        _buildMarriageBadge(),
+                      _buildGenderAgeBadge(),
+                      if (member.gotra.isNotEmpty) _buildGotraBadge(),
+                    ],
+                  ),
+                  if (member.occupation.isNotEmpty) ...[
+                    SizedBox(height: 8.h),
+                    Row(
                       children: [
-                        Text(
-                          member.name,
-                          style: AppTextStyles.titleMedium.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.sp,
+                        Icon(
+                          Icons.business_center_outlined,
+                          size: 13.sp,
+                          color: AppColors.grey.shade700,
+                        ),
+                        SizedBox(width: 6.w),
+                        Expanded(
+                          child: Text(
+                            occupationText,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.grey.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        SizedBox(height: 6.h),
-                        Wrap(
-                          spacing: 6.w,
-                          runSpacing: 8.h,
-                          children: [
-                            if (member.isHead == true) _buildHeadBadge(),
-                            if (member.isLookingforMarriage == true)
-                              _buildMarriageBadge(),
-                            _buildGenderAgeBadge(),
-                            if (member.gotra.isNotEmpty) _buildGotraBadge(),
-                          ],
-                        ),
-                        if (member.occupation.isNotEmpty) ...[
-                          SizedBox(height: 8.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.business_center_outlined,
-                                size: 13.sp,
-                                color: AppColors.grey,
-                              ),
-                              SizedBox(width: 6.w),
-                              Expanded(
-                                child: Text(
-                                  occupationText,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.grey.shade700,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (member.area.isNotEmpty) ...[
-                          SizedBox(height: 4.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 13.sp,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 6.w),
-                              Expanded(
-                                child: Text(
-                                  member.area,
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.grey.shade700,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
                       ],
                     ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Center(
-                    child: Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.05),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppColors.primary,
-                        size: 20.sp,
-                      ),
+                  ],
+                  if (member.area.isNotEmpty) ...[
+                    SizedBox(height: 4.h),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 13.sp,
+                          color: AppColors.grey.shade700,
+                        ),
+                        SizedBox(width: 6.w),
+                        Expanded(
+                          child: Text(
+                            member.area,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.grey.shade700,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
+            SizedBox(width: 8.w),
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.primary,
+                  size: 20.sp,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

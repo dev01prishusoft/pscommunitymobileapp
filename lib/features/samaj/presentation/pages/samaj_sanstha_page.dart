@@ -7,8 +7,11 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_sanstha.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_sanstha_controller.dart';
 
 class SamajSansthaPage extends StatefulWidget {
@@ -36,16 +39,18 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
   }
 
   Widget _buildHeader(SamajSansthaController controller) {
+    final samajController = Get.isRegistered<SamajController>()
+        ? Get.find<SamajController>()
+        : null;
+    final logoUrl = samajController?.samaj.value?.logoUrl ?? '';
+    final samajName = samajController?.samaj.value?.name ?? LK.community.tr;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -69,24 +74,58 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  LK.community.tr.toUpperCase(),
-                  style: TextStyle(
-                    color: AppColors.orange,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.5,
+              Row(
+                children: [
+                  Container(
+                    width: 52.w,
+                    height: 52.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: CachedImg(
+                        url: logoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (_, __, ___) => Image.asset(
+                          'assets/images/prishusoft_logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 12.w),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      samajName,
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
@@ -144,19 +183,24 @@ class _SansthaCardState extends State<_SansthaCard> {
   @override
   Widget build(BuildContext context) {
     final isEnglish = Get.locale?.languageCode == 'en';
-    
-    String displayName = isEnglish && widget.sanstha.nameEnglish.isNotEmpty 
-        ? widget.sanstha.nameEnglish 
+
+    String displayName = isEnglish && widget.sanstha.nameEnglish.isNotEmpty
+        ? widget.sanstha.nameEnglish
         : widget.sanstha.name;
     if (displayName.isEmpty) {
-      displayName = isEnglish ? widget.sanstha.name : widget.sanstha.nameEnglish;
+      displayName = isEnglish
+          ? widget.sanstha.name
+          : widget.sanstha.nameEnglish;
     }
 
-    String displayDescription = isEnglish && widget.sanstha.descriptionEnglish.isNotEmpty 
-        ? widget.sanstha.descriptionEnglish 
+    String displayDescription =
+        isEnglish && widget.sanstha.descriptionEnglish.isNotEmpty
+        ? widget.sanstha.descriptionEnglish
         : widget.sanstha.description;
     if (displayDescription.isEmpty) {
-      displayDescription = isEnglish ? widget.sanstha.description : widget.sanstha.descriptionEnglish;
+      displayDescription = isEnglish
+          ? widget.sanstha.description
+          : widget.sanstha.descriptionEnglish;
     }
 
     final initials = _getInitials(displayName);
@@ -182,156 +226,124 @@ class _SansthaCardState extends State<_SansthaCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              MemberAvatar(
+                radius: 22,
+                imageUrl: initials,
+                fallbackName: initials,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 48.w,
-                      height: 48.h,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.primary, AppColors.secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.2),
-                            blurRadius: 6,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                    Text(
+                      displayName,
+                      style: AppTextStyles.titleLarge.copyWith(
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
-                      child: Text(
-                        initials,
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName,
-                            style: AppTextStyles.titleLarge.copyWith(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (hasDescription) ...[
-                          const SizedBox(height: 6),
-                          AnimatedRotation(
-                            turns: _isExpanded ? 0.5 : 0,
-                            duration: const Duration(milliseconds: 250),
-                            child: Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.grey.shade400,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ],
                     ),
                   ],
                 ),
-                if (hasDescription)
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    alignment: Alignment.topCenter,
-                    child: _isExpanded
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 12),
-                              Divider(
-                                color: AppColors.grey.shade100,
-                                height: 1,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                displayDescription,
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.grey.shade700,
-                                  height: 1.5,
-                                ),
-                              ),
-                              // removed english subtitle
-                              const SizedBox(height: 10),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: OutlinedButton.icon(
-                                  onPressed: () {
-                                    final copyContent =
-                                        '${displayName}\n\n$displayDescription';
-                                    Clipboard.setData(
-                                      ClipboardData(text: copyContent),
-                                    ).then((_) {
-                                      PSDelightToastBar(
-                                        snackbarDuration: const Duration(
-                                          seconds: 3,
-                                        ),
-                                        builder: (context) => ToastCard(
-                                          title: LK.success.tr,
-                                          subtitle:
-                                              LK.orgDetailsCopied.tr,
-                                        ),
-                                      ).show();
-                                    });
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    minimumSize: Size.zero,
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (hasDescription) ...[
+                    const SizedBox(height: 6),
+                    AnimatedRotation(
+                      turns: _isExpanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 250),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: AppColors.grey.shade400,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+          if (hasDescription)
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: _isExpanded
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        Divider(color: AppColors.grey.shade100, height: 1),
+                        const SizedBox(height: 12),
+                        Text(
+                          displayDescription,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.grey.shade700,
+                            height: 1.5,
+                          ),
+                        ),
+                        // removed english subtitle
+                        const SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              final copyContent =
+                                  '${displayName}\n\n$displayDescription';
+                              Clipboard.setData(
+                                ClipboardData(text: copyContent),
+                              ).then((_) {
+                                PSDelightToastBar(
+                                  snackbarDuration: const Duration(seconds: 3),
+                                  builder: (context) => ToastCard(
+                                    title: LK.success.tr,
+                                    subtitle: LK.orgDetailsCopied.tr,
                                   ),
-                                  icon: Icon(
-                                    Icons.copy_rounded,
-                                    size: 14,
-                                    color: AppColors.primary,
-                                  ),
-                                  label: Text(
-                                    'Copy',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
+                                ).show();
+                              });
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: AppColors.primary.withValues(alpha: 0.3),
                               ),
-                            ],
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-              ],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            icon: Icon(
+                              Icons.copy_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
+                            label: Text(
+                              'Copy',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ),
+        ],
+      ),
     );
   }
 }

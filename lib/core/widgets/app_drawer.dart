@@ -158,17 +158,14 @@ class AppDrawer extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   ListTile(
-                    leading: Icon(
-                      Icons.home_outlined,
-                      color: AppColors.primary,
-                    ),
+                    leading: Icon(Icons.home_outlined, color: AppColors.black),
                     title: Text(LK.home.tr),
                     onTap: () => Get.back<void>(),
                   ),
                   ListTile(
                     leading: Icon(
                       Icons.person_search_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.findMember.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.findMember),
@@ -176,23 +173,20 @@ class AppDrawer extends StatelessWidget {
                   ListTile(
                     leading: Icon(
                       Icons.favorite_outline,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.marriage.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.marriage),
                   ),
                   ListTile(
-                    leading: Icon(
-                      Icons.edit_outlined,
-                      color: AppColors.primary,
-                    ),
+                    leading: Icon(Icons.edit_outlined, color: AppColors.black),
                     title: Text(LK.editProfile.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.editProfile),
                   ),
                   ListTile(
                     leading: Icon(
                       Icons.corporate_fare_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.samajSansthas.tr),
                     onTap: () {
@@ -203,7 +197,7 @@ class AppDrawer extends StatelessWidget {
                   ListTile(
                     leading: Icon(
                       Icons.person_add_alt_1_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.addFamilyMember.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
@@ -211,7 +205,7 @@ class AppDrawer extends StatelessWidget {
                   ListTile(
                     leading: Icon(
                       Icons.groups_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.addedMembers.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.addedMembers),
@@ -219,7 +213,7 @@ class AppDrawer extends StatelessWidget {
                   ListTile(
                     leading: Icon(
                       Icons.privacy_tip_outlined,
-                      color: AppColors.primary,
+                      color: AppColors.black,
                     ),
                     title: Text(LK.privacyPolicy.tr),
                     onTap: () {
@@ -233,10 +227,7 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   ListTile(
-                    leading: Icon(
-                      Icons.gavel_outlined,
-                      color: AppColors.primary,
-                    ),
+                    leading: Icon(Icons.gavel_outlined, color: AppColors.black),
                     title: Text(LK.termsAndConditions.tr),
                     onTap: () {
                       Get.back<void>();
@@ -288,14 +279,23 @@ class AppDrawer extends StatelessWidget {
     Get.dialog<void>(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text(LK.logout.tr),
+        title: Text(
+          LK.logout.tr,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Text(LK.logoutConfirm.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back<void>(),
             child: Text(
               LK.cancel.tr,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           SizedBox(width: 8.w),
@@ -304,6 +304,7 @@ class AppDrawer extends StatelessWidget {
             child: AppPrimaryButton(
               text: LK.logout.tr,
               height: 45.h,
+              color: AppColors.primary,
               onPressed: () {
                 Get.back<void>();
                 authState.logoutAndRedirect();
@@ -321,7 +322,7 @@ class AppDrawer extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
           LK.deleteAccount.tr,
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.red),
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(LK.deleteAccountConfirm.tr),
         actions: [
@@ -329,7 +330,10 @@ class AppDrawer extends StatelessWidget {
             onPressed: () => Get.back<void>(),
             child: Text(
               LK.cancel.tr,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           SizedBox(width: 8.w),
@@ -346,7 +350,7 @@ class AppDrawer extends StatelessWidget {
               ).show();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.red,
+              backgroundColor: AppColors.primary,
               foregroundColor: AppColors.white,
               elevation: 0,
               minimumSize: Size(120, 45),

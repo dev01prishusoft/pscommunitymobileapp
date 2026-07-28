@@ -138,120 +138,120 @@ class BankDetailsPage extends StatelessWidget {
       elevation: 0.04,
       border: Border.all(color: Colors.grey.shade100),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(18),
-              color: Colors.grey.shade200,
-              child: Row(
-                children: [
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            color: AppColors.primary.withValues(alpha: 0.1),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.account_balance_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Text(
+                    bank.bankName ?? '-',
+                    style: AppTextStyles.headlineSmall.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                if (bank.isPrimary == true)
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.account_balance_rounded,
-                      color: AppColors.primary,
-                      size: 24,
-                    ),
-                  ),
-                  SizedBox(width: 14.w),
-                  Expanded(
-                    child: Text(
-                      bank.bankName ?? '-',
-                      style: AppTextStyles.headlineSmall.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  if (bank.isPrimary == true)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.green.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: AppColors.green.withValues(alpha: 0.25),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        LK.primary.tr,
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, color: Colors.transparent),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDetailRow(LK.branchLabel.tr, bank.branchName ?? '-'),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    LK.acLabel.tr,
-                    bank.accountNumber ?? '-',
-                    showCopy: true,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    LK.ifscLabel.tr,
-                    bank.ifscCode ?? '-',
-                    showCopy: true,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14.0),
-                    child: Divider(color: Colors.grey.shade100, height: 1),
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Get.toNamed<void>(
-                          AppRouter.bankAccountDetails,
-                          arguments: bank,
-                        );
-                      },
+                      color: AppColors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              LK.viewDetails.tr,
-                              style: AppTextStyles.labelLarge.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              color: AppColors.primary,
-                              size: 16,
-                            ),
-                          ],
-                        ),
+                      border: Border.all(
+                        color: AppColors.green.withValues(alpha: 0.25),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      LK.primary.tr,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.green,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          const Divider(height: 1, color: Colors.transparent),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailRow(LK.branchLabel.tr, bank.branchName ?? '-'),
+                const SizedBox(height: 10),
+                _buildDetailRow(
+                  LK.acLabel.tr,
+                  bank.accountNumber ?? '-',
+                  showCopy: true,
+                ),
+                const SizedBox(height: 10),
+                _buildDetailRow(
+                  LK.ifscLabel.tr,
+                  bank.ifscCode ?? '-',
+                  showCopy: true,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                  child: Divider(color: Colors.grey.shade100, height: 1),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed<void>(
+                        AppRouter.bankAccountDetails,
+                        arguments: bank,
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            LK.viewDetails.tr,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: AppColors.primary,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -278,6 +278,7 @@ class BankDetailsPage extends StatelessWidget {
                   value,
                   style: AppTextStyles.titleSmall.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: AppColors.black,
                   ),
                 ),
               ),
@@ -300,7 +301,7 @@ class BankDetailsPage extends StatelessWidget {
                     child: Icon(
                       Icons.copy_rounded,
                       size: 14.sp,
-                      color: AppColors.chart4,
+                      color: const Color(0xFFDAA520),
                     ),
                   ),
                 ),
@@ -341,107 +342,105 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
               });
             }
           : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  if (widget.samaj.logoUrl.isNotEmpty) ...[
-                    Container(
-                      width: 56.w,
-                      height: 56.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CachedImg(
-                          url: widget.samaj.logoUrl,
-                          fit: BoxFit.contain,
-                          placeholder: (_, __) => const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          errorWidget: (_, __, ___) => Image.asset(
-                            'assets/images/prishusoft_logo.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
+              Container(
+                width: 56.w,
+                height: 56.h,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                    SizedBox(width: 16.w),
                   ],
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.samaj.name,
-                          style: AppTextStyles.headlineSmall.copyWith(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        if (hasDescription) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            _isExpanded
-                                ? LK.tapToCollapse.tr
-                                : LK.tapToExpandDetails.tr,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.primary.withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: CachedImg(
+                    url: widget.samaj.logoUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    errorWidget: (_, __, ___) => Image.asset(
+                      'assets/images/prishusoft_logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  if (hasDescription)
-                    Icon(
-                      _isExpanded
-                          ? Icons.keyboard_arrow_up_rounded
-                          : Icons.keyboard_arrow_down_rounded,
-                      color: AppColors.primary,
-                      size: 24,
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.samaj.name,
+                      style: AppTextStyles.headlineSmall.copyWith(
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                ],
+                    if (hasDescription) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        _isExpanded
+                            ? LK.tapToCollapse.tr
+                            : LK.tapToExpandDetails.tr,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.primary.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
               if (hasDescription)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_isExpanded) ...[
-                        SizedBox(height: 16.h),
-                        Divider(color: Colors.grey.shade100, height: 1),
-                        SizedBox(height: 12.h),
-                        Text(
-                          widget.samaj.description,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: Colors.grey.shade700,
-                            height: 1.5,
-                          ),
-                        ),
-                      ] else ...[
-                        const SizedBox.shrink(),
-                      ],
-                    ],
-                  ),
+                Icon(
+                  _isExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  color: AppColors.primary,
+                  size: 24,
                 ),
             ],
           ),
+          if (hasDescription)
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_isExpanded) ...[
+                    SizedBox(height: 16.h),
+                    Divider(color: Colors.grey.shade100, height: 1),
+                    SizedBox(height: 12.h),
+                    Text(
+                      widget.samaj.description,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Colors.grey.shade700,
+                        height: 1.5,
+                      ),
+                    ),
+                  ] else ...[
+                    const SizedBox.shrink(),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

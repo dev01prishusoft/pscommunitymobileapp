@@ -128,7 +128,7 @@ class SupportPage extends StatelessWidget {
                           Text(
                             LK.supportMembers.tr,
                             style: AppTextStyles.titleLarge.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.black,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -193,7 +193,7 @@ class SupportPage extends StatelessWidget {
                                                       .titleMedium
                                                       .copyWith(
                                                         color:
-                                                            AppColors.secondary,
+                                                            AppColors.black,
                                                         fontWeight:
                                                             FontWeight.w800,
                                                       ),
@@ -297,17 +297,12 @@ class SupportPage extends StatelessWidget {
                       Text(
                         contactDetails,
                         style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: themeColor,
-                  size: 16,
                 ),
               ],
             ),
