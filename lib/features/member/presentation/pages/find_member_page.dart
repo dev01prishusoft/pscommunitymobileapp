@@ -34,7 +34,10 @@ class _FindMemberPageState extends State<FindMemberPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LK.findMember.tr)),
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: AppColors.primary),
+        title: Text(LK.findMember.tr),
+      ),
       body: Column(
         children: [
           15.verticalSpace,
@@ -42,6 +45,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: AppColors.primary, width: 1.w),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.black.withValues(alpha: 0.04),
@@ -53,6 +57,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
             child: AppTextField(
               hint: LK.searchHint.tr,
               icon: Iconsax.search_normal_copy,
+              iconColor: AppColors.primary,
               controller: _searchController,
               onChanged: _controller.updateSearch,
               suffixIcon: Obx(() {
@@ -60,7 +65,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                     ? IconButton(
                         icon: Icon(
                           Icons.cancel_rounded,
-                          color: AppColors.grey,
+                          color: AppColors.primary,
                           size: 20.sp,
                         ),
                         onPressed: () {
@@ -299,7 +304,7 @@ class _FindMemberCard extends StatelessWidget {
                               Icon(
                                 Icons.business_center_outlined,
                                 size: 13.sp,
-                                color: AppColors.grey,
+                                color: AppColors.primary,
                               ),
                               SizedBox(width: 6.w),
                               Expanded(

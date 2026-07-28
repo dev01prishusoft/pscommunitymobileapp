@@ -192,7 +192,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       return Text(
                         resolvedText,
                         style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 11.sp,
                         ),
@@ -233,7 +233,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               onTap: () => controller.toggleGroup(role),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                color: AppColors.grey.withValues(alpha: 0.2),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 child: Row(
                   children: [
                     Container(
@@ -330,7 +330,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       ),
                       child: Icon(
                         Icons.close_rounded,
-                        color: AppColors.secondary,
+                        color: AppColors.black,
                         size: 18.r,
                       ),
                     ),
@@ -524,7 +524,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               Text(
                 value,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.secondary,
+                  color: AppColors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),

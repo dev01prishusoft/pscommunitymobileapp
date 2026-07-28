@@ -142,7 +142,7 @@ class BankDetailsPage extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(18),
-              color: Colors.grey.shade200,
+              color: AppColors.primary.withValues(alpha: 0.1),
               child: Row(
                 children: [
                   Container(
@@ -278,6 +278,7 @@ class BankDetailsPage extends StatelessWidget {
                   value,
                   style: AppTextStyles.titleSmall.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: AppColors.black,
                   ),
                 ),
               ),
@@ -300,7 +301,7 @@ class BankDetailsPage extends StatelessWidget {
                     child: Icon(
                       Icons.copy_rounded,
                       size: 14.sp,
-                      color: AppColors.chart4,
+                      color: const Color(0xFFDAA520),
                     ),
                   ),
                 ),
@@ -346,38 +347,36 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
             children: [
               Row(
                 children: [
-                  if (widget.samaj.logoUrl.isNotEmpty) ...[
-                    Container(
-                      width: 56.w,
-                      height: 56.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CachedImg(
-                          url: widget.samaj.logoUrl,
+                  Container(
+                    width: 56.w,
+                    height: 56.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: CachedImg(
+                        url: widget.samaj.logoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (_, __, ___) => Image.asset(
+                          'assets/images/prishusoft_logo.png',
                           fit: BoxFit.contain,
-                          placeholder: (_, __) => const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          errorWidget: (_, __, ___) => Image.asset(
-                            'assets/images/prishusoft_logo.png',
-                            fit: BoxFit.contain,
-                          ),
                         ),
                       ),
                     ),
-                    SizedBox(width: 16.w),
-                  ],
+                  ),
+                  SizedBox(width: 16.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +384,7 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                         Text(
                           widget.samaj.name,
                           style: AppTextStyles.headlineSmall.copyWith(
-                            color: AppColors.secondary,
+                            color: AppColors.black,
                             fontWeight: FontWeight.w800,
                           ),
                         ),

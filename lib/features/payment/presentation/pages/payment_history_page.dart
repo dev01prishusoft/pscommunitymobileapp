@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -105,7 +104,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             );
           }),
           IconButton(
-            icon: const Icon(Iconsax.filter_search_copy),
+            icon: const Icon(Iconsax.filter_search_copy, color: AppColors.grey),
             tooltip: 'Filters',
             onPressed: () async {
               await Get.dialog<void>(
@@ -277,7 +276,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                         LK.paymentFilters.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                         ),
                       ),
                     ),
@@ -472,7 +471,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
       child: Text(
         text,
         style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.secondary,
+          color: AppColors.black,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -513,7 +512,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
             color: AppColors.primary,
           ),
           style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.secondary,
+            color: AppColors.black,
             fontWeight: FontWeight.bold,
           ),
           dropdownColor: AppColors.white,
@@ -534,7 +533,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                 child: Text(
                   s == 'All' ? LK.all.tr : s,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -606,7 +605,7 @@ class _PaymentCard extends StatelessWidget {
                           Text(
                             '₹${payment.amount}',
                             style: AppTextStyles.bodyLarge.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -615,7 +614,7 @@ class _PaymentCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.grey,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

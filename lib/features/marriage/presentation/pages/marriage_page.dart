@@ -45,6 +45,7 @@ class MarriagePage extends GetView<MarriageController> {
               prefix: Icon(
                 Iconsax.search_normal_copy,
                 size: 15,
+                color: Colors.grey,
               ).paddingOnly(left: 10),
               suffix: GestureDetector(
                 onTap: () {
@@ -56,6 +57,7 @@ class MarriagePage extends GetView<MarriageController> {
                 child: Icon(
                   Iconsax.close_circle_copy,
                   size: 20,
+                  color: AppColors.black,
                 ).paddingOnly(right: 10),
               ),
               decoration: BoxDecoration(
@@ -81,7 +83,7 @@ class MarriagePage extends GetView<MarriageController> {
             }
 
             return IconButton(
-              icon: const Icon(Iconsax.search_normal_copy),
+              icon: const Icon(Iconsax.search_normal_copy, color: Colors.grey),
               onPressed: () {
                 controller.isSearchVisible.value = true;
               },
@@ -89,7 +91,7 @@ class MarriagePage extends GetView<MarriageController> {
           }),
 
           IconButton(
-            icon: Icon(Iconsax.filter_search_copy),
+            icon: Icon(Iconsax.filter_search_copy, color: Colors.grey),
             tooltip: LK.advancedFilters.tr,
             onPressed: () => _showAdvancedFilters(context),
           ),
@@ -403,14 +405,14 @@ class _MarriageMemberCard extends StatelessWidget {
                       child: Text(
                         member.name,
                         style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: AppColors.grey.shade400,
+                      color: AppColors.black,
                       size: 20.sp,
                     ),
                   ],

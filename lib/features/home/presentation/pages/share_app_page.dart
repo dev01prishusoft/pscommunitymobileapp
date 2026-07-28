@@ -159,7 +159,7 @@ class _AppLinkCard extends GetView<SamajController> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.secondary,
+                        color: AppColors.black,
                         letterSpacing: 0.2,
                       ),
                     );

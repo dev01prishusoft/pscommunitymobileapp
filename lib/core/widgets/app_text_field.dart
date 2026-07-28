@@ -20,10 +20,12 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.maxLength,
     this.inputFormatters,
+    this.iconColor,
   });
   final TextEditingController controller;
   final String hint;
   final IconData icon;
+  final Color? iconColor;
   final bool obscureText;
   final TextInputType keyboardType;
   final Widget? suffixIcon;
@@ -102,7 +104,7 @@ class AppTextField extends StatelessWidget {
               color: AppColors.grey,
               fontSize: 14.0.sp,
             ),
-            prefixIcon: Icon(icon, color: AppColors.grey),
+            prefixIcon: Icon(icon, color: iconColor ?? AppColors.grey),
             suffixIcon: suffixIcon,
             counterText: '',
           ),

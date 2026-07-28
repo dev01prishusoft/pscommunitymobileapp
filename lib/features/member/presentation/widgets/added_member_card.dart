@@ -49,7 +49,7 @@ class AddedMemberCard extends StatelessWidget {
                                   child: Text(
                                     member.fullName,
                                     style: AppTextStyles.titleMedium.copyWith(
-                                      color: AppColors.secondary,
+                                      color: AppColors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     maxLines: 1,

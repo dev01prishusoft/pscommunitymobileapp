@@ -48,6 +48,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: AppColors.primary),
         title: Text(LK.family.tr),
         actions: [
           IconButton(
@@ -256,7 +257,7 @@ class _FilterDialogState extends State<_FilterDialog> {
                       LK.locationFilters.tr,
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
+                        color: AppColors.black,
                       ),
                     ),
                   ),
@@ -272,7 +273,7 @@ class _FilterDialogState extends State<_FilterDialog> {
                       child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: AppColors.grey.shade600,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -385,6 +386,7 @@ class _ResultsHeader extends GetView<FamilyController> {
                       }),
                 style: AppTextStyles.titleSmall.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppColors.black,
                 ),
               ),
             ),
@@ -463,6 +465,7 @@ class _AreasList extends StatelessWidget {
                           area.title,
                           style: AppTextStyles.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: AppColors.black,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -473,7 +476,7 @@ class _AreasList extends StatelessWidget {
                             Icon(
                               Icons.location_city_rounded,
                               size: 14.sp,
-                              color: AppColors.grey,
+                              color: AppColors.primary,
                             ),
                             SizedBox(width: 4.w),
                             Expanded(
@@ -580,7 +583,7 @@ class _AreasList extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.chevron_right_rounded,
-                      color: AppColors.secondary,
+                      color: AppColors.primary,
                       size: 20.sp,
                     ),
                   ),
@@ -688,7 +691,7 @@ class _CustomDropdown extends StatelessWidget {
                 )
               : Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: isEnabled ? AppColors.secondary : AppColors.grey,
+                  color: isEnabled ? AppColors.primary : AppColors.grey,
                   size: 20.sp,
                 ),
           items: options.isEmpty

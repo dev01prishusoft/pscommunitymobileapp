@@ -62,13 +62,19 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_occupationName.tr)),
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: AppColors.primary),
+        title: Text(_occupationName.tr),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           15.verticalSpace,
           Container(
             decoration: BoxDecoration(
+              color: AppColors.white,
+              border: Border.all(color: AppColors.primary),
+              borderRadius: BorderRadius.circular(14.r),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.black.withValues(alpha: 0.02),
@@ -81,6 +87,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
               controller: _searchController,
               hint: LK.searchMember.tr,
               icon: Iconsax.search_normal_copy,
+              iconColor: AppColors.primary,
               onChanged: controller.searchMembers,
               suffixIcon: Obx(
                 () => controller.memberSearchQuery.value.isNotEmpty
@@ -88,7 +95,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                         icon: Icon(
                           Icons.close_rounded,
                           size: 20.r,
-                          color: AppColors.grey,
+                          color: AppColors.primary,
                         ),
                         onPressed: () {
                           _searchController.clear();
@@ -263,7 +270,7 @@ class _OccupationMemberCard extends StatelessWidget {
                           Icon(
                             Icons.location_on_rounded,
                             size: 14.r,
-                            color: AppColors.grey,
+                            color: AppColors.primary,
                           ),
                           SizedBox(width: 4.w),
                           Expanded(

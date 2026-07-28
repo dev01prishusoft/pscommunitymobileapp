@@ -1115,6 +1115,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   onPressed: _addAddressAndScroll,
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(LK.addAddress.tr),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                  ),
                 ),
               ],
             ),
@@ -1579,6 +1582,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   onPressed: _addEducationAndScroll,
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(LK.addEducation.tr),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                  ),
                 ),
               ],
             ),
@@ -1625,7 +1631,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ),
           title: Text(
             '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (${LK.highest.tr})' : ''}',
-            style: AppTextStyles.labelMedium,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: AppColors.primary,
+            ),
           ),
           trailing: IconButton(
             onPressed: () => controller.removeEducation(index),

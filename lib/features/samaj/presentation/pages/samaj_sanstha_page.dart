@@ -7,8 +7,10 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_sanstha.dart';
+import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_sanstha_controller.dart';
 
 class SamajSansthaPage extends StatefulWidget {
@@ -36,16 +38,16 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
   }
 
   Widget _buildHeader(SamajSansthaController controller) {
+    final samajController = Get.isRegistered<SamajController>() ? Get.find<SamajController>() : null;
+    final logoUrl = samajController?.samaj.value?.logoUrl ?? '';
+    final samajName = samajController?.samaj.value?.name ?? LK.community.tr;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -69,24 +71,58 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  LK.community.tr.toUpperCase(),
-                  style: TextStyle(
-                    color: AppColors.orange,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.5,
+              Row(
+                children: [
+                  Container(
+                    width: 52.w,
+                    height: 52.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: CachedImg(
+                        url: logoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (_, __, ___) => Image.asset(
+                          'assets/images/prishusoft_logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 12.w),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      samajName,
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
@@ -190,11 +226,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                       height: 48.h,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.primary, AppColors.secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -221,7 +253,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                           Text(
                             displayName,
                             style: AppTextStyles.titleLarge.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.black,
                               fontWeight: FontWeight.w800,
                               height: 1.2,
                             ),

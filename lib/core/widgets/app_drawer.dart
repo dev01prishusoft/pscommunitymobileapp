@@ -288,7 +288,10 @@ class AppDrawer extends StatelessWidget {
     Get.dialog<void>(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text(LK.logout.tr),
+        title: Text(
+          LK.logout.tr,
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.red),
+        ),
         content: Text(LK.logoutConfirm.tr),
         actions: [
           TextButton(
@@ -304,6 +307,7 @@ class AppDrawer extends StatelessWidget {
             child: AppPrimaryButton(
               text: LK.logout.tr,
               height: 45.h,
+              color: AppColors.red,
               onPressed: () {
                 Get.back<void>();
                 authState.logoutAndRedirect();

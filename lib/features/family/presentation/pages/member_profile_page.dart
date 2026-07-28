@@ -145,12 +145,19 @@ class _ProfileHeader extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                Text(
-                  member.memberNo ?? '',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6.r),
+                    border: Border.all(color: AppColors.primary, width: 1.2.w),
+                  ),
+                  child: Text(
+                    member.memberNo ?? '',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
+                    ),
                   ),
                 ),
                 if (member.jobPositionName != null &&
@@ -357,7 +364,7 @@ class _MemberDetailsSection extends StatelessWidget {
                   value,
                   style: AppTextStyles.labelMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                     decoration: onTap != null ? TextDecoration.underline : null,
                   ),
                 ),
@@ -440,7 +447,7 @@ class _AddressSection extends StatelessWidget {
                 Text(
                   addr.fullAddress,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                     height: 1.4,
                   ),
                 ),
@@ -522,7 +529,7 @@ class _AssetLifeSection extends StatelessWidget {
                           value1 ? LK.yes.tr : LK.no.tr,
                           style: AppTextStyles.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: value1 ? AppColors.green : AppColors.red,
+                            color: AppColors.black,
                           ),
                         )
                       else
@@ -530,7 +537,7 @@ class _AssetLifeSection extends StatelessWidget {
                           value1.toString(),
                           style: AppTextStyles.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
+                            color: AppColors.black,
                           ),
                         ),
                     ],
@@ -552,7 +559,7 @@ class _AssetLifeSection extends StatelessWidget {
                   value2 ? LK.yes.tr : LK.no.tr,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: value2 ? AppColors.green : AppColors.red,
+                    color: AppColors.black,
                   ),
                 ),
               ],
@@ -672,7 +679,7 @@ class _SocialMediaSection extends StatelessWidget {
                   handle,
                   style: AppTextStyles.labelMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+                    color: AppColors.black,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -869,7 +876,7 @@ class _EducationSection extends StatelessWidget {
               text: value,
               style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppColors.secondary,
+                color: AppColors.black,
               ),
             ),
           ],
@@ -891,7 +898,7 @@ class _EducationSection extends StatelessWidget {
           value,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.secondary,
+            color: AppColors.black,
           ),
         ),
       ],
@@ -977,7 +984,7 @@ class _OccupationSection extends StatelessWidget {
           value,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.secondary,
+            color: AppColors.black,
           ),
         ),
       ],

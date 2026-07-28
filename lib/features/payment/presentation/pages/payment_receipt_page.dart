@@ -247,7 +247,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                               name,
                               textAlign: TextAlign.center,
                               style: AppTextStyles.titleMedium.copyWith(
-                                color: AppColors.secondary,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -260,7 +260,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         style: TextStyle(
                           fontSize: 32.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -268,7 +268,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         data['category']!,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey.shade600,
+                          color: AppColors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -392,7 +392,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               value,
               textAlign: TextAlign.end,
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.secondary,
+                color: AppColors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -451,8 +451,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       theme: pw.ThemeData.withFont(base: font, bold: boldFont),
     );
 
-    final primaryColor = PdfColor.fromInt(AppColors.primary.value);
-    final secondaryColor = PdfColor.fromInt(AppColors.secondary.value);
+    final primaryColor = PdfColors.black;
+    final secondaryColor = PdfColors.black;
     final lightGrey = PdfColor.fromInt(0xFFF9F9F9);
     final borderGrey = PdfColor.fromInt(0xFFE5E5E5);
 

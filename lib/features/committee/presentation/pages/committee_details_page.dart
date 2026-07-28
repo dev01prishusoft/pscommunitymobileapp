@@ -417,10 +417,9 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                     SizedBox(width: 6.w),
                     Text(
                       tag,
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 9.sp,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],

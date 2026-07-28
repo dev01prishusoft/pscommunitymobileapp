@@ -467,7 +467,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       child: Text(
                         req.amountFormatted,
                         style: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -515,7 +515,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   Text(
                     req.memberName,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.grey,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

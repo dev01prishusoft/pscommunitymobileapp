@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class PSDelightToastBar {
   final Duration snackbarDuration;
@@ -170,7 +169,7 @@ class ToastCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isErrorMessage
-              ? [AppColors.primary, AppColors.secondary]
+              ? [const Color(0xFFD32F2F), const Color(0xFFB71C1C)]
               : [const Color(0xFF1E6C3B), const Color(0xFF0F3E21)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -179,7 +178,7 @@ class ToastCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color:
-                (isErrorMessage ? AppColors.primary : const Color(0xFF1E6C3B))
+                (isErrorMessage ? const Color(0xFFD32F2F) : const Color(0xFF1E6C3B))
                     .withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 4),

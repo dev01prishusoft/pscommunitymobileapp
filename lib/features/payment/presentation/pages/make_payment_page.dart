@@ -226,7 +226,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                             Text(
                               '₹',
                               style: AppTextStyles.displaySmall.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -236,6 +236,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                 final isFixed = controller.isAmountFixed;
                                 return TextFormField(
                                   controller: amountController,
+                                  cursorColor: AppColors.primary,
                                   readOnly: isFixed,
                                   keyboardType:
                                       const TextInputType.numberWithOptions(
@@ -286,7 +287,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                   style: AppTextStyles.displaySmall.copyWith(
                                     color: isFixed
                                         ? AppColors.grey.shade600
-                                        : AppColors.secondary,
+                                        : AppColors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   decoration: const InputDecoration(
@@ -298,6 +299,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                     filled: false,
                                     contentPadding: EdgeInsets.zero,
                                     hintText: '0',
+                                    errorStyle: TextStyle(color: Colors.red),
                                   ),
                                 );
                               }),
@@ -327,7 +329,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                 Text(
                                   '${LK.amountMustBeAtLeast.tr}${min.toInt()}',
                                   style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.primary,
+                                    color: Colors.red,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -335,7 +337,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                 Text(
                                   '${LK.amountCannotExceed.tr}${max.toInt()}',
                                   style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.primary,
+                                    color: Colors.red,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -402,7 +404,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                 child: Text(
                   '₹$formatted',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.white : AppColors.secondary,
+                    color: isSelected ? AppColors.white : AppColors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

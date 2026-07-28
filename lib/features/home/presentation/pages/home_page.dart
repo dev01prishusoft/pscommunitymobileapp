@@ -50,6 +50,13 @@ class _HomePageState extends State<HomePage> with RouteAware {
       key: _scaffoldKey,
       drawer: AppDrawer(),
       appBar: AppBar(
+        iconTheme: IconThemeData(color: AppColors.primary),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: AppColors.primary),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
         actions: [
           _NotificationMenu(),
           AppSpacing.hS,
@@ -323,7 +330,7 @@ class _NotificationMenu extends GetView<HomeController> {
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            Icon(Iconsax.notification_copy),
+            Icon(Iconsax.notification_copy, color: AppColors.primary),
             if (count > 0) ...[
               Positioned(
                 right: -2,
