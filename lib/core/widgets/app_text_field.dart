@@ -98,10 +98,6 @@ class AppTextField extends StatelessWidget {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.grey,
-              fontSize: 14.0.sp,
-            ),
             prefixIcon: Icon(icon, color: AppColors.grey),
             suffixIcon: suffixIcon,
             counterText: '',

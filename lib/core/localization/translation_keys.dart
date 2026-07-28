@@ -1,4 +1,4 @@
-﻿class LK {
+class LK {
   static const String reviewAndSaveChanges = 'Review & Save changes';
   static const String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
 
@@ -19,6 +19,7 @@
   static const String notifications = 'Notifications';
   static const String noNotificationsFound = 'No notifications found';
   static const String newLabel = 'New';
+  static const String enter = 'Enter';
   static const String resetPassword = 'Reset Password';
   static const String newPassword = 'New Password';
   static const String confirmNewPassword = 'Confirm New Password';
