@@ -79,9 +79,6 @@ class AppFormDropdown<T> extends StatelessWidget {
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
             decoration: InputDecoration(
               hintText: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
-              hintStyle: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.grey,
-              ),
             ),
             validator: (val) {
               if (isRequired && val == null) {
