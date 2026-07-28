@@ -21,15 +21,7 @@ class ShareAppPage extends StatelessWidget {
       },
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              LK.share.tr,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
+          appBar: AppBar(title: Text(LK.share.tr)),
           body: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -49,19 +41,27 @@ class ShareAppPage extends StatelessWidget {
                   _AppLinkCard(ctrl: controller),
                   const SizedBox(height: 16),
                   _QrCard(ctrl: controller),
-                  const SizedBox(height: 24),
-                  _ShareButton(
-                    icon: Icons.chat_bubble_rounded,
-                    label: LK.shareAppViaWhatsApp.tr,
-                    color: const Color(0xFF25D366),
-                    onTap: controller.shareViaWhatsApp,
-                  ),
-                  const SizedBox(height: 14),
-                  _ShareButton(
-                    icon: Icons.share_rounded,
-                    label: LK.shareAppViaOther.tr,
-                    color: AppColors.primary,
-                    onTap: controller.shareGeneral,
+                  const SizedBox(height: 16),
+                  Row(
+                    spacing: 14,
+                    children: [
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.chat_bubble_rounded,
+                          label: LK.shareAppViaWhatsApp.tr,
+                          color: AppColors.green,
+                          onTap: controller.shareViaWhatsApp,
+                        ),
+                      ),
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.share_rounded,
+                          label: LK.shareAppViaOther.tr,
+                          color: AppColors.primary,
+                          onTap: controller.shareGeneral,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -415,13 +415,10 @@ class _ShareButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: color.withValues(alpha: 0.25),
-              width: 1.5,
-            ),
+            border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               children: [
                 Container(
@@ -430,20 +427,19 @@ class _ShareButton extends StatelessWidget {
                     color: color.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child: Icon(icon, color: color, size: 20),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 10.w),
                 Expanded(
                   child: Text(
                     label,
                     style: TextStyle(
                       color: color,
                       fontWeight: FontWeight.w800,
-                      fontSize: 15,
+                      fontSize: 11.sp,
                     ),
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: color, size: 24),
               ],
             ),
           ),

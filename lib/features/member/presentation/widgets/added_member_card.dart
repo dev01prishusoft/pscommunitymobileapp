@@ -180,7 +180,7 @@ class AddedMemberCard extends StatelessWidget {
           Icon(
             Icons.work_outline_rounded,
             size: 13.sp,
-            color: AppColors.primary.withValues(alpha: 0.7),
+            color: AppColors.grey.shade600,
           ),
           SizedBox(width: 6.w),
           Expanded(
@@ -213,7 +213,7 @@ class AddedMemberCard extends StatelessWidget {
           Icon(
             Icons.location_on_outlined,
             size: 13.sp,
-            color: AppColors.primary.withValues(alpha: 0.7),
+            color: AppColors.grey.shade600,
           ),
           SizedBox(width: 6.w),
           Expanded(

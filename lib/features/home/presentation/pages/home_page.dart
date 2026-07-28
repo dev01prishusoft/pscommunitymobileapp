@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
         iconTheme: IconThemeData(color: AppColors.primary),
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: AppColors.primary),
+            icon: Icon(Icons.menu, color: AppColors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -153,28 +153,28 @@ class _HomeMenuGrid extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: LayoutBuilder(
-          builder: (context, constraints) {
-            final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
-              context,
-              desiredItemWidth: 110.w,
-            );
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.menuItems.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 14.h,
-                crossAxisSpacing: 14.w,
-                childAspectRatio: 0.84,
-              ),
-              itemBuilder: (context, index) {
-                final item = controller.menuItems[index];
-                return _MenuCard(item: item);
-              },
-            );
-          },
-        ),
+        builder: (context, constraints) {
+          final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
+            context,
+            desiredItemWidth: 110.w,
+          );
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.menuItems.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 14.h,
+              crossAxisSpacing: 14.w,
+              childAspectRatio: 0.84,
+            ),
+            itemBuilder: (context, index) {
+              final item = controller.menuItems[index];
+              return _MenuCard(item: item);
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -294,7 +294,7 @@ class _LanguageDropdown extends GetView<LocalizationService> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+          border: Border.all(color: AppColors.black.withValues(alpha: 0.15)),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
@@ -302,7 +302,7 @@ class _LanguageDropdown extends GetView<LocalizationService> {
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 20.sp,
-              color: AppColors.primary,
+              color: AppColors.grey,
             ),
             borderRadius: BorderRadius.circular(10.r),
             style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
@@ -330,7 +330,7 @@ class _NotificationMenu extends GetView<HomeController> {
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            Icon(Iconsax.notification_copy, color: AppColors.primary),
+            Icon(Iconsax.notification_copy, color: AppColors.black),
             if (count > 0) ...[
               Positioned(
                 right: -2,

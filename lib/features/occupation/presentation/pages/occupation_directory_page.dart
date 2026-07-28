@@ -78,7 +78,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.grey.withValues(alpha: 0.5),
+                    color: AppColors.primary.withValues(alpha: 0.5),
                     width: 1.w,
                   ),
                 ),
@@ -257,79 +257,77 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         FocusManager.instance.primaryFocus?.unfocus();
         _controller.loadOccupations(refresh: true);
       },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.r),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Row(
+              spacing: 5.w,
               children: [
-                Container(
-                  padding: EdgeInsets.all(10.r),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Row(
-                    spacing: 5.w,
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.white,
-                        child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
-                            ? CachedImg(
-                                url: occ.logoUrl!,
-                                height: 25.h,
-                                width: 25.w,
-                                memCacheHeight: 120,
-                                memCacheWidth: 120,
-                                fit: BoxFit.contain,
-                                placeholder: (context, url) => SizedBox(
-                                  height: 25.h,
-                                  width: 25.w,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Icon(
-                                  _getIconData(occ.iconKey),
-                                  size: 20.r,
-                                  color: AppColors.primary,
-                                ),
-                              )
-                            : Icon(
-                                _getIconData(occ.iconKey),
-                                size: 20.r,
-                                color: AppColors.primary,
-                              ),
-                      ),
-                      _buildActionBadge(occ.count),
-                    ],
-                  ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppColors.white,
+                  child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
+                      ? CachedImg(
+                          url: occ.logoUrl!,
+                          height: 25.h,
+                          width: 25.w,
+                          memCacheHeight: 120,
+                          memCacheWidth: 120,
+                          fit: BoxFit.contain,
+                          placeholder: (context, url) => SizedBox(
+                            height: 25.h,
+                            width: 25.w,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Icon(
+                            _getIconData(occ.iconKey),
+                            size: 20.r,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : Icon(
+                          _getIconData(occ.iconKey),
+                          size: 20.r,
+                          color: AppColors.primary,
+                        ),
                 ),
-                10.verticalSpace,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      occ.name,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      'Tap to explore',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.grey.shade600,
-                        fontSize: 9.sp,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildActionBadge(occ.count),
               ],
             ),
+          ),
+          10.verticalSpace,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                occ.name,
+                style: AppTextStyles.titleSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                'Tap to explore',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.grey.shade600,
+                  fontSize: 9.sp,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

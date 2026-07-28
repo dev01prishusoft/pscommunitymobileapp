@@ -48,7 +48,6 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: AppColors.primary),
         title: Text(LK.family.tr),
         actions: [
           IconButton(
@@ -372,7 +371,7 @@ class _ResultsHeader extends GetView<FamilyController> {
         padding: EdgeInsets.only(bottom: 12.h),
         child: Row(
           children: [
-            Icon(Icons.map_rounded, size: 18.sp, color: AppColors.primary),
+            Icon(Icons.map_rounded, size: 18.sp),
             SizedBox(width: 8.w),
             Expanded(
               child: Text(
@@ -411,7 +410,6 @@ class _AreasList extends StatelessWidget {
       itemBuilder: (context, index) {
         final area = areas[index];
         return Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16.r),
@@ -476,7 +474,7 @@ class _AreasList extends StatelessWidget {
                             Icon(
                               Icons.location_city_rounded,
                               size: 14.sp,
-                              color: AppColors.primary,
+                              color: AppColors.grey,
                             ),
                             SizedBox(width: 4.w),
                             Expanded(
@@ -691,7 +689,7 @@ class _CustomDropdown extends StatelessWidget {
                 )
               : Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: isEnabled ? AppColors.primary : AppColors.grey,
+                  color: AppColors.grey,
                   size: 20.sp,
                 ),
           items: options.isEmpty

@@ -79,7 +79,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.grey.withValues(alpha: 0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   width: 1.w,
                 ),
               ),
@@ -104,7 +104,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             );
           }),
           IconButton(
-            icon: const Icon(Iconsax.filter_search_copy, color: AppColors.grey),
+            icon: const Icon(Iconsax.filter_search_copy),
             tooltip: 'Filters',
             onPressed: () async {
               await Get.dialog<void>(
@@ -509,7 +509,7 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
             size: 18,
-            color: AppColors.primary,
+            color: AppColors.grey,
           ),
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.black,

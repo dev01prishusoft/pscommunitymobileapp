@@ -150,7 +150,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             ),
           SizedBox(height: 16.h),
           _buildSection(
-            title: '${detail.members.length == 1 ? LK.member.tr : LK.membersCount.tr} (${detail.members.length})',
+            title:
+                '${detail.members.length == 1 ? LK.member.tr : LK.membersCount.tr} (${detail.members.length})',
             icon: Icons.groups_rounded,
             child: Column(
               children: [

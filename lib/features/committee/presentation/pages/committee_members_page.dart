@@ -413,7 +413,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                       LK.role.tr,
                       member.roleName,
                     ),
-                    if (member.reportsToName != null && member.reportsToName!.isNotEmpty) ...[
+                    if (member.reportsToName != null &&
+                        member.reportsToName!.isNotEmpty) ...[
                       Divider(
                         height: 24.h,
                         thickness: 0.5,
@@ -542,11 +543,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: [
-              MemberAvatar(
-                imageUrl: member.imageUrl,
-                fallbackName: member.name,
-                radius: 20.r,
-              ),
+            MemberAvatar(
+              imageUrl: member.imageUrl,
+              fallbackName: member.name,
+              radius: 20.r,
+            ),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(

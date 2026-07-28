@@ -103,8 +103,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                           ),
                   ),
                 ),
-                if (controller.selectedCategory.value?.isRecurring ==
-                    true) ...[
+                if (controller.selectedCategory.value?.isRecurring == true) ...[
                   SizedBox(height: 16.h),
                   GestureDetector(
                     onTap: controller.isProcessingPayment.value
@@ -145,216 +144,236 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.grey.shade200),
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionHeader(LK.paymentTypeHeader.tr),
+                    Obx(
+                      () => _buildDropdownField<PaymentType>(
+                        hint: LK.selectPaymentType.tr,
+                        value: controller.selectedType.value,
+                        items: controller.paymentTypes,
+                        onChanged: (type) => controller.onTypeChanged(type),
+                        itemLabel: (type) => type.name,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    _buildSectionHeader(LK.paymentModeHeader.tr),
+                    Obx(
+                      () => _buildDropdownField<PaymentMode>(
+                        hint: LK.selectPaymentMode.tr,
+                        value: controller.selectedMode.value,
+                        items: controller.paymentModes,
+                        onChanged: (mode) => controller.onModeChanged(mode),
+                        itemLabel: (mode) => mode.name,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    _buildSectionHeader(LK.categoryHeader.tr),
+                    Obx(
+                      () => _buildDropdownField<PaymentCategory>(
+                        hint: LK.selectCategory.tr,
+                        value: controller.selectedCategory.value,
+                        items: controller.categories,
+                        onChanged: (cat) => controller.onCategoryChanged(cat),
+                        itemLabel: (cat) => cat.name,
+                        isEnabled: controller.selectedType.value != null,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader(LK.paymentTypeHeader.tr),
-                  Obx(
-                    () => _buildDropdownField<PaymentType>(
-                      hint: LK.selectPaymentType.tr,
-                      value: controller.selectedType.value,
-                      items: controller.paymentTypes,
-                      onChanged: (type) => controller.onTypeChanged(type),
-                      itemLabel: (type) => type.name,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  _buildSectionHeader(LK.paymentModeHeader.tr),
-                  Obx(
-                    () => _buildDropdownField<PaymentMode>(
-                      hint: LK.selectPaymentMode.tr,
-                      value: controller.selectedMode.value,
-                      items: controller.paymentModes,
-                      onChanged: (mode) => controller.onModeChanged(mode),
-                      itemLabel: (mode) => mode.name,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-                  _buildSectionHeader(LK.categoryHeader.tr),
-                  Obx(
-                    () => _buildDropdownField<PaymentCategory>(
-                      hint: LK.selectCategory.tr,
-                      value: controller.selectedCategory.value,
-                      items: controller.categories,
-                      onChanged: (cat) => controller.onCategoryChanged(cat),
-                      itemLabel: (cat) => cat.name,
-                      isEnabled: controller.selectedType.value != null,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.grey.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader(LK.amountHeader.tr),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.grey.shade50,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.grey.shade200),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              LK.amountLabel.tr,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.grey.shade600,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Text(
-                              '₹',
-                              style: AppTextStyles.displaySmall.copyWith(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 6.w),
-                            Expanded(
-                              child: Obx(() {
-                                final isFixed = controller.isAmountFixed;
-                                return TextFormField(
-                                  controller: amountController,
-                                  cursorColor: AppColors.primary,
-                                  readOnly: isFixed,
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d*\.?\d{0,2}'),
-                                    ),
-                                    LengthLimitingTextInputFormatter(8),
-                                    TextInputFormatter.withFunction((
-                                      oldValue,
-                                      newValue,
-                                    ) {
-                                      if (newValue.text.isEmpty)
-                                        return newValue;
-                                      if (newValue.text == '.') return newValue;
-                                      final val = double.tryParse(
-                                        newValue.text,
-                                      );
-                                      if (val == null) return oldValue;
-                                      final maxAmount =
-                                          controller
-                                              .selectedCategory
-                                              .value
-                                              ?.maxAmount ??
-                                          0;
-                                      if (maxAmount > 0 && val > maxAmount) {
-                                        return oldValue;
-                                      }
-                                      return newValue;
-                                    }),
-                                  ],
-                                  onChanged: (val) =>
-                                      controller.enteredAmount.value =
-                                          double.tryParse(val) ?? 0,
-                                  validator: (val) {
-                                    if (val == null || val.isEmpty) return LK.fieldRequired.tr;
-                                    final amt = double.tryParse(val);
-                                    if (amt == null || amt <= 0) return LK.amountMustBeGreaterThanZero.tr;
-                                    final cat = controller.selectedCategory.value;
-                                    if (cat != null && !controller.isAmountFixed) {
-                                      if (cat.minAmount > 0 && amt < cat.minAmount) return '${LK.amountMustBeAtLeast.tr}${cat.minAmount.toInt()}';
-                                      if (cat.maxAmount > 0 && amt > cat.maxAmount) return '${LK.amountCannotExceed.tr}${cat.maxAmount.toInt()}';
-                                    }
-                                    return null;
-                                  },
-                                  style: AppTextStyles.displaySmall.copyWith(
-                                    color: isFixed
-                                        ? AppColors.grey.shade600
-                                        : AppColors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    errorBorder: InputBorder.none,
-                                    focusedErrorBorder: InputBorder.none,
-                                    filled: false,
-                                    contentPadding: EdgeInsets.zero,
-                                    hintText: '0',
-                                    errorStyle: TextStyle(color: Colors.red),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ],
-                        ),
-                        Obx(() {
-                          final isFixed = controller.isAmountFixed;
-                          if (isFixed) return const SizedBox.shrink();
-                          return _buildQuickAmountChips();
-                        }),
-                      ],
-                    ),
-                  ),
-                  Obx(() {
-                    final cat = controller.selectedCategory.value;
-                    if (cat != null && !controller.isAmountFixed) {
-                      final min = cat.minAmount;
-                      final max = cat.maxAmount;
-                      if (min > 0 || max > 0) {
-                        return Padding(
-                          padding: EdgeInsets.only(top: 12.h),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(height: 20.h),
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionHeader(LK.amountHeader.tr),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.shade50,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.grey.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              if (min > 0)
-                                Text(
-                                  '${LK.amountMustBeAtLeast.tr}${min.toInt()}',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Text(
+                                LK.amountLabel.tr,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.grey.shade600,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                              if (max > 0)
-                                Text(
-                                  '${LK.amountCannotExceed.tr}${max.toInt()}',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Text(
+                                '₹',
+                                style: AppTextStyles.displaySmall.copyWith(
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
+                              ),
+                              SizedBox(width: 6.w),
+                              Expanded(
+                                child: Obx(() {
+                                  final isFixed = controller.isAmountFixed;
+                                  return TextFormField(
+                                    controller: amountController,
+                                    cursorColor: AppColors.primary,
+                                    readOnly: isFixed,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                        RegExp(r'^\d*\.?\d{0,2}'),
+                                      ),
+                                      LengthLimitingTextInputFormatter(8),
+                                      TextInputFormatter.withFunction((
+                                        oldValue,
+                                        newValue,
+                                      ) {
+                                        if (newValue.text.isEmpty)
+                                          return newValue;
+                                        if (newValue.text == '.')
+                                          return newValue;
+                                        final val = double.tryParse(
+                                          newValue.text,
+                                        );
+                                        if (val == null) return oldValue;
+                                        final maxAmount =
+                                            controller
+                                                .selectedCategory
+                                                .value
+                                                ?.maxAmount ??
+                                            0;
+                                        if (maxAmount > 0 && val > maxAmount) {
+                                          return oldValue;
+                                        }
+                                        return newValue;
+                                      }),
+                                    ],
+                                    onChanged: (val) =>
+                                        controller.enteredAmount.value =
+                                            double.tryParse(val) ?? 0,
+                                    validator: (val) {
+                                      if (val == null || val.isEmpty)
+                                        return LK.fieldRequired.tr;
+                                      final amt = double.tryParse(val);
+                                      if (amt == null || amt <= 0)
+                                        return LK
+                                            .amountMustBeGreaterThanZero
+                                            .tr;
+                                      final cat =
+                                          controller.selectedCategory.value;
+                                      if (cat != null &&
+                                          !controller.isAmountFixed) {
+                                        if (cat.minAmount > 0 &&
+                                            amt < cat.minAmount)
+                                          return '${LK.amountMustBeAtLeast.tr}${cat.minAmount.toInt()}';
+                                        if (cat.maxAmount > 0 &&
+                                            amt > cat.maxAmount)
+                                          return '${LK.amountCannotExceed.tr}${cat.maxAmount.toInt()}';
+                                      }
+                                      return null;
+                                    },
+                                    style: AppTextStyles.displaySmall.copyWith(
+                                      color: isFixed
+                                          ? AppColors.grey.shade600
+                                          : AppColors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      focusedErrorBorder: InputBorder.none,
+                                      filled: false,
+                                      contentPadding: EdgeInsets.zero,
+                                      hintText: '0',
+                                      hintStyle: AppTextStyles.displaySmall
+                                          .copyWith(
+                                            color: AppColors.grey.shade600,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                      errorStyle: TextStyle(color: Colors.red),
+                                    ),
+                                  );
+                                }),
+                              ),
                             ],
                           ),
-                        );
+                          Obx(() {
+                            final isFixed = controller.isAmountFixed;
+                            if (isFixed) return const SizedBox.shrink();
+                            return _buildQuickAmountChips();
+                          }),
+                        ],
+                      ),
+                    ),
+                    Obx(() {
+                      final cat = controller.selectedCategory.value;
+                      if (cat != null && !controller.isAmountFixed) {
+                        final min = cat.minAmount;
+                        final max = cat.maxAmount;
+                        if (min > 0 || max > 0) {
+                          return Padding(
+                            padding: EdgeInsets.only(top: 12.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (min > 0)
+                                  Text(
+                                    '${LK.amountMustBeAtLeast.tr}${min.toInt()}',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                if (max > 0)
+                                  Text(
+                                    '${LK.amountCannotExceed.tr}${max.toInt()}',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        }
                       }
-                    }
-                    return SizedBox.shrink();
-                  }),
-                ],
+                      return SizedBox.shrink();
+                    }),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16.h),
-          ],
+              SizedBox(height: 16.h),
+            ],
+          ),
         ),
-       ),
       ),
     );
   }
@@ -395,7 +414,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.grey.shade100,
+                  color: isSelected ? AppColors.primary : Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isSelected ? AppColors.primary : Colors.transparent,

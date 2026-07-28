@@ -86,7 +86,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.grey.withValues(alpha: 0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   width: 1.w,
                 ),
               ),
