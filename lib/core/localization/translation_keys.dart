@@ -1,4 +1,4 @@
-﻿class LK {
+class LK {
   static const String reviewAndSaveChanges = 'Review & Save changes';
   static const String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
 
@@ -19,23 +19,7 @@
   static const String notifications = 'Notifications';
   static const String noNotificationsFound = 'No notifications found';
   static const String newLabel = 'New';
-  static String resetPassword = 'Reset Password';
-  static String newPassword = 'New Password';
-  static String confirmNewPassword = 'Confirm New Password';
-  static String updatePassword = 'Update Password';
-  static String passwordsDoNotMatch = 'Passwords do not match';
-  static String error = 'Error';
-  static String enter = 'Enter';
-  static String errorServer = 'Server Error';
-  static String errorNoInternet = 'No Internet Connection';
-  static String errorUnauthorized = 'Unauthorized';
-  static String errorTimeout = 'Request Timeout';
-  static String errorCertificatePinning = 'Security Error';
-  static String errorValidation = 'Validation Error';
-  static String invalidCredentials = 'Invalid credentials';
-  static String invalidMobileOrPassword = 'Invalid Mobile number or password';
-  static String pleaseEnterMobile = 'Please enter mobile number';
-  static String pleaseEnterValidMobile =
+  static const String enter = 'Enter';
   static const String resetPassword = 'Reset Password';
   static const String newPassword = 'New Password';
   static const String confirmNewPassword = 'Confirm New Password';
