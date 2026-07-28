@@ -59,11 +59,7 @@ class AppFormDropdown<T> extends StatelessWidget {
             key: ValueKey(value),
             initialValue: value,
             items: items,
-            icon: Icon(
-              Icons.arrow_drop_down,
-              size: 20,
-              color: AppColors.grey,
-            ),
+            icon: Icon(Icons.arrow_drop_down, size: 20, color: AppColors.grey),
             selectedItemBuilder: (BuildContext context) {
               return items.map<Widget>((DropdownMenuItem<T> item) {
                 return FittedBox(
@@ -77,8 +73,13 @@ class AppFormDropdown<T> extends StatelessWidget {
             isExpanded: true,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
-            decoration: InputDecoration(
-              hintText: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
+            hint: Text(
+              hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey,
+                overflow: TextOverflow.ellipsis,
+              ),
+              maxLines: 1,
             ),
             validator: (val) {
               if (isRequired && val == null) {
