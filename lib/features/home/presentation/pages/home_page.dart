@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
@@ -289,32 +290,20 @@ class _LanguageDropdown extends GetView<LocalizationService> {
           ? currentCode
           : codes.first;
 
-      return Container(
+      return CustomDropdown<String>(
+        hint: '',
+        value: selectedCode,
+        isExpanded: false,
         height: 35.h,
         padding: EdgeInsets.symmetric(horizontal: 10.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.black.withValues(alpha: 0.15)),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedCode,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              size: 20.sp,
-              color: AppColors.grey,
-            ),
-            borderRadius: BorderRadius.circular(10.r),
-            style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
-            items: codes.map((code) {
-              return DropdownMenuItem<String>(value: code, child: Text(code));
-            }).toList(),
-            onChanged: (code) {
-              homeController.changeLocale(controller, code);
-            },
-          ),
-        ),
+        fillColor: Colors.white,
+        style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+        items: codes.map((code) {
+          return DropdownMenuItem<String>(value: code, child: Text(code));
+        }).toList(),
+        onChanged: (code) {
+          homeController.changeLocale(controller, code);
+        },
       );
     });
   }

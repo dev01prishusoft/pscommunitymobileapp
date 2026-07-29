@@ -9,8 +9,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/presentation/controllers/marriage_controller.dart';
@@ -1050,57 +1051,31 @@ class _FilterDropdownField extends StatelessWidget {
         items.add(val);
       }
 
-      return Container(
+      return CustomDropdown<String>(
+        hint: '',
+        value: val,
         height: 48.h,
-        decoration: BoxDecoration(
-          color: isEnabledVal
-              ? AppColors.white
-              : AppColors.grey.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: AppColors.grey.withValues(alpha: 0.15),
-            width: 1.2.w,
-          ),
-        ),
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: val,
-            isDense: true,
-            isExpanded: true,
-            focusColor: AppColors.transparent,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              color: AppColors.grey,
-              size: 20.sp,
+        isEnabled: isEnabledVal,
+        items: items.toSet().toList().map((e) {
+          return DropdownMenuItem<String>(
+            value: e,
+            child: Text(
+              mapper != null ? mapper!(e) : e,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: isEnabledVal ? AppColors.black : AppColors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            items: items.toSet().toList().map((e) {
-              return DropdownMenuItem<String>(
-                value: e,
-                child: Text(
-                  mapper != null ? mapper!(e) : e,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: isEnabledVal ? AppColors.black : AppColors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: isEnabledVal
-                ? (newVal) {
-                    if (newVal != null) {
-                      rxValue.value = newVal;
-                      onChanged?.call(newVal);
-                    }
-                  }
-                : null,
-            borderRadius: BorderRadius.circular(12.r),
-            dropdownColor: AppColors.white,
-            elevation: 8,
-            menuMaxHeight: 350,
-          ),
-        ),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            rxValue.value = newValue;
+            onChanged?.call(newValue);
+          }
+        },
       );
     });
   }

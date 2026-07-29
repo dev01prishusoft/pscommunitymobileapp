@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown_form_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
 
@@ -55,11 +56,12 @@ class AppFormDropdown<T> extends StatelessWidget {
         Listener(
           onPointerDown: (_) =>
               FocusScope.of(context).requestFocus(FocusNode()),
-          child: DropdownButtonFormField<T>(
-            key: ValueKey(value),
-            initialValue: value,
+          child: CustomDropdownFormField<T>(
+            value: value,
             items: items,
-            icon: Icon(Icons.arrow_drop_down, size: 20, color: AppColors.grey),
+            onChanged: onChanged,
+            hint: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
+            menuMaxHeight: 350,
             selectedItemBuilder: (BuildContext context) {
               return items.map<Widget>((DropdownMenuItem<T> item) {
                 return FittedBox(
@@ -69,18 +71,6 @@ class AppFormDropdown<T> extends StatelessWidget {
                 );
               }).toList();
             },
-            onChanged: onChanged,
-            isExpanded: true,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
-            hint: Text(
-              hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.grey,
-                overflow: TextOverflow.ellipsis,
-              ),
-              maxLines: 1,
-            ),
             validator: (val) {
               if (isRequired && val == null) {
                 if (originalValue == null) {

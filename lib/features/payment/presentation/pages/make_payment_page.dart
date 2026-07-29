@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown_form_field.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/payment/domain/entities/payment_type.dart';
@@ -156,34 +157,61 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                   children: [
                     _buildSectionHeader(LK.paymentTypeHeader.tr),
                     Obx(
-                      () => _buildDropdownField<PaymentType>(
+                      () => CustomDropdownFormField<PaymentType>(
                         hint: LK.selectPaymentType.tr,
                         value: controller.selectedType.value,
-                        items: controller.paymentTypes,
+                        items: controller.paymentTypes.map((type) {
+                          return DropdownMenuItem<PaymentType>(
+                            value: type,
+                            child: Text(
+                              type.name,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                         onChanged: (type) => controller.onTypeChanged(type),
-                        itemLabel: (type) => type.name,
                       ),
                     ),
                     SizedBox(height: 20.h),
                     _buildSectionHeader(LK.paymentModeHeader.tr),
                     Obx(
-                      () => _buildDropdownField<PaymentMode>(
+                      () => CustomDropdownFormField<PaymentMode>(
                         hint: LK.selectPaymentMode.tr,
                         value: controller.selectedMode.value,
-                        items: controller.paymentModes,
+                        items: controller.paymentModes.map((mode) {
+                          return DropdownMenuItem<PaymentMode>(
+                            value: mode,
+                            child: Text(
+                              mode.name,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                         onChanged: (mode) => controller.onModeChanged(mode),
-                        itemLabel: (mode) => mode.name,
                       ),
                     ),
                     SizedBox(height: 20.h),
                     _buildSectionHeader(LK.categoryHeader.tr),
                     Obx(
-                      () => _buildDropdownField<PaymentCategory>(
+                      () => CustomDropdownFormField<PaymentCategory>(
                         hint: LK.selectCategory.tr,
                         value: controller.selectedCategory.value,
-                        items: controller.categories,
+                        items: controller.categories.map((cat) {
+                          return DropdownMenuItem<PaymentCategory>(
+                            value: cat,
+                            child: Text(
+                              cat.name,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                         onChanged: (cat) => controller.onCategoryChanged(cat),
-                        itemLabel: (cat) => cat.name,
                         isEnabled: controller.selectedType.value != null,
                       ),
                     ),
@@ -445,71 +473,6 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
           letterSpacing: 0.5,
         ),
       ),
-    );
-  }
-
-  Widget _buildDropdownField<T>({
-    required String hint,
-    required T? value,
-    required List<T> items,
-    required void Function(T?) onChanged,
-    required String Function(T) itemLabel,
-    bool isEnabled = true,
-  }) {
-    return DropdownButtonFormField<T>(
-      initialValue: value,
-      hint: Text(
-        hint,
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.grey.shade400,
-        ),
-      ),
-      isExpanded: true,
-      dropdownColor: AppColors.white,
-      borderRadius: BorderRadius.circular(14),
-      icon: Icon(
-        Icons.keyboard_arrow_down_rounded,
-        color: AppColors.primary,
-        size: 20,
-      ),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: isEnabled ? AppColors.grey.shade50 : AppColors.grey.shade100,
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.grey.shade200),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.grey.shade200),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.grey.shade200),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary),
-        ),
-      ),
-      validator: (val) => val == null ? LK.fieldRequired.tr : null,
-      items: items.map((T item) {
-        return DropdownMenuItem<T>(
-          value: item,
-          child: Text(
-            itemLabel(item),
-            style: AppTextStyles.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        );
-      }).toList(),
-      onChanged: isEnabled ? onChanged : null,
     );
   }
 }

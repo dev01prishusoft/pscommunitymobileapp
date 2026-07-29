@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -484,65 +485,39 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
     required void Function(String?) onChanged,
     String? value,
   }) {
-    return Container(
+    return CustomDropdown<String?>(
+      hint: hint,
+      value: (value != null && items.contains(value)) ? value : null,
       height: 48.h,
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: AppColors.grey.shade50,
-        border: Border.all(
-          color: value != null
-              ? AppColors.primary.withValues(alpha: 0.4)
-              : AppColors.grey.shade200,
-        ),
-        borderRadius: BorderRadius.circular(12),
+      style: AppTextStyles.bodySmall.copyWith(
+        color: AppColors.black,
+        fontWeight: FontWeight.bold,
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: (value != null && items.contains(value)) ? value : null,
-          hint: Text(
+      items: [
+        DropdownMenuItem(
+          value: null,
+          child: Text(
             hint,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.grey.shade400,
             ),
           ),
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 18,
-            color: AppColors.grey,
-          ),
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.black,
-            fontWeight: FontWeight.bold,
-          ),
-          dropdownColor: AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          items: [
-            DropdownMenuItem(
-              value: null,
-              child: Text(
-                hint,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.grey.shade400,
-                ),
-              ),
-            ),
-            ...items.map(
-              (s) => DropdownMenuItem(
-                value: s,
-                child: Text(
-                  s == 'All' ? LK.all.tr : s,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          onChanged: onChanged,
         ),
-      ),
+        ...items.map(
+          (s) => DropdownMenuItem(
+            value: s,
+            child: Text(
+              s == 'All' ? LK.all.tr : s,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+      onChanged: onChanged,
     );
   }
 }
