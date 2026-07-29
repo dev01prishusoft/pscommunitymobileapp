@@ -1138,7 +1138,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     final fieldsWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (addr.isPrimary)
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
