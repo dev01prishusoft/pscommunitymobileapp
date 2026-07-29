@@ -99,7 +99,7 @@ class _AnimatedLogo extends GetView<SamajController> {
           url: logoUrl,
           width: 175.w,
           memCacheWidth: 360,
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
           placeholder: (context, url) => SizedBox(
             width: 175.w,
             height: 175.h,

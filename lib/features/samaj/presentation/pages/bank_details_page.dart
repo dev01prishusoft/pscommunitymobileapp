@@ -372,7 +372,7 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                     ),
                     errorWidget: (_, __, ___) => Image.asset(
                       FallBackImage,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

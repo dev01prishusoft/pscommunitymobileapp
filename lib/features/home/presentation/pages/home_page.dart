@@ -125,7 +125,7 @@ class _HomeHeader extends GetView<SamajController> {
                 child: samaj?.logoUrl != null && samaj!.logoUrl.isNotEmpty
                     ? CachedImg(
                         url: samaj.logoUrl,
-                        fit: BoxFit.contain,
+                        fit: BoxFit.cover,
                         placeholder: (_, __) => Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
@@ -142,7 +142,7 @@ class _HomeHeader extends GetView<SamajController> {
 }
 
 Widget _fallbackLogo() =>
-    Image.asset(FallBackImage, fit: BoxFit.contain);
+    Image.asset(FallBackImage, fit: BoxFit.cover);
 
 class _HomeMenuGrid extends StatelessWidget {
   const _HomeMenuGrid({required this.controller});
