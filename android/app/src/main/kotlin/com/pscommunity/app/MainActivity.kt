@@ -1,4 +1,4 @@
-package com.pscommunity.app
+package com.sajivan.app
 
 import io.flutter.embedding.android.FlutterActivity
 

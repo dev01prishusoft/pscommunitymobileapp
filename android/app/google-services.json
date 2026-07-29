@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:413758830617:android:785897cd5bc76861d11288",
+        "mobilesdk_app_id": "1:413758830617:android:f10f3b8f44b8c311d11288",
         "android_client_info": {
-          "package_name": "com.pscommunity.app"
+          "package_name": "com.sajivan.app"
         }
       },
       "oauth_client": [],
