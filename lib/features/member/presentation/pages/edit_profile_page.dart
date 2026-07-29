@@ -2104,34 +2104,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Obx(() {
-                  final isFetching = controller.isFetchingLocation.value;
-                  return TextButton.icon(
-                    onPressed: isFetching
-                        ? null
-                        : () => controller.fetchCurrentLocation(addr),
-                    icon: isFetching
-                        ? SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.primary,
-                            ),
-                          )
-                        : const Icon(Icons.my_location, size: 18),
-                    label: Text(
-                      isFetching
-                          ? 'Fetching Address...'
-                          : 'Use Current Location',
-                    ),
-                  );
-                }),
-              ],
-            ),
+            if (addr.isPrimary)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Obx(() {
+                    final isFetching = controller.isFetchingLocation.value;
+                    return TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                      ),
+                      onPressed: isFetching
+                          ? null
+                          : () => controller.fetchCurrentLocation(addr),
+                      icon: isFetching
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            )
+                          : const Icon(Icons.my_location, size: 18),
+                      label: Text(
+                        isFetching
+                            ? 'Fetching Address...'
+                            : 'Use Current Location',
+                      ),
+                    );
+                  }),
+                ],
+              ),
             AppSpacing.vS,
             Obx(() {
               final typeList = controller.contactInfo.addressTypeList;
@@ -2142,7 +2146,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       (e) => DropdownMenuItem(
                         value: e,
                         child: Text(
-                          e,
+                          e.tr,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),

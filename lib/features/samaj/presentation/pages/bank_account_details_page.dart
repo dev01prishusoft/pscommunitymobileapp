@@ -361,16 +361,12 @@ class BankAccountDetailsPage extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                label,
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
-                ),
+            child: Text(
+              label,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
               ),
             ),
           ),
