@@ -10,9 +10,9 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
-import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
 
@@ -52,10 +52,9 @@ class _HomePageState extends State<HomePage> with RouteAware {
       key: _scaffoldKey,
       drawer: AppDrawer(),
       appBar: AppBar(
-        iconTheme: IconThemeData(color: AppColors.primary),
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: AppColors.black),
+            icon: Icon(Icons.menu),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),

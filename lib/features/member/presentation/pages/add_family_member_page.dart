@@ -10,9 +10,9 @@ import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -1966,9 +1966,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.personalInfo.monthlyIncomeCtrl,
                   label: LK.monthlyIncomeLabel.tr,
                   prefixIcon: const Icon(Icons.currency_rupee),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: 8,
+                  keyboardType: TextInputType.numberWithOptions(
+                    decimal: true
+                  ),
+                  maxLength: 13,
                 ),
               ],
             ),

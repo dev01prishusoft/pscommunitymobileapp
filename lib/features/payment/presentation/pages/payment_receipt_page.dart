@@ -57,14 +57,14 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Get.back<void>(),
         ),
         title: Text(LK.paymentReceipt.tr),
         actions: [
           IconButton(
             onPressed: () => _shareReceipt(),
-            icon: Icon(Icons.share, color: AppColors.primary),
+            icon: Icon(Icons.share),
           ),
         ],
       ),
