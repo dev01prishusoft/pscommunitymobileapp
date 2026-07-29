@@ -22,7 +22,7 @@ void main() {
 Future<void> _bootstrap() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -33,7 +33,7 @@ Future<void> _bootstrap() async {
 
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     await DI.bootstrap();
-    
+
     AppLifecycleObserver.instance.init();
 
     if (kDebugMode) {

@@ -2,7 +2,7 @@ class LK {
   static const String reviewAndSaveChanges = 'Review & Save changes';
   static const String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
 
-  static const String appTitle = 'PS Community';
+  static const String appTitle = 'Sajivan';
   static const String welcome = 'Welcome to PrishuSoft Samaj';
   static const String welcomesYou = 'welcomes you';
   static const String signIn = 'Sign In';
@@ -33,14 +33,16 @@ class LK {
   static const String errorCertificatePinning = 'Security Error';
   static const String errorValidation = 'Validation Error';
   static const String invalidCredentials = 'Invalid credentials';
-  static const String invalidMobileOrPassword = 'Invalid Mobile number or password';
+  static const String invalidMobileOrPassword =
+      'Invalid Mobile number or password';
   static const String pleaseEnterMobile = 'Please enter mobile number';
   static const String pleaseEnterValidMobile =
       'Please enter a valid 10-digit mobile number';
   static const String pleaseEnterPassword = 'Please enter password';
   static const String pleaseEnterOldPassword = 'Please enter Old Password';
   static const String pleaseEnterNewPassword = 'Please enter New Password';
-  static const String pleaseEnterConfirmPassword = 'Please enter Confirm Password';
+  static const String pleaseEnterConfirmPassword =
+      'Please enter Confirm Password';
   static const String family = 'Family';
   static const String findMember = 'Find Member';
   static const String committee = 'Committee';
@@ -130,13 +132,16 @@ class LK {
   static const String sessionExpiredBody =
       'You have been logged out due to inactivity.';
   static const String pleaseEnterEmail = 'Please enter email address';
-  static const String pleaseEnterValidEmail = 'Please enter a valid email address';
-  static const String passwordMinLength = 'Password must be at least 8 characters';
+  static const String pleaseEnterValidEmail =
+      'Please enter a valid email address';
+  static const String passwordMinLength =
+      'Password must be at least 8 characters';
   static const String passwordLowercase =
       'Password must contain at least one lowercase letter';
   static const String passwordUppercase =
       'Password must contain at least one uppercase letter';
-  static const String passwordNumber = 'Password must contain at least one number';
+  static const String passwordNumber =
+      'Password must contain at least one number';
   static const String passwordSpecialChar =
       r'Password must contain at least one special character (!@#$&*~)';
   static const String pleaseEnterOTP = 'Please enter OTP';
@@ -155,7 +160,8 @@ class LK {
   static const String pleaseSelectCategory = 'pleaseSelectCategory';
   static const String amountMustBeAtLeast = 'amountMustBeAtLeast';
   static const String amountCannotExceed = 'amountCannotExceed';
-  static const String amountMustBeGreaterThanZero = 'amountMustBeGreaterThanZero';
+  static const String amountMustBeGreaterThanZero =
+      'amountMustBeGreaterThanZero';
   static const String couldNotDetermineMemberId = 'couldNotDetermineMemberId';
   static const String paymentTimedOut = 'paymentTimedOut';
   static const String retry = 'Retry';
@@ -308,8 +314,10 @@ class LK {
   static const String applyFilters = 'Apply Filters';
   static const String clearAll = 'Clear All';
   static const String copiedToClipboard = 'copied to clipboard';
-  static const String orgDetailsCopied = 'Organization details copied to clipboard.';
-  static const String ourSupportTeamDesc = 'Our support team is here to assist you.';
+  static const String orgDetailsCopied =
+      'Organization details copied to clipboard.';
+  static const String ourSupportTeamDesc =
+      'Our support team is here to assist you.';
   static const String supportMembers = 'Support Members';
   static const String representative = 'Representative';
   static const String whatsAppSupport = 'WhatsApp Support';
@@ -323,7 +331,8 @@ class LK {
   static const String scanToDownload = 'Scan to download the app';
   static const String committeeMemberDetails = 'Committee Member Details';
   static const String committeeDetailsHeader = 'COMMITTEE DETAILS';
-  static const String noMembersCommittee = 'No members found for this committee';
+  static const String noMembersCommittee =
+      'No members found for this committee';
   static const String searchByFirstNameHint = 'Search by first name...';
   static const String stateLabel = 'State:';
   static const String districtLabel = 'District:';
@@ -492,7 +501,8 @@ class LK {
   static const String crore = 'Crore';
   static const String editRequestComment = 'Edit Request Comment';
 
-  static const String educationAddedSuccessfully = 'Education Added Successfully';
+  static const String educationAddedSuccessfully =
+      'Education Added Successfully';
   static const String profileAndEducationUpdated =
       'Profile update requested and education added successfully';
   static const String adminAnnouncement = 'Admin Announcement';
@@ -521,5 +531,3 @@ class LK {
   static const String bankName = 'Bank Name';
   static const String scanQrToPay = 'Scan this QR code with any UPI app to pay';
 }
-
-

@@ -55,8 +55,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/images/app_logo.png', height: 100.h),
-                AppSpacing.vXxxl,
+                Image.asset('assets/images/sajivan.png', height: 160.h),
+                AppSpacing.vXxl,
                 Card(
                   color: AppColors.white,
                   shape: RoundedRectangleBorder(

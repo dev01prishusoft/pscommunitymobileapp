@@ -67,36 +67,26 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           15.verticalSpace,
-          Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: AppTextField(
-              controller: _searchController,
-              hint: LK.searchMember.tr,
-              icon: Iconsax.search_normal_copy,
-              onChanged: controller.searchMembers,
-              suffixIcon: Obx(
-                () => controller.memberSearchQuery.value.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.close_rounded,
-                          size: 20.r,
-                          color: AppColors.grey,
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                          controller.clearMemberSearch();
-                        },
-                      )
-                    : const SizedBox.shrink(),
-              ),
+          AppTextField(
+            controller: _searchController,
+            hint: LK.searchMember.tr,
+            icon: Iconsax.search_normal_copy,
+            iconColor: AppColors.primary,
+            onChanged: controller.searchMembers,
+            suffixIcon: Obx(
+              () => controller.memberSearchQuery.value.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.close_rounded,
+                        size: 20.r,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        _searchController.clear();
+                        controller.clearMemberSearch();
+                      },
+                    )
+                  : const SizedBox.shrink(),
             ),
           ),
           10.verticalSpace,
@@ -203,100 +193,98 @@ class _OccupationMemberCard extends StatelessWidget {
         );
       },
       child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              MemberAvatar(
-                imageUrl: member.profilePhotoFullUrl,
-                gender: member.gender,
-                fallbackName: member.name,
-                radius: 28.r,
-              ),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          MemberAvatar(
+            imageUrl: member.profilePhotoFullUrl,
+            gender: member.gender,
+            fallbackName: member.name,
+            radius: 28.r,
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  member.name,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Wrap(
+                  spacing: 6.w,
+                  runSpacing: 6.h,
                   children: [
-                    Text(
-                      member.name,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
+                    if (genderLabel.isNotEmpty)
+                      _buildBadge(
+                        genderLabel,
+                        isFemale ? Icons.female_rounded : Icons.male_rounded,
+                        isFemale
+                            ? const Color(0xFFFFEEF0)
+                            : const Color(0xFFE8F0FE),
+                        isFemale
+                            ? const Color(0xFFD81B60)
+                            : const Color(0xFF1A73E8),
                       ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Wrap(
-                      spacing: 6.w,
-                      runSpacing: 6.h,
-                      children: [
-                        if (genderLabel.isNotEmpty)
-                          _buildBadge(
-                            genderLabel,
-                            isFemale
-                                ? Icons.female_rounded
-                                : Icons.male_rounded,
-                            isFemale
-                                ? const Color(0xFFFFEEF0)
-                                : const Color(0xFFE8F0FE),
-                            isFemale
-                                ? const Color(0xFFD81B60)
-                                : const Color(0xFF1A73E8),
-                          ),
-                        if (member.age > 0)
-                          _buildBadge(
-                            '${member.age} ${LK.ageYears.tr}',
-                            Icons.cake_rounded,
-                            const Color(0xFFFEF7E0),
-                            const Color(0xFFB06000),
-                          ),
-                        if (member.occupation.isNotEmpty)
-                          _buildBadge(
-                            member.occupation,
-                            Icons.work_rounded,
-                            AppColors.primary.withValues(alpha: 0.05),
-                            AppColors.primary,
-                          ),
-                      ],
-                    ),
-                    if (member.area.isNotEmpty) ...[
-                      SizedBox(height: 10.h),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_rounded,
-                            size: 14.r,
-                            color: AppColors.grey,
-                          ),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: Text(
-                              member.area,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.grey.shade700,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                    if (member.age > 0)
+                      _buildBadge(
+                        '${member.age} ${LK.ageYears.tr}',
+                        Icons.cake_rounded,
+                        const Color(0xFFFEF7E0),
+                        const Color(0xFFB06000),
                       ),
-                    ],
+                    if (member.occupation.isNotEmpty)
+                      _buildBadge(
+                        member.occupation,
+                        Icons.work_rounded,
+                        AppColors.primary.withValues(alpha: 0.05),
+                        AppColors.primary,
+                      ),
                   ],
                 ),
-              ),
-              SizedBox(width: 10.w),
-              Container(
-                padding: EdgeInsets.all(6.r),
-                decoration: BoxDecoration(
-                  color: AppColors.sfBackground,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors.primary,
-                  size: 20.r,
-                ),
-              ),
-            ],
+                if (member.area.isNotEmpty) ...[
+                  SizedBox(height: 10.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_rounded,
+                        size: 14.r,
+                        color: AppColors.grey.shade700,
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          member.area,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.grey.shade700,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
           ),
+          SizedBox(width: 10.w),
+          Container(
+            padding: EdgeInsets.all(6.r),
+            decoration: BoxDecoration(
+              color: AppColors.sfBackground,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.primary,
+              size: 20.r,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

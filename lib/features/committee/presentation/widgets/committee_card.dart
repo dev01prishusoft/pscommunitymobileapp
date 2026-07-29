@@ -101,9 +101,7 @@ class CommitteeCard extends StatelessWidget {
                     currentDepth == 0
                         ? Icons.account_balance_rounded
                         : Icons.corporate_fare_rounded,
-                    color: currentDepth == 0
-                        ? AppColors.primary
-                        : AppColors.secondary,
+                    color: AppColors.primary,
                     size: 18.sp,
                   ),
                 ),

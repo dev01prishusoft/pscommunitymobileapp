@@ -27,7 +27,7 @@ class Samaj {
       nameEnglish: json['nameenglish'] as String? ?? '',
       description: json['description'] as String? ?? '',
       descriptionEnglish: json['descriptionenglish'] as String? ?? '',
-      logoUrl: json['logoUrl'] as String? ?? '',
+      logoUrl: json['logoUrl'] as String? ?? json['logourl'] as String? ?? json['logo_url'] as String? ?? '',
       bankAccounts:
           (json['bankAccounts'] as List<dynamic>?)
               ?.map((e) => BankAccount.fromJson(e as Map<String, dynamic>))

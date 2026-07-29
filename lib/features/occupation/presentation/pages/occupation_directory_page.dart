@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,6 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/features/occupation/domain/entities/occupation_item.dart';
@@ -27,6 +27,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   final OccupationController _controller = Get.find<OccupationController>();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
@@ -52,48 +53,55 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LK.occupationDirectory.tr)),
+      appBar: AppBar(
+        title: _isSearchVisible
+            ? CupertinoTextField(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+                prefix: Icon(
+                  Iconsax.search_normal_copy,
+                  size: 15,
+                ).paddingOnly(left: 10),
+                suffix: GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
+                    _controller.clearSearch();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  },
+                  child: Icon(
+                    Iconsax.close_circle_copy,
+                    size: 20,
+                  ).paddingOnly(right: 10),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                    width: 1.w,
+                  ),
+                ),
+                placeholder: LK.searchOccupation.tr,
+                controller: _searchController,
+                onChanged: _controller.search,
+              )
+            : Text(LK.occupationDirectory.tr),
+        actions: [
+          if (!_isSearchVisible)
+            IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                setState(() {
+                  _isSearchVisible = true;
+                });
+              },
+            ),
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(14.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: AppTextField(
-                controller: _searchController,
-                hint: LK.searchOccupation.tr,
-                icon: Iconsax.search_normal_copy,
-                onChanged: _controller.search,
-                suffixIcon: Obx(
-                  () => _controller.searchQuery.value.isNotEmpty
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.close_rounded,
-                            size: 20.r,
-                            color: AppColors.grey,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                            _controller.clearSearch();
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ),
-            ),
-          ),
-
           SizedBox(
             height: 34.h,
             child: Obx(
@@ -204,7 +212,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               Text(
                 displayName,
                 style: AppTextStyles.labelSmall.copyWith(
-                  color: isSelected ? AppColors.white : AppColors.secondary,
+                  color: isSelected ? AppColors.white : AppColors.black,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                 ),
               ),
@@ -249,79 +257,77 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         FocusManager.instance.primaryFocus?.unfocus();
         _controller.loadOccupations(refresh: true);
       },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.r),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Row(
+              spacing: 5.w,
               children: [
-                Container(
-                  padding: EdgeInsets.all(10.r),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Row(
-                    spacing: 5.w,
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.white,
-                        child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
-                            ? CachedImg(
-                                url: occ.logoUrl!,
-                                height: 25.h,
-                                width: 25.w,
-                                memCacheHeight: 120,
-                                memCacheWidth: 120,
-                                fit: BoxFit.contain,
-                                placeholder: (context, url) => SizedBox(
-                                  height: 25.h,
-                                  width: 25.w,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Icon(
-                                  _getIconData(occ.iconKey),
-                                  size: 20.r,
-                                  color: AppColors.primary,
-                                ),
-                              )
-                            : Icon(
-                                _getIconData(occ.iconKey),
-                                size: 20.r,
-                                color: AppColors.primary,
-                              ),
-                      ),
-                      _buildActionBadge(occ.count),
-                    ],
-                  ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppColors.white,
+                  child: occ.logoUrl != null && occ.logoUrl!.isNotEmpty
+                      ? CachedImg(
+                          url: occ.logoUrl!,
+                          height: 25.h,
+                          width: 25.w,
+                          memCacheHeight: 120,
+                          memCacheWidth: 120,
+                          fit: BoxFit.contain,
+                          placeholder: (context, url) => SizedBox(
+                            height: 25.h,
+                            width: 25.w,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Icon(
+                            _getIconData(occ.iconKey),
+                            size: 20.r,
+                            color: AppColors.primary,
+                          ),
+                        )
+                      : Icon(
+                          _getIconData(occ.iconKey),
+                          size: 20.r,
+                          color: AppColors.primary,
+                        ),
                 ),
-                10.verticalSpace,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      occ.name,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      'Tap to explore',
-                      style: AppTextStyles.labelSmall.copyWith(
-                        color: AppColors.grey.shade600,
-                        fontSize: 9.sp,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildActionBadge(occ.count),
               ],
             ),
+          ),
+          10.verticalSpace,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                occ.name,
+                style: AppTextStyles.titleSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                'Tap to explore',
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.grey.shade600,
+                  fontSize: 9.sp,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

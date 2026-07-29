@@ -86,7 +86,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.grey.withValues(alpha: 0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   width: 1.w,
                 ),
               ),
@@ -467,7 +467,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       child: Text(
                         req.amountFormatted,
                         style: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -515,7 +515,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   Text(
                     req.memberName,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.grey,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

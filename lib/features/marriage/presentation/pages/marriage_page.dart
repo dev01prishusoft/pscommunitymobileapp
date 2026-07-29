@@ -45,6 +45,7 @@ class MarriagePage extends GetView<MarriageController> {
               prefix: Icon(
                 Iconsax.search_normal_copy,
                 size: 15,
+                color: Colors.grey,
               ).paddingOnly(left: 10),
               suffix: GestureDetector(
                 onTap: () {
@@ -56,12 +57,13 @@ class MarriagePage extends GetView<MarriageController> {
                 child: Icon(
                   Iconsax.close_circle_copy,
                   size: 20,
+                  color: AppColors.black,
                 ).paddingOnly(right: 10),
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.grey.withValues(alpha: 0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   width: 1.w,
                 ),
               ),
@@ -403,14 +405,14 @@ class _MarriageMemberCard extends StatelessWidget {
                       child: Text(
                         member.name,
                         style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.primary,
+                          color: AppColors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: AppColors.grey.shade400,
+                      color: AppColors.black,
                       size: 20.sp,
                     ),
                   ],
@@ -563,7 +565,18 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Iconsax.filter_search_copy, size: 22.sp),
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Iconsax.filter_search_copy,
+                    size: 22.sp,
+                    color: AppColors.primary,
+                  ),
+                ),
                 SizedBox(width: 10.w),
                 Text(
                   LK.advancedFilters.tr,
@@ -969,7 +982,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
 
   Widget _buildIncomeTextField(TextEditingController ctrl, String hint) {
     return SizedBox(
-      height: 44.h,
+      height: 48.h,
       child: TextField(
         controller: ctrl,
         keyboardType: TextInputType.number,
@@ -979,9 +992,12 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
         ],
         decoration: InputDecoration(
           hintText: hint,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 10.h,
+          filled: true,
+          fillColor: AppColors.white,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          hintStyle: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.grey,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
@@ -1042,11 +1058,7 @@ class _FilterDropdownField extends StatelessWidget {
               : AppColors.grey.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: isEnabledVal
-                ? (val != 'All' && val != 'Any'
-                      ? AppColors.primary.withValues(alpha: 0.4)
-                      : AppColors.grey.withValues(alpha: 0.25))
-                : AppColors.grey.withValues(alpha: 0.15),
+            color: AppColors.grey.withValues(alpha: 0.15),
             width: 1.2.w,
           ),
         ),
@@ -1059,7 +1071,7 @@ class _FilterDropdownField extends StatelessWidget {
             focusColor: AppColors.transparent,
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: isEnabledVal ? AppColors.primary : AppColors.grey,
+              color: AppColors.grey,
               size: 20.sp,
             ),
             items: items.toSet().toList().map((e) {

@@ -1,12 +1,14 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -232,12 +234,12 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                           ),
                                         ),
                                         errorWidget: (_, __, ___) => Image.asset(
-                                          'assets/images/prishusoft_logo.png',
+                                          FallBackImage,
                                           fit: BoxFit.contain,
                                         ),
                                       )
                                     : Image.asset(
-                                        'assets/images/prishusoft_logo.png',
+                                        FallBackImage,
                                         fit: BoxFit.contain,
                                       ),
                               ),
@@ -247,7 +249,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                               name,
                               textAlign: TextAlign.center,
                               style: AppTextStyles.titleMedium.copyWith(
-                                color: AppColors.secondary,
+                                color: AppColors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -260,7 +262,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         style: TextStyle(
                           fontSize: 32.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                          color: AppColors.black,
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -268,7 +270,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                         data['category']!,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey.shade600,
+                          color: AppColors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -392,7 +394,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               value,
               textAlign: TextAlign.end,
               style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.secondary,
+                color: AppColors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -451,8 +453,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       theme: pw.ThemeData.withFont(base: font, bold: boldFont),
     );
 
-    final primaryColor = PdfColor.fromInt(AppColors.primary.value);
-    final secondaryColor = PdfColor.fromInt(AppColors.secondary.value);
+    final primaryColor = PdfColors.black;
+    final secondaryColor = PdfColors.black;
     final lightGrey = PdfColor.fromInt(0xFFF9F9F9);
     final borderGrey = PdfColor.fromInt(0xFFE5E5E5);
 
