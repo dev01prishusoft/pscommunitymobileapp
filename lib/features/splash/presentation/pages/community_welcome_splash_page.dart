@@ -98,7 +98,7 @@ class _AnimatedLogo extends GetView<SamajController> {
         child: CachedImg(
           url: logoUrl,
           width: 175.w,
-          memCacheWidth: 360,
+          height: 175.h,
           fit: BoxFit.cover,
           placeholder: (context, url) => SizedBox(
             width: 175.w,
