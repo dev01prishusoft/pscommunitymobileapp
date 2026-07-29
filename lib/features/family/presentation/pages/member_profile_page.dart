@@ -403,7 +403,7 @@ class _AddressSection extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        addr.addressTypeName,
+                        addr.addressTypeName.tr,
                         style: AppTextStyles.labelSmall.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
