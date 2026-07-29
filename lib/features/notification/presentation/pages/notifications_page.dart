@@ -18,7 +18,7 @@ class NotificationsPage extends GetView<NotificationController> {
       top: false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(LK.notifications.tr, style: AppTextStyles.titleLarge),
+          title: Text(LK.notifications.tr),
         ),
         body: Obx(() {
           if (controller.isLoading.value && controller.notifications.isEmpty) {

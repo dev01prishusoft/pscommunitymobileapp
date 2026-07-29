@@ -61,6 +61,11 @@ class AppTheme {
       selectionColor: AppColors.primary.withValues(alpha: 0.3),
       selectionHandleColor: AppColors.primary,
     ),
+    scrollbarTheme: ScrollbarThemeData(
+      thumbColor: WidgetStatePropertyAll(AppColors.primary),
+      radius: const Radius.circular(8),
+      thickness: const WidgetStatePropertyAll(6),
+    ),
     scaffoldBackgroundColor: AppColors.sfBackground,
     splashColor: AppColors.primary.withValues(alpha: 0.1),
     highlightColor: AppColors.primary.withValues(alpha: 0.05),

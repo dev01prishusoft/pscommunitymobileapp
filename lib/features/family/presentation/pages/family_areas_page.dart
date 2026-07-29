@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/features/family/domain/entities/family_area.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
 
@@ -280,28 +281,28 @@ class _FilterDialogState extends State<_FilterDialog> {
               ),
               SizedBox(height: 24.h),
               Obx(
-                () => _CustomDropdown(
+                () => CustomDropdown<DropdownItem>(
                   hint: LK.selectState.tr,
                   value: _tempState,
-                  options: controller.states,
+                  items: controller.states.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
                   onChanged: _onStateChanged,
                   isLoading: controller.isStatesLoading.value,
                 ),
               ),
               SizedBox(height: 16.h),
-              _CustomDropdown(
+              CustomDropdown<DropdownItem>(
                 hint: LK.selectDistrict.tr,
                 value: _tempDistrict,
-                options: _localDistricts,
+                items: _localDistricts.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
                 onChanged: _onDistrictChanged,
                 isEnabled: _tempState != null,
                 isLoading: _isDistrictsLoading,
               ),
               SizedBox(height: 16.h),
-              _CustomDropdown(
+              CustomDropdown<DropdownItem>(
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
-                options: _localTalukas,
+                items: _localTalukas.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
                 onChanged: _onTalukaChanged,
                 isEnabled: _tempDistrict != null,
                 isLoading: _isTalukasLoading,
@@ -629,90 +630,3 @@ class _EmptyState extends GetView<FamilyController> {
   }
 }
 
-class _CustomDropdown extends StatelessWidget {
-  const _CustomDropdown({
-    required this.hint,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-    this.isEnabled = true,
-    this.isLoading = false,
-  });
-  final String hint;
-  final DropdownItem? value;
-  final List<DropdownItem> options;
-  final void Function(DropdownItem?) onChanged;
-  final bool isEnabled;
-  final bool isLoading;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 52.h,
-      decoration: BoxDecoration(
-        color: isEnabled
-            ? AppColors.white
-            : AppColors.grey.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: isEnabled
-              ? (value != null
-                    ? AppColors.primary.withValues(alpha: 0.4)
-                    : AppColors.grey.withValues(alpha: 0.25))
-              : AppColors.grey.withValues(alpha: 0.15),
-          width: 1.2.w,
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<DropdownItem>(
-          value: (value != null && options.any((o) => o.id == value!.id))
-              ? options.firstWhere((o) => o.id == value!.id)
-              : null,
-          hint: Text(
-            hint,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.grey.withValues(alpha: 0.6),
-            ),
-          ),
-          isExpanded: true,
-          icon: isLoading
-              ? SizedBox(
-                  width: 20.w,
-                  height: 20.h,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                  ),
-                )
-              : Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.grey,
-                  size: 20.sp,
-                ),
-          items: options.isEmpty
-              ? null
-              : options.map((option) {
-                  return DropdownMenuItem<DropdownItem>(
-                    value: option,
-                    child: Text(
-                      option.text,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: AppColors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  );
-                }).toList(),
-          onChanged: isEnabled ? onChanged : null,
-          borderRadius: BorderRadius.circular(14.r),
-          dropdownColor: AppColors.white,
-          elevation: 8,
-          menuMaxHeight: 350,
-        ),
-      ),
-    );
-  }
-}

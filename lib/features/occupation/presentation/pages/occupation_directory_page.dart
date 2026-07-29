@@ -102,6 +102,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 10.h),
+
           SizedBox(
             height: 34.h,
             child: Obx(
@@ -120,7 +122,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             ),
           ),
 
-          SizedBox(height: 15.h),
+          SizedBox(height: 10.h),
 
           Expanded(
             child: Obx(

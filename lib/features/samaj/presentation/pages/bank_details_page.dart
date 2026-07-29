@@ -31,11 +31,7 @@ class BankDetailsPage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              LK.samajInfo.tr,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
+              LK.samajInfo.tr
             ),
           ),
           body: Container(

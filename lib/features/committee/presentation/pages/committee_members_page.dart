@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -150,63 +151,50 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     List<DropdownItem?> options,
     ValueChanged<DropdownItem?> onChanged,
   ) {
-    return Card(
-      color: AppColors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<DropdownItem?>(
-          value: value,
-          isExpanded: true,
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: AppColors.primary,
-            size: 20.r,
-          ),
-          dropdownColor: AppColors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondary),
-          onChanged: onChanged,
-          items: options.map<DropdownMenuItem<DropdownItem?>>((
-            DropdownItem? val,
-          ) {
-            final displayText = val?.text ?? 'All';
-            return DropdownMenuItem<DropdownItem?>(
-              value: val,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label.replaceAll(':', '').trim(),
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.grey,
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                  Builder(
-                    builder: (context) {
-                      final valKey = RoleMapper.getLabelKey(displayText);
-                      final resolvedText = valKey != null
-                          ? valKey.tr
-                          : (displayText == 'All' ? LK.all.tr : displayText);
-                      return Text(
-                        resolvedText,
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11.sp,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      );
-                    },
-                  ),
-                ],
+    return CustomDropdown<DropdownItem?>(
+      hint: '',
+      value: value,
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      items: options.map<DropdownMenuItem<DropdownItem?>>((
+        DropdownItem? val,
+      ) {
+        final displayText = val?.text ?? 'All';
+        return DropdownMenuItem<DropdownItem?>(
+          value: val,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label.replaceAll(':', '').trim(),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.grey,
+                  fontSize: 9.sp,
+                ),
               ),
-            );
-          }).toList(),
-        ),
-      ).paddingSymmetric(horizontal: 10.w),
+              Builder(
+                builder: (context) {
+                  final valKey = RoleMapper.getLabelKey(displayText);
+                  final resolvedText = valKey != null
+                      ? valKey.tr
+                      : (displayText == 'All' ? LK.all.tr : displayText);
+                  return Text(
+                    resolvedText,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11.sp,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 

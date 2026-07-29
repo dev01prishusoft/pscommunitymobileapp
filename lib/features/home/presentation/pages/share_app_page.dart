@@ -23,50 +23,41 @@ class ShareAppPage extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(title: Text(LK.share.tr)),
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.white, AppColors.sfBackground],
-              ),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 16.0,
             ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 16.0,
-              ),
-              child: Column(
-                children: [
-                  _AppLinkCard(ctrl: controller),
-                  const SizedBox(height: 16),
-                  _QrCard(ctrl: controller),
-                  const SizedBox(height: 16),
-                  Row(
-                    spacing: 14,
-                    children: [
-                      Expanded(
-                        child: _ShareButton(
-                          icon: Icons.chat_bubble_rounded,
-                          label: LK.shareAppViaWhatsApp.tr,
-                          color: AppColors.green,
-                          onTap: controller.shareViaWhatsApp,
-                        ),
+            child: Column(
+              children: [
+                _AppLinkCard(ctrl: controller),
+                const SizedBox(height: 10),
+                _QrCard(ctrl: controller),
+                const SizedBox(height: 10),
+                Row(
+                  spacing: 14,
+                  children: [
+                    Expanded(
+                      child: _ShareButton(
+                        icon: Icons.chat_bubble_rounded,
+                        label: LK.shareAppViaWhatsApp.tr,
+                        color: AppColors.green,
+                        onTap: controller.shareViaWhatsApp,
                       ),
-                      Expanded(
-                        child: _ShareButton(
-                          icon: Icons.share_rounded,
-                          label: LK.shareAppViaOther.tr,
-                          color: AppColors.primary,
-                          onTap: controller.shareGeneral,
-                        ),
+                    ),
+                    Expanded(
+                      child: _ShareButton(
+                        icon: Icons.share_rounded,
+                        label: LK.shareAppViaOther.tr,
+                        color: AppColors.primary,
+                        onTap: controller.shareGeneral,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
           ),
         );
