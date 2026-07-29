@@ -112,6 +112,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -121,34 +123,43 @@ class BankAccountDetailsPage extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
-                              maxLines: 1,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            LK.bankName.tr.toUpperCase(),
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
+                      SizedBox(width: 16.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              LK.bankName.tr.toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            bank.bankName ?? '-',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 4),
+                            Text(
+                              bank.bankName ?? '-',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
