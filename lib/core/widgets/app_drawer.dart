@@ -116,18 +116,18 @@ class AppDrawer extends StatelessWidget {
                     child: logoUrl != null && logoUrl.isNotEmpty
                         ? CachedImg(
                             url: logoUrl,
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
                               FallBackImage,
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
                             ),
                           )
                         : Image.asset(
                             FallBackImage,
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                           ),
                   ),
                 );

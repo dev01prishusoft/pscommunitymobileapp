@@ -1,13 +1,38 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 
-class SplashController extends GetxController {
+class SplashController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   static final _splashDuration = Duration(milliseconds: 2500);
 
   Timer? _navigationTimer;
+
+  late final AnimationController _animController;
+  late final Animation<double> scaleAnim;
+  late final Animation<double> fadeAnim;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _animController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1500),
+    );
+    scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
+    );
+    fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
+    _animController.forward();
+  }
 
   @override
   void onReady() {
@@ -19,6 +44,12 @@ class SplashController extends GetxController {
   void onClose() {
     _navigationTimer?.cancel();
     super.onClose();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
   }
 
   void _scheduleNavigation() {

@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
@@ -13,6 +11,7 @@ import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/auth/data/auth_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/auth/domain/usecases/login_usecase.dart';
 import 'package:pscommunitymobileapp/features/auth/presentation/controllers/reset_password_controller.dart';
@@ -36,6 +35,7 @@ import 'package:pscommunitymobileapp/features/payment/presentation/controllers/p
 import 'package:pscommunitymobileapp/features/samaj/data/repositories/samaj_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/bank_account_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/splash/presentation/controllers/splash_controller.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
 
 class DI {
@@ -81,6 +81,7 @@ class DI {
         final loginUseCase = LoginUseCase(authRepository);
         Get.put(loginUseCase, permanent: true);
         Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
+        Get.lazyPut(() => SplashController(), fenix: true);
         final memberRepository = MemberRepositoryImpl(apiClient);
         Get.lazyPut(() => FindMemberController(memberRepository), fenix: true);
         final familyRepository = FamilyRepositoryImpl(apiClient);

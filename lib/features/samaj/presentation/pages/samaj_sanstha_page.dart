@@ -101,7 +101,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
                         ),
                         errorWidget: (_, __, ___) => Image.asset(
                           FallBackImage,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),

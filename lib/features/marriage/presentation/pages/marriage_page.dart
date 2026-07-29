@@ -284,7 +284,7 @@ class MarriagePage extends GetView<MarriageController> {
               () => SizedBox(
                 height: 25.h,
                 child: FittedBox(
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
                   child: Switch(
                     value: controller.lookingForMarriage.value,
                     onChanged: (val) {
