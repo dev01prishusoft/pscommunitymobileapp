@@ -13,11 +13,11 @@ class AppColors {
   static const transparent = Colors.transparent;
   static const Color red = Color(0xFFD32F2F);
   static const orange = Color(0xFFFDBA13);
-  static Color primary = const Color(0xFF8F0500);
-  static Color secondary = const Color(0xFF4A0200);
+  static Color primary = const Color(0xFF042563);
+  static Color secondary = const Color(0xFF0d85dc);
 
-  static const Color defaultPrimary = Color(0xFF8F0500);
-  static const Color defaultSecondary = Color(0xFF4A0200);
+  static const Color defaultPrimary = Color(0xFF042563);
+  static const Color defaultSecondary = Color(0xFF0d85dc);
 
   static void updateColors(String? primaryHex, String? secondaryHex) {
     if (primaryHex != null && primaryHex.isNotEmpty) {
@@ -43,6 +43,7 @@ class AppColors {
     if (val == null) return null;
     return Color(val);
   }
+
   static const chart1 = Color(0xFF1AA3E8);
   static const chart2 = Color(0xFF3F6BB8);
   static const chart3 = Color(0xFF0F2444);

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -141,7 +142,7 @@ class _HomeHeader extends GetView<SamajController> {
 }
 
 Widget _fallbackLogo() =>
-    Image.asset('assets/images/prishusoft_logo.png', fit: BoxFit.contain);
+    Image.asset(FallBackImage, fit: BoxFit.contain);
 
 class _HomeMenuGrid extends StatelessWidget {
   const _HomeMenuGrid({required this.controller});

@@ -1,12 +1,14 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -232,12 +234,12 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                           ),
                                         ),
                                         errorWidget: (_, __, ___) => Image.asset(
-                                          'assets/images/prishusoft_logo.png',
+                                          FallBackImage,
                                           fit: BoxFit.contain,
                                         ),
                                       )
                                     : Image.asset(
-                                        'assets/images/prishusoft_logo.png',
+                                        FallBackImage,
                                         fit: BoxFit.contain,
                                       ),
                               ),

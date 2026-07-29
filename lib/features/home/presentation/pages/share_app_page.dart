@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
@@ -136,12 +137,12 @@ class _AppLinkCard extends GetView<SamajController> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
-                              'assets/images/prishusoft_logo.png',
+                              FallBackImage,
                               fit: BoxFit.cover,
                             ),
                           )
                         : Image.asset(
-                            'assets/images/prishusoft_logo.png',
+                            FallBackImage,
                             fit: BoxFit.cover,
                           ),
                   ),

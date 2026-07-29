@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -99,7 +100,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         errorWidget: (_, __, ___) => Image.asset(
-                          'assets/images/prishusoft_logo.png',
+                          FallBackImage,
                           fit: BoxFit.contain,
                         ),
                       ),
