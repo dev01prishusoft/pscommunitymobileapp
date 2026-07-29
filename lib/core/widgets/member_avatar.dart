@@ -19,24 +19,24 @@ class MemberAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallbackNameStr = fallbackName?.trim() ?? '';
-    final memCacheSize = (radius * 3).toInt();
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: CircleAvatar(
         radius: radius,
         backgroundColor: AppColors.primary.withValues(alpha: 0.05),
-        child: _buildContent(fallbackNameStr, memCacheSize),
+        child: _buildContent(fallbackNameStr),
       ),
     );
   }
 
-  Widget _buildContent(String name, int memCacheSize) {
+  Widget _buildContent(String name) {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CachedImg(
         url: imageUrl!,
-        memCacheHeight: memCacheSize,
-        memCacheWidth: memCacheSize,
+        width: radius * 2,
+        height: radius * 2,
+        fit: BoxFit.cover,
         placeholder: (context, url) => const CircularProgressIndicator(),
         errorWidget: (context, url, error) => _buildInitialsOrIcon(name),
       );
