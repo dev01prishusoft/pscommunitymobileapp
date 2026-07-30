@@ -298,7 +298,7 @@ class BankDetailsPage extends StatelessWidget {
                     child: Icon(
                       Icons.copy_rounded,
                       size: 14.sp,
-                      color: const Color(0xFFDAA520),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),

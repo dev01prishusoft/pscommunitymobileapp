@@ -6,8 +6,8 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/domain/entities/samaj_bank_details_model.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class BankAccountDetailsPage extends StatelessWidget {
   const BankAccountDetailsPage({super.key});
@@ -16,16 +16,11 @@ class BankAccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final SamajBankDetais bank = Get.arguments as SamajBankDetais;
 
-    final upiUri =
-        bank.upiId != null && bank.upiId!.isNotEmpty && bank.upiId != '-'
-        ? 'upi://pay?pa=${bank.upiId}&pn=${Uri.encodeComponent(bank.accountHolderName ?? '')}'
-        : null;
-
     return Scaffold(
       appBar: AppBar(title: Text(LK.bankAccountDetails.tr)),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Container(
@@ -79,7 +74,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                         ),
                     ],
                   ),
-                  SizedBox(height: 28.h),
+                  SizedBox(height: 20.h),
                   Text(
                     bank.accountNumber != null &&
                             bank.accountNumber!.length >= 4
@@ -96,7 +91,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                       fontFamily: 'monospace',
                     ),
                   ),
-                  SizedBox(height: 28.h),
+                  SizedBox(height: 20.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -123,13 +118,12 @@ class BankAccountDetailsPage extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: 16.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -154,7 +148,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.right,
                             ),
@@ -166,7 +160,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 10.h),
             Container(
               decoration: BoxDecoration(
                 color: AppColors.white,
@@ -247,7 +241,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 10.h),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -297,26 +291,23 @@ class BankAccountDetailsPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: upiUri != null
-                        ? QrImageView(
-                            data: upiUri,
-                            version: QrVersions.auto,
-                            size: 160.w,
-                            eyeStyle: const QrEyeStyle(
-                              eyeShape: QrEyeShape.circle,
-                              color: AppColors.black,
-                            ),
-                            dataModuleStyle: const QrDataModuleStyle(
-                              dataModuleShape: QrDataModuleShape.circle,
-                              color: AppColors.black,
-                            ),
+                    child: bank.qrCodeImagePath != null
+                        ? CachedImg(
+                            url: bank.qrCodeImagePath!,
+                            height: 180.h,
+                            fit: BoxFit.cover,
+                            errorWidget: (val,val2,val3) => Icon(
+                                Icons.qr_code_2_rounded,
+                                size: 180.w,
+                                color: Colors.grey.shade200,
+                              ),
                           )
                         : Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.qr_code_2_rounded,
-                                size: 120.w,
+                                size: 180.w,
                                 color: Colors.grey.shade200,
                               ),
                               const SizedBox(height: 10),
@@ -332,7 +323,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                             ],
                           ),
                   ),
-                  if (upiUri != null) ...[
+                  if (bank.qrCodeImagePath != null) ...[
                     SizedBox(height: 12.h),
                     Text(
                       LK.scanQrToPay.tr,
@@ -364,19 +355,18 @@ class BankAccountDetailsPage extends StatelessWidget {
     bool showCopyAction = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 14.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 20, color: Colors.grey.shade600),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             flex: 2,
             child: Text(
               label,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
                 fontSize: 13,
               ),
             ),
@@ -389,18 +379,15 @@ class BankAccountDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      value,
-                      textAlign: TextAlign.left,
-                      maxLines: 1,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.left,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
                   ),
                 ),
