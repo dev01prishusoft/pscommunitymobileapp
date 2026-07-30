@@ -37,6 +37,7 @@ class CustomDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height ?? 52.h,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: fillColor ?? (isEnabled
             ? AppColors.white
@@ -87,6 +88,7 @@ class CustomDropdown<T> extends StatelessWidget {
           dropdownColor: AppColors.white,
           elevation: 8,
           menuMaxHeight: 350,
+          isDense: true,
         ),
       ),
     );
