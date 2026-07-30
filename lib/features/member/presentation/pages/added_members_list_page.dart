@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -21,6 +23,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
   final AddedMembersController _controller = Get.put(AddedMembersController());
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
@@ -46,13 +49,55 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: AppBar(title: Text(LK.addedMembers.tr)),
+        appBar: AppBar(
+          title: _isSearchVisible
+              ? CupertinoTextField(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+                  prefix: Icon(
+                    Iconsax.search_normal_copy,
+                    size: 15,
+                  ).paddingOnly(left: 10),
+                  suffix: GestureDetector(
+                    onTap: () {
+                      _searchController.clear();
+                      _controller.onSearchChanged('');
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        _isSearchVisible = false;
+                      });
+                    },
+                    child: Icon(
+                      Iconsax.close_circle_copy,
+                      size: 20,
+                    ).paddingOnly(right: 10),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.5),
+                      width: 1.w,
+                    ),
+                  ),
+                  placeholder: LK.searchHint.tr,
+                  controller: _searchController,
+                  onChanged: _controller.onSearchChanged,
+                )
+              : Text(LK.addedMembers.tr),
+          actions: [
+            if (!_isSearchVisible)
+              IconButton(
+                icon: const Icon(Iconsax.search_normal_copy),
+                onPressed: () {
+                  setState(() {
+                    _isSearchVisible = true;
+                  });
+                },
+              ),
+          ],
+        ),
         body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          15.verticalSpace,
-          _buildSearchBar(),
-          10.verticalSpace,
           _buildStatsPanel(),
           Expanded(
             child: Obx(() {
@@ -149,33 +194,6 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: AppTextField(
-        hint: LK.searchHint.tr,
-        icon: Icons.search_rounded,
-        suffixIcon: Obx(() {
-          final isQueryNotEmpty = _controller.searchQuery.value.isNotEmpty;
-          return isQueryNotEmpty
-              ? IconButton(
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: AppColors.grey.shade500,
-                    size: 20.sp,
-                  ),
-                  onPressed: () {
-                    _searchController.clear();
-                    _controller.onSearchChanged('');
-                  },
-                )
-              : const SizedBox.shrink();
-        }),
-        controller: _searchController,
-        onChanged: _controller.onSearchChanged,
-      ),
-    );
-  }
 
   Widget _buildStatsPanel() {
     return Obx(() {

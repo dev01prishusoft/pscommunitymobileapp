@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   final FamilyController _controller = Get.find<FamilyController>();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _isSearchVisible = false;
 
   late int _areaId;
   late String _areaName;
@@ -62,58 +64,74 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => Get.back<void>(),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _areaName,
-              style: AppTextStyles.titleLarge.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
+        title: _isSearchVisible
+            ? CupertinoTextField(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+                prefix: Icon(
+                  Iconsax.search_normal_copy,
+                  size: 15,
+                ).paddingOnly(left: 10),
+                suffix: GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
+                    _controller.memberSearchQuery.value = '';
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  },
+                  child: Icon(
+                    Iconsax.close_circle_copy,
+                    size: 20,
+                  ).paddingOnly(right: 10),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                    width: 1.w,
+                  ),
+                ),
+                placeholder: LK.searchByNameHint.tr,
+                controller: _searchController,
+                onChanged: (value) {
+                  _controller.memberSearchQuery.value = value;
+                },
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _areaName,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    '$_membersCount ${_membersCount <= 1 ? LK.member.tr : LK.membersCount.tr}  |  $_familiesCount ${_familiesCount <= 1 ? LK.family.tr : LK.familiesCount.tr}',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
               ),
+        actions: [
+          if (!_isSearchVisible)
+            IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                setState(() {
+                  _isSearchVisible = true;
+                });
+              },
             ),
-            SizedBox(height: 2.h),
-            Text(
-              '$_membersCount ${_membersCount <= 1 ? LK.member.tr : LK.membersCount.tr}  |  $_familiesCount ${_familiesCount <= 1 ? LK.family.tr : LK.familiesCount.tr}',
-              style: AppTextStyles.bodySmall.copyWith(
-                fontWeight: FontWeight.w400,
-                color: AppColors.grey,
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: LK.searchByNameHint.tr,
-                prefixIcon: const Icon(Iconsax.search_normal_copy),
-                suffixIcon: Obx(
-                  () => _controller.memberSearchQuery.value.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close_rounded),
-                          tooltip: LK.clearAll.tr,
-                          onPressed: () {
-                            _searchController.clear();
-                            _controller.memberSearchQuery.value = '';
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 14.h,
-                ),
-              ),
-              onChanged: (value) {
-                _controller.memberSearchQuery.value = value;
-              },
-            ),
-          ),
 
           Expanded(
             child: Obx(
