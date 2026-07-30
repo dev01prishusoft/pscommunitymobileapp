@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/utils/pagination_mixin.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 
 class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
   const PaginatedListView({
@@ -126,7 +127,7 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
                   Text(
                     controller.paginationError.value?.message ??
                         LK.somethingWrong.tr,
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                    style: AppTextStyles.bodySmall.copyWith(color: Colors.red),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),

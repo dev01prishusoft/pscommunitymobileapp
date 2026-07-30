@@ -391,8 +391,7 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                         _isExpanded
                             ? LK.tapToCollapse.tr
                             : LK.tapToExpandDetails.tr,
-                        style: TextStyle(
-                          fontSize: 11,
+                        style: AppTextStyles.labelSmall.copyWith(
                           color: AppColors.primary.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w600,
                         ),

@@ -450,9 +450,8 @@ class _PaymentFilterDialogState extends State<_PaymentFilterDialog> {
                       ),
                       child: Text(
                         LK.reset.tr,
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14.sp,
                         ),
                       ),
                     ),

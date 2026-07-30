@@ -118,9 +118,8 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
                     ),
                     child: Text(
                       samajName,
-                      style: TextStyle(
+                      style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.white,
-                        fontSize: 12.sp,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
                       ),
@@ -131,18 +130,16 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
               const SizedBox(height: 8),
               Text(
                 LK.samajSansthas.tr,
-                style: TextStyle(
+                style: AppTextStyles.titleLarge.copyWith(
                   color: AppColors.white,
-                  fontSize: 20.sp,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 LK.samajSansthaDescription.tr,
-                style: TextStyle(
+                style: AppTextStyles.labelSmall.copyWith(
                   color: AppColors.white.withValues(alpha: 0.8),
-                  fontSize: 12.sp,
                   height: 1.3,
                 ),
               ),
@@ -331,8 +328,7 @@ class _SansthaCardState extends State<_SansthaCard> {
                             ),
                             label: Text(
                               'Copy',
-                              style: TextStyle(
-                                fontSize: 11,
+                              style: AppTextStyles.labelSmall.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primary,
                               ),

@@ -346,7 +346,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                             color: AppColors.grey.shade600,
                                             fontWeight: FontWeight.bold,
                                           ),
-                                      errorStyle: TextStyle(color: Colors.red),
+                                      errorStyle: AppTextStyles.bodySmall.copyWith(color: Colors.red),
                                     ),
                                   );
                                 }),

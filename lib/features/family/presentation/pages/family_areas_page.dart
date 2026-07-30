@@ -344,9 +344,8 @@ class _FilterDialogState extends State<_FilterDialog> {
                     ),
                     child: Text(
                       LK.reset.tr,
-                      style: TextStyle(
+                      style: AppTextStyles.labelLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
                       ),
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/controllers/added_members_controller.dart';
@@ -138,10 +139,9 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
         ),
         label: Text(
           LK.addMember.tr,
-          style: TextStyle(
+          style: AppTextStyles.labelLarge.copyWith(
             color: AppColors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14.sp,
           ),
         ),
         ),
@@ -304,16 +304,14 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
               children: [
                 Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 13.sp,
+                  style: AppTextStyles.labelLarge.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
                 ),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 10.sp,
+                  style: AppTextStyles.labelSmall.copyWith(
                     fontWeight: FontWeight.w500,
                     color: AppColors.grey.shade600,
                   ),

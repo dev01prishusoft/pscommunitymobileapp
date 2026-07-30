@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -148,9 +149,7 @@ class _AppLinkCard extends GetView<SamajController> {
                     return Text(
                       samajName,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
+                      style: AppTextStyles.headlineLarge.copyWith(
                         color: AppColors.black,
                         letterSpacing: 0.2,
                       ),
@@ -159,10 +158,8 @@ class _AppLinkCard extends GetView<SamajController> {
                   const SizedBox(height: 6),
                   Text(
                     LK.joinCommunity.tr,
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: AppTextStyles.titleSmall.copyWith(
                       color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -181,9 +178,8 @@ class _AppLinkCard extends GetView<SamajController> {
                 Expanded(
                   child: Text(
                     ctrl.appLink,
-                    style: const TextStyle(
+                    style: AppTextStyles.labelLarge.copyWith(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
                     ),
                     softWrap: true,
                     overflow: TextOverflow.visible,
@@ -203,9 +199,7 @@ class _AppLinkCard extends GetView<SamajController> {
                       const SizedBox(width: 6),
                       Text(
                         LK.copyLink.tr,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                        style: AppTextStyles.labelMedium.copyWith(
                           color: AppColors.primary,
                         ),
                       ),
@@ -281,12 +275,10 @@ class _QrCard extends StatelessWidget {
                         ),
                         child: Text(
                           item.appType,
-                          style: TextStyle(
+                          style: AppTextStyles.labelLarge.copyWith(
                             color: isSelected
                                 ? Colors.white
                                 : Colors.grey.shade700,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -331,10 +323,9 @@ class _QrCard extends StatelessWidget {
             Text(
               LK.scanToDownload.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTextStyles.titleSmall.copyWith(
                 fontSize: 13,
                 color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
               ),
             ),
 
@@ -366,10 +357,8 @@ class _QrCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       LK.shareQR.tr,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.labelLarge.copyWith(
                         color: AppColors.primary,
-                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -425,10 +414,9 @@ class _ShareButton extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: TextStyle(
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: color,
                       fontWeight: FontWeight.w800,
-                      fontSize: 11.sp,
                     ),
                   ),
                 ),

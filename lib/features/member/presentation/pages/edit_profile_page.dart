@@ -123,7 +123,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         child: Text(
                           LK.saveChanges.tr,
-                          style: TextStyle(
+                          style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
@@ -207,7 +207,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       },
                       label: Text(
                         LK.back.tr,
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),
@@ -2031,11 +2031,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       children: [
                         Text(
                           LK.memberNo.tr.toUpperCase(),
-                          style: TextStyle(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary.withValues(alpha: 0.6),
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
-                            fontSize: 9,
                           ),
                         ),
                         const SizedBox(height: 2),
