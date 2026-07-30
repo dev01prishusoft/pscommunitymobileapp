@@ -49,7 +49,7 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(LK.family.tr),
+        title: Text(LK.familyByArea.tr),
         actions: [
           IconButton(
             icon: const Icon(Iconsax.filter_search_copy),
@@ -78,8 +78,6 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ResultsHeader(),
-                SizedBox(height: 5.h),
                 Obx(
                   () => AppStateView(
                     state: controller.state.value,
@@ -359,43 +357,6 @@ class _FilterDialogState extends State<_FilterDialog> {
   }
 }
 
-class _ResultsHeader extends GetView<FamilyController> {
-  const _ResultsHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      if (controller.areas.isEmpty) return const SizedBox.shrink();
-      final isAll = controller.selectedTaluka.value == null;
-      return Padding(
-        padding: EdgeInsets.only(bottom: 12.h),
-        child: Row(
-          children: [
-            Icon(Icons.map_rounded, size: 18.sp),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: Text(
-                isAll
-                    ? LK.totalAreasAllLabel.trParams({
-                        'count': controller.areas.length.toString(),
-                      })
-                    : LK.totalAreasLabel.trParams({
-                        'taluka': controller.selectedTaluka.value!.text,
-                        'count': controller.areas.length.toString(),
-                      }),
-                style: AppTextStyles.titleSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-}
-
 class _AreasList extends StatelessWidget {
   const _AreasList({required this.areas});
   final List<FamilyArea> areas;
@@ -445,7 +406,7 @@ class _AreasList extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(12.w),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.08),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Icon(

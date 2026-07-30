@@ -374,7 +374,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                   child: Text(
                     value,
                     textAlign: TextAlign.left,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.black,

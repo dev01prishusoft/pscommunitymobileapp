@@ -75,6 +75,7 @@ class AppDrawer extends StatelessWidget {
       top: false,
       bottom: true,
       child: Drawer(
+        shape: BeveledRectangleBorder(),
         child: Column(
           children: [
             UserAccountsDrawerHeader(
@@ -120,15 +121,10 @@ class AppDrawer extends StatelessWidget {
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              FallBackImage,
-                              fit: BoxFit.cover,
-                            ),
+                            errorWidget: (context, url, error) =>
+                                Image.asset(FallBackImage, fit: BoxFit.cover),
                           )
-                        : Image.asset(
-                            FallBackImage,
-                            fit: BoxFit.cover,
-                          ),
+                        : Image.asset(FallBackImage, fit: BoxFit.cover),
                   ),
                 );
               }),
@@ -240,36 +236,40 @@ class AppDrawer extends StatelessWidget {
                       );
                     },
                   ),
+                  Divider(thickness: 0.5, color: AppColors.grey.shade400),
+                  ListTile(
+                    leading: Icon(
+                      Icons.person_remove_alt_1_outlined,
+                      color: AppColors.red,
+                    ),
+                    title: Text(
+                      LK.deleteAccount.tr,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.red,
+                      ),
+                    ),
+                    onTap: () {
+                      Get.back<void>();
+                      _showDeleteAccountDialog(context, authState);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.logout_rounded, color: AppColors.red),
+                    title: Text(
+                      LK.logout.tr,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.red,
+                      ),
+                    ),
+                    onTap: () {
+                      Get.back<void>();
+                      _showLogoutDialog(context, authState);
+                    },
+                  ),
+                  SizedBox(height: 20.h),
                 ],
               ),
             ),
-            Divider(),
-            ListTile(
-              leading: Icon(
-                Icons.person_remove_alt_1_outlined,
-                color: AppColors.red,
-              ),
-              title: Text(
-                LK.deleteAccount.tr,
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.red),
-              ),
-              onTap: () {
-                Get.back<void>();
-                _showDeleteAccountDialog(context, authState);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout_rounded, color: AppColors.red),
-              title: Text(
-                LK.logout.tr,
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.red),
-              ),
-              onTap: () {
-                Get.back<void>();
-                _showLogoutDialog(context, authState);
-              },
-            ),
-            SizedBox(height: 20.h),
           ],
         ),
       ),
