@@ -112,8 +112,18 @@ class _PaymentsPageState extends State<PaymentsPage> {
           }),
         ],
       ),
-      body: Obx(
-        () => AppStateView(
+      body: Obx(() {
+        final paidCount =
+            controller.dashboard.value?.paidPayments
+                .where(
+                  (p) =>
+                      p.status.toLowerCase() == 'success' ||
+                      p.status.toLowerCase() == 'completed' ||
+                      p.status.toLowerCase() == 'successful',
+                )
+                .length ??
+            0;
+        return AppStateView(
           state: controller.dashboardState.value,
           onRetry: controller.loadDashboard,
           child: SafeArea(
@@ -128,15 +138,13 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildOverviewCard(),
-                    SizedBox(height: 20.h),
                     if (controller.dashboard.value?.paidPayments.isNotEmpty ??
                         false) ...[
                       _buildSectionHeader(
                         LK.requestedPaymentsPaid.tr,
-                        subtitle: '(${LK.adminSent.tr})',
+                        subtitle: '(${paidCount})',
                       ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 10.h),
                       ...controller.filteredDashboardPayments.map(
                         (req) => _buildPaidPaymentCard(req),
                       ),
@@ -146,8 +154,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
       floatingActionButton: Obx(() {
         if (controller.dashboardState.value != AppState.data) {
           return const SizedBox.shrink();
@@ -223,193 +231,6 @@ class _PaymentsPageState extends State<PaymentsPage> {
     );
   }
 
-  Widget _buildOverviewCard() {
-    final paidCount =
-        controller.dashboard.value?.paidPayments
-            .where(
-              (p) =>
-                  p.status.toLowerCase() == 'success' ||
-                  p.status.toLowerCase() == 'completed' ||
-                  p.status.toLowerCase() == 'successful',
-            )
-            .length ??
-        0;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            spacing: 10.w,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppColors.white,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    LK.communityPortal.tr,
-                    style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.white.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    LK.payments.tr,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 8.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    spacing: 4.w,
-                    children: [
-                      Icon(
-                        Icons.history_rounded,
-                        color: AppColors.primary,
-                        size: 16.sp,
-                      ),
-                      Text(
-                        LK.paymentHistory.tr,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            height: 1,
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: 15.h),
-            color: AppColors.white.withValues(alpha: 0.2),
-          ).paddingSymmetric(horizontal: 40.w),
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              /*
-              _buildStatItem(
-                LK.initiatedPayments.tr.toUpperCase(),
-                '$initiatedCount',
-                AppColors.orange,
-              ),
-              Container(
-                width: 1,
-                height: 36,
-                color: AppColors.white.withValues(alpha: 0.2),
-              ),
-              */
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.verified, color: AppColors.white),
-              ),
-              10.horizontalSpace,
-              _buildStatItem(
-                LK.completedPayments.tr.toUpperCase(),
-                '$paidCount',
-                AppColors.green,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, Color statusColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: AppTextStyles.labelSmall.copyWith(
-            color: AppColors.white.withValues(alpha: 0.6),
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Row(
-          children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: statusColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              value,
-              style: AppTextStyles.titleLarge.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget _buildSectionHeader(String title, {String? subtitle}) {
     return Row(
       children: [
@@ -427,6 +248,42 @@ class _PaymentsPageState extends State<PaymentsPage> {
             ),
           ),
         ],
+        10.horizontalSpace,
+        Spacer(),
+        GestureDetector(
+          onTap: () => Get.toNamed<void>(AppRouter.paymentHistory),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              spacing: 4.w,
+              children: [
+                Icon(
+                  Icons.history_rounded,
+                  color: AppColors.white,
+                  size: 14.sp,
+                ),
+                Text(
+                  LK.paymentHistory.tr,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

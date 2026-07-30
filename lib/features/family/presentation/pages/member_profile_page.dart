@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -107,70 +108,56 @@ class _ProfileHeader extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
+        alignment: Alignment.topRight,
         children: [
-          GestureDetector(
-            onTap: () {
-              if (member.profilePhotoFullUrl != null &&
-                  member.profilePhotoFullUrl!.isNotEmpty) {
-                Get.to(
-                  () => FullScreenImageViewer(
-                    imageUrl: member.profilePhotoFullUrl!,
-                    heroTag: 'profile_image_${member.memberId}',
+          Column(
+            spacing: 10.h,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (member.profilePhotoFullUrl != null &&
+                          member.profilePhotoFullUrl!.isNotEmpty) {
+                        Get.to(
+                          () => FullScreenImageViewer(
+                            imageUrl: member.profilePhotoFullUrl!,
+                            heroTag: 'profile_image_${member.memberId}',
+                          ),
+                        );
+                      }
+                    },
+                    child: Hero(
+                      tag: 'profile_image_${member.memberId}',
+                      child: MemberAvatar(
+                        imageUrl: member.profilePhotoFullUrl,
+                        gender: member.gender,
+                        fallbackName: member.fullName,
+                        radius: 30.r,
+                      ),
+                    ),
                   ),
-                );
-              }
-            },
-            child: Hero(
-              tag: 'profile_image_${member.memberId}',
-              child: MemberAvatar(
-                imageUrl: member.profilePhotoFullUrl,
-                gender: member.gender,
-                fallbackName: member.fullName,
-                radius: 40.r,
+                  SizedBox(width: 15.w),
+                  Expanded(
+                    child: Text(
+                      member.fullName,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          SizedBox(width: 20.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ExpandableText(
-                  maxLines: 1,
-                  text: member.fullName,
-                  style: AppTextStyles.titleLarge.copyWith(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      width: 1.w,
-                    ),
-                  ),
-                  child: Text(
-                    member.memberNo ?? '',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                ),
-                if (member.jobPositionName != null &&
-                    member.jobPositionName!.trim().isNotEmpty) ...[
-                  SizedBox(height: 8.h),
+              Row(
+                spacing: 10.w,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
+                      horizontal: 8.w,
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
@@ -181,32 +168,201 @@ class _ProfileHeader extends StatelessWidget {
                         width: 1.w,
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.workspace_premium_rounded,
-                          size: 14.sp,
-                          color: AppColors.primary,
-                        ),
-                        SizedBox(width: 6.w),
-                        Text(
-                          member.jobPositionName!,
-                          style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      member.memberNo ?? '',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                      ),
                     ),
                   ),
+                  if (member.jobPositionName != null &&
+                      member.jobPositionName!.trim().isNotEmpty) ...[
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 4.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          width: 1.w,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.workspace_premium_rounded,
+                            size: 14.sp,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            member.jobPositionName!,
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
+              ),
+            ],
           ),
+          if (member.approveStatus != null &&
+              member.approveStatus!.trim().isNotEmpty)
+            _buildStatusBadge(member.approveStatus ?? ""),
         ],
       ),
     );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    Color bgColor;
+
+    final lowerStatus = status.toLowerCase();
+    final isRejected = lowerStatus == 'rejected';
+
+    if (lowerStatus == 'approved') {
+      color = const Color(0xFF2E7D32);
+      bgColor = const Color(0xFFE8F5E9);
+    } else if (isRejected) {
+      color = const Color(0xFFC62828);
+      bgColor = const Color(0xFFFFEBEE);
+    } else {
+      color = const Color(0xFFEF6C00);
+      bgColor = const Color(0xFFFFF3E0);
+    }
+
+    final badgeContent = Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            status.tr,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 10.sp,
+            ),
+          ),
+          if (isRejected) ...[
+            SizedBox(width: 4.w),
+            Icon(Iconsax.info_circle_copy, size: 12.sp, color: color),
+          ],
+        ],
+      ),
+    );
+
+    if (isRejected) {
+      return GestureDetector(
+        onTap: () => Get.dialog(
+          Dialog(
+            backgroundColor: AppColors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Iconsax.info_circle_copy,
+                        color: AppColors.black,
+                        size: 20.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Rejection Details'.tr,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    spacing: 10.w,
+                    children: [
+                      Text(
+                        '${'Status'.tr}:',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                      Text(
+                        '${status.tr}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (member.rejectedReasonCommentByAdmin != null &&
+                      member.rejectedReasonCommentByAdmin!
+                          .trim()
+                          .isNotEmpty) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      'Reason'.tr,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      member.rejectedReasonCommentByAdmin!,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 16.h),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text(
+                        'Close'.tr,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        child: badgeContent,
+      );
+    }
+
+    return badgeContent;
   }
 }
 
@@ -463,15 +619,67 @@ class _AddressSection extends StatelessWidget {
                     ],
                   ],
                 ),
-                SizedBox(height: 12.h),
-                ExpandableText(
-                  text: addr.fullAddress,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.black,
-                    fontWeight: FontWeight.bold,
-                    height: 1.4,
+                if (addr.addressLine1.isNotEmpty) ...[
+                  SizedBox(height: 10.h),
+                  Text(
+                    maxLines: 2,
+                    addr.addressLine1,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1.4,
+                    ),
                   ),
-                ),
+                ],
+                if (addr.addressLine2.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    maxLines: 2,
+                    addr.addressLine2,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                if (addr.landmark.isNotEmpty || addr.areaName.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    maxLines: 2,
+                    "${addr.landmark} - ${addr.areaName}",
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                if (addr.talukaName.isNotEmpty ||
+                    addr.districtName.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    maxLines: 2,
+                    "${addr.talukaName}, ${addr.districtName}",
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+                if (addr.stateName.isNotEmpty || addr.pincode.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    maxLines: 2,
+                    "${addr.stateName}, ${addr.pincode}",
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
                 if (controller.memberAddresses.last != addr)
                   Padding(
                     padding: EdgeInsets.only(top: 12.h),
@@ -500,94 +708,77 @@ class _AssetLifeSection extends StatelessWidget {
       title: LK.assetAndLife.tr,
       icon: Icons.work_outline,
       child: Column(
+        spacing: 10.h,
         children: [
-          _buildAssetRow(
-            LK.incomeColon.tr,
-            controller.formatIncome(member),
-            LK.ownHouse.tr,
-            member.isOwnHouse ?? false,
+          Row(
+            spacing: 10.w,
+            children: [
+              Text(
+                LK.incomeColon.tr,
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+              ),
+              Text(
+                controller.formatIncome(member),
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
+            ],
           ),
-          _buildAssetRow(
-            LK.ownLand.tr,
-            member.isOwnLand ?? false,
-            LK.twoWheeler.tr,
-            member.hasTwoWheeler ?? false,
+          Row(
+            spacing: 10.w,
+            children: [
+              Expanded(
+                child: _buildAssetRow(
+                  LK.ownHouse.tr,
+                  member.isOwnHouse ?? false,
+                ),
+              ),
+              Expanded(
+                child: _buildAssetRow(LK.ownLand.tr, member.isOwnLand ?? false),
+              ),
+            ],
           ),
-          _buildAssetRow(
-            '',
-            '',
-            LK.fourWheeler.tr,
-            member.hasFourWheeler ?? false,
+          Row(
+            spacing: 10.w,
+            children: [
+              Expanded(
+                child: _buildAssetRow(
+                  LK.twoWheeler.tr,
+                  member.hasTwoWheeler ?? false,
+                ),
+              ),
+              Expanded(
+                child: _buildAssetRow(
+                  LK.fourWheeler.tr,
+                  member.hasFourWheeler ?? false,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAssetRow(
-    String label1,
-    dynamic value1,
-    String label2,
-    bool value2,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6.h),
-      child: Row(
-        children: [
-          Expanded(
-            child: label1.isNotEmpty
-                ? Row(
-                    children: [
-                      Text(
-                        label1,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.grey,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (value1 is bool)
-                        Text(
-                          value1 ? LK.yes.tr : LK.no.tr,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: value1 ? AppColors.green : AppColors.red,
-                          ),
-                        )
-                      else
-                        Text(
-                          value1.toString(),
-                          style: AppTextStyles.bodySmall.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.black,
-                          ),
-                        ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-          SizedBox(width: 32.w),
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  label2,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  value2 ? LK.yes.tr : LK.no.tr,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: value2 ? AppColors.green : AppColors.red,
-                  ),
-                ),
-              ],
+  Widget _buildAssetRow(String label1, dynamic value1) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label1,
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+        ),
+        if (value1 is bool)
+          Text(
+            value1 ? LK.yes.tr : LK.no.tr,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.bold,
+              color: value1 ? AppColors.green : AppColors.red,
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -843,15 +1034,18 @@ class _EducationSection extends StatelessWidget {
                     ],
                   ],
                 ),
-                SizedBox(height: 12.h),
-                if (edu.institute.isNotEmpty)
+
+                if (edu.institute.isNotEmpty) ...[
+                  SizedBox(height: 12.h),
                   _buildColumnItem(LK.instituteNameLabel.tr, edu.institute),
+                ],
                 if (edu.description.isNotEmpty) ...[
                   SizedBox(height: 12.h),
                   _buildColumnItem(LK.description.tr, edu.description),
                 ],
-                SizedBox(height: 8.h),
+                SizedBox(height: 12.h),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (edu.passingYear.isNotEmpty)
                       Expanded(
@@ -884,27 +1078,6 @@ class _EducationSection extends StatelessWidget {
           );
         }).toList(),
       ),
-    );
-  }
-
-  Widget _buildColumnItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
-        ),
-        SizedBox(height: 2.h),
-        ExpandableText(
-          maxLines: 2,
-          text: value,
-          style: AppTextStyles.labelMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -1011,11 +1184,7 @@ class _OccupationSection extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 12.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: w1),
-                SizedBox(width: 12.w),
-                const Expanded(child: SizedBox()),
-              ],
+              children: [Expanded(child: w1)],
             ),
           ),
         );
@@ -1025,11 +1194,7 @@ class _OccupationSection extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 12.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Expanded(child: SizedBox()),
-                SizedBox(width: 12.w),
-                Expanded(child: w2),
-              ],
+              children: [Expanded(child: w2)],
             ),
           ),
         );
@@ -1204,4 +1369,25 @@ class _ExpandableTextState extends State<ExpandableText> {
       },
     );
   }
+}
+
+Widget _buildColumnItem(String label, String value) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+      ),
+      SizedBox(height: 2.h),
+      Text(
+        value,
+        overflow: TextOverflow.clip,
+        style: AppTextStyles.labelMedium.copyWith(
+          fontWeight: FontWeight.bold,
+          color: AppColors.black,
+        ),
+      ),
+    ],
+  );
 }

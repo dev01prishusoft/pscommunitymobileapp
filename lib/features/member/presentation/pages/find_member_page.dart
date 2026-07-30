@@ -35,102 +35,66 @@ class _FindMemberPageState extends State<FindMemberPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearchVisible
-            ? CupertinoTextField(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
-                prefix: Icon(
-                  Iconsax.search_normal_copy,
-                  size: 15,
-                ).paddingOnly(left: 10),
-                suffix: GestureDetector(
-                  onTap: () {
-                    _searchController.clear();
-                    _controller.clearSearch();
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    setState(() {
-                      _isSearchVisible = false;
-                    });
-                  },
-                  child: Icon(
-                    Iconsax.close_circle_copy,
-                    size: 20,
-                  ).paddingOnly(right: 10),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    width: 1.w,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: _isSearchVisible
+              ? CupertinoTextField(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 9.h,
                   ),
-                ),
-                placeholder: LK.searchHint.tr,
-                controller: _searchController,
-                onChanged: _controller.updateSearch,
-              )
-            : Text(LK.findMember.tr),
-        actions: [
-          if (!_isSearchVisible)
-            IconButton(
-              icon: const Icon(Iconsax.search_normal_copy),
-              onPressed: () {
-                setState(() {
-                  _isSearchVisible = true;
-                });
-              },
-            ),
-        ],
+                  prefix: Icon(
+                    Iconsax.search_normal_copy,
+                    size: 15,
+                  ).paddingOnly(left: 10),
+                  suffix: GestureDetector(
+                    onTap: () {
+                      _searchController.clear();
+                      _controller.clearSearch();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        _isSearchVisible = false;
+                      });
+                    },
+                    child: Icon(
+                      Iconsax.close_circle_copy,
+                      size: 20,
+                    ).paddingOnly(right: 10),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.5),
+                      width: 1.w,
+                    ),
+                  ),
+                  placeholder: LK.searchHint.tr,
+                  controller: _searchController,
+                  onChanged: _controller.updateSearch,
+                )
+              : Text(LK.findMember.tr),
+          actions: [
+            if (!_isSearchVisible)
+              IconButton(
+                icon: const Icon(Iconsax.search_normal_copy),
+                onPressed: () {
+                  setState(() {
+                    _isSearchVisible = true;
+                  });
+                },
+              ),
+          ],
+        ),
+        body: PaginatedListView<Member, FindMemberController>(
+          emptyMessage: LK.noMembersFound.tr,
+          padding: EdgeInsetsGeometry.zero,
+          separatorBuilder: (val, val2) => SizedBox(height: 6.h),
+          itemBuilder: (context, index, member) =>
+              _FindMemberCard(member: member),
+        ).paddingSymmetric(horizontal: 14.w, vertical: 10.h),
       ),
-      body: Column(
-        children: [
-
-          Obx(
-            () => Row(
-              children: [
-                Icon(
-                  Icons.people_alt_outlined,
-                  size: 16.sp,
-                  color: AppColors.grey,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  LK.showing.tr,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  ' ${_controller.items.length} ',
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  _controller.items.length == 1
-                      ? LK.member.tr
-                      : LK.membersCount.tr,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ).paddingOnly(left: 5.w),
-          ),
-          15.verticalSpace,
-          Expanded(
-            child: PaginatedListView<Member, FindMemberController>(
-              emptyMessage: LK.noMembersFound.tr,
-              padding: EdgeInsetsGeometry.zero,
-              itemBuilder: (context, index, member) =>
-                  _FindMemberCard(member: member),
-            ),
-          ),
-        ],
-      ).paddingSymmetric(horizontal: 14.w),
     );
   }
 }
@@ -253,8 +217,6 @@ class _FindMemberCard extends StatelessWidget {
     }
 
     return AppCard(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(10.w),
       elevation: 0.02,
       border: Border.all(
         color: AppColors.grey.withValues(alpha: 0.15),

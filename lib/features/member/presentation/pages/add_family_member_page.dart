@@ -1138,35 +1138,33 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     final fieldsWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Obx(() {
-                final isFetching = controller.isFetchingLocation.value;
-                return TextButton.icon(
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                  ),
-                  onPressed: isFetching
-                      ? null
-                      : () => controller.fetchCurrentLocation(addr),
-                  icon: isFetching
-                      ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.primary,
-                          ),
-                        )
-                      : const Icon(Icons.my_location, size: 18),
-                  label: Text(
-                    isFetching ? 'Fetching Address...' : 'Use Current Location',
-                  ),
-                );
-              }),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Obx(() {
+              final isFetching = controller.isFetchingLocation.value;
+              return TextButton.icon(
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                onPressed: isFetching
+                    ? null
+                    : () => controller.fetchCurrentLocation(addr),
+                icon: isFetching
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : const Icon(Icons.my_location, size: 18),
+                label: Text(
+                  isFetching ? 'Fetching Address...' : 'Use Current Location',
+                ),
+              );
+            }),
+          ],
+        ),
         AppSpacing.vS,
         Obx(() {
           final typeList = controller.addressTypeList;
@@ -1634,9 +1632,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ),
           title: Text(
             '${LK.educationTab.tr} #${index + 1}${isHighest ? ' (${LK.highest.tr})' : ''}',
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.primary,
-            ),
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.primary),
           ),
           trailing: IconButton(
             onPressed: () => controller.removeEducation(index),
@@ -1965,9 +1961,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.personalInfo.monthlyIncomeCtrl,
                   label: LK.monthlyIncomeLabel.tr,
                   prefixIcon: const Icon(Icons.currency_rupee),
-                  keyboardType: TextInputType.numberWithOptions(
-                    decimal: true
-                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   maxLength: 13,
                 ),
               ],
@@ -2311,7 +2305,104 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 if (!hasImage) return const SizedBox.shrink();
 
                 return TextButton.icon(
-                  onPressed: controller.removePhoto,
+                  onPressed: () {
+                    Get.dialog<void>(
+                      Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24.r),
+                        ),
+                        elevation: 6,
+                        backgroundColor: AppColors.white,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 24.h,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.red.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.delete_forever_rounded,
+                                  color: AppColors.red,
+                                  size: 36.sp,
+                                ),
+                              ),
+                              SizedBox(height: 20.h),
+                              Text(
+                                LK.removePhoto.tr,
+                                style: AppTextStyles.titleMedium.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.sp,
+                                  color: AppColors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 10.h),
+                              Text(
+                                LK.removePhotoConfirm.tr,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.grey,
+                                  height: 1.4,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 24.h),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () => Get.back<void>(),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12.h,
+                                        ),
+                                        side: BorderSide(
+                                          color: AppColors.grey.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12.r,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        LK.cancel.tr,
+                                        style: AppTextStyles.labelLarge
+                                            .copyWith(
+                                              color: AppColors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: AppPrimaryButton(
+                                      text: LK.yes.tr,
+                                      height: 48.h,
+                                      color: AppColors.red,
+                                      onPressed: () {
+                                        Get.back<void>();
+                                        controller.removePhoto();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   icon: Icon(
                     Icons.delete_outline,
                     size: 14,

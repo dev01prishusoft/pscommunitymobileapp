@@ -90,43 +90,6 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
             ),
           ),
           10.verticalSpace,
-          Obx(
-            () => Row(
-              children: [
-                Icon(
-                  Icons.people_alt_outlined,
-                  size: 16.sp,
-                  color: AppColors.grey,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  LK.showing.tr,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  ' ${controller.occupationMembers.length} ',
-                  style: AppTextStyles.labelMedium.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  controller.occupationMembers.length <= 1
-                      ? LK.member.tr
-                      : LK.membersCount.tr,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.grey.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ).paddingOnly(left: 5.w),
-          ),
-
-          15.verticalSpace,
           Expanded(
             child: Obx(
               () => AppStateView(

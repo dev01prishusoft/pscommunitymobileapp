@@ -784,47 +784,6 @@ class _PaymentCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                if (payment.notes.isNotEmpty) ...[
-                  SizedBox(height: 10.h),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.02),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border(
-                        left: BorderSide(
-                          color: AppColors.primary.withValues(alpha: 0.4),
-                          width: 3.5,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.notes_rounded,
-                          size: 16,
-                          color: AppColors.primary.withValues(alpha: 0.6),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            payment.notes.replaceAll(RegExp(r'\r\n|\n'), ' '),
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.grey.shade700,
-                              fontStyle: FontStyle.italic,
-                              height: 1.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

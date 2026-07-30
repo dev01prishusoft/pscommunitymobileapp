@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
@@ -104,26 +103,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         children: [
           SizedBox(height: 10.h),
 
-          SizedBox(
-            height: 34.h,
-            child: Obx(
-              () => ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _controller.occupationTypes.length,
-                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                itemBuilder: (context, index) {
-                  final type = _controller.occupationTypes[index];
-                  return Padding(
-                    padding: EdgeInsets.only(right: 4.w),
-                    child: _buildFilterChip(type),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          SizedBox(height: 10.h),
-
           Expanded(
             child: Obx(
               () => AppStateView(
@@ -178,67 +157,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildFilterChip(DropdownItem type) {
-    final displayName = type.id == 0 ? LK.all.tr : type.text;
-    return Obx(() {
-      final isSelected =
-          _controller.selectedOccupationType.value?.id == type.id;
-      return GestureDetector(
-        onTap: () {
-          _controller.onOccupationTypeChanged(type);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: EdgeInsets.symmetric(horizontal: 14.w),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : AppColors.white,
-            borderRadius: BorderRadius.circular(22.r),
-            border: Border.all(
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.grey.withValues(alpha: 0.2),
-              width: 1.w,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                _getChipIcon(displayName),
-                size: 14.r,
-                color: isSelected ? AppColors.white : AppColors.primary,
-              ),
-              SizedBox(width: 4.w),
-              Text(
-                displayName,
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: isSelected ? AppColors.white : AppColors.black,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    });
-  }
-
-  IconData _getChipIcon(String text) {
-    final lower = text.toLowerCase();
-    if (lower == 'all') return Icons.grid_view_rounded;
-    if (lower.contains('business')) return Icons.business_center_rounded;
-    if (lower.contains('job')) return Icons.work_rounded;
-    if (lower.contains('profession')) return Icons.psychology_rounded;
-    if (lower.contains('agriculture')) return Icons.agriculture_rounded;
-    if (lower.contains('medical') || lower.contains('doctor'))
-      return Icons.medical_services_rounded;
-    if (lower.contains('school') ||
-        lower.contains('education') ||
-        lower.contains('teacher'))
-      return Icons.school_rounded;
-    return Icons.work_rounded;
   }
 
   Widget _buildOccupationCard(OccupationItem occ) {

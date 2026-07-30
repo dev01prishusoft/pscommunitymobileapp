@@ -474,6 +474,7 @@ class LK {
   static const String chooseFile = 'Choose File';
   static const String noFileChosen = 'No file chosen';
   static const String removePhoto = 'Remove photo';
+  static const String removePhotoConfirm = 'remove_photo_description';
   static const String saveChanges = 'Save Changes';
   static const String addMember = 'Add Member';
   static const String educationDetails = 'Education Details';

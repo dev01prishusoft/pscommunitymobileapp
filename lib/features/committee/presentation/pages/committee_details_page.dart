@@ -32,13 +32,16 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(node.name)),
-      body: Obx(
-        () => AppStateView(
-          state: controller.detailState.value,
-          onRetry: () => controller.loadCommitteeDetail(node.id),
-          child: _buildContent(controller.committeeDetail.value),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(title: Text(node.name)),
+        body: Obx(
+          () => AppStateView(
+            state: controller.detailState.value,
+            onRetry: () => controller.loadCommitteeDetail(node.id),
+            child: _buildContent(controller.committeeDetail.value),
+          ),
         ),
       ),
     );
@@ -185,7 +188,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                       );
                     },
                   ),
-                if (detail.members.isNotEmpty) ...[
+                if (detail.members.isNotEmpty && detail.members.length > 3) ...[
                   SizedBox(height: 12.h),
                   OutlinedButton(
                     onPressed: () {
@@ -228,6 +231,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
               ],
             ),
           ),
+          SizedBox(height: 30.h),
         ],
       ),
     );

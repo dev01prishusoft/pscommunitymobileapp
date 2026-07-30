@@ -12,7 +12,6 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -316,7 +315,9 @@ class _LanguageDropdown extends GetView<LocalizationService> {
             children: [
               Text(
                 selectedCode,
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: AppColors.primary,
+                ),
               ),
               SizedBox(width: 4.w),
               Icon(
@@ -333,7 +334,9 @@ class _LanguageDropdown extends GetView<LocalizationService> {
               value: code,
               child: Text(
                 code,
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: AppColors.primary,
+                ),
               ),
             );
           }).toList();

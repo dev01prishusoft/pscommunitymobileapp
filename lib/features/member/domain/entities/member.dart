@@ -87,6 +87,7 @@ class Member {
     this.signName,
     this.issameAddressasMyFamilyHeadAddress,
     this.approveStatus,
+    this.rejectedReasonCommentByAdmin,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) {
@@ -234,6 +235,9 @@ class Member {
       signName: getString('signName', 'SignName'),
       issameAddressasMyFamilyHeadAddress: json['issameAddressasMyFamilyHeadAddress'] as bool?,
       approveStatus: getString('approveStatus', 'ApproveStatus'),
+      rejectedReasonCommentByAdmin: getString('rejectedReasonCommentByAdmin') ??
+          getString('rejectionReason') ??
+          getString('rejectReason'),
     );
   }
   final int memberId;
@@ -259,6 +263,7 @@ class Member {
   final String? bloodGroupName;
   final bool? isLookingforMarriage;
   final String? approveStatus;
+  final String? rejectedReasonCommentByAdmin;
   final String? educationName;
   final String? jobPositionName;
   final String? otherJobPosition;
@@ -379,6 +384,7 @@ class Member {
       'districtId': districtId,
       'talukaId': talukaId,
       'areaId': areaId,
+      'rejectedReasonCommentByAdmin': rejectedReasonCommentByAdmin,
     };
   }
 }

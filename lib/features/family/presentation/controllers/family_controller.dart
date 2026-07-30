@@ -63,7 +63,8 @@ class FamilyController extends GetxController {
     try {
       final results = await _repository.getStates();
       states.assignAll(results);
-    } catch (_) {} finally {
+    } catch (_) {
+    } finally {
       isStatesLoading.value = false;
     }
   }
@@ -116,9 +117,11 @@ class FamilyController extends GetxController {
       isTalukasLoading.value = false;
     }
   }
+
   Future<List<DropdownItem>> fetchDistricts(int stateId) async {
     return _repository.getDistricts(stateId);
   }
+
   Future<List<DropdownItem>> fetchTalukas(int districtId) async {
     return _repository.getTalukas(districtId);
   }
@@ -372,8 +375,7 @@ class FamilyController extends GetxController {
           await launchUrl(url, mode: LaunchMode.externalApplication);
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   String getFormattedDateOfBirth(Member member) {
