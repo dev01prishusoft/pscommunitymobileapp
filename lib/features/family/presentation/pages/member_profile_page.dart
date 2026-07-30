@@ -136,8 +136,9 @@ class _ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  member.fullName,
+                ExpandableText(
+                  maxLines: 1,
+                  text: member.fullName,
                   style: AppTextStyles.titleLarge.copyWith(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -260,6 +261,7 @@ class _MemberDetailsSection extends StatelessWidget {
               Icons.person_outline,
               LK.motherFatherName.tr,
               controller.formatMotherFather(member),
+              isExpandable: true,
             ),
             _buildGridItem(
               Icons.work_outline,
@@ -309,6 +311,7 @@ class _MemberDetailsSection extends StatelessWidget {
               Icons.mail_outline,
               LK.email.tr,
               controller.formatEmail(member),
+              isExpandable: true,
             ),
             isLast: true,
           ),
@@ -336,6 +339,7 @@ class _MemberDetailsSection extends StatelessWidget {
     String label,
     String value, {
     VoidCallback? onTap,
+    bool isExpandable = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -364,14 +368,26 @@ class _MemberDetailsSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 2.h),
-                Text(
-                  value,
-                  style: AppTextStyles.labelMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.black,
-                    decoration: onTap != null ? TextDecoration.underline : null,
-                  ),
-                ),
+                isExpandable
+                    ? ExpandableText(
+                        text: value,
+                        style: AppTextStyles.labelMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.black,
+                        ),
+                        onTap: onTap,
+                        isUnderline: onTap != null,
+                      )
+                    : Text(
+                        value,
+                        style: AppTextStyles.labelMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.black,
+                          decoration: onTap != null
+                              ? TextDecoration.underline
+                              : null,
+                        ),
+                      ),
               ],
             ),
           ),
@@ -448,8 +464,8 @@ class _AddressSection extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12.h),
-                Text(
-                  addr.fullAddress,
+                ExpandableText(
+                  text: addr.fullAddress,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.black,
                     fontWeight: FontWeight.bold,
@@ -829,10 +845,10 @@ class _EducationSection extends StatelessWidget {
                 ),
                 SizedBox(height: 12.h),
                 if (edu.institute.isNotEmpty)
-                  _buildRowItem(LK.instituteNameLabel.tr, edu.institute),
+                  _buildColumnItem(LK.instituteNameLabel.tr, edu.institute),
                 if (edu.description.isNotEmpty) ...[
                   SizedBox(height: 12.h),
-                  _buildRowItem(LK.description.tr, edu.description),
+                  _buildColumnItem(LK.description.tr, edu.description),
                 ],
                 SizedBox(height: 8.h),
                 Row(
@@ -871,27 +887,6 @@ class _EducationSection extends StatelessWidget {
     );
   }
 
-  Widget _buildRowItem(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 4.h),
-      child: RichText(
-        text: TextSpan(
-          text: '$label: ',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
-          children: [
-            TextSpan(
-              text: value,
-              style: AppTextStyles.bodySmall.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildColumnItem(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -901,8 +896,9 @@ class _EducationSection extends StatelessWidget {
           style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
-        Text(
-          value,
+        ExpandableText(
+          maxLines: 2,
+          text: value,
           style: AppTextStyles.labelMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: AppColors.black,
@@ -919,54 +915,155 @@ class _OccupationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fields = <Widget>[];
+    Widget? getFieldWidget(
+      String label,
+      String? value, {
+      bool isExpandable = false,
+    }) {
+      if (value == null ||
+          value.isEmpty ||
+          value == LK.na.tr ||
+          value == 'null') {
+        return null;
+      }
+      return _buildColumnItem(label, value, isExpandable: isExpandable);
+    }
 
-    void addField(String label, String? value) {
-      if (value != null &&
-          value.isNotEmpty &&
-          value != LK.na.tr &&
-          value != 'null') {
-        fields.add(_buildColumnItem(label, value));
+    final wType = getFieldWidget(
+      LK.occupationTypeLabel.tr,
+      member.occupationTypeName,
+    );
+    final wName = getFieldWidget(LK.occupationColon.tr, member.occupationName);
+    final wJobPos = getFieldWidget(
+      LK.jobPositionLabel.tr,
+      member.jobPositionName,
+    );
+    final wOtherJobPos = getFieldWidget(
+      LK.otherJobPositionLabel.tr,
+      member.otherJobPosition,
+    );
+    final wOtherOcc = getFieldWidget(
+      LK.otherOccupationLabel.tr,
+      member.otherOccupation,
+      isExpandable: true,
+    );
+    final wCompany = getFieldWidget(
+      LK.companyNameLabel.tr,
+      member.companyName,
+      isExpandable: true,
+    );
+
+    final wBusiness = getFieldWidget(
+      LK.businessName.tr,
+      member.businessName,
+      isExpandable: true,
+    );
+    final wDesc = getFieldWidget(
+      LK.occupationDescriptionLabel.tr,
+      member.occupationDescription,
+      isExpandable: true,
+    );
+    final wAddr1 = getFieldWidget(
+      LK.occupationAddressLine1Label.tr,
+      member.occupationAddressLine1,
+      isExpandable: true,
+    );
+    final wAddr2 = getFieldWidget(
+      LK.occupationAddressLine2Label.tr,
+      member.occupationAddressLine2,
+      isExpandable: true,
+    );
+
+    final wState = getFieldWidget(LK.state.tr, member.occupationStateName);
+    final wDistrict = getFieldWidget(
+      LK.district.tr,
+      member.occupationDistrictName,
+    );
+    final wTaluka = getFieldWidget(LK.taluka.tr, member.occupationTalukaName);
+    final wArea = getFieldWidget(LK.area.tr, member.occupationAreaName);
+    final wLandmark = getFieldWidget(
+      LK.landmarkLabel.tr,
+      member.occupationLandmark,
+      isExpandable: true,
+    );
+    final wPincode = getFieldWidget(LK.pincode.tr, member.occupationPincode);
+
+    final rows = <Widget>[];
+
+    void addPair(Widget? w1, Widget? w2) {
+      if (w1 != null && w2 != null) {
+        rows.add(
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: w1),
+                SizedBox(width: 12.w),
+                Expanded(child: w2),
+              ],
+            ),
+          ),
+        );
+      } else if (w1 != null) {
+        rows.add(
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: w1),
+                SizedBox(width: 12.w),
+                const Expanded(child: SizedBox()),
+              ],
+            ),
+          ),
+        );
+      } else if (w2 != null) {
+        rows.add(
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(child: SizedBox()),
+                SizedBox(width: 12.w),
+                Expanded(child: w2),
+              ],
+            ),
+          ),
+        );
       }
     }
 
-    addField(LK.occupationTypeLabel.tr, member.occupationTypeName);
-    addField(LK.occupationColon.tr, member.occupationName);
-    addField(LK.jobPositionLabel.tr, member.jobPositionName);
-    addField(LK.otherJobPositionLabel.tr, member.otherJobPosition);
-    addField(LK.otherOccupationLabel.tr, member.otherOccupation);
-    addField(LK.companyNameLabel.tr, member.companyName);
-    addField(LK.businessName.tr, member.businessName);
-    addField(LK.occupationDescriptionLabel.tr, member.occupationDescription);
-    addField(LK.state.tr, member.occupationStateName);
-    addField(LK.district.tr, member.occupationDistrictName);
-    addField(LK.taluka.tr, member.occupationTalukaName);
-    addField(LK.area.tr, member.occupationAreaName);
-    addField(LK.occupationAddressLine1Label.tr, member.occupationAddressLine1);
-    addField(LK.occupationAddressLine2Label.tr, member.occupationAddressLine2);
-    addField(LK.landmarkLabel.tr, member.occupationLandmark);
-    addField(LK.pincode.tr, member.occupationPincode);
-
-    if (fields.isEmpty) return SizedBox.shrink();
-
-    final rows = <Widget>[];
-    for (int i = 0; i < fields.length; i += 2) {
-      final item1 = fields[i];
-      final item2 = (i + 1 < fields.length) ? fields[i + 1] : const SizedBox();
-      rows.add(
-        Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: item1),
-              SizedBox(width: 12.w),
-              Expanded(child: item2),
-            ],
+    void addSingle(Widget? w) {
+      if (w != null) {
+        rows.add(
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: w,
           ),
-        ),
-      );
+        );
+      }
     }
+
+    addPair(wType, wName);
+    addPair(wJobPos, wOtherJobPos);
+    addSingle(wOtherOcc);
+    addSingle(wCompany);
+
+    addSingle(wBusiness);
+    addSingle(wDesc);
+    addSingle(wAddr1);
+    addSingle(wAddr2);
+
+    addPair(wState, wDistrict);
+    addPair(wTaluka, wArea);
+
+    addSingle(wLandmark);
+    addSingle(wPincode);
+
+    if (rows.isEmpty) return SizedBox.shrink();
 
     return _SectionContainer(
       title: LK.occupationProfile.tr,
@@ -978,7 +1075,11 @@ class _OccupationSection extends StatelessWidget {
     );
   }
 
-  Widget _buildColumnItem(String label, String value) {
+  Widget _buildColumnItem(
+    String label,
+    String value, {
+    bool isExpandable = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -987,14 +1088,120 @@ class _OccupationSection extends StatelessWidget {
           style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
         ),
         SizedBox(height: 2.h),
-        Text(
-          value,
-          style: AppTextStyles.labelMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-          ),
-        ),
+        isExpandable
+            ? ExpandableText(
+                text: value,
+                style: AppTextStyles.labelMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              )
+            : Text(
+                value,
+                style: AppTextStyles.labelMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
       ],
+    );
+  }
+}
+
+class ExpandableText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  final int maxLines;
+  final VoidCallback? onTap;
+  final bool isUnderline;
+  final String? prefixText;
+  final TextStyle? prefixStyle;
+
+  const ExpandableText({
+    super.key,
+    required this.text,
+    required this.style,
+    this.maxLines = 2,
+    this.onTap,
+    this.isUnderline = false,
+    this.prefixText,
+    this.prefixStyle,
+  });
+
+  @override
+  State<ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<ExpandableText> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textSpan = TextSpan(
+          text: widget.prefixText != null ? '${widget.prefixText}: ' : '',
+          style: widget.prefixStyle ?? widget.style,
+          children: [TextSpan(text: widget.text, style: widget.style)],
+        );
+        final textPainter = TextPainter(
+          text: textSpan,
+          textDirection: TextDirection.ltr,
+          maxLines: widget.maxLines,
+        );
+        textPainter.layout(maxWidth: constraints.maxWidth);
+
+        final exceeds = textPainter.didExceedMaxLines;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: widget.onTap,
+              child: Text.rich(
+                TextSpan(
+                  text: widget.prefixText != null
+                      ? '${widget.prefixText}: '
+                      : '',
+                  style: widget.prefixStyle ?? widget.style,
+                  children: [
+                    TextSpan(
+                      text: widget.text,
+                      style: widget.style.copyWith(
+                        decoration: widget.isUnderline
+                            ? TextDecoration.underline
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+                maxLines: _isExpanded ? null : widget.maxLines,
+                overflow: _isExpanded
+                    ? TextOverflow.clip
+                    : TextOverflow.ellipsis,
+              ),
+            ),
+            if (exceeds) ...[
+              SizedBox(height: 2.h),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+                child: Text(
+                  _isExpanded ? 'less' : 'more...',
+                  style: widget.style.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }

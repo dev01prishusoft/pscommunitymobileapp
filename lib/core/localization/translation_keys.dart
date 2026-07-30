@@ -44,6 +44,7 @@ class LK {
   static const String pleaseEnterConfirmPassword =
       'Please enter Confirm Password';
   static const String family = 'Family';
+  static const String familyByArea = 'family_by_area';
   static const String findMember = 'Find Member';
   static const String committee = 'Committee';
   static const String payment = 'Payment';

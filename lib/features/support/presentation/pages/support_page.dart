@@ -91,9 +91,13 @@ class SupportPage extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     LK.ourSupportTeamDesc.tr,
-                                    style: TextStyle(
+                                    // style: TextStyle(
+                                    //   color: Colors.white70,
+                                    //   fontSize: 12,
+                                    //   fontWeight: FontWeight.w500,
+                                    // ),
+                                    style: AppTextStyles.bodySmall.copyWith(
                                       color: Colors.white70,
-                                      fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

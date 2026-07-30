@@ -34,85 +34,82 @@ class BankDetailsPage extends StatelessWidget {
               LK.samajInfo.tr
             ),
           ),
-          body: Container(
-            color: AppColors.sfBackground,
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const AppStateView(
-                  state: AppState.loading,
-                  child: SizedBox.shrink(),
-                );
-              }
-
-              if (controller.bankdetailsError.value != null) {
-                return AppStateView(
-                  state: AppState.error,
-                  errorMessage: controller.bankdetailsError.value,
-                  onRetry: controller.fetchBankAccountDetail,
-                  child: const SizedBox.shrink(),
-                );
-              }
-
-              final accounts = controller.bankAccountDetails;
-
-              if (accounts.isEmpty) {
-                return ListView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  children: [
-                    _buildSamajCardSection(),
-                    SizedBox(height: 24.h),
-                    Text(
-                      LK.bankAccounts.tr,
-                      style: AppTextStyles.titleLarge.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppStateView(
-                      state: AppState.empty,
-                      emptyMessage: LK.noBankAccountsFound.tr,
-                      onRetry: controller.fetchBankAccountDetail,
-                      child: const SizedBox.shrink(),
-                    ),
-                  ],
-                );
-              }
-
-              return ListView.separated(
+          body: Obx(() {
+            if (controller.isLoading.value) {
+              return const AppStateView(
+                state: AppState.loading,
+                child: SizedBox.shrink(),
+              );
+            }
+          
+            if (controller.bankdetailsError.value != null) {
+              return AppStateView(
+                state: AppState.error,
+                errorMessage: controller.bankdetailsError.value,
+                onRetry: controller.fetchBankAccountDetail,
+                child: const SizedBox.shrink(),
+              );
+            }
+          
+            final accounts = controller.bankAccountDetails;
+          
+            if (accounts.isEmpty) {
+              return ListView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
                 ),
-                itemCount: accounts.length + 1,
-                separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSamajCardSection(),
-                        SizedBox(height: 24.h),
-                        Text(
-                          LK.bankAccounts.tr,
-                          style: AppTextStyles.titleLarge.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                      ],
-                    );
-                  }
-                  final bank = accounts[index - 1];
-                  return _buildBankCard(context, bank);
-                },
+                children: [
+                  _buildSamajCardSection(),
+                  SizedBox(height: 24.h),
+                  Text(
+                    LK.bankAccounts.tr,
+                    style: AppTextStyles.titleLarge.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  AppStateView(
+                    state: AppState.empty,
+                    emptyMessage: LK.noBankAccountsFound.tr,
+                    onRetry: controller.fetchBankAccountDetail,
+                    child: const SizedBox.shrink(),
+                  ),
+                ],
               );
-            }),
-          ),
+            }
+          
+            return ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+              itemCount: accounts.length + 1,
+              separatorBuilder: (context, index) => SizedBox(height: 16.h),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSamajCardSection(),
+                      SizedBox(height: 24.h),
+                      Text(
+                        LK.bankAccounts.tr,
+                        style: AppTextStyles.titleLarge.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
+                  );
+                }
+                final bank = accounts[index - 1];
+                return _buildBankCard(context, bank);
+              },
+            );
+          }),
         );
       },
     );
