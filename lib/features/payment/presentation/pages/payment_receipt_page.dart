@@ -259,8 +259,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                       SizedBox(height: 8.h),
                       Text(
                         '₹${data['amount']}',
-                        style: TextStyle(
-                          fontSize: 32.sp,
+                        style: AppTextStyles.displaySmall.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.black,
                         ),

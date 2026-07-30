@@ -64,9 +64,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                           ),
                           child: Text(
                             LK.primary.tr.toUpperCase(),
-                            style: const TextStyle(
+                            style: AppTextStyles.labelSmall.copyWith(
                               color: Colors.white,
-                              fontSize: 10,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.2,
                             ),
@@ -83,9 +82,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                             (match) => "${match.group(0)}  ",
                           )
                         : bank.accountNumber ?? '-',
-                    style: TextStyle(
+                    style: AppTextStyles.headlineSmall.copyWith(
                       color: Colors.white,
-                      fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
                       fontFamily: 'monospace',
@@ -101,9 +99,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                           children: [
                             Text(
                               LK.accountHolder.tr.toUpperCase(),
-                              style: TextStyle(
+                              style: AppTextStyles.labelSmall.copyWith(
                                 color: Colors.white60,
-                                fontSize: 9,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1,
                               ),
@@ -113,9 +110,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               bank.accountHolderName ?? '-',
-                              style: const TextStyle(
+                              style: AppTextStyles.labelLarge.copyWith(
                                 color: Colors.white,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 2,
@@ -130,9 +126,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                           children: [
                             Text(
                               LK.bankName.tr.toUpperCase(),
-                              style: TextStyle(
+                              style: AppTextStyles.labelSmall.copyWith(
                                 color: Colors.white60,
-                                fontSize: 9,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1,
                               ),
@@ -143,9 +138,8 @@ class BankAccountDetailsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               bank.bankName ?? '-',
-                              style: const TextStyle(
+                              style: AppTextStyles.labelLarge.copyWith(
                                 color: Colors.white,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 2,
@@ -314,8 +308,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                               Text(
                                 'UPI ID not configured for payment QR code',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: AppTextStyles.labelSmall.copyWith(
                                   color: Colors.grey.shade500,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -327,8 +320,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     SizedBox(height: 12.h),
                     Text(
                       LK.scanQrToPay.tr,
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: AppTextStyles.labelSmall.copyWith(
                         color: Colors.grey.shade500,
                         fontWeight: FontWeight.w500,
                       ),

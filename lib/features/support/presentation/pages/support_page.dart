@@ -91,11 +91,7 @@ class SupportPage extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     LK.ourSupportTeamDesc.tr,
-                                    // style: TextStyle(
-                                    //   color: Colors.white70,
-                                    //   fontSize: 12,
-                                    //   fontWeight: FontWeight.w500,
-                                    // ),
+                                   
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: Colors.white70,
                                       fontWeight: FontWeight.w500,
@@ -197,8 +193,7 @@ class SupportPage extends StatelessWidget {
                                               const SizedBox(height: 2),
                                               Text(
                                                 LK.representative.tr,
-                                                style: TextStyle(
-                                                  fontSize: 11.sp,
+                                                style: AppTextStyles.labelSmall.copyWith(
                                                   color: Colors.grey.shade500,
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -282,9 +277,8 @@ class SupportPage extends StatelessWidget {
                     children: [
                       Text(
                         isWhatsApp ? LK.whatsAppSupport.tr : LK.emailSupport.tr,
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           fontWeight: FontWeight.w800,
-                          fontSize: 13,
                           color: themeColor,
                         ),
                       ),

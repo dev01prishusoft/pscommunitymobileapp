@@ -789,9 +789,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                               padding: EdgeInsets.only(top: 8.h),
                               child: Text(
                                 controller.incomeError.value,
-                                style: TextStyle(
+                                style: AppTextStyles.labelSmall.copyWith(
                                   color: AppColors.red,
-                                  fontSize: 12.sp,
                                 ),
                               ),
                             );
@@ -841,9 +840,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                     ),
                     child: Text(
                       LK.applyFilters.tr,
-                      style: TextStyle(
+                      style: AppTextStyles.labelLarge.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
                       ),
                     ),
                   ),
@@ -865,9 +863,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                     ),
                     child: Text(
                       LK.clearAll.tr,
-                      style: TextStyle(
+                      style: AppTextStyles.labelLarge.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
                       ),
                     ),
                   ),
@@ -949,7 +946,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
               padding: EdgeInsets.only(top: 4.h),
               child: Text(
                 errorRx.value,
-                style: TextStyle(color: AppColors.red, fontSize: 12.sp),
+                style: AppTextStyles.labelSmall.copyWith(color: AppColors.red),
               ),
             );
           }

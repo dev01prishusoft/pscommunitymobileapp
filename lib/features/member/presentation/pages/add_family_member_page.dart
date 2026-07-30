@@ -193,7 +193,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       },
                       label: Text(
                         LK.back.tr,
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                         ),

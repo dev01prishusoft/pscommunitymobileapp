@@ -49,7 +49,7 @@ android {
         }
        }
     }
-    
+     
     buildTypes {
         release {
             signingConfig = if (keystorePropertiesFile.exists())

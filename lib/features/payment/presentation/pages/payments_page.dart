@@ -275,9 +275,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 children: [
                   Text(
                     LK.communityPortal.tr,
-                    style: TextStyle(
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.white.withValues(alpha: 0.7),
-                      fontSize: 10.sp,
                       fontWeight: FontWeight.w500,
                       letterSpacing: 1.0,
                     ),
@@ -285,9 +284,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   SizedBox(height: 4.h),
                   Text(
                     LK.payments.tr,
-                    style: TextStyle(
+                    style: AppTextStyles.titleMedium.copyWith(
                       color: AppColors.white,
-                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -381,9 +379,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
+          style: AppTextStyles.labelSmall.copyWith(
             color: AppColors.white.withValues(alpha: 0.6),
-            fontSize: 10.sp,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
@@ -402,9 +399,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
             SizedBox(width: 6.w),
             Text(
               value,
-              style: TextStyle(
+              style: AppTextStyles.titleLarge.copyWith(
                 color: AppColors.white,
-                fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),

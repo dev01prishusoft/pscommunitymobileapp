@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pscommunitymobileapp/core/constants/app_strings_preboot.dart';
+import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class PrebootColors {
@@ -43,7 +44,7 @@ class FatalErrorScreen extends StatelessWidget {
                 Text(
                   PrebootStrings.initError,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: AppTextStyles.displayLarge.copyWith(
                     fontSize: 36,
                     color: PrebootColors.textPrimary,
                     letterSpacing: -0.5,
@@ -53,8 +54,7 @@ class FatalErrorScreen extends StatelessWidget {
                 Text(
                   PrebootStrings.initBody,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: AppTextStyles.bodyLarge.copyWith(
                     color: PrebootColors.textSecondary,
                     height: 1.5,
                   ),
@@ -72,8 +72,7 @@ class FatalErrorScreen extends StatelessWidget {
                     children: [
                       Text(
                         PrebootStrings.errorLog,
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: AppTextStyles.labelSmall.copyWith(
                           color: PrebootColors.logHeader,
                           letterSpacing: 1,
                         ),
@@ -81,8 +80,7 @@ class FatalErrorScreen extends StatelessWidget {
                       SizedBox(height: 12),
                       Text(
                         '$error',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: AppTextStyles.bodySmall.copyWith(
                           color: PrebootColors.logText,
                           fontFamily: 'monospace',
                         ),
@@ -106,7 +104,7 @@ class FatalErrorScreen extends StatelessWidget {
                   ),
                   child: Text(
                     PrebootStrings.closeApp,
-                    style: const TextStyle(fontSize: 14, letterSpacing: 0.5),
+                    style: AppTextStyles.labelLarge.copyWith(letterSpacing: 0.5),
                   ),
                 ),
               ],
