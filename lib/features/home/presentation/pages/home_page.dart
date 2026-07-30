@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -141,8 +142,7 @@ class _HomeHeader extends GetView<SamajController> {
   }
 }
 
-Widget _fallbackLogo() =>
-    Image.asset(FallBackImage, fit: BoxFit.cover);
+Widget _fallbackLogo() => Image.asset(FallBackImage, fit: BoxFit.cover);
 
 class _HomeMenuGrid extends StatelessWidget {
   const _HomeMenuGrid({required this.controller});
