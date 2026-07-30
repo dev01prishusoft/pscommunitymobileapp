@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,7 @@ import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
+
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
@@ -24,6 +25,7 @@ class FindMemberPage extends StatefulWidget {
 class _FindMemberPageState extends State<FindMemberPage> {
   final FindMemberController _controller = Get.find<FindMemberController>();
   final TextEditingController _searchController = TextEditingController();
+  bool _isSearchVisible = false;
 
   @override
   void dispose() {
@@ -34,28 +36,55 @@ class _FindMemberPageState extends State<FindMemberPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LK.findMember.tr)),
+      appBar: AppBar(
+        title: _isSearchVisible
+            ? CupertinoTextField(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+                prefix: Icon(
+                  Iconsax.search_normal_copy,
+                  size: 15,
+                ).paddingOnly(left: 10),
+                suffix: GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
+                    _controller.clearSearch();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  },
+                  child: Icon(
+                    Iconsax.close_circle_copy,
+                    size: 20,
+                  ).paddingOnly(right: 10),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                    width: 1.w,
+                  ),
+                ),
+                placeholder: LK.searchHint.tr,
+                controller: _searchController,
+                onChanged: _controller.updateSearch,
+              )
+            : Text(LK.findMember.tr),
+        actions: [
+          if (!_isSearchVisible)
+            IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                setState(() {
+                  _isSearchVisible = true;
+                });
+              },
+            ),
+        ],
+      ),
       body: Column(
         children: [
-          15.verticalSpace,
-          AppTextField(
-            hint: LK.searchHint.tr,
-            icon: Iconsax.search_normal_copy,
-            controller: _searchController,
-            onChanged: _controller.updateSearch,
-            suffixIcon: Obx(() {
-              return _controller.searchQuery.value.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(Icons.cancel_outlined, size: 20.sp),
-                      onPressed: () {
-                        _searchController.clear();
-                        _controller.clearSearch();
-                      },
-                    )
-                  : const SizedBox.shrink();
-            }),
-          ),
-          10.verticalSpace,
+
           Obx(
             () => Row(
               children: [
