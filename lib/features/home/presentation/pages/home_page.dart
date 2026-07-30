@@ -289,19 +289,54 @@ class _LanguageDropdown extends GetView<LocalizationService> {
           ? currentCode
           : codes.first;
 
-      return CustomDropdown<String>(
-        hint: '',
-        value: selectedCode,
-        isExpanded: false,
-        height: 35.h,
-        padding: EdgeInsets.symmetric(horizontal: 10.w),
-        fillColor: Colors.white,
-        style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
-        items: codes.map((code) {
-          return DropdownMenuItem<String>(value: code, child: Text(code));
-        }).toList(),
-        onChanged: (code) {
+      return PopupMenuButton<String>(
+        initialValue: selectedCode,
+        onSelected: (code) {
           homeController.changeLocale(controller, code);
+        },
+        color: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        elevation: 4,
+        offset: const Offset(0, 45), // Push popup slightly below the button
+        child: Container(
+          height: 35.h,
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.4),
+              width: 1.2.w,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                selectedCode,
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+              ),
+              SizedBox(width: 4.w),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: AppColors.grey,
+                size: 20.sp,
+              ),
+            ],
+          ),
+        ),
+        itemBuilder: (context) {
+          return codes.map((code) {
+            return PopupMenuItem<String>(
+              value: code,
+              child: Text(
+                code,
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+              ),
+            );
+          }).toList();
         },
       );
     });
