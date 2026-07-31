@@ -22,11 +22,7 @@ class SupportPage extends StatelessWidget {
       builder: (controller) {
         final support = controller.supportData.value;
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              LK.support.tr
-            ),
-          ),
+          appBar: AppBar(title: Text(LK.support.tr)),
           body: controller.isLoading.value
               ? const Center(child: CircularProgressIndicator())
               : support == null
@@ -52,9 +48,7 @@ class SupportPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(
-                                alpha: 0.25,
-                              ),
+                              color: AppColors.primary.withValues(alpha: 0.25),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -81,17 +75,16 @@ class SupportPage extends StatelessWidget {
                                 children: [
                                   Text(
                                     LK.needHelp.tr,
-                                    style: AppTextStyles.displaySmall
-                                        .copyWith(
-                                          color: Colors.white,
-                                          fontSize: 22.sp,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    style: AppTextStyles.displaySmall.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 22.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     LK.ourSupportTeamDesc.tr,
-                                   
+
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: Colors.white70,
                                       fontWeight: FontWeight.w500,
@@ -139,76 +132,155 @@ class SupportPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(
-                                      alpha: 0.03,
-                                    ),
+                                    color: Colors.black.withValues(alpha: 0.03),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
-                                border: Border.all(
-                                  color: Colors.grey.shade100,
-                                ),
+                                border: Border.all(color: Colors.grey.shade100),
                               ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    Get.toNamed<void>(
-                                      AppRouter.memberProfile,
-                                      arguments: {
-                                        'memberId': member.memberId,
-                                      },
-                                    );
-                                  },
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  dividerColor: Colors.transparent,
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                ),
+                                child: ExpansionTile(
+                                  tilePadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  iconColor: AppColors.primary,
+                                  collapsedIconColor: Colors.grey.shade400,
+                                  leading: MemberAvatar(
+                                    imageUrl: member.profileImage,
+                                    fallbackName: _getInitials(
+                                      member.displayName,
+                                    ),
+                                    radius: 24,
+                                  ),
+                                  title: Text(
+                                    member.displayName,
+                                    style: AppTextStyles.titleMedium.copyWith(
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    LK.representative.tr,
+                                    style: AppTextStyles.labelSmall.copyWith(
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  childrenPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  children: [
+                                    Divider(
+                                      color: Colors.grey.shade100,
+                                      height: 1,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        MemberAvatar(
-                                          imageUrl: member.profileImage,
-                                          fallbackName: _getInitials(
-                                            member.displayName,
-                                          ),
-                                          radius: 24,
-                                        ),
-                                        const SizedBox(width: 14),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                member.displayName,
-                                                style: AppTextStyles
-                                                    .titleMedium
-                                                    .copyWith(
-                                                      color:
-                                                          AppColors.black,
-                                                      fontWeight:
-                                                          FontWeight.w800,
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 10),
+                                            if (member.mobileNumber != null &&
+                                                member
+                                                    .mobileNumber!
+                                                    .isNotEmpty) ...[
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.phone_rounded,
+                                                    size: 16,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  GestureDetector(
+                                                    onTap: () => controller
+                                                        .launchSafeUrl(
+                                                          'tel:${member.mobileNumber}',
+                                                        ),
+                                                    child: Text(
+                                                      member.mobileNumber!,
+                                                      style: AppTextStyles
+                                                          .bodyMedium
+                                                          .copyWith(
+                                                            color:
+                                                                AppColors.blue,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
                                                     ),
-                                              ),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                LK.representative.tr,
-                                                style: AppTextStyles.labelSmall.copyWith(
-                                                  color: Colors.grey.shade500,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
-                                          ),
+                                            if (member.email != null &&
+                                                member.email!.isNotEmpty) ...[
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.email_rounded,
+                                                    size: 16,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  GestureDetector(
+                                                    onTap: () => controller
+                                                        .launchSafeUrl(
+                                                          'mailto:${member.email}',
+                                                        ),
+                                                    child: Text(
+                                                      member.email!,
+                                                      style: AppTextStyles
+                                                          .bodyMedium
+                                                          .copyWith(
+                                                            color:
+                                                                AppColors.blue,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ],
                                         ),
-                                        Icon(
-                                          Icons.chevron_right_rounded,
-                                          color: Colors.grey.shade400,
-                                          size: 24,
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.toNamed<void>(
+                                              AppRouter.memberProfile,
+                                              arguments: {
+                                                'memberId': member.memberId,
+                                              },
+                                            );
+                                          },
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: AppColors.primary,
+                                            textStyle: AppTextStyles.labelLarge
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                            padding: EdgeInsets.zero,
+                                            minimumSize: const Size(0, 0),
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                          ),
+                                          child: const Text('View Profile'),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                    10.verticalSpace,
+                                  ],
                                 ),
                               ),
                             );

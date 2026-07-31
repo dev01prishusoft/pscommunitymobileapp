@@ -381,10 +381,7 @@ class _MarriageMemberCard extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed<void>(
           AppRouter.memberProfile,
-          arguments: {
-            'memberId': member.memberId,
-            'fromMatrimonial': true,
-          },
+          arguments: {'memberId': member.memberId, 'fromMatrimonial': true},
         );
       },
       padding: EdgeInsets.all(14.w),
@@ -845,6 +842,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                       LK.applyFilters.tr,
                       style: AppTextStyles.labelLarge.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.white,
                       ),
                     ),
                   ),

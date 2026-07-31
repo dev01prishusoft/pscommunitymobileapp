@@ -61,6 +61,11 @@ class SupportTeamMember {
     required this.displayName,
 
     required this.profileImage,
+
+    this.mobileNumber,
+
+    this.email,
+
   });
  
   factory SupportTeamMember.fromJson(Map<String, dynamic> json) {
@@ -72,6 +77,11 @@ class SupportTeamMember {
       displayName: json['displayName'] as String? ?? '',
 
       profileImage: json['profileImage'] as String? ?? '',
+
+      mobileNumber: json['mobileNumber'] as String?,
+
+      email: json['email'] as String?,
+
     );
 
   }
@@ -81,6 +91,10 @@ class SupportTeamMember {
   final String displayName;
 
   final String profileImage;
+
+  final String? mobileNumber;
+
+  final String? email;
  
   Map<String, dynamic> toJson() {
 
@@ -89,12 +103,16 @@ class SupportTeamMember {
       'memberId': memberId,
 
       'displayName': displayName,
-      
+
       'profileImage': profileImage,
+
+      'mobileNumber': mobileNumber,
+
+      'email': email,
+
     };
 
   }
 
 }
-
  
