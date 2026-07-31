@@ -5,16 +5,14 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-
+import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
@@ -39,8 +37,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   @override
   void initState() {
     super.initState();
-    node = Get.arguments as CommitteeNode;
-    controller.init(node);
+    final args = Get.arguments;
+    String? initialRole;
+    if (args is CommitteeNode) {
+      node = args;
+    } else if (args is Map<String, dynamic>) {
+      node = args['node'] as CommitteeNode;
+      initialRole = args['selectedRole'] as String?;
+    }
+    controller.init(node, initialRole: initialRole);
     _searchController.text = controller.searchQuery.value;
   }
 
@@ -435,7 +440,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 onPressed: () {
                   Get.back<void>();
                   Get.toNamed<void>(
-                    AppRouter.memberProfile,
+                    AppRouter.frompageCommittee,
                     arguments: {'memberId': member.memberId},
                   );
                 },

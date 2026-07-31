@@ -21,7 +21,10 @@ class AddedMemberCard extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed<void>(
           AppRouter.memberProfile,
-          arguments: {'memberId': member.memberId},
+          arguments: {
+            'memberId': member.memberId,
+            'fromMyMemberList': true,
+          },
         );
       },
       child: AppCard(

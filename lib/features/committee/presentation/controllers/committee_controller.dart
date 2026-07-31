@@ -9,7 +9,7 @@ import 'package:pscommunitymobileapp/features/committee/domain/repositories/comm
 
 class CommitteeController extends PaginationMixin<CommitteeNode> {
   CommitteeController(this._repository);
-  
+
   final RxMap<int, bool> nodeExpansion = <int, bool>{}.obs;
 
   final CommitteeRepository _repository;
@@ -27,7 +27,10 @@ class CommitteeController extends PaginationMixin<CommitteeNode> {
   }
 
   @override
-  Future<Result<List<CommitteeNode>>> fetchPage(int page, CancelToken? cancelToken) {
+  Future<Result<List<CommitteeNode>>> fetchPage(
+    int page,
+    CancelToken? cancelToken,
+  ) {
     return _repository.getCommittees(
       searchQuery: searchQuery.value,
       pageNumber: page,
@@ -39,20 +42,28 @@ class CommitteeController extends PaginationMixin<CommitteeNode> {
   int? _currentDetailId;
 
   Future<void> loadCommitteeDetail(int id) async {
-    if (_currentDetailId == id && committeeDetail.value != null && detailState.value == AppState.data) return;
+    if (_currentDetailId == id &&
+        committeeDetail.value != null &&
+        detailState.value == AppState.data)
+      return;
     if (detailState.value == AppState.loading && _currentDetailId == id) return;
-    
+
     _currentDetailId = id;
     detailState.value = AppState.loading;
-    
+
     _detailCancelToken?.cancel();
     _detailCancelToken = CancelToken();
-    
+
     try {
-      final result = await _repository.getCommitteeDetail(id, cancelToken: _detailCancelToken);
+      final result = await _repository.getCommitteeDetail(
+        id,
+        cancelToken: _detailCancelToken,
+      );
       if (result is Success<CommitteeDetail?>) {
         committeeDetail.value = result.data;
-        detailState.value = result.data == null ? AppState.empty : AppState.data;
+        detailState.value = result.data == null
+            ? AppState.empty
+            : AppState.data;
       } else {
         detailState.value = AppState.error;
       }

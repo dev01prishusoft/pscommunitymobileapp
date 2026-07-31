@@ -15,10 +15,27 @@ class PersonalInfoController extends GetxController {
   final defaultGenders = ['Male', 'Female', 'Other'];
   final defaultMaritalStatuses = ['Married', 'Unmarried', 'Widow', 'Divorced'];
   final defaultBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-  final defaultRelations = ['Self', 'Wife', 'Son', 'Daughter', 'Father', 'Mother'];
+  final defaultRelations = [
+    'Self',
+    'Wife',
+    'Son',
+    'Daughter',
+    'Father',
+    'Mother',
+  ];
   final defaultSigns = [
-    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio',
-    'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    'Aries',
+    'Taurus',
+    'Gemini',
+    'Cancer',
+    'Leo',
+    'Virgo',
+    'Libra',
+    'Scorpio',
+    'Sagittarius',
+    'Capricorn',
+    'Aquarius',
+    'Pisces',
   ];
 
   final genderList = <String>[].obs;
@@ -104,7 +121,9 @@ class PersonalInfoController extends GetxController {
 
     memberNoCtrl.addListener(() => memberNo.value = memberNoCtrl.text);
     tobCtrl.addListener(() => tob.value = tobCtrl.text);
-    motherFatherNameCtrl.addListener(() => motherFatherName.value = motherFatherNameCtrl.text);
+    motherFatherNameCtrl.addListener(
+      () => motherFatherName.value = motherFatherNameCtrl.text,
+    );
     firstNameCtrl.addListener(() => firstName.value = firstNameCtrl.text);
     middleNameCtrl.addListener(() => middleName.value = middleNameCtrl.text);
     lastNameCtrl.addListener(() => lastName.value = lastNameCtrl.text);
@@ -113,7 +132,9 @@ class PersonalInfoController extends GetxController {
     dobCtrl.addListener(() => dob.value = dobCtrl.text);
     heightCtrl.addListener(() => height.value = heightCtrl.text);
     weightCtrl.addListener(() => weight.value = weightCtrl.text);
-    monthlyIncomeCtrl.addListener(() => monthlyIncome.value = monthlyIncomeCtrl.text);
+    monthlyIncomeCtrl.addListener(
+      () => monthlyIncome.value = monthlyIncomeCtrl.text,
+    );
   }
 
   @override
@@ -170,7 +191,8 @@ class PersonalInfoController extends GetxController {
     ownHouse.value = m.isOwnHouse ?? false;
     twoWheeler.value = m.hasTwoWheeler ?? false;
     fourWheeler.value = m.hasFourWheeler ?? false;
-    monthlyIncome.value = m.monthlyIncome?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
+    monthlyIncome.value =
+        m.monthlyIncome?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
     isFamilyHead.value = m.isHead ?? false;
     relatedToMemberName.value = m.relatedToMemberName ?? '';
 
@@ -211,7 +233,10 @@ class PersonalInfoController extends GetxController {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -219,10 +244,7 @@ class PersonalInfoController extends GetxController {
                       icon: const Icon(Icons.close),
                       onPressed: () => Get.back<void>(),
                     ),
-                    Text(
-                      'Profile picture',
-                      style: AppTextStyles.titleMedium,
-                    ),
+                    Text('Profile picture', style: AppTextStyles.titleMedium),
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
                       onPressed: () {
@@ -240,7 +262,9 @@ class PersonalInfoController extends GetxController {
                 onTap: () async {
                   Get.back<void>();
                   final picker = ImagePicker();
-                  final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.camera,
+                  );
                   if (pickedFile != null) {
                     await _cropImage(pickedFile.path);
                   }
@@ -252,7 +276,9 @@ class PersonalInfoController extends GetxController {
                 onTap: () async {
                   Get.back<void>();
                   final picker = ImagePicker();
-                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (pickedFile != null) {
                     await _cropImage(pickedFile.path);
                   }
@@ -281,12 +307,7 @@ class PersonalInfoController extends GetxController {
           initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: true,
         ),
-        IOSUiSettings(
-          title: 'Crop Profile Photo',
-          aspectRatioLockEnabled: true,
-          resetAspectRatioEnabled: false,
-          aspectRatioPickerButtonHidden: true,
-        ),
+        IOSUiSettings(title: 'Crop Profile Photo'),
       ],
     );
 

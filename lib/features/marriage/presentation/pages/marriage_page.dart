@@ -381,7 +381,10 @@ class _MarriageMemberCard extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed<void>(
           AppRouter.memberProfile,
-          arguments: {'memberId': member.memberId},
+          arguments: {
+            'memberId': member.memberId,
+            'fromMatrimonial': true,
+          },
         );
       },
       padding: EdgeInsets.all(14.w),

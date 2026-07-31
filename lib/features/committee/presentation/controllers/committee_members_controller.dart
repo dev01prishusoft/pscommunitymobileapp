@@ -10,9 +10,10 @@ import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_node.dart';
+
 class CommitteeMembersController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
-  
+
   final Rx<AppState> membersState = AppState.empty.obs;
   final RxList<CommitteeMember> membersList = <CommitteeMember>[].obs;
 
@@ -29,8 +30,13 @@ class CommitteeMembersController extends GetxController {
     super.onClose();
   }
 
-  void init(CommitteeNode committeeNode) {
+  void init(CommitteeNode committeeNode, {String? initialRole}) {
     node = committeeNode;
+    if (initialRole != null) {
+      selectedRole.value = DropdownItem(id: 0, text: initialRole);
+    } else {
+      selectedRole.value = null;
+    }
     _fetchMembers(node.id);
     _fetchRoles();
     expandedGroups.clear();
@@ -55,8 +61,7 @@ class CommitteeMembersController extends GetxController {
       if (result is Success<ApiResponse<List<DropdownItem>>>) {
         availableRoles.value = result.data.data ?? [];
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _fetchMembers(int id) async {
@@ -68,11 +73,15 @@ class CommitteeMembersController extends GetxController {
             .map((e) => CommitteeMember.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
-      
+
       if (result is Success<ApiResponse<List<CommitteeMember>>>) {
         final allMembers = result.data.data ?? [];
-        membersList.value = allMembers.where((m) => !isDateInPast(m.endDate)).toList();
-        membersState.value = membersList.isEmpty ? AppState.empty : AppState.data;
+        membersList.value = allMembers
+            .where((m) => !isDateInPast(m.endDate))
+            .toList();
+        membersState.value = membersList.isEmpty
+            ? AppState.empty
+            : AppState.data;
       } else {
         membersState.value = AppState.error;
       }
@@ -96,7 +105,10 @@ class CommitteeMembersController extends GetxController {
   }
 
   List<DropdownItem?> getRoles(List<CommitteeMember> members) {
-    final roles = members.map((m) => m.roleName).where((r) => r.isNotEmpty).toSet();
+    final roles = members
+        .map((m) => m.roleName)
+        .where((r) => r.isNotEmpty)
+        .toSet();
     return [null, ...roles.map((r) => DropdownItem(id: 0, text: r))];
   }
 
@@ -104,7 +116,13 @@ class CommitteeMembersController extends GetxController {
     List<CommitteeMember> members,
   ) {
     final roles = getRoles(members);
-    if (selectedRole.value != null && !roles.any((r) => r?.id == selectedRole.value?.id && r?.text == selectedRole.value?.text)) {
+    if (selectedRole.value != null &&
+        members.isNotEmpty &&
+        !roles.any(
+          (r) =>
+              r?.id == selectedRole.value?.id &&
+              r?.text == selectedRole.value?.text,
+        )) {
       selectedRole.value = null;
     }
     final filtered = members.where((m) {

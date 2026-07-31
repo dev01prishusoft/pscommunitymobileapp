@@ -175,7 +175,7 @@ class _OccupationMemberCard extends StatelessWidget {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         Get.toNamed<void>(
-          AppRouter.memberProfile,
+          AppRouter.frompageOccupation,
           arguments: {'memberId': member.memberId},
         );
       },

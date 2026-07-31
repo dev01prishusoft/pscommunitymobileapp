@@ -52,5 +52,4 @@ class SupportController extends GetxController {
 
     await launchUrl(uri);
   }
-
 }
