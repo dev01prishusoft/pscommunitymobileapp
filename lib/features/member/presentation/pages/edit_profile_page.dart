@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
@@ -136,7 +137,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ResponsiveFormContainer(
-              padding: EdgeInsets.zero,
+              padding: AppSpacing.pagePadding,
               child: Form(
                 key: controller.formKey,
                 child: Column(
@@ -2949,3 +2950,4 @@ class _KeepAliveStepWrapperState extends State<KeepAliveStepWrapper>
     return widget.child;
   }
 }
+

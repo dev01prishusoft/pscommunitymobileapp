@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
@@ -26,10 +28,7 @@ class ShareAppPage extends StatelessWidget {
           appBar: AppBar(title: Text(LK.share.tr)),
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 16.0,
-            ),
+            padding: AppSpacing.pagePadding,
             child: Column(
               children: [
                 _AppLinkCard(ctrl: controller),
@@ -428,3 +427,4 @@ class _ShareButton extends StatelessWidget {
     );
   }
 }
+

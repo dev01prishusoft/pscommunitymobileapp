@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 import 'package:pscommunitymobileapp/features/committee/presentation/controllers/committee_controller.dart';
@@ -85,7 +87,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
             child: PaginatedListView<CommitteeNode, CommitteeController>(
               itemBuilder: (context, index, node) => CommitteeCard(node: node),
               separatorBuilder: (context, index) => SizedBox(height: 12.h),
-              padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 24.h),
+              padding: AppSpacing.pagePadding,
             ),
           ),
         ],
@@ -93,3 +95,4 @@ class _CommitteesPageState extends State<CommitteesPage> {
     );
   }
 }
+

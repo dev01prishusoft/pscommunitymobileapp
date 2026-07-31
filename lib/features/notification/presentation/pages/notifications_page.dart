@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -163,7 +164,7 @@ class NotificationsPage extends GetView<NotificationController> {
                 return false;
               },
               child: ListView.builder(
-                padding: EdgeInsets.only(top: 10.h, bottom: 60.h),
+                padding: AppSpacing.pagePadding,
                 itemCount:
                     controller.notifications.length +
                     (controller.isLoadingMore.value ? 1 : 0),
@@ -227,3 +228,4 @@ class NotificationsPage extends GetView<NotificationController> {
     );
   }
 }
+

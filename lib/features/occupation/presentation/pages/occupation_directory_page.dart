@@ -7,6 +7,8 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -131,7 +133,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                                       mainAxisSpacing: 10.h,
                                       childAspectRatio: 1.2,
                                     ),
-                                padding: EdgeInsets.only(bottom: 20.h),
+                                padding: AppSpacing.pagePadding,
                                 itemCount:
                                     _controller.filteredOccupations.length,
                                 itemBuilder: (context, index) {
@@ -302,3 +304,4 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
     }
   }
 }
+

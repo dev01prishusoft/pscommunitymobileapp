@@ -6,6 +6,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/controllers/family_controller.dart';
@@ -163,10 +165,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                       )
                     : ListView.separated(
                         controller: _scrollController,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 8.h,
-                        ),
+                        padding: AppSpacing.pagePadding,
                         itemCount:
                             _controller.filteredFamilies.length +
                             (_controller.hasMoreFamilies.value ? 1 : 0),
@@ -281,3 +280,4 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
     );
   }
 }
+

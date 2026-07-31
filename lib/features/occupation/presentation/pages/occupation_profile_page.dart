@@ -8,6 +8,8 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 
@@ -110,7 +112,9 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
             ),
         ],
       ),
-      body: Column(
+      body: Padding(
+        padding: AppSpacing.pagePadding,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
@@ -147,7 +151,8 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
             ),
           ),
         ],
-      ).paddingSymmetric(horizontal: 16.w),
+      ),
+      ),
     );
   }
 }
@@ -312,3 +317,4 @@ class _OccupationMemberCard extends StatelessWidget {
     );
   }
 }
+

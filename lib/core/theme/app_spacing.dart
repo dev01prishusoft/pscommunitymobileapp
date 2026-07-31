@@ -53,4 +53,5 @@ class AppSpacing {
   static const EdgeInsets pScreen = EdgeInsets.symmetric(horizontal: l, vertical: l);
   static const EdgeInsets pScreenTop = EdgeInsets.only(left: l, right: l, top: l);
   static const EdgeInsets pScreenBottom = EdgeInsets.only(left: l, right: l, bottom: l);
+  static EdgeInsets get pagePadding => EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h);
 }

@@ -8,6 +8,8 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
@@ -132,7 +134,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               },
               child: ListView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                padding: AppSpacing.pagePadding,
                 itemCount:
                     controller.payments.length +
                     (controller.isLoadingMore.value ? 1 : 0),
@@ -792,3 +794,4 @@ class _PaymentCard extends StatelessWidget {
     );
   }
 }
+

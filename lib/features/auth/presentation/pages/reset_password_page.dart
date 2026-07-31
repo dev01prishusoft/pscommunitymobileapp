@@ -112,7 +112,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: AppSpacing.pXl,
+              padding: AppSpacing.pagePadding,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
