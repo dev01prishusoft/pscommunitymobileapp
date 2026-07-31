@@ -532,4 +532,8 @@ class LK {
   static const String accountHolder = 'Account Holder';
   static const String bankName = 'Bank Name';
   static const String scanQrToPay = 'Scan this QR code with any UPI app to pay';
+  static const String delete = 'Delete';
+  static const String deleteAllNotification = 'delete_all_notification';
+  static const String deleteAllNotificationDesc =
+      'delete_all_notification_description';
 }

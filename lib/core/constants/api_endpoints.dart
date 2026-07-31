@@ -23,7 +23,8 @@ class ApiEndpoints {
   static String marriage = '/api/v1/marriage/list';
   static String unmarriedCount = '/api/v1/metrimonial/UnMarriedCount';
   static String languageDropdown = '/api/v1/member/language-dropdown';
-  static String languageResources(String languageCode) => '/api/v1/language-resource/get-resources/$languageCode';
+  static String languageResources(String languageCode) =>
+      '/api/v1/language-resource/get-resources/$languageCode';
   static String memberDetail = '/api/v1/member/mobile/member';
   static String memberAddress = '/api/v1/member-address/mobile/member';
   static String samajDetail = '/api/v1/samaj/mobile/samaj';
@@ -47,6 +48,9 @@ class ApiEndpoints {
   static String appLinks = '/api/v1/application-link/getapplink';
   static String samajSansthaList = '/api/v1/samaj-sanstha/mobile/list';
   static String notifications = '/api/v1/daily-notification/member/list';
-  static String markNotificationRead(int id) => '/api/v1/daily-notification/member/$id/read';
-  static String currenAppVersion(String appVersion) => '/api/v1/application-link/latest-version?currentversion=$appVersion';
+  static String markNotificationRead(int id) =>
+      '/api/v1/daily-notification/member/$id/read';
+  static String currenAppVersion(String appVersion) =>
+      '/api/v1/application-link/latest-version?currentversion=$appVersion';
+  static String deleteNotification = '/api/v1/daily-notification/member';
 }

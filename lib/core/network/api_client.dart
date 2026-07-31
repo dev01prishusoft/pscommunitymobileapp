@@ -30,7 +30,9 @@ class ApiClient {
     CertificatePinning.configure(_dio);
     CertificatePinning.configure(refreshDio);
 
-    refreshDio.interceptors.add(RetryInterceptor(dio: refreshDio, maxRetries: 1));
+    refreshDio.interceptors.add(
+      RetryInterceptor(dio: refreshDio, maxRetries: 1),
+    );
 
     _dio.interceptors.addAll([
       LanguageInterceptor(),
@@ -74,7 +76,12 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
   }) {
-    return request(path, method: 'GET', queryParameters: queryParameters, cancelToken: cancelToken);
+    return request(
+      path,
+      method: 'GET',
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+    );
   }
 
   Future<Response<dynamic>> post(
@@ -83,7 +90,13 @@ class ApiClient {
     CancelToken? cancelToken,
     Options? options,
   }) {
-    return request(path, method: 'POST', data: data, cancelToken: cancelToken, options: options);
+    return request(
+      path,
+      method: 'POST',
+      data: data,
+      cancelToken: cancelToken,
+      options: options,
+    );
   }
 
   Future<Response<dynamic>> put(
@@ -94,6 +107,19 @@ class ApiClient {
     return request(path, method: 'PUT', data: data, cancelToken: cancelToken);
   }
 
+  Future<Response<dynamic>> delete(
+    String path, {
+    dynamic data,
+    CancelToken? cancelToken,
+  }) {
+    return request(
+      path,
+      method: 'DELETE',
+      data: data,
+      cancelToken: cancelToken,
+    );
+  }
+
   Future<Result<ApiResponse<T>>> getParsed<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -101,11 +127,17 @@ class ApiClient {
     T Function(Object? json)? fromJsonT,
   }) async {
     try {
-      final response = await get(path, queryParameters: queryParameters, cancelToken: cancelToken);
-      return Success(ApiResponse<T>.fromJson(
-        response.data as Map<String, dynamic>,
-        fromJsonT,
-      ));
+      final response = await get(
+        path,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+      );
+      return Success(
+        ApiResponse<T>.fromJson(
+          response.data as Map<String, dynamic>,
+          fromJsonT,
+        ),
+      );
     } catch (e) {
       return Error(NetworkExceptionMapper.map(e));
     }
@@ -119,12 +151,18 @@ class ApiClient {
     required T Function(Object? json) fromJsonT,
   }) async {
     try {
-      final response = await get(path, queryParameters: queryParameters, cancelToken: cancelToken);
-      return Success(PaginatedResponse<T>.fromJson(
-        response.data as Map<String, dynamic>,
-        listKey,
-        fromJsonT,
-      ));
+      final response = await get(
+        path,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+      );
+      return Success(
+        PaginatedResponse<T>.fromJson(
+          response.data as Map<String, dynamic>,
+          listKey,
+          fromJsonT,
+        ),
+      );
     } catch (e) {
       return Error(NetworkExceptionMapper.map(e));
     }
@@ -138,10 +176,12 @@ class ApiClient {
   }) async {
     try {
       final response = await post(path, data: data, cancelToken: cancelToken);
-      return Success(ApiResponse<T>.fromJson(
-        response.data as Map<String, dynamic>,
-        fromJsonT,
-      ));
+      return Success(
+        ApiResponse<T>.fromJson(
+          response.data as Map<String, dynamic>,
+          fromJsonT,
+        ),
+      );
     } catch (e) {
       return Error(NetworkExceptionMapper.map(e));
     }
@@ -155,10 +195,12 @@ class ApiClient {
   }) async {
     try {
       final response = await put(path, data: data, cancelToken: cancelToken);
-      return Success(ApiResponse<T>.fromJson(
-        response.data as Map<String, dynamic>,
-        fromJsonT,
-      ));
+      return Success(
+        ApiResponse<T>.fromJson(
+          response.data as Map<String, dynamic>,
+          fromJsonT,
+        ),
+      );
     } catch (e) {
       return Error(NetworkExceptionMapper.map(e));
     }

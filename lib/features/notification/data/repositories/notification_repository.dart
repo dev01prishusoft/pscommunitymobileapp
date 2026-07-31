@@ -5,6 +5,17 @@ import 'package:pscommunitymobileapp/features/notification/data/models/member_no
 import 'package:dio/dio.dart';
 
 abstract class NotificationRepository {
-  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(int page, int pageSize, {CancelToken? cancelToken});
-  Future<Result<bool>> markAsRead(int notificationId, {CancelToken? cancelToken});
+  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(
+    int page,
+    int pageSize, {
+    CancelToken? cancelToken,
+  });
+  Future<Result<bool>> markAsRead(
+    int notificationId, {
+    CancelToken? cancelToken,
+  });
+  Future<Result<bool>> deleteAllNotification(
+    int? notificationId, {
+    CancelToken? cancelToken,
+  });
 }
