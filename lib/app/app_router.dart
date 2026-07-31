@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/features/auth/presentation/pages/reset_pass
 import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_details_page.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/pages/committee_members_page.dart';
 import 'package:pscommunitymobileapp/features/committee/presentation/pages/committees_page.dart';
+import 'package:pscommunitymobileapp/features/committee/presentation/pages/frompage_committee.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/family_members_list_page.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/member_profile_page.dart';
@@ -68,6 +69,7 @@ class AppRouter {
   static String samajSansthas = '/samaj-sansthas';
   static String notifications = '/notifications';
   static String frompageOccupation = '/frompageOccupation';
+  static String frompageCommittee = '/frompageCommittee';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -219,6 +221,11 @@ class AppRouter {
     GetPage<void>(
       name: frompageOccupation,
       page: () => FromPageOccupation(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: frompageCommittee,
+      page: () => FromPageCommittee(),
       middlewares: [AuthGuard()],
     ),
   ];

@@ -12,14 +12,14 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/features/family/presentation/pages/member_profile_page.dart';
 import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
 
-class FromPageOccupation extends StatefulWidget {
-  const FromPageOccupation({super.key});
+class FromPageCommittee extends StatefulWidget {
+  const FromPageCommittee({super.key});
 
   @override
-  State<FromPageOccupation> createState() => _FromPageOccupationState();
+  State<FromPageCommittee> createState() => _FromPageCommitteeState();
 }
 
-class _FromPageOccupationState extends State<FromPageOccupation> {
+class _FromPageCommitteeState extends State<FromPageCommittee> {
   final FamilyController _controller = Get.find<FamilyController>();
   int _memberId = 0;
 
@@ -110,7 +110,6 @@ class _ProfileContent extends GetView<FamilyController> {
         children: [
           _ProfileHeader(member: member),
           _MemberDetailsSection(member: member, controller: controller),
-          _OccupationSection(member: member),
           _SocialMediaSection(member: member, controller: controller),
           SizedBox(height: 100.h),
         ],
@@ -203,21 +202,12 @@ class _MemberDetailsSection extends StatelessWidget {
                   : null,
             ),
             _buildGridItem(
-              Icons.contact_phone_outlined,
-              LK.emergencyContact.tr,
-              controller.formatEmergencyContact(member),
-              onTap: member.emergencyContactNo != null
-                  ? () => controller.launchSafeUrl(
-                      'tel:${member.emergencyContactNo}',
-                    )
-                  : null,
+              Icons.mail_outline,
+              LK.email.tr,
+              controller.formatEmail(member),
+              isExpandable: true,
             ),
-          ),
-          _buildGridItem(
-            Icons.mail_outline,
-            LK.email.tr,
-            controller.formatEmail(member),
-            isExpandable: true,
+            isLast: true,
           ),
         ],
       ),
@@ -301,197 +291,6 @@ class _MemberDetailsSection extends StatelessWidget {
   }
 }
 
-class _OccupationSection extends StatelessWidget {
-  const _OccupationSection({required this.member});
-  final Member member;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget? getFieldWidget(
-      String label,
-      String? value, {
-      bool isExpandable = false,
-    }) {
-      if (value == null ||
-          value.isEmpty ||
-          value == LK.na.tr ||
-          value == 'null') {
-        return null;
-      }
-      return _buildColumnItem(label, value, isExpandable: isExpandable);
-    }
-
-    final wType = getFieldWidget(
-      LK.occupationTypeLabel.tr,
-      member.occupationTypeName,
-    );
-    final wName = getFieldWidget(LK.occupationColon.tr, member.occupationName);
-    final wJobPos = getFieldWidget(
-      LK.jobPositionLabel.tr,
-      member.jobPositionName,
-    );
-    final wOtherJobPos = getFieldWidget(
-      LK.otherJobPositionLabel.tr,
-      member.otherJobPosition,
-    );
-    final wOtherOcc = getFieldWidget(
-      LK.otherOccupationLabel.tr,
-      member.otherOccupation,
-      isExpandable: true,
-    );
-    final wCompany = getFieldWidget(
-      LK.companyNameLabel.tr,
-      member.companyName,
-      isExpandable: true,
-    );
-
-    final wBusiness = getFieldWidget(
-      LK.businessName.tr,
-      member.businessName,
-      isExpandable: true,
-    );
-    final wDesc = getFieldWidget(
-      LK.occupationDescriptionLabel.tr,
-      member.occupationDescription,
-      isExpandable: true,
-    );
-    final wAddr1 = getFieldWidget(
-      LK.occupationAddressLine1Label.tr,
-      member.occupationAddressLine1,
-      isExpandable: true,
-    );
-    final wAddr2 = getFieldWidget(
-      LK.occupationAddressLine2Label.tr,
-      member.occupationAddressLine2,
-      isExpandable: true,
-    );
-
-    final wState = getFieldWidget(LK.state.tr, member.occupationStateName);
-    final wDistrict = getFieldWidget(
-      LK.district.tr,
-      member.occupationDistrictName,
-    );
-    final wTaluka = getFieldWidget(LK.taluka.tr, member.occupationTalukaName);
-    final wArea = getFieldWidget(LK.area.tr, member.occupationAreaName);
-    final wLandmark = getFieldWidget(
-      LK.landmarkLabel.tr,
-      member.occupationLandmark,
-      isExpandable: true,
-    );
-    final wPincode = getFieldWidget(LK.pincode.tr, member.occupationPincode);
-
-    final rows = <Widget>[];
-
-    void addPair(Widget? w1, Widget? w2) {
-      if (w1 != null && w2 != null) {
-        rows.add(
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: w1),
-                SizedBox(width: 12.w),
-                Expanded(child: w2),
-              ],
-            ),
-          ),
-        );
-      } else if (w1 != null) {
-        rows.add(
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Expanded(child: w1)],
-            ),
-          ),
-        );
-      } else if (w2 != null) {
-        rows.add(
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Expanded(child: w2)],
-            ),
-          ),
-        );
-      }
-    }
-
-    void addSingle(Widget? w) {
-      if (w != null) {
-        rows.add(
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: w,
-          ),
-        );
-      }
-    }
-
-    addPair(wType, wName);
-    addPair(wJobPos, wOtherJobPos);
-    addSingle(wOtherOcc);
-    addSingle(wCompany);
-
-    addSingle(wBusiness);
-    addSingle(wDesc);
-    addSingle(wAddr1);
-    addSingle(wAddr2);
-
-    addPair(wState, wDistrict);
-    addPair(wTaluka, wArea);
-
-    addSingle(wLandmark);
-    addSingle(wPincode);
-
-    if (rows.isEmpty) return SizedBox.shrink();
-
-    return _SectionContainer(
-      title: LK.occupationProfile.tr,
-      icon: Icons.business_center_outlined,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: rows,
-      ),
-    );
-  }
-
-  Widget _buildColumnItem(
-    String label,
-    String value, {
-    bool isExpandable = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.replaceAll(':', ''),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
-        ),
-        SizedBox(height: 2.h),
-        isExpandable
-            ? ExpandableText(
-                text: value,
-                style: AppTextStyles.labelMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              )
-            : Text(
-                value,
-                style: AppTextStyles.labelMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              ),
-      ],
-    );
-  }
-}
-
 class _SocialMediaSection extends StatelessWidget {
   const _SocialMediaSection({required this.member, required this.controller});
   final Member member;
@@ -523,7 +322,7 @@ class _SocialMediaSection extends StatelessWidget {
             LK.facebook.tr,
             member.facebookUrl ?? LK.na,
             AppColors.blue,
-            onTap: member.facebookUrl != null
+            onTap: _hasValidUrl(member.facebookUrl)
                 ? () => controller.launchSafeUrl(member.facebookUrl!)
                 : null,
           ),
@@ -533,7 +332,7 @@ class _SocialMediaSection extends StatelessWidget {
             LK.instagram.tr,
             member.instagramUrl ?? LK.na,
             Colors.pink,
-            onTap: member.instagramUrl != null
+            onTap: _hasValidUrl(member.instagramUrl)
                 ? () => controller.launchSafeUrl(member.instagramUrl!)
                 : null,
           ),
@@ -543,7 +342,7 @@ class _SocialMediaSection extends StatelessWidget {
             LK.whatsapp.tr,
             member.whatsappUrl ?? LK.na,
             AppColors.green,
-            onTap: member.whatsappUrl != null
+            onTap: _hasValidUrl(member.whatsappUrl)
                 ? () => controller.launchSafeUrl(member.whatsappUrl!)
                 : null,
           ),
@@ -553,7 +352,7 @@ class _SocialMediaSection extends StatelessWidget {
             LK.twitterX.tr,
             member.twitterUrl ?? LK.na,
             AppColors.black,
-            onTap: member.twitterUrl != null
+            onTap: _hasValidUrl(member.twitterUrl)
                 ? () => controller.launchSafeUrl(member.twitterUrl!)
                 : null,
           ),

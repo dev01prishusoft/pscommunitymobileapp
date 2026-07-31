@@ -37,8 +37,15 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   @override
   void initState() {
     super.initState();
-    node = Get.arguments as CommitteeNode;
-    controller.init(node);
+    final args = Get.arguments;
+    String? initialRole;
+    if (args is CommitteeNode) {
+      node = args;
+    } else if (args is Map<String, dynamic>) {
+      node = args['node'] as CommitteeNode;
+      initialRole = args['selectedRole'] as String?;
+    }
+    controller.init(node, initialRole: initialRole);
     _searchController.text = controller.searchQuery.value;
   }
 
@@ -155,9 +162,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       hint: '',
       value: value,
       padding: EdgeInsets.symmetric(horizontal: 10.w),
-      items: options.map<DropdownMenuItem<DropdownItem?>>((
-        DropdownItem? val,
-      ) {
+      items: options.map<DropdownMenuItem<DropdownItem?>>((DropdownItem? val) {
         final displayText = val?.text ?? 'All';
         return DropdownMenuItem<DropdownItem?>(
           value: val,
@@ -446,7 +451,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 onPressed: () {
                   Get.back<void>();
                   Get.toNamed<void>(
-                    AppRouter.memberProfile,
+                    AppRouter.frompageCommittee,
                     arguments: {'memberId': member.memberId},
                   );
                 },

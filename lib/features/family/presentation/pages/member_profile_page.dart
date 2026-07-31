@@ -28,10 +28,14 @@ class _MemberProfilePageState extends State<MemberProfilePage> {
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null && args.containsKey('memberId')) {
       _memberId = args['memberId'] as int;
-      _controller.loadMemberDetails(_memberId);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.loadMemberDetails(_memberId);
+      });
     } else {
-      _controller.selectedMember.value = null;
-      _controller.memberDetailState.value = AppState.loading;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controller.selectedMember.value = null;
+        _controller.memberDetailState.value = AppState.loading;
+      });
     }
   }
 
@@ -90,6 +94,15 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments as Map<String, dynamic>?;
+    final fromMyMemberList =
+        args != null && (args['fromMyMemberList'] as bool? ?? false);
+    final fromMatrimonial =
+        args != null && (args['fromMatrimonial'] as bool? ?? false);
+
+    final controller = Get.find<FamilyController>();
+    final maritalStatus = controller.formatMaritalStatus(member);
+
     return Container(
       margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.all(20.w),
@@ -149,34 +162,69 @@ class _ProfileHeader extends StatelessWidget {
                         color: AppColors.black,
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          width: 1.w,
-                        ),
-                      ),
-                      child: Text(
-                        member.memberNo ?? '',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
+                    Row(
+                      spacing: 8.w,
+                      children: [
+                        if (member.memberNo != null &&
+                            member.memberNo!.trim().isNotEmpty)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(20.r),
+                              border: Border.all(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.12,
+                                ),
+                                width: 1.w,
+                              ),
+                            ),
+                            child: Text(
+                              member.memberNo ?? '',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ),
+                        if (fromMatrimonial &&
+                            maritalStatus.isNotEmpty &&
+                            maritalStatus.toLowerCase() != 'n/a' &&
+                            maritalStatus.toLowerCase() != 'null')
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(20.r),
+                              border: Border.all(
+                                color: Colors.pink.withValues(alpha: 0.12),
+                                width: 1.w,
+                              ),
+                            ),
+                            child: Text(
+                              maritalStatus,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.pink,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          if (member.approveStatus != null &&
+          if (fromMyMemberList &&
+              member.approveStatus != null &&
               member.approveStatus!.trim().isNotEmpty)
             _buildStatusBadge(member.approveStatus ?? ""),
         ],
@@ -258,7 +306,10 @@ class _ProfileHeader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Divider(height: 24),
+                  Divider(
+                    height: 20.h,
+                    color: AppColors.grey.withValues(alpha: 0.07),
+                  ),
                   Row(
                     spacing: 10.w,
                     children: [
@@ -639,7 +690,7 @@ class _AddressSection extends StatelessWidget {
                     padding: EdgeInsets.only(top: 12.h),
                     child: Divider(
                       height: 1.h,
-                      color: AppColors.grey.withValues(alpha: 0.15),
+                      color: AppColors.grey.withValues(alpha: 0.05),
                     ),
                   ),
               ],
@@ -1024,7 +1075,7 @@ class _EducationSection extends StatelessWidget {
                     padding: EdgeInsets.only(top: 12.h),
                     child: Divider(
                       height: 1.h,
-                      color: AppColors.grey.withValues(alpha: 0.15),
+                      color: AppColors.grey.withValues(alpha: 0.05),
                     ),
                   ),
               ],

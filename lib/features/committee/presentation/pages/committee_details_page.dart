@@ -142,11 +142,21 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
                 itemCount: detail.roles.length,
                 itemBuilder: (context, index) {
                   final role = detail.roles[index];
-                  return _buildRoleTile(
-                    _getRoleIcon(role.roleTypeName),
-                    role.roleName,
-                    role.roleTypeName,
-                    role.memberCount,
+                  return GestureDetector(
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRouter.committeeMembers,
+                      arguments: {
+                        'node': node,
+                        'selectedRole': role.roleName,
+                      },
+                    ),
+                    child: _buildRoleTile(
+                      _getRoleIcon(role.roleTypeName),
+                      role.roleName,
+                      role.roleTypeName,
+                      role.memberCount,
+                    ),
                   );
                 },
               ),
@@ -392,8 +402,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
       child: InkWell(
         onTap: () {
           Get.toNamed<void>(
-            AppRouter.memberProfile,
-            arguments: {'memberId': memberId, 'fromPage': 'committee'},
+            AppRouter.frompageCommittee,
+            arguments: {'memberId': memberId},
           );
         },
         borderRadius: BorderRadius.circular(12.r),
