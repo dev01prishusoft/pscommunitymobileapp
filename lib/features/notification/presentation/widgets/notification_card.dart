@@ -173,117 +173,101 @@ class _NotificationCardState extends State<NotificationCard> {
         width: 1.w,
       ),
       onTap: widget.onTap,
-      child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.l.w,
-                      vertical: AppSpacing.l.h,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildIconContainer(),
-                        SizedBox(width: AppSpacing.m.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (widget.notification.announcementType !=
-                                          null &&
-                                      widget
-                                          .notification
-                                          .announcementType!
-                                          .isNotEmpty)
-                                    _buildCategoryBadge(
-                                      widget.notification.announcementType!.tr,
-                                    )
-                                  else
-                                    const SizedBox.shrink(),
-                                  if (!widget.notification.isRead)
-                                    _buildNewBadge(),
-                                ],
-                              ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.l.w,
+          vertical: AppSpacing.l.h,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildIconContainer(),
+            SizedBox(width: AppSpacing.m.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (widget.notification.announcementType !=
+                              null &&
+                          widget
+                              .notification
+                              .announcementType!
+                              .isNotEmpty)
+                        _buildCategoryBadge(
+                          widget.notification.announcementType!.tr,
+                        )
+                      else
+                        const SizedBox.shrink(),
+                      if (!widget.notification.isRead) _buildNewBadge(),
+                    ],
+                  ),
 
-                              if (widget.notification.announcementType !=
-                                      null &&
-                                  widget
-                                      .notification
-                                      .announcementType!
-                                      .isNotEmpty) ...[
-                                Text(
-                                  widget.notification.message,
-                                  maxLines: _isExpanded
-                                      ? null
-                                      : (isLongText ? 3 : null),
-                                  overflow: _isExpanded
-                                      ? null
-                                      : (isLongText
-                                            ? TextOverflow.ellipsis
-                                            : null),
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    fontWeight: widget.notification.isRead
-                                        ? FontWeight.normal
-                                        : FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                              if (isLongText) ...[
-                                InkWell(
-                                  onTap: () => setState(
-                                    () => _isExpanded = !_isExpanded,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4.r),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        _isExpanded
-                                            ? LK.showLess.tr
-                                            : LK.showMore.tr,
-                                        style: AppTextStyles.labelMedium
-                                            .copyWith(
-                                              color: AppColors.primary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      Icon(
-                                        _isExpanded
-                                            ? Icons.keyboard_arrow_up_rounded
-                                            : Icons.keyboard_arrow_down_rounded,
-                                        size: 16.sp,
-                                        color: AppColors.primary,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                              10.verticalSpace,
-                              Text(
-                                _formatDate(widget.notification.sendTime),
-                                style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.grey.withValues(alpha: 0.8),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                  if (widget.notification.announcementType != null &&
+                      widget
+                          .notification
+                          .announcementType!
+                          .isNotEmpty) ...[
+                    Text(
+                      widget.notification.message,
+                      maxLines: _isExpanded
+                          ? null
+                          : (isLongText ? 3 : null),
+                      overflow: _isExpanded
+                          ? null
+                          : (isLongText ? TextOverflow.ellipsis : null),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        fontWeight: widget.notification.isRead
+                            ? FontWeight.normal
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                  if (isLongText) ...[
+                    InkWell(
+                      onTap: () =>
+                          setState(() => _isExpanded = !_isExpanded),
+                      borderRadius: BorderRadius.circular(4.r),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _isExpanded
+                                ? LK.showLess.tr
+                                : LK.showMore.tr,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 2.w),
+                          Icon(
+                            _isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
+                            size: 16.sp,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  10.verticalSpace,
+                  Text(
+                    _formatDate(widget.notification.sendTime),
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.grey.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 }

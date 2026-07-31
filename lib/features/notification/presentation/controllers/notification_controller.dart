@@ -106,6 +106,83 @@ class NotificationController extends GetxController {
     isLoadingMore.value = false;
   }
 
+  Future<void> deleteNotification({int? notificationID}) async {
+    if (notificationID != null) {
+      final index = notifications.indexWhere(
+        (n) => n.memberNotificationId == notificationID,
+      );
+      if (index == -1) return;
+
+      final removedNotification = notifications[index];
+      notifications.removeAt(index);
+
+      try {
+        final deleteCancelToken = CancelToken();
+        final result = await _repository.deleteAllNotification(
+          notificationID,
+          cancelToken: deleteCancelToken,
+        );
+
+        if (result.isFailure) {
+          notifications.insert(index, removedNotification);
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) => ToastCard(
+              title: LK.error.tr,
+              subtitle: result.failureOrNull?.message ?? LK.unknownError.tr,
+              isErrorMessage: true,
+            ),
+          ).show();
+        }
+      } catch (e) {
+        notifications.insert(index, removedNotification);
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.unknownError.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
+      }
+    } else {
+      isLoading.value = true;
+      notifications.clear();
+      try {
+        final deleteCancelToken = CancelToken();
+
+        final result = await _repository.deleteAllNotification(
+          null,
+          cancelToken: deleteCancelToken,
+        );
+
+        if (result.isSuccess) {
+          fetchNotifications();
+        } else {
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) => ToastCard(
+              title: LK.error.tr,
+              subtitle: result.failureOrNull?.message ?? LK.unknownError.tr,
+              isErrorMessage: true,
+            ),
+          ).show();
+        }
+      } catch (e) {
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.unknownError.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
+      } finally {
+        isLoading.value = false;
+      }
+    }
+  }
+
   Future<void> handleNotificationClick(MemberNotification notification) async {
     if (!notification.isRead) {
       final index = notifications.indexWhere(

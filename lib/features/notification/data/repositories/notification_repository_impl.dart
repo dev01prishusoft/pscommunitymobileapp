@@ -14,26 +14,49 @@ class NotificationRepositoryImpl implements NotificationRepository {
   final ApiClient _apiClient;
 
   @override
-  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(int page, int pageSize, {CancelToken? cancelToken}) {
+  Future<Result<PaginatedResponse<MemberNotification>>> getNotifications(
+    int page,
+    int pageSize, {
+    CancelToken? cancelToken,
+  }) {
     return _apiClient.getPaginated<MemberNotification>(
       ApiEndpoints.notifications,
-      queryParameters: {
-        'Page': page,
-        'PageSize': pageSize,
-      },
+      queryParameters: {'Page': page, 'PageSize': pageSize},
       cancelToken: cancelToken,
       listKey: 'data',
-      fromJsonT: (json) => MemberNotification.fromJson(json as Map<String, dynamic>),
+      fromJsonT: (json) =>
+          MemberNotification.fromJson(json as Map<String, dynamic>),
     );
   }
 
   @override
-  Future<Result<bool>> markAsRead(int notificationId, {CancelToken? cancelToken}) async {
+  Future<Result<bool>> markAsRead(
+    int notificationId, {
+    CancelToken? cancelToken,
+  }) async {
     try {
       final response = await _apiClient.post(
         ApiEndpoints.markNotificationRead(notificationId),
         cancelToken: cancelToken,
       );
+      final isSuccess = response.data['succeeded'] == true;
+      return Success(isSuccess);
+    } catch (e) {
+      return Error(NetworkExceptionMapper.map(e));
+    }
+  }
+
+  @override
+  Future<Result<bool>> deleteAllNotification(
+    int? notificationId, {
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      String url = ApiEndpoints.deleteNotification;
+      if (notificationId != null) {
+        url = '$url?id=$notificationId';
+      }
+      final response = await _apiClient.delete(url, cancelToken: cancelToken);
       final isSuccess = response.data['succeeded'] == true;
       return Success(isSuccess);
     } catch (e) {
