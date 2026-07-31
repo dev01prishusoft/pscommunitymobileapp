@@ -1,19 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
+import 'package:pscommunitymobileapp/core/widgets/full_screen_image_viewer.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/committee/domain/entities/committee_detail.dart';
@@ -33,6 +32,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   );
   late CommitteeNode node;
   final TextEditingController _searchController = TextEditingController();
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
@@ -58,7 +58,99 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LK.committeeMembers.tr)),
+      appBar: AppBar(
+        title: _isSearchVisible
+            ? CupertinoTextField(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
+                prefix: Icon(
+                  Iconsax.search_normal_copy,
+                  size: 15,
+                ).paddingOnly(left: 10),
+                suffix: GestureDetector(
+                  onTap: () {
+                    _searchController.clear();
+                    controller.onSearchChanged('');
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  },
+                  child: Icon(
+                    Iconsax.close_circle_copy,
+                    size: 20,
+                  ).paddingOnly(right: 10),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                    width: 1.w,
+                  ),
+                ),
+                placeholder: LK.searchMember.tr,
+                controller: _searchController,
+                onChanged: controller.onSearchChanged,
+              )
+            : Text(LK.committeeMembers.tr),
+        actions: [
+          if (!_isSearchVisible) ...[
+            IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                setState(() {
+                  _isSearchVisible = true;
+                });
+              },
+            ),
+            Obx(() {
+              final roles = controller.getRoles(controller.membersList);
+              return PopupMenuButton<DropdownItem?>(
+                icon: const Icon(Icons.more_vert),
+                initialValue: controller.selectedRole.value,
+                onSelected: (DropdownItem? item) {
+                  controller.selectRole(item);
+                },
+                itemBuilder: (BuildContext context) {
+                  return roles.map((DropdownItem? role) {
+                    final displayText = role?.text ?? 'All';
+                    final valKey = RoleMapper.getLabelKey(displayText);
+                    final resolvedText = valKey != null
+                        ? valKey.tr
+                        : (displayText == 'All' ? LK.all.tr : displayText);
+                    return PopupMenuItem<DropdownItem?>(
+                      value: role,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            LK.role.tr,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.grey,
+                              fontSize: 9.sp,
+                            ),
+                          ),
+                          Text(
+                            resolvedText,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11.sp,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+              );
+            }),
+          ],
+        ],
+      ),
       body: Obx(() {
         return AppStateView(
           state: controller.membersState.value,
@@ -72,62 +164,9 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   }
 
   Widget _buildContent(Map<String, List<CommitteeMember>> groups) {
-    final roles = controller.getRoles(controller.membersList);
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildFilterDropdown(
-                  '${LK.role.tr}:',
-                  controller.selectedRole.value,
-                  roles,
-                  (DropdownItem? val) => controller.selectRole(val),
-                ),
-              ),
-              SizedBox(width: 4.w),
-              Expanded(
-                flex: 4,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: AppTextField(
-                    hint: LK.searchMember.tr,
-                    controller: _searchController,
-                    icon: Iconsax.search_normal_copy,
-                    onChanged: controller.onSearchChanged,
-                    suffixIcon: Obx(() {
-                      return controller.searchQuery.value.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(
-                                Icons.close,
-                                color: AppColors.grey,
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                controller.onSearchChanged('');
-                              },
-                            )
-                          : const SizedBox.shrink();
-                    }),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+
         Expanded(
           child: groups.isEmpty
               ? Center(
@@ -152,56 +191,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 
-  Widget _buildFilterDropdown(
-    String label,
-    DropdownItem? value,
-    List<DropdownItem?> options,
-    ValueChanged<DropdownItem?> onChanged,
-  ) {
-    return CustomDropdown<DropdownItem?>(
-      hint: '',
-      value: value,
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
-      items: options.map<DropdownMenuItem<DropdownItem?>>((DropdownItem? val) {
-        final displayText = val?.text ?? 'All';
-        return DropdownMenuItem<DropdownItem?>(
-          value: val,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label.replaceAll(':', '').trim(),
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.grey,
-                  fontSize: 9.sp,
-                ),
-              ),
-              Builder(
-                builder: (context) {
-                  final valKey = RoleMapper.getLabelKey(displayText);
-                  final resolvedText = valKey != null
-                      ? valKey.tr
-                      : (displayText == 'All' ? LK.all.tr : displayText);
-                  return Text(
-                    resolvedText,
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11.sp,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: onChanged,
-    );
-  }
 
   Widget _buildRoleGroup(String role, List<CommitteeMember> members) {
     return Obx(() {
