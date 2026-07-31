@@ -6,7 +6,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -164,7 +163,7 @@ class NotificationsPage extends GetView<NotificationController> {
                 return false;
               },
               child: ListView.builder(
-                padding: AppSpacing.pagePadding,
+                padding: EdgeInsets.fromLTRB(0.w, 10.h, 0.w, 50.h),
                 itemCount:
                     controller.notifications.length +
                     (controller.isLoadingMore.value ? 1 : 0),
@@ -228,4 +227,3 @@ class NotificationsPage extends GetView<NotificationController> {
     );
   }
 }
-

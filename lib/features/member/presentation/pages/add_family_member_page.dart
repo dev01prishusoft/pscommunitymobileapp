@@ -6,7 +6,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
@@ -93,7 +92,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     return Scaffold(
       appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
       body: ResponsiveFormContainer(
-        padding: AppSpacing.pagePadding,
         child: Form(
           key: controller.formKey,
           autovalidateMode: AutovalidateMode.disabled,
@@ -178,60 +176,57 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           ],
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: Row(
-              children: [
-                if (_currentStep > 0)
-                  Expanded(
-                    child: TextButton.icon(
-                      icon: Icon(
-                        Icons.arrow_back_ios_new_rounded,
+          child: Row(
+            children: [
+              if (_currentStep > 0)
+                Expanded(
+                  child: TextButton.icon(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.primary,
+                    ),
+                    onPressed: () {
+                      _animateToStep(_currentStep - 1);
+                    },
+                    label: Text(
+                      LK.back.tr,
+                      style: AppTextStyles.labelLarge.copyWith(
                         color: AppColors.primary,
-                      ),
-                      onPressed: () {
-                        _animateToStep(_currentStep - 1);
-                      },
-                      label: Text(
-                        LK.back.tr,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                if (_currentStep > 0) const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: Obx(() {
-                    final isFormLoading = controller.isFormLoading;
-                    final isLastStep = _currentStep == 5;
-                    final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
-
-                    return AppPrimaryButton(
-                      text: text,
-                      height: 50.h,
-                      onPressed: isLastStep
-                          ? () {
-                              final isValid =
-                                  _stepFormKeys[5].currentState?.validate() ??
-                                  false;
-                              if (isValid) {
-                                controller.submitForm(
-                                  successMessage: LK.memberAddedSuccessfully.tr,
-                                );
-                              }
-                            }
-                          : () {
-                              _animateToStep(_currentStep + 1);
-                            },
-                      isLoading: isLastStep ? isFormLoading : false,
-                    );
-                  }),
                 ),
-              ],
-            ),
+              if (_currentStep > 0) const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: Obx(() {
+                  final isFormLoading = controller.isFormLoading;
+                  final isLastStep = _currentStep == 5;
+                  final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
+
+                  return AppPrimaryButton(
+                    text: text,
+                    height: 50.h,
+                    onPressed: isLastStep
+                        ? () {
+                            final isValid =
+                                _stepFormKeys[5].currentState?.validate() ??
+                                false;
+                            if (isValid) {
+                              controller.submitForm(
+                                successMessage: LK.memberAddedSuccessfully.tr,
+                              );
+                            }
+                          }
+                        : () {
+                            _animateToStep(_currentStep + 1);
+                          },
+                    isLoading: isLastStep ? isFormLoading : false,
+                  );
+                }),
+              ),
+            ],
           ),
         ),
       ),
@@ -2505,4 +2500,3 @@ class _KeepAliveStepWrapperState extends State<KeepAliveStepWrapper>
     return widget.child;
   }
 }
-

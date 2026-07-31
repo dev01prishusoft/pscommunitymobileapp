@@ -72,7 +72,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
             await Get.find<SamajController>().fetchAll();
           },
           child: SingleChildScrollView(
-            padding: AppSpacing.pagePadding,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [

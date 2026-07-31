@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
@@ -284,7 +283,20 @@ class _FilterDialogState extends State<_FilterDialog> {
                 () => CustomDropdown<DropdownItem>(
                   hint: LK.selectState.tr,
                   value: _tempState,
-                  items: controller.states.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
+                  items: controller.states
+                      .map(
+                        (o) => DropdownMenuItem(
+                          value: o,
+                          child: Text(
+                            o.text,
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
                   onChanged: _onStateChanged,
                   isLoading: controller.isStatesLoading.value,
                 ),
@@ -293,7 +305,20 @@ class _FilterDialogState extends State<_FilterDialog> {
               CustomDropdown<DropdownItem>(
                 hint: LK.selectDistrict.tr,
                 value: _tempDistrict,
-                items: _localDistricts.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
+                items: _localDistricts
+                    .map(
+                      (o) => DropdownMenuItem(
+                        value: o,
+                        child: Text(
+                          o.text,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
                 onChanged: _onDistrictChanged,
                 isEnabled: _tempState != null,
                 isLoading: _isDistrictsLoading,
@@ -302,7 +327,20 @@ class _FilterDialogState extends State<_FilterDialog> {
               CustomDropdown<DropdownItem>(
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
-                items: _localTalukas.map((o) => DropdownMenuItem(value: o, child: Text(o.text, style: AppTextStyles.titleSmall.copyWith(color: AppColors.black, fontWeight: FontWeight.w500)))).toList(),
+                items: _localTalukas
+                    .map(
+                      (o) => DropdownMenuItem(
+                        value: o,
+                        child: Text(
+                          o.text,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
                 onChanged: _onTalukaChanged,
                 isEnabled: _tempDistrict != null,
                 isLoading: _isTalukasLoading,
@@ -591,5 +629,3 @@ class _EmptyState extends GetView<FamilyController> {
     );
   }
 }
-
-

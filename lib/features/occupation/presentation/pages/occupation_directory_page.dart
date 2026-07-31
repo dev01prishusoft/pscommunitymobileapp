@@ -7,8 +7,6 @@ import 'package:pscommunitymobileapp/app/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -104,54 +102,54 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 10.h),
-
           Expanded(
             child: Obx(
               () => AppStateView(
                 state: _controller.state.value,
                 onRetry: _controller.loadOccupations,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18.w),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: _controller.filteredOccupations.isEmpty
-                            ? Center(
-                                child: AppEmptyState(
-                                  icon: Icons.work_off_outlined,
-                                  secondaryIcon: Iconsax.search_normal_copy,
-                                  title: LK.noResultsFound.tr,
-                                  subtitle: LK.trySelectingDifferentFilters.tr,
-                                ),
-                              )
-                            : GridView.builder(
-                                controller: _scrollController,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 6.w,
-                                      mainAxisSpacing: 10.h,
-                                      childAspectRatio: 1.2,
-                                    ),
-                                padding: AppSpacing.pagePadding,
-                                itemCount:
-                                    _controller.filteredOccupations.length,
-                                itemBuilder: (context, index) {
-                                  final occ =
-                                      _controller.filteredOccupations[index];
-                                  return _buildOccupationCard(occ);
-                                },
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: _controller.filteredOccupations.isEmpty
+                          ? Center(
+                              child: AppEmptyState(
+                                icon: Icons.work_off_outlined,
+                                secondaryIcon: Iconsax.search_normal_copy,
+                                title: LK.noResultsFound.tr,
+                                subtitle: LK.trySelectingDifferentFilters.tr,
                               ),
-                      ),
-                      if (_controller.isNextPageLoading.value)
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20.h),
-                          child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
+                            )
+                          : GridView.builder(
+                              controller: _scrollController,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 6.w,
+                                    mainAxisSpacing: 10.h,
+                                    childAspectRatio: 1.2,
+                                  ),
+                              padding: EdgeInsets.fromLTRB(
+                                14.w,
+                                10.h,
+                                14.w,
+                                50.h,
+                              ),
+                              itemCount: _controller.filteredOccupations.length,
+                              itemBuilder: (context, index) {
+                                final occ =
+                                    _controller.filteredOccupations[index];
+                                return _buildOccupationCard(occ);
+                              },
+                            ),
+                    ),
+                    if (_controller.isNextPageLoading.value)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20.h),
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -304,4 +302,3 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
     }
   }
 }
-

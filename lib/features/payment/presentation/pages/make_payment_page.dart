@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown_form_field.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
@@ -348,7 +347,8 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                             color: AppColors.grey.shade600,
                                             fontWeight: FontWeight.bold,
                                           ),
-                                      errorStyle: AppTextStyles.bodySmall.copyWith(color: Colors.red),
+                                      errorStyle: AppTextStyles.bodySmall
+                                          .copyWith(color: Colors.red),
                                     ),
                                   );
                                 }),
@@ -478,4 +478,3 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
     );
   }
 }
-

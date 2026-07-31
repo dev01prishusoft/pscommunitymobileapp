@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -31,11 +30,7 @@ class BankDetailsPage extends StatelessWidget {
       },
       builder: (controller) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              LK.samajInfo.tr
-            ),
-          ),
+          appBar: AppBar(title: Text(LK.samajInfo.tr)),
           body: Obx(() {
             if (controller.isLoading.value) {
               return const AppStateView(
@@ -43,7 +38,7 @@ class BankDetailsPage extends StatelessWidget {
                 child: SizedBox.shrink(),
               );
             }
-          
+
             if (controller.bankdetailsError.value != null) {
               return AppStateView(
                 state: AppState.error,
@@ -52,9 +47,9 @@ class BankDetailsPage extends StatelessWidget {
                 child: const SizedBox.shrink(),
               );
             }
-          
+
             final accounts = controller.bankAccountDetails;
-          
+
             if (accounts.isEmpty) {
               return ListView(
                 physics: const BouncingScrollPhysics(),
@@ -78,7 +73,7 @@ class BankDetailsPage extends StatelessWidget {
                 ],
               );
             }
-          
+
             return ListView.separated(
               physics: const BouncingScrollPhysics(),
               padding: AppSpacing.pagePadding,
@@ -359,10 +354,8 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                     placeholder: (_, __) => const Center(
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
-                    errorWidget: (_, __, ___) => Image.asset(
-                      FallBackImage,
-                      fit: BoxFit.cover,
-                    ),
+                    errorWidget: (_, __, ___) =>
+                        Image.asset(FallBackImage, fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -433,4 +426,3 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
     );
   }
 }
-

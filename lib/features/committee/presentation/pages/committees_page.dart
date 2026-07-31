@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
@@ -82,7 +81,6 @@ class _CommitteesPageState extends State<CommitteesPage> {
       ),
       body: Column(
         children: [
-
           Expanded(
             child: PaginatedListView<CommitteeNode, CommitteeController>(
               itemBuilder: (context, index, node) => CommitteeCard(node: node),
@@ -95,4 +93,3 @@ class _CommitteesPageState extends State<CommitteesPage> {
     );
   }
 }
-

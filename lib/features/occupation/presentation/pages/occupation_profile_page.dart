@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -115,43 +114,43 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
       body: Padding(
         padding: AppSpacing.pagePadding,
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          Expanded(
-            child: Obx(
-              () => AppStateView(
-                state: controller.membersState.value,
-                onRetry: () => controller.loadOccupationMembers(_occupationId),
-                child: RefreshIndicator(
-                  onRefresh: () => controller.loadOccupationMembers(
-                    _occupationId,
-                    refresh: true,
-                  ),
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount:
-                        controller.occupationMembers.length +
-                        (controller.hasMoreMembers.value ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == controller.occupationMembers.length) {
-                        return const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Obx(
+                () => AppStateView(
+                  state: controller.membersState.value,
+                  onRetry: () =>
+                      controller.loadOccupationMembers(_occupationId),
+                  child: RefreshIndicator(
+                    onRefresh: () => controller.loadOccupationMembers(
+                      _occupationId,
+                      refresh: true,
+                    ),
+                    color: AppColors.primary,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount:
+                          controller.occupationMembers.length +
+                          (controller.hasMoreMembers.value ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == controller.occupationMembers.length) {
+                          return const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        }
+                        return _OccupationMemberCard(
+                          member: controller.occupationMembers[index],
                         );
-                      }
-                      return _OccupationMemberCard(
-                        member: controller.occupationMembers[index],
-                      );
-                    },
+                      },
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -317,4 +316,3 @@ class _OccupationMemberCard extends StatelessWidget {
     );
   }
 }
-

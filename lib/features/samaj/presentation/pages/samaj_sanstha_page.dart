@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -50,7 +49,6 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.primary,
@@ -101,10 +99,8 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
                         placeholder: (_, __) => const Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                        errorWidget: (_, __, ___) => Image.asset(
-                          FallBackImage,
-                          fit: BoxFit.cover,
-                        ),
+                        errorWidget: (_, __, ___) =>
+                            Image.asset(FallBackImage, fit: BoxFit.cover),
                       ),
                     ),
                   ),
@@ -207,7 +203,7 @@ class _SansthaCardState extends State<_SansthaCard> {
     final hasDescription = displayDescription.isNotEmpty;
 
     return AppCard(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      margin: const EdgeInsets.symmetric(vertical: 14.0),
       padding: const EdgeInsets.all(16.0),
       elevation: _isExpanded ? 0.08 : 0.03,
       border: Border.all(
@@ -346,4 +342,3 @@ class _SansthaCardState extends State<_SansthaCard> {
     );
   }
 }
-

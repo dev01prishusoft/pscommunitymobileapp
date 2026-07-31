@@ -13,7 +13,6 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -64,10 +63,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         ),
         title: Text(LK.paymentReceipt.tr),
         actions: [
-          IconButton(
-            onPressed: () => _shareReceipt(),
-            icon: Icon(Icons.share),
-          ),
+          IconButton(onPressed: () => _shareReceipt(), icon: Icon(Icons.share)),
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -167,7 +163,12 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   'N/A')
               .tr,
       'status':
-          ((data['status'] ?? data['paymentStatus'] ?? data['subscriptionStatus'] ?? data['paymentStatusName'])?.toString() ?? 'N/A'),
+          ((data['status'] ??
+                  data['paymentStatus'] ??
+                  data['subscriptionStatus'] ??
+                  data['paymentStatusName'])
+              ?.toString() ??
+          'N/A'),
       'transactionId':
           (data['transactionId'] ??
                   data['paymentTransactionId'] ??
@@ -235,10 +236,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                             strokeWidth: 2,
                                           ),
                                         ),
-                                        errorWidget: (_, __, ___) => Image.asset(
-                                          FallBackImage,
-                                          fit: BoxFit.cover,
-                                        ),
+                                        errorWidget: (_, __, ___) =>
+                                            Image.asset(
+                                              FallBackImage,
+                                              fit: BoxFit.cover,
+                                            ),
                                       )
                                     : Image.asset(
                                         FallBackImage,
@@ -436,8 +438,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       if (response.statusCode == 200) {
         return await consolidateHttpClientResponseBytes(response);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     return null;
   }
@@ -793,4 +794,3 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 }
-

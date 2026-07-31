@@ -10,7 +10,6 @@ import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
@@ -104,55 +103,55 @@ class MarriagePage extends GetView<MarriageController> {
         padding: AppSpacing.pagePadding,
         child: CustomScrollView(
           controller: controller.scrollController,
-        slivers: [
-          Obx(() {
-            if (controller.state.value == AppState.data ||
-                controller.state.value == AppState.empty) {
-              return SliverToBoxAdapter(child: _buildFilterControlsCard());
-            } else {
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
-            }
-          }),
-          Obx(() {
-            if (controller.state.value == AppState.data) {
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index == controller.filteredMembers.length) {
-                      return controller.isNextPageLoading.value
-                          ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(16),
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
-                          : const SizedBox.shrink();
-                    }
-                    return _MarriageMemberCard(
-                      member: controller.filteredMembers[index],
-                    );
-                  },
-                  childCount:
-                      controller.filteredMembers.length +
-                      (controller.hasMore.value ? 1 : 0),
-                ),
-              );
-            } else {
-              return SliverToBoxAdapter(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  child: AppStateView(
-                    state: controller.state.value,
-                    emptyMessage: LK.noMatchesFound.tr,
-                    child: const SizedBox.shrink(),
+          slivers: [
+            Obx(() {
+              if (controller.state.value == AppState.data ||
+                  controller.state.value == AppState.empty) {
+                return SliverToBoxAdapter(child: _buildFilterControlsCard());
+              } else {
+                return const SliverToBoxAdapter(child: SizedBox.shrink());
+              }
+            }),
+            Obx(() {
+              if (controller.state.value == AppState.data) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index == controller.filteredMembers.length) {
+                        return controller.isNextPageLoading.value
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      }
+                      return _MarriageMemberCard(
+                        member: controller.filteredMembers[index],
+                      );
+                    },
+                    childCount:
+                        controller.filteredMembers.length +
+                        (controller.hasMore.value ? 1 : 0),
                   ),
-                ),
-              );
-            }
-          }),
-          SliverToBoxAdapter(child: SizedBox(height: 80.h)),
-        ],
-      ),
+                );
+              } else {
+                return SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: AppStateView(
+                      state: controller.state.value,
+                      emptyMessage: LK.noMatchesFound.tr,
+                      child: const SizedBox.shrink(),
+                    ),
+                  ),
+                );
+              }
+            }),
+            SliverToBoxAdapter(child: SizedBox(height: 80.h)),
+          ],
+        ),
       ),
     );
   }
@@ -1095,4 +1094,3 @@ String _translateFallback(String val) {
   }
   return val;
 }
-

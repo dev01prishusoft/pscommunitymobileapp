@@ -5,7 +5,6 @@ import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/presentation/controllers/share_controller.dart';
@@ -127,15 +126,10 @@ class _AppLinkCard extends GetView<SamajController> {
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              FallBackImage,
-                              fit: BoxFit.cover,
-                            ),
+                            errorWidget: (context, url, error) =>
+                                Image.asset(FallBackImage, fit: BoxFit.cover),
                           )
-                        : Image.asset(
-                            FallBackImage,
-                            fit: BoxFit.cover,
-                          ),
+                        : Image.asset(FallBackImage, fit: BoxFit.cover),
                   ),
                 );
               }),
@@ -177,9 +171,7 @@ class _AppLinkCard extends GetView<SamajController> {
                 Expanded(
                   child: Text(
                     ctrl.appLink,
-                    style: AppTextStyles.labelLarge.copyWith(
-                      fontSize: 13,
-                    ),
+                    style: AppTextStyles.labelLarge.copyWith(fontSize: 13),
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
@@ -427,4 +419,3 @@ class _ShareButton extends StatelessWidget {
     );
   }
 }
-
