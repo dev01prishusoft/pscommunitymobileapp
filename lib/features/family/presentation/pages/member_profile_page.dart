@@ -111,77 +111,47 @@ class _ProfileHeader extends StatelessWidget {
       child: Stack(
         alignment: Alignment.topRight,
         children: [
-          Column(
-            spacing: 10.h,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (member.profilePhotoFullUrl != null &&
-                          member.profilePhotoFullUrl!.isNotEmpty) {
-                        Get.to(
-                          () => FullScreenImageViewer(
-                            imageUrl: member.profilePhotoFullUrl!,
-                            heroTag: 'profile_image_${member.memberId}',
-                          ),
-                        );
-                      }
-                    },
-                    child: Hero(
-                      tag: 'profile_image_${member.memberId}',
-                      child: MemberAvatar(
-                        imageUrl: member.profilePhotoFullUrl,
-                        gender: member.gender,
-                        fallbackName: member.fullName,
-                        radius: 30.r,
+              GestureDetector(
+                onTap: () {
+                  if (member.profilePhotoFullUrl != null &&
+                      member.profilePhotoFullUrl!.isNotEmpty) {
+                    Get.to(
+                      () => FullScreenImageViewer(
+                        imageUrl: member.profilePhotoFullUrl!,
+                        heroTag: 'profile_image_${member.memberId}',
                       ),
-                    ),
+                    );
+                  }
+                },
+                child: Hero(
+                  tag: 'profile_image_${member.memberId}',
+                  child: MemberAvatar(
+                    imageUrl: member.profilePhotoFullUrl,
+                    gender: member.gender,
+                    fallbackName: member.fullName,
+                    radius: 30.r,
                   ),
-                  SizedBox(width: 15.w),
-                  Expanded(
-                    child: Text(
+                ),
+              ),
+              SizedBox(width: 15.w),
+              Expanded(
+                child: Column(
+                  spacing: 5.h,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       member.fullName,
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.black,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                spacing: 10.w,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Text(
-                      member.memberNo ?? '',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ),
-                  if (member.jobPositionName != null &&
-                      member.jobPositionName!.trim().isNotEmpty) ...[
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
+                        horizontal: 8.w,
                         vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
@@ -192,27 +162,17 @@ class _ProfileHeader extends StatelessWidget {
                           width: 1.w,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.workspace_premium_rounded,
-                            size: 14.sp,
-                            color: AppColors.primary,
-                          ),
-                          SizedBox(width: 6.w),
-                          Text(
-                            member.jobPositionName!,
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        member.memberNo ?? '',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
             ],
           ),
@@ -376,67 +336,7 @@ class _MemberDetailsSection extends StatelessWidget {
     return _SectionContainer(
       child: Column(
         children: [
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.person_outline,
-              LK.gender.tr,
-              controller.formatGender(member),
-            ),
-            _buildGridItem(
-              Icons.water_drop_outlined,
-              LK.bloodGroupColon.tr,
-              controller.formatBloodGroup(member),
-            ),
-          ),
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.calendar_today_outlined,
-              LK.birthDate.tr,
-              controller.getFormattedDateOfBirth(member),
-            ),
-            _buildGridItem(
-              Icons.height,
-              LK.heightColon.tr,
-              controller.formatHeight(member),
-            ),
-          ),
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.access_time,
-              LK.birthTime.tr,
-              controller.getFormattedBirthTime(member),
-            ),
-            _buildGridItem(
-              Icons.monitor_weight_outlined,
-              LK.weightColon.tr,
-              controller.formatWeight(member),
-            ),
-          ),
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.person_outline,
-              LK.motherFatherName.tr,
-              controller.formatMotherFather(member),
-              isExpandable: true,
-            ),
-            _buildGridItem(
-              Icons.work_outline,
-              LK.occupationLabel.tr,
-              controller.formatOccupation(member),
-            ),
-          ),
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.location_on_outlined,
-              LK.occupationArea.tr,
-              controller.formatOccupationArea(member),
-            ),
-            _buildGridItem(
-              Icons.favorite_border,
-              LK.maritalStatusLabel.tr,
-              controller.formatMaritalStatus(member),
-            ),
-          ),
+          // Mobile no and email
           _buildDetailRow(
             _buildGridItem(
               Icons.phone_outlined,
@@ -447,6 +347,73 @@ class _MemberDetailsSection extends StatelessWidget {
                   : null,
             ),
             _buildGridItem(
+              Icons.mail_outline,
+              LK.email.tr,
+              controller.formatEmail(member),
+              isExpandable: true,
+            ),
+          ),
+          //birth date and birth time
+          _buildDetailRow(
+            _buildGridItem(
+              Icons.calendar_today_outlined,
+              LK.birthDate.tr,
+              controller.getFormattedDateOfBirth(member),
+            ),
+            _buildGridItem(
+              Icons.access_time,
+              LK.birthTime.tr,
+              controller.getFormattedBirthTime(member),
+            ),
+          ),
+          // gender and marital status
+          _buildDetailRow(
+            _buildGridItem(
+              Icons.person_outline,
+              LK.gender.tr,
+              controller.formatGender(member),
+            ),
+            _buildGridItem(
+              Icons.favorite_border,
+              LK.maritalStatusLabel.tr,
+              controller.formatMaritalStatus(member),
+            ),
+          ),
+          // blood group and gotra
+          _buildDetailRow(
+            _buildGridItem(
+              Icons.water_drop_outlined,
+              LK.bloodGroupColon.tr,
+              controller.formatBloodGroup(member),
+            ),
+            _buildGridItem(
+              Iconsax.hierarchy_2_copy,
+              LK.gotraLabel.tr,
+              controller.formatGotra(member),
+            ),
+          ),
+          // height and weight
+          _buildDetailRow(
+            _buildGridItem(
+              Icons.height,
+              LK.heightColon.tr,
+              controller.formatHeight(member),
+            ),
+            _buildGridItem(
+              Icons.monitor_weight_outlined,
+              LK.weightColon.tr,
+              controller.formatWeight(member),
+            ),
+          ),
+          // mother father name and occupation
+          _buildDetailRow(
+            _buildGridItem(
+              Icons.person_outline,
+              LK.motherFatherName.tr,
+              controller.formatMotherFather(member),
+              isExpandable: true,
+            ),
+            _buildGridItem(
               Icons.contact_phone_outlined,
               LK.emergencyContact.tr,
               controller.formatEmergencyContact(member),
@@ -455,19 +422,6 @@ class _MemberDetailsSection extends StatelessWidget {
                       'tel:${member.emergencyContactNo}',
                     )
                   : null,
-            ),
-          ),
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.opacity,
-              LK.gotraLabel.tr,
-              controller.formatGotra(member),
-            ),
-            _buildGridItem(
-              Icons.mail_outline,
-              LK.email.tr,
-              controller.formatEmail(member),
-              isExpandable: true,
             ),
             isLast: true,
           ),

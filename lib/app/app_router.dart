@@ -16,6 +16,7 @@ import 'package:pscommunitymobileapp/features/member/presentation/pages/add_fami
 import 'package:pscommunitymobileapp/features/member/presentation/pages/added_members_list_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/edit_profile_page.dart';
 import 'package:pscommunitymobileapp/features/member/presentation/pages/find_member_page.dart';
+import 'package:pscommunitymobileapp/features/occupation/presentation/pages/frompage_occupation.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_directory_page.dart';
 import 'package:pscommunitymobileapp/features/occupation/presentation/pages/occupation_profile_page.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/pages/make_payment_page.dart';
@@ -36,7 +37,8 @@ import 'package:pscommunitymobileapp/features/notification/data/repositories/not
 import 'package:pscommunitymobileapp/features/notification/presentation/services/notification_navigation_service.dart';
 
 class AppRouter {
-  static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
 
   static String login = '/login';
   static String home = '/home';
@@ -65,6 +67,7 @@ class AppRouter {
   static String addedMembers = '/added-members';
   static String samajSansthas = '/samaj-sansthas';
   static String notifications = '/notifications';
+  static String frompageOccupation = '/frompageOccupation';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -189,7 +192,11 @@ class AppRouter {
       name: samajSansthas,
       page: () => SamajSansthaPage(),
       binding: BindingsBuilder<dynamic>(() {
-        Get.lazyPut<SamajSansthaController>(() => SamajSansthaController(SamajRepositoryImpl(Get.find<ApiClient>())));
+        Get.lazyPut<SamajSansthaController>(
+          () => SamajSansthaController(
+            SamajRepositoryImpl(Get.find<ApiClient>()),
+          ),
+        );
       }),
       middlewares: [AuthGuard()],
     ),
@@ -197,9 +204,21 @@ class AppRouter {
       name: notifications,
       page: () => NotificationsPage(),
       binding: BindingsBuilder<dynamic>(() {
-        Get.lazyPut<NotificationNavigationService>(() => NotificationNavigationService());
-        Get.lazyPut<NotificationController>(() => NotificationController(NotificationRepositoryImpl(Get.find<ApiClient>()), Get.find<NotificationNavigationService>()));
+        Get.lazyPut<NotificationNavigationService>(
+          () => NotificationNavigationService(),
+        );
+        Get.lazyPut<NotificationController>(
+          () => NotificationController(
+            NotificationRepositoryImpl(Get.find<ApiClient>()),
+            Get.find<NotificationNavigationService>(),
+          ),
+        );
       }),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: frompageOccupation,
+      page: () => FromPageOccupation(),
       middlewares: [AuthGuard()],
     ),
   ];

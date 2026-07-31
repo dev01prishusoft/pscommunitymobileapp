@@ -393,7 +393,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
         onTap: () {
           Get.toNamed<void>(
             AppRouter.memberProfile,
-            arguments: {'memberId': memberId},
+            arguments: {'memberId': memberId, 'fromPage': 'committee'},
           );
         },
         borderRadius: BorderRadius.circular(12.r),
