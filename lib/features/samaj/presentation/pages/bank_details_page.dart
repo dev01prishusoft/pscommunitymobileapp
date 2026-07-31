@@ -7,6 +7,8 @@ import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -56,10 +58,7 @@ class BankDetailsPage extends StatelessWidget {
             if (accounts.isEmpty) {
               return ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
+                padding: AppSpacing.pagePadding,
                 children: [
                   _buildSamajCardSection(),
                   SizedBox(height: 24.h),
@@ -82,10 +81,7 @@ class BankDetailsPage extends StatelessWidget {
           
             return ListView.separated(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
+              padding: AppSpacing.pagePadding,
               itemCount: accounts.length + 1,
               separatorBuilder: (context, index) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
@@ -437,3 +433,4 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
     );
   }
 }
+

@@ -8,6 +8,8 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
@@ -31,7 +33,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
       appBar: AppBar(title: Text(LK.samajSansthas.tr)),
       body: PaginatedListView<SamajSanstha, SamajSansthaController>(
         headerWidget: _buildHeader(_controller),
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: AppSpacing.pagePadding,
         emptyMessage: 'No items found',
         itemBuilder: (context, index, sanstha) =>
             _SansthaCard(sanstha: sanstha),
@@ -344,3 +346,4 @@ class _SansthaCardState extends State<_SansthaCard> {
     );
   }
 }
+

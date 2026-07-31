@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/mappers/role_mapper.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -178,7 +179,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 )
               : ListView.separated(
                   itemCount: groups.length,
-                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  padding: AppSpacing.pagePadding,
                   separatorBuilder: (context, index) => SizedBox(height: 10.h),
                   itemBuilder: (context, index) {
                     final role = groups.keys.elementAt(index);
@@ -586,3 +587,4 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 }
+

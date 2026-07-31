@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: AppSpacing.pXl,
+            padding: AppSpacing.pagePadding,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

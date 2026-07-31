@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/gender_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -89,11 +90,11 @@ class _FindMemberPageState extends State<FindMemberPage> {
         ),
         body: PaginatedListView<Member, FindMemberController>(
           emptyMessage: LK.noMembersFound.tr,
-          padding: EdgeInsetsGeometry.zero,
+          padding: AppSpacing.pagePadding,
           separatorBuilder: (val, val2) => SizedBox(height: 6.h),
           itemBuilder: (context, index, member) =>
               _FindMemberCard(member: member),
-        ).paddingSymmetric(horizontal: 14.w, vertical: 10.h),
+        ),
       ),
     );
   }
@@ -336,3 +337,4 @@ class _FindMemberCard extends StatelessWidget {
     );
   }
 }
+

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -92,7 +93,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     return Scaffold(
       appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
       body: ResponsiveFormContainer(
-        padding: EdgeInsets.zero,
+        padding: AppSpacing.pagePadding,
         child: Form(
           key: controller.formKey,
           autovalidateMode: AutovalidateMode.disabled,
@@ -2504,3 +2505,4 @@ class _KeepAliveStepWrapperState extends State<KeepAliveStepWrapper>
     return widget.child;
   }
 }
+

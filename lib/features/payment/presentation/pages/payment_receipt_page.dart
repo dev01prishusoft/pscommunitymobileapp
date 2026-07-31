@@ -12,6 +12,8 @@ import 'package:pscommunitymobileapp/core/constants/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/presentation/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
@@ -182,7 +184,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   Widget _buildContent(Map<String, dynamic> rawData) {
     final data = _getParsedData(rawData);
     return SingleChildScrollView(
-      padding: EdgeInsets.all(20.0),
+      padding: AppSpacing.pagePadding,
       child: Column(
         children: [
           Container(
@@ -791,3 +793,4 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 }
+

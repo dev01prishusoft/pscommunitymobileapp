@@ -9,6 +9,8 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/mappers/marital_status_mapper.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
@@ -98,8 +100,10 @@ class MarriagePage extends GetView<MarriageController> {
           ),
         ],
       ),
-      body: CustomScrollView(
-        controller: controller.scrollController,
+      body: Padding(
+        padding: AppSpacing.pagePadding,
+        child: CustomScrollView(
+          controller: controller.scrollController,
         slivers: [
           Obx(() {
             if (controller.state.value == AppState.data ||
@@ -148,6 +152,7 @@ class MarriagePage extends GetView<MarriageController> {
           }),
           SliverToBoxAdapter(child: SizedBox(height: 80.h)),
         ],
+      ),
       ),
     );
   }
@@ -238,7 +243,7 @@ class MarriagePage extends GetView<MarriageController> {
 
   Widget _buildFilterControlsCard() {
     return AppCard(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      margin: EdgeInsets.only(bottom: 8.h),
       elevation: 0,
       borderRadius: 16.r,
       border: Border.all(
@@ -371,7 +376,7 @@ class _MarriageMemberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+      margin: EdgeInsets.only(bottom: 6.h),
       elevation: 0.03,
       border: Border.all(
         color: AppColors.grey.withValues(alpha: 0.15),
@@ -1092,3 +1097,4 @@ String _translateFallback(String val) {
   }
   return val;
 }
+
