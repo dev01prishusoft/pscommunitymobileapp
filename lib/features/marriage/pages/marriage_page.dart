@@ -72,7 +72,14 @@ class MarriagePage extends GetView<MarriageController> {
               placeholder: LK.searchByFirstNameHint.tr,
               controller: controller.searchTextController,
               onChanged: (val) {
-                controller.searchQuery.value = val;
+                if (val.isEmpty) {
+                  controller.searchTextController.clear();
+                  controller.searchQuery.value = '';
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                } else {
+                  controller.searchQuery.value = val;
+                }
               },
             );
           }
@@ -550,334 +557,343 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.grey.withValues(alpha: 0.1),
-                  width: 1.w,
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppColors.grey.withValues(alpha: 0.1),
+                    width: 1.w,
+                  ),
                 ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Iconsax.filter_search_copy,
-                    size: 22.sp,
-                    color: AppColors.primary,
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                Text(
-                  LK.advancedFilters.tr,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: Container(
-                    padding: EdgeInsets.all(4.r),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.w),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.close_rounded,
-                      size: 18.sp,
+                      Iconsax.filter_search_copy,
+                      size: 22.sp,
                       color: AppColors.primary,
                     ),
                   ),
-                  onPressed: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    controller.isAdvancedFiltersOpen.value = false;
-                    Get.back<void>();
-                  },
-                ),
-              ],
+                  SizedBox(width: 10.w),
+                  Text(
+                    LK.advancedFilters.tr,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18.sp,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      controller.isAdvancedFiltersOpen.value = false;
+                      Get.back<void>();
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          Flexible(
-            child: SingleChildScrollView(
+            Flexible(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildFieldSection(
+                      label: LK.ageRangeLabel.tr,
+                      icon: Iconsax.calendar_copy,
+                      child: _buildFilterRow(
+                        fromRx: controller.selectedAgeFrom,
+                        toRx: controller.selectedAgeTo,
+                        errorRx: controller.ageError,
+                        staticItems: controller.ages,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.heightRangeLabel.tr,
+                      icon: Iconsax.weight_copy,
+                      child: _buildFilterRow(
+                        fromRx: controller.selectedHeightFrom,
+                        toRx: controller.selectedHeightTo,
+                        errorRx: controller.heightError,
+                        staticItems: controller.heights,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.gotraLabel.tr,
+                      icon: Iconsax.hierarchy_copy,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _FilterDropdownField(
+                                  rxValue: controller.selectedGotra,
+                                  rxItems: controller.dynamicGotras,
+                                  mapper: _translateFallback,
+                                ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Obx(
+                                () => SizedBox(
+                                  width: 24.w,
+                                  height: 24.h,
+                                  child: Checkbox(
+                                    value: controller.excludeSameGotra.value,
+                                    activeColor: AppColors.primary,
+                                    onChanged: (val) =>
+                                        controller.excludeSameGotra.value =
+                                            val!,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                LK.excludeSameGotra.tr,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.maritalStatusLabel.tr,
+                      icon: Iconsax.info_circle_copy,
+                      child: _FilterDropdownField(
+                        rxValue: controller.selectedMaritalStatus,
+                        staticItems: controller.dynamicMaritalStatuses,
+                        mapper: (val) {
+                          if (val == 'All') return LK.all.tr;
+                          final key = MaritalStatusMapper.getLabelKey(val);
+                          return key != null ? key.tr : val;
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.residenceLabel.tr,
+                      icon: Iconsax.location_copy,
+                      child: Column(
+                        children: [
+                          _FilterDropdownField(
+                            hint: LK.selectState.tr,
+                            rxValue: controller.selectedState,
+                            rxItems: controller.states,
+                            prependAll: true,
+                            itemStringifier: (e) =>
+                                (e as dynamic).text as String,
+                            mapper: _translateFallback,
+                            onChanged: (val) => controller.onStateChanged(val),
+                          ),
+                          SizedBox(height: 12.h),
+                          Obx(
+                            () => _FilterDropdownField(
+                              hint: LK.selectDistrict.tr,
+                              rxValue: controller.selectedDistrict,
+                              rxItems: controller.districts,
+                              prependAll: true,
+                              itemStringifier: (e) =>
+                                  (e as dynamic).text as String,
+                              mapper: _translateFallback,
+                              onChanged: (val) =>
+                                  controller.onDistrictChanged(val),
+                              isEnabled:
+                                  controller.selectedState.value != 'All',
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          Obx(
+                            () => _FilterDropdownField(
+                              hint: LK.selectTaluka.tr,
+                              rxValue: controller.selectedTaluka,
+                              rxItems: controller.talukas,
+                              prependAll: true,
+                              itemStringifier: (e) =>
+                                  (e as dynamic).text as String,
+                              mapper: _translateFallback,
+                              onChanged: (val) =>
+                                  controller.onTalukaChanged(val),
+                              isEnabled:
+                                  controller.selectedDistrict.value != 'All',
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          Obx(
+                            () => _FilterDropdownField(
+                              hint: 'Select Area',
+                              rxValue: controller.selectedArea,
+                              rxItems: controller.areas,
+                              prependAll: true,
+                              itemStringifier: (e) =>
+                                  (e as dynamic).text as String,
+                              mapper: _translateFallback,
+                              isEnabled:
+                                  controller.selectedTaluka.value != 'All',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.educationLabel.tr,
+                      icon: Iconsax.teacher_copy,
+                      child: _FilterDropdownField(
+                        rxValue: controller.selectedEducation,
+                        rxItems: controller.dynamicEducations,
+                        mapper: _translateFallback,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.occupationLabel.tr,
+                      icon: Iconsax.briefcase_copy,
+                      child: _FilterDropdownField(
+                        rxValue: controller.selectedOccupation,
+                        rxItems: controller.dynamicOccupations,
+                        mapper: _translateFallback,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
+                      label: LK.incomeRangeLabel.tr,
+                      icon: Iconsax.money_3_copy,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildIncomeTextRow(
+                            label: '',
+                            fromCtrl: controller.incomeFromCtrl,
+                            toCtrl: controller.incomeToCtrl,
+                          ),
+                          Obx(() {
+                            if (controller.incomeError.value.isNotEmpty) {
+                              return Padding(
+                                padding: EdgeInsets.only(top: 8.h),
+                                child: Text(
+                                  controller.incomeError.value,
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    color: AppColors.red,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          }),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
               padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Row(
                 children: [
-                  _buildFieldSection(
-                    label: LK.ageRangeLabel.tr,
-                    icon: Iconsax.calendar_copy,
-                    child: _buildFilterRow(
-                      fromRx: controller.selectedAgeFrom,
-                      toRx: controller.selectedAgeTo,
-                      errorRx: controller.ageError,
-                      staticItems: controller.ages,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.heightRangeLabel.tr,
-                    icon: Iconsax.weight_copy,
-                    child: _buildFilterRow(
-                      fromRx: controller.selectedHeightFrom,
-                      toRx: controller.selectedHeightTo,
-                      errorRx: controller.heightError,
-                      staticItems: controller.heights,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.gotraLabel.tr,
-                    icon: Iconsax.hierarchy_copy,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _FilterDropdownField(
-                                rxValue: controller.selectedGotra,
-                                rxItems: controller.dynamicGotras,
-                                mapper: _translateFallback,
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            Obx(
-                              () => SizedBox(
-                                width: 24.w,
-                                height: 24.h,
-                                child: Checkbox(
-                                  value: controller.excludeSameGotra.value,
-                                  activeColor: AppColors.primary,
-                                  onChanged: (val) =>
-                                      controller.excludeSameGotra.value = val!,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              LK.excludeSameGotra.tr,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.maritalStatusLabel.tr,
-                    icon: Iconsax.info_circle_copy,
-                    child: _FilterDropdownField(
-                      rxValue: controller.selectedMaritalStatus,
-                      staticItems: controller.dynamicMaritalStatuses,
-                      mapper: (val) {
-                        if (val == 'All') return LK.all.tr;
-                        final key = MaritalStatusMapper.getLabelKey(val);
-                        return key != null ? key.tr : val;
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        controller.closeAdvancedFilters();
+                        if (controller.incomeError.value.isEmpty &&
+                            controller.ageError.value.isEmpty &&
+                            controller.heightError.value.isEmpty) {
+                          controller.applyFilters();
+                          Get.back<bool>(result: true);
+                        }
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                      ),
+                      child: Text(
+                        LK.applyFilters.tr,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.residenceLabel.tr,
-                    icon: Iconsax.location_copy,
-                    child: Column(
-                      children: [
-                        _FilterDropdownField(
-                          hint: LK.selectState.tr,
-                          rxValue: controller.selectedState,
-                          rxItems: controller.states,
-                          prependAll: true,
-                          itemStringifier: (e) => (e as dynamic).text as String,
-                          mapper: _translateFallback,
-                          onChanged: (val) => controller.onStateChanged(val),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => controller.clearFilters(),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: AppColors.grey.withValues(alpha: 0.4),
+                          width: 1.w,
                         ),
-                        SizedBox(height: 12.h),
-                        Obx(
-                          () => _FilterDropdownField(
-                            hint: LK.selectDistrict.tr,
-                            rxValue: controller.selectedDistrict,
-                            rxItems: controller.districts,
-                            prependAll: true,
-                            itemStringifier: (e) =>
-                                (e as dynamic).text as String,
-                            mapper: _translateFallback,
-                            onChanged: (val) =>
-                                controller.onDistrictChanged(val),
-                            isEnabled: controller.selectedState.value != 'All',
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
-                        SizedBox(height: 12.h),
-                        Obx(
-                          () => _FilterDropdownField(
-                            hint: LK.selectTaluka.tr,
-                            rxValue: controller.selectedTaluka,
-                            rxItems: controller.talukas,
-                            prependAll: true,
-                            itemStringifier: (e) =>
-                                (e as dynamic).text as String,
-                            mapper: _translateFallback,
-                            onChanged: (val) => controller.onTalukaChanged(val),
-                            isEnabled:
-                                controller.selectedDistrict.value != 'All',
-                          ),
+                        foregroundColor: AppColors.primary,
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                      ),
+                      child: Text(
+                        LK.clearAll.tr,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(height: 12.h),
-                        Obx(
-                          () => _FilterDropdownField(
-                            hint: 'Select Area',
-                            rxValue: controller.selectedArea,
-                            rxItems: controller.areas,
-                            prependAll: true,
-                            itemStringifier: (e) =>
-                                (e as dynamic).text as String,
-                            mapper: _translateFallback,
-                            isEnabled: controller.selectedTaluka.value != 'All',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.educationLabel.tr,
-                    icon: Iconsax.teacher_copy,
-                    child: _FilterDropdownField(
-                      rxValue: controller.selectedEducation,
-                      rxItems: controller.dynamicEducations,
-                      mapper: _translateFallback,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.occupationLabel.tr,
-                    icon: Iconsax.briefcase_copy,
-                    child: _FilterDropdownField(
-                      rxValue: controller.selectedOccupation,
-                      rxItems: controller.dynamicOccupations,
-                      mapper: _translateFallback,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildFieldSection(
-                    label: LK.incomeRangeLabel.tr,
-                    icon: Iconsax.money_3_copy,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildIncomeTextRow(
-                          label: '',
-                          fromCtrl: controller.incomeFromCtrl,
-                          toCtrl: controller.incomeToCtrl,
-                        ),
-                        Obx(() {
-                          if (controller.incomeError.value.isNotEmpty) {
-                            return Padding(
-                              padding: EdgeInsets.only(top: 8.h),
-                              child: Text(
-                                controller.incomeError.value,
-                                style: AppTextStyles.labelSmall.copyWith(
-                                  color: AppColors.red,
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        }),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 24.h),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      controller.closeAdvancedFilters();
-                      if (controller.incomeError.value.isEmpty &&
-                          controller.ageError.value.isEmpty &&
-                          controller.heightError.value.isEmpty) {
-                        controller.applyFilters();
-                        Get.back<bool>(result: true);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                    ),
-                    child: Text(
-                      LK.applyFilters.tr,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => controller.clearFilters(),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: AppColors.grey.withValues(alpha: 0.4),
-                        width: 1.w,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      foregroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                    ),
-                    child: Text(
-                      LK.clearAll.tr,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

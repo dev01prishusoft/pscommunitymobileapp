@@ -93,7 +93,16 @@ class _PaymentsPageState extends State<PaymentsPage> {
               ),
               placeholder: LK.searchHint.tr,
               controller: _searchController,
-              onChanged: (val) => controller.searchDashboard(val),
+              onChanged: (val) {
+                if (val.isEmpty) {
+                  _searchController.clear();
+                  controller.searchDashboard('');
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                } else {
+                  controller.searchDashboard(val);
+                }
+              },
             );
           }
           return Text(LK.payments.tr);
@@ -114,16 +123,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
         ],
       ),
       body: Obx(() {
-        final paidCount =
-            controller.dashboard.value?.paidPayments
-                .where(
-                  (p) =>
-                      p.status.toLowerCase() == 'success' ||
-                      p.status.toLowerCase() == 'completed' ||
-                      p.status.toLowerCase() == 'successful',
-                )
-                .length ??
-            0;
+        final filteredList = controller.filteredDashboardPayments;
+
         return AppStateView(
           state: controller.dashboardState.value,
           onRetry: controller.loadDashboard,
@@ -139,14 +140,13 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (controller.dashboard.value?.paidPayments.isNotEmpty ??
-                        false) ...[
+                    if (filteredList.isNotEmpty) ...[
                       _buildSectionHeader(
                         LK.requestedPaymentsPaid.tr,
-                        subtitle: '(${paidCount})',
+                        subtitle: '(${filteredList.length})',
                       ),
                       SizedBox(height: 10.h),
-                      ...controller.filteredDashboardPayments.map(
+                      ...filteredList.map(
                         (req) => _buildPaidPaymentCard(req),
                       ),
                     ],

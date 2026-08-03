@@ -83,7 +83,18 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                 ),
                 placeholder: LK.searchOccupation.tr,
                 controller: _searchController,
-                onChanged: _controller.search,
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    _controller.search('');
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  } else {
+                    _controller.search(value);
+                  }
+                },
               )
             : Text(LK.occupationDirectory.tr),
         actions: [
@@ -126,7 +137,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 6.w,
                                     mainAxisSpacing: 10.h,
-                                    childAspectRatio: 1.2,
+                                    childAspectRatio: 1.4,
                                   ),
                               padding: EdgeInsets.fromLTRB(
                                 14.w,
@@ -178,7 +189,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
         _controller.loadOccupations(refresh: true);
       },
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             padding: EdgeInsets.all(10.r),
@@ -223,29 +235,18 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               ],
             ),
           ),
-          10.verticalSpace,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                occ.name,
-                style: AppTextStyles.titleSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                  height: 1.2,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                'Tap to explore',
-                style: AppTextStyles.labelSmall.copyWith(
-                  color: AppColors.grey.shade600,
-                  fontSize: 9.sp,
-                ),
-              ),
-            ],
+          5.verticalSpace,
+          Text(
+            occ.name,
+            style: AppTextStyles.titleSmall.copyWith(
+              fontWeight: FontWeight.bold,
+              height: 1.2,
+            ),
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
           ),
+          5.verticalSpace,
         ],
       ),
     );

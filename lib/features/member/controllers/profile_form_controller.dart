@@ -145,6 +145,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   TextEditingController get firstNameEnCtrl => personalInfo.firstNameEnCtrl;
   TextEditingController get lastNameEnCtrl => personalInfo.lastNameEnCtrl;
   TextEditingController get dobCtrl => personalInfo.dobCtrl;
+  TextEditingController get bornPlaceCtrl => personalInfo.bornPlaceCtrl;
   TextEditingController get heightCtrl => personalInfo.heightCtrl;
   TextEditingController get weightCtrl => personalInfo.weightCtrl;
   TextEditingController get monthlyIncomeCtrl => personalInfo.monthlyIncomeCtrl;

@@ -105,26 +105,31 @@ class AppDrawer extends StatelessWidget {
                 final logoUrl = userPic?.isNotEmpty == true
                     ? userPic
                     : samajController.samaj.value?.logoUrl;
-                return Container(
-                  width: 64.w,
-                  height: 64.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.white,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: logoUrl != null && logoUrl.isNotEmpty
-                        ? CachedImg(
-                            url: logoUrl,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Image.asset(FallBackImage, fit: BoxFit.cover),
-                          )
-                        : Image.asset(FallBackImage, fit: BoxFit.cover),
+                return GestureDetector(
+                  onTap: () => Get.toNamed<void>(AppRouter.editProfile),
+                  child: Container(
+                    width: 64.w,
+                    height: 64.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: logoUrl != null && logoUrl.isNotEmpty
+                          ? CachedImg(
+                              url: logoUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Image.asset(FallBackImage, fit: BoxFit.cover),
+                            )
+                          : Image.asset(FallBackImage, fit: BoxFit.cover),
+                    ),
                   ),
                 );
               }),

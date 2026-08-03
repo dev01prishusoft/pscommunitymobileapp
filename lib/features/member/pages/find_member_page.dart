@@ -73,7 +73,18 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   ),
                   placeholder: LK.searchHint.tr,
                   controller: _searchController,
-                  onChanged: _controller.updateSearch,
+                  onChanged: (value) {
+                    if (value.isEmpty) {
+                      _searchController.clear();
+                      _controller.clearSearch();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        _isSearchVisible = false;
+                      });
+                    } else {
+                      _controller.updateSearch(value);
+                    }
+                  },
                 )
               : Text(LK.findMember.tr),
           actions: [

@@ -87,140 +87,141 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(LK.editProfile.tr),
-        actions: [
-          if (_currentStep != 6)
-            Obx(() {
-              final hasChanges = controller.hasChanges;
-              final isFormLoading = controller.isFormLoading;
-              if (!hasChanges) return const SizedBox.shrink();
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(LK.editProfile.tr),
+          actions: [
+            if (_currentStep != 6)
+              Obx(() {
+                final hasChanges = controller.hasChanges;
+                final isFormLoading = controller.isFormLoading;
+                if (!hasChanges) return const SizedBox.shrink();
 
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: isFormLoading
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.primary,
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: isFormLoading
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: () => controller.submitForm(
+                            successMessage: LK.editProfileRequestSent.tr,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          child: Text(
+                            LK.saveChanges.tr,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      )
-                    : OutlinedButton(
-                        onPressed: () => controller.submitForm(
-                          successMessage: LK.editProfileRequestSent.tr,
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                        ),
-                        child: Text(
-                          LK.saveChanges.tr,
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-              );
-            }),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ResponsiveFormContainer(
-              child: Form(
-                key: controller.formKey,
-                child: Column(
-                  children: [
-                    _buildStepProgressIndicator(),
-                    Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        physics: const NeverScrollableScrollPhysics(),
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentStep = index;
-                          });
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            final context = _stepKeys[index].currentContext;
-                            if (context != null &&
-                                _headerScrollController.hasClients) {
-                              Scrollable.ensureVisible(
-                                context,
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeOut,
-                                alignment: 0.5,
-                              );
-                            }
-                          });
-                        },
-                        children: [
-                          KeepAliveStepWrapper(child: _buildStepPersonal()),
-                          KeepAliveStepWrapper(child: _buildStepContact()),
-                          KeepAliveStepWrapper(child: _buildStepFamily()),
-                          KeepAliveStepWrapper(child: _buildStepAddresses()),
-                          KeepAliveStepWrapper(child: _buildStepEducation()),
-                          KeepAliveStepWrapper(child: _buildStepWork()),
-                          KeepAliveStepWrapper(child: _buildStepReviewSubmit()),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
+                );
+              }),
           ],
         ),
-        child: SafeArea(
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ResponsiveFormContainer(
+                child: Form(
+                  key: controller.formKey,
+                  child: Column(
+                    children: [
+                      _buildStepProgressIndicator(),
+                      Expanded(
+                        child: PageView(
+                          controller: _pageController,
+                          physics: const NeverScrollableScrollPhysics(),
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentStep = index;
+                            });
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              final context = _stepKeys[index].currentContext;
+                              if (context != null &&
+                                  _headerScrollController.hasClients) {
+                                Scrollable.ensureVisible(
+                                  context,
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: Curves.easeOut,
+                                  alignment: 0.5,
+                                );
+                              }
+                            });
+                          },
+                          children: [
+                            KeepAliveStepWrapper(child: _buildStepPersonal()),
+                            KeepAliveStepWrapper(child: _buildStepContact()),
+                            KeepAliveStepWrapper(child: _buildStepFamily()),
+                            KeepAliveStepWrapper(child: _buildStepAddresses()),
+                            KeepAliveStepWrapper(child: _buildStepEducation()),
+                            KeepAliveStepWrapper(child: _buildStepWork()),
+                            KeepAliveStepWrapper(
+                              child: _buildStepReviewSubmit(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               if (_currentStep > 0)
-                Expanded(
-                  child: TextButton.icon(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
+                TextButton.icon(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () {
+                    _animateToStep(_currentStep - 1);
+                  },
+                  label: Text(
+                    LK.back.tr,
+                    style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.primary,
-                    ),
-                    onPressed: () {
-                      _animateToStep(_currentStep - 1);
-                    },
-                    label: Text(
-                      LK.back.tr,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              if (_currentStep > 0) const SizedBox(width: 12),
+              if (_currentStep > 0) Spacer(),
               Expanded(
-                flex: 2,
                 child: Obx(() {
                   final hasChanges = controller.hasChanges;
                   final isFormLoading = controller.isFormLoading;
-
+      
                   final isLastStep = _currentStep == 6;
                   final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
-
+      
                   return AppPrimaryButton(
                     text: text,
                     height: 50.h,

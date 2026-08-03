@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -99,6 +101,7 @@ class OccupationController extends GetxController {
       if (results.isEmpty) {
         hasMoreMembers.value = false;
       } else {
+        printInfo(info: json.encode(results));
         occupationMembers.addAll(results);
         _membersPage++;
         if (results.length < _membersPageSize) {

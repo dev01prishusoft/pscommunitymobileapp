@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:pscommunitymobileapp/core/constants/mappers.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -96,7 +95,18 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 ),
                 placeholder: LK.searchMember.tr,
                 controller: _searchController,
-                onChanged: controller.searchMembers,
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    controller.clearMemberSearch();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  } else {
+                    controller.searchMembers(value);
+                  }
+                },
               )
             : Text(_occupationName.tr),
         actions: [
@@ -162,13 +172,6 @@ class _OccupationMemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final genderLabel =
-        GenderMapper.getLabelKey(member.gender)?.tr ?? member.gender;
-    final isFemale =
-        member.gender.toLowerCase().contains('fem') ||
-        member.gender.toLowerCase().contains('stri') ||
-        member.gender.contains('સ્ત્રી');
-
     return AppCard(
       margin: EdgeInsets.only(bottom: 5.h),
       elevation: 0.02,
@@ -208,24 +211,6 @@ class _OccupationMemberCard extends StatelessWidget {
                   spacing: 6.w,
                   runSpacing: 6.h,
                   children: [
-                    if (genderLabel.isNotEmpty)
-                      _buildBadge(
-                        genderLabel,
-                        isFemale ? Icons.female_rounded : Icons.male_rounded,
-                        isFemale
-                            ? const Color(0xFFFFEEF0)
-                            : const Color(0xFFE8F0FE),
-                        isFemale
-                            ? const Color(0xFFD81B60)
-                            : const Color(0xFF1A73E8),
-                      ),
-                    if (member.age > 0)
-                      _buildBadge(
-                        '${member.age} ${LK.ageYears.tr}',
-                        Icons.cake_rounded,
-                        const Color(0xFFFEF7E0),
-                        const Color(0xFFB06000),
-                      ),
                     if (member.occupation.isNotEmpty)
                       _buildBadge(
                         member.occupation,
@@ -235,7 +220,10 @@ class _OccupationMemberCard extends StatelessWidget {
                       ),
                   ],
                 ),
-                if (member.area.isNotEmpty) ...[
+                if (member.occupationAreaName != null &&
+                        member.occupationAreaName!.isNotEmpty ||
+                    member.occupationTalukaName != null &&
+                        member.occupationTalukaName!.isNotEmpty) ...[
                   SizedBox(height: 10.h),
                   Row(
                     children: [
@@ -247,11 +235,12 @@ class _OccupationMemberCard extends StatelessWidget {
                       SizedBox(width: 4.w),
                       Expanded(
                         child: Text(
-                          member.area,
+                          "${member.occupationAreaName}, ${member.occupationTalukaName}",
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.grey.shade700,
                             fontWeight: FontWeight.w500,
                           ),
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

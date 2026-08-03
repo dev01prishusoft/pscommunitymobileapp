@@ -64,7 +64,18 @@ class _CommitteesPageState extends State<CommitteesPage> {
                 ),
                 placeholder: LK.searchCommittees.tr,
                 controller: _searchController,
-                onChanged: controller.updateSearch,
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    controller.clearSearch();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  } else {
+                    controller.updateSearch(value);
+                  }
+                },
               )
             : Text(LK.committees.tr),
         actions: [

@@ -58,10 +58,11 @@ class AppPrimaryButton extends StatelessWidget {
               )
             : Text(
                 text,
-                style: AppTextStyles.titleLarge.copyWith(
+                style: AppTextStyles.titleSmall.copyWith(
                   letterSpacing: 0.5,
                   color: AppColors.white,
                 ),
+                textAlign: TextAlign.center,
               ),
       ),
     );

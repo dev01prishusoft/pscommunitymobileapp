@@ -61,6 +61,9 @@ class PersonalInfoController extends GetxController {
   final firstNameEn = ''.obs;
   final lastNameEn = ''.obs;
   final dob = ''.obs;
+  final bornPlace = ''.obs;
+  final bornPlaceLat = 0.0.obs;
+  final bornPlaceLng = 0.0.obs;
   final tob = ''.obs;
   final weight = ''.obs;
   final height = ''.obs;
@@ -99,6 +102,7 @@ class PersonalInfoController extends GetxController {
   late final TextEditingController firstNameEnCtrl;
   late final TextEditingController lastNameEnCtrl;
   late final TextEditingController dobCtrl;
+  late final TextEditingController bornPlaceCtrl;
   late final TextEditingController heightCtrl;
   late final TextEditingController weightCtrl;
   late final TextEditingController monthlyIncomeCtrl;
@@ -115,6 +119,7 @@ class PersonalInfoController extends GetxController {
     firstNameEnCtrl = TextEditingController();
     lastNameEnCtrl = TextEditingController();
     dobCtrl = TextEditingController();
+    bornPlaceCtrl = TextEditingController();
     heightCtrl = TextEditingController();
     weightCtrl = TextEditingController();
     monthlyIncomeCtrl = TextEditingController();
@@ -130,6 +135,7 @@ class PersonalInfoController extends GetxController {
     firstNameEnCtrl.addListener(() => firstNameEn.value = firstNameEnCtrl.text);
     lastNameEnCtrl.addListener(() => lastNameEn.value = lastNameEnCtrl.text);
     dobCtrl.addListener(() => dob.value = dobCtrl.text);
+    bornPlaceCtrl.addListener(() => bornPlace.value = bornPlaceCtrl.text);
     heightCtrl.addListener(() => height.value = heightCtrl.text);
     weightCtrl.addListener(() => weight.value = weightCtrl.text);
     monthlyIncomeCtrl.addListener(
@@ -148,6 +154,7 @@ class PersonalInfoController extends GetxController {
     firstNameEnCtrl.dispose();
     lastNameEnCtrl.dispose();
     dobCtrl.dispose();
+    bornPlaceCtrl.dispose();
     heightCtrl.dispose();
     weightCtrl.dispose();
     monthlyIncomeCtrl.dispose();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -13,6 +14,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_location_autocomplete.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -89,122 +91,121 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
-      body: ResponsiveFormContainer(
-        child: Form(
-          key: controller.formKey,
-          autovalidateMode: AutovalidateMode.disabled,
-          child: Column(
-            children: [
-              _buildStepProgressIndicator(),
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentStep = index;
-                    });
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      final context = _stepKeys[index].currentContext;
-                      if (context != null &&
-                          _headerScrollController.hasClients) {
-                        Scrollable.ensureVisible(
-                          context,
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeOut,
-                          alignment: 0.5,
-                        );
-                      }
-                    });
-                  },
-                  children: [
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[0],
-                        child: _buildStepPersonal(),
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
+        body: ResponsiveFormContainer(
+          child: Form(
+            key: controller.formKey,
+            autovalidateMode: AutovalidateMode.disabled,
+            child: Column(
+              children: [
+                _buildStepProgressIndicator(),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentStep = index;
+                      });
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        final context = _stepKeys[index].currentContext;
+                        if (context != null &&
+                            _headerScrollController.hasClients) {
+                          Scrollable.ensureVisible(
+                            context,
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeOut,
+                            alignment: 0.5,
+                          );
+                        }
+                      });
+                    },
+                    children: [
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[0],
+                          child: _buildStepPersonal(),
+                        ),
                       ),
-                    ),
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[1],
-                        child: _buildStepContact(),
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[1],
+                          child: _buildStepContact(),
+                        ),
                       ),
-                    ),
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[2],
-                        child: _buildStepFamily(),
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[2],
+                          child: _buildStepFamily(),
+                        ),
                       ),
-                    ),
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[3],
-                        child: _buildStepAddresses(),
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[3],
+                          child: _buildStepAddresses(),
+                        ),
                       ),
-                    ),
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[4],
-                        child: _buildStepEducation(),
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[4],
+                          child: _buildStepEducation(),
+                        ),
                       ),
-                    ),
-                    KeepAliveStepWrapper(
-                      child: Form(
-                        key: _stepFormKeys[5],
-                        child: _buildStepWork(),
+                      KeepAliveStepWrapper(
+                        child: Form(
+                          key: _stepFormKeys[5],
+                          child: _buildStepWork(),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ],
+            ),
+          ),
+        ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
               ),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 0),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SafeArea(
           child: Row(
             children: [
               if (_currentStep > 0)
-                Expanded(
-                  child: TextButton.icon(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
+                TextButton.icon(
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () {
+                    _animateToStep(_currentStep - 1);
+                  },
+                  label: Text(
+                    LK.back.tr,
+                    style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.primary,
-                    ),
-                    onPressed: () {
-                      _animateToStep(_currentStep - 1);
-                    },
-                    label: Text(
-                      LK.back.tr,
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              if (_currentStep > 0) const SizedBox(width: 12),
+              if (_currentStep > 0) Spacer(),
               Expanded(
-                flex: 2,
                 child: Obx(() {
                   final isFormLoading = controller.isFormLoading;
                   final isLastStep = _currentStep == 5;
                   final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
-
+      
                   return AppPrimaryButton(
                     text: text,
                     height: 50.h,

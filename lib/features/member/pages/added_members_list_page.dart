@@ -82,7 +82,18 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                   ),
                   placeholder: LK.searchHint.tr,
                   controller: _searchController,
-                  onChanged: _controller.onSearchChanged,
+                  onChanged: (value) {
+                    if (value.isEmpty) {
+                      _searchController.clear();
+                      _controller.onSearchChanged('');
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      setState(() {
+                        _isSearchVisible = false;
+                      });
+                    } else {
+                      _controller.onSearchChanged(value);
+                    }
+                  },
                 )
               : Text(LK.addedMembers.tr),
           actions: [
@@ -155,7 +166,10 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                     ),
                     itemCount:
                         _controller.filteredMembers.length +
-                        (_controller.hasMore.value ? 1 : 0),
+                        (_controller.hasMore.value &&
+                                _controller.isLoading.value
+                            ? 1
+                            : 0),
                     separatorBuilder: (context, index) =>
                         SizedBox(height: 12.h),
                     itemBuilder: (context, index) {

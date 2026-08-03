@@ -53,7 +53,9 @@ class PaymentController extends GetxController {
 
     return allPayments.where((p) {
       return p.title.toLowerCase().contains(query) ||
-          p.memberName.toLowerCase().contains(query);
+          p.memberName.toLowerCase().contains(query) ||
+          p.amountFormatted.toLowerCase().contains(query) ||
+          p.status.toLowerCase().contains(query);
     }).toList();
   }
 
@@ -159,16 +161,8 @@ class PaymentController extends GetxController {
     int? typeId;
     int? categoryId;
 
-    if (adminPaymentRequestId != null) {
-      final req = dashboard.value?.pendingPayments.firstWhere(
-        (p) => p.id == adminPaymentRequestId,
-      );
-      typeId = req?.paymentTypeId;
-      categoryId = req?.paymentCategoryId;
-    } else {
-      typeId = selectedType.value?.id;
-      categoryId = selectedCategory.value?.id;
-    }
+    typeId = selectedType.value?.id;
+    categoryId = selectedCategory.value?.id;
 
     if (adminPaymentRequestId == null) {
       if (typeId == null) {

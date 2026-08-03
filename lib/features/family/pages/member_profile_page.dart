@@ -107,7 +107,6 @@ class _ProfileHeader extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
@@ -224,11 +223,13 @@ class _ProfileHeader extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          ).paddingSymmetric(vertical: 25.h, horizontal: 20.w),
           if (fromMyMemberList &&
               member.approveStatus != null &&
               member.approveStatus!.trim().isNotEmpty)
-            _buildStatusBadge(member.approveStatus ?? ""),
+            _buildStatusBadge(
+              member.approveStatus ?? "",
+            ).paddingOnly(top: 5.h, right: 10.w),
         ],
       ),
     );
@@ -312,39 +313,10 @@ class _ProfileHeader extends StatelessWidget {
                     height: 20.h,
                     color: AppColors.grey.withValues(alpha: 0.07),
                   ),
-                  Row(
-                    spacing: 10.w,
-                    children: [
-                      Text(
-                        '${'Status'.tr}:',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                      Text(
-                        '${status.tr}',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
-                      ),
-                    ],
-                  ),
-
                   if (member.rejectedReasonCommentByAdmin != null &&
                       member.rejectedReasonCommentByAdmin!
                           .trim()
                           .isNotEmpty) ...[
-                    SizedBox(height: 12.h),
-                    Text(
-                      'Reason'.tr,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
                     Text(
                       member.rejectedReasonCommentByAdmin!,
                       style: AppTextStyles.bodyMedium.copyWith(

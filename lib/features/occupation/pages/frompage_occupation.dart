@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -42,52 +43,38 @@ class _FromPageOccupationState extends State<FromPageOccupation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(LK.memberDetails.tr)),
-      body: SafeArea(
-        child: Obx(
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Scaffold(
+        appBar: AppBar(title: Text(LK.memberDetails.tr)),
+        body: Obx(
           () => AppStateView(
             state: _controller.memberDetailState.value,
             onRetry: () => _controller.loadMemberDetails(_memberId),
             child: _ProfileContent(),
           ),
         ),
-      ),
-      bottomNavigationBar: Container(
-        margin: EdgeInsets.all(16.w),
-        child: ElevatedButton(
-          onPressed: () {
-            Get.toNamed<void>(
-              AppRouter.memberProfile,
-              arguments: {'memberId': _memberId},
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(double.infinity, 50.h),
-            backgroundColor: AppColors.primary,
-            elevation: 2,
-            shadowColor: AppColors.primary.withValues(alpha: 0.3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.account_circle_outlined,
-                color: AppColors.white,
-                size: 22.r,
-              ),
-              SizedBox(width: 10.w),
-              Text(
-                LK.viewProfile.tr,
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
               ),
             ],
+          ),
+          child: AppPrimaryButton(
+            text: LK.viewProfile.tr,
+            onPressed: () {
+              Get.toNamed<void>(
+                AppRouter.memberProfile,
+                arguments: {'memberId': _memberId},
+              );
+            },
           ),
         ),
       ),

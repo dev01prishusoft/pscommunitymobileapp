@@ -30,7 +30,7 @@ class OccupationRepositoryImpl implements OccupationRepository {
         fromJsonT: (json) =>
             OccupationItem.fromJson(json as Map<String, dynamic>),
       );
-      
+
       var data = response.dataOrNull?.data ?? [];
 
       if (search != null && search.isNotEmpty) {

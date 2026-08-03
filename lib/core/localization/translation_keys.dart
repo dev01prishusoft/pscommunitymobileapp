@@ -464,6 +464,7 @@ class LK {
   static const String lastName = 'Last Name';
   static const String firstNameEnglish = 'First Name (English)';
   static const String lastNameEnglish = 'Last Name (English)';
+  static const String BornPlace = 'Born Place';
   static const String timeOfBirth = 'Time of Birth';
   static const String bloodGroup = 'Blood Group';
   static const String sign = 'Sign';

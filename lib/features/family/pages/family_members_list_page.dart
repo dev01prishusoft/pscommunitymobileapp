@@ -96,7 +96,16 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                 placeholder: LK.searchByNameHint.tr,
                 controller: _searchController,
                 onChanged: (value) {
-                  _controller.memberSearchQuery.value = value;
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    _controller.memberSearchQuery.value = '';
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  } else {
+                    _controller.memberSearchQuery.value = value;
+                  }
                 },
               )
             : Column(

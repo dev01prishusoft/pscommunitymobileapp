@@ -90,7 +90,18 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 ),
                 placeholder: LK.searchMember.tr,
                 controller: _searchController,
-                onChanged: controller.onSearchChanged,
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    controller.onSearchChanged('');
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  } else {
+                    controller.onSearchChanged(value);
+                  }
+                },
               )
             : Text(LK.committeeMembers.tr),
         actions: [
@@ -167,7 +178,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
   Widget _buildContent(Map<String, List<CommitteeMember>> groups) {
     return Column(
       children: [
-
         Expanded(
           child: groups.isEmpty
               ? Center(
@@ -191,7 +201,6 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
       ],
     );
   }
-
 
   Widget _buildRoleGroup(String role, List<CommitteeMember> members) {
     return Obx(() {
@@ -587,4 +596,3 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
     );
   }
 }
-

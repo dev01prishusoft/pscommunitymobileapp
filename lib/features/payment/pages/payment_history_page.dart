@@ -87,7 +87,16 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               ),
               placeholder: LK.searchHint.tr,
               controller: _searchController,
-              onChanged: (val) => controller.searchHistory(val),
+              onChanged: (val) {
+                if (val.isEmpty) {
+                  _searchController.clear();
+                  controller.searchHistory('');
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                } else {
+                  controller.searchHistory(val);
+                }
+              },
             );
           }
           return Text(LK.paymentHistory.tr);
