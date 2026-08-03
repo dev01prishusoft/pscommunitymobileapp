@@ -1,0 +1,29 @@
+import 'package:pscommunitymobileapp/core/models/family_area.dart';
+import 'package:pscommunitymobileapp/core/models/family.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/core/models/member_address.dart';
+import 'package:pscommunitymobileapp/core/models/education_model.dart';
+
+abstract class FamilyRepository {
+  Future<List<FamilyArea>> getFamilyAreas({
+    int? stateId,
+    int? districtId,
+    int? talukaId,
+    int pageNo = 1,
+    int pageSize = 20,
+  });
+  Future<List<Family>> getFamiliesByArea(
+    int areaId, {
+    int pageNo = 1,
+    int pageSize = 20,
+  });
+  Future<Member> getMemberDetails(int memberId);
+  Future<List<MemberAddress>> getMemberAddresses(int memberId);
+  Future<List<EducationModel>> getMemberEducations(int memberId);
+
+  Future<List<DropdownItem>> getStates();
+  Future<List<DropdownItem>> getDistricts(int stateId);
+  Future<List<DropdownItem>> getTalukas(int districtId);
+  Future<List<DropdownItem>> getAreas(int talukaId);
+}

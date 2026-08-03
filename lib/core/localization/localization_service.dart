@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
-import 'package:pscommunitymobileapp/core/localization/models/language.dart';
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/models/language.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/storage/secure_storage_service.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart'
+import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart'
     as pscommunitymobileapp_token_manager;
 
 class LocalizationService {

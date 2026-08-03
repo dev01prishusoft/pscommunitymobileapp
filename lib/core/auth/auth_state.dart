@@ -1,12 +1,12 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart'
     as pscommunitymobileapp_api_client;
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
+import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 
 class AuthState {

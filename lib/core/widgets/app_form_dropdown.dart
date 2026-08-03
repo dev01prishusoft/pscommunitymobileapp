@@ -6,7 +6,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown_form_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 
 class AppFormDropdown<T> extends StatelessWidget {
   const AppFormDropdown({

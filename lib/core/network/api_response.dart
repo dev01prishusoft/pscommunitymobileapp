@@ -1,4 +1,4 @@
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
 
 class ApiResponse<T> {
   ApiResponse({required this.succeeded, this.message, this.data});

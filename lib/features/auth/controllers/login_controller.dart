@@ -1,0 +1,88 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/core/network/app_config.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart' as ps_localization;
+import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
+import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/core/models/auth_tokens.dart';
+import 'package:pscommunitymobileapp/features/auth/repositories/login_usecase.dart';
+import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+
+enum LoginResult { success, requirePasswordReset, failure }
+
+class LoginController extends GetxController with FormStateMixin {
+  LoginController(this._loginUseCase);
+  final LoginUseCase _loginUseCase;
+  
+  final RxBool obscurePassword = true.obs;
+
+  void submit({
+    required GlobalKey<FormState> formKey,
+    required String mobile,
+    required String password,
+  }) {
+    if (kUiReviewMode) {
+      Get.offNamed(AppRouter.postLoginSplash);
+      return;
+    }
+
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    submitThrottled(() async {
+      final result = await _login(
+        mobile: mobile.trim(),
+        password: password,
+      );
+
+      switch (result) {
+        case LoginResult.requirePasswordReset:
+          Get.offNamed(AppRouter.resetPassword);
+          break;
+        case LoginResult.success:
+          await Get.find<ps_localization.LocalizationService>().restoreSavedLocale();
+          Get.offNamed(AppRouter.postLoginSplash);
+          break;
+        case LoginResult.failure:
+          break;
+      }
+    });
+  }
+
+  void togglePasswordVisibility() =>
+      obscurePassword.value = !obscurePassword.value;
+
+  String? validateMobile(String? value) => AppValidators.mobile(value);
+
+  String? validatePassword(String? value) => AppValidators.password(value);
+
+  Future<LoginResult> _login({
+    required String mobile,
+    required String password,
+  }) async {
+    final result = await _loginUseCase.call(
+      mobile: mobile,
+      password: password,
+    );
+    
+    if (result is Success<AuthTokens>) {
+      AppColors.updateColors(
+        result.data.primaryColor,
+        result.data.secondaryColor,
+      );
+      Get.changeTheme(AppTheme.light);
+      await Get.find<SamajController>().fetchSamajDetail();
+      return result.data.isDefaultPassword
+          ? LoginResult.requirePasswordReset
+          : LoginResult.success;
+    } else {
+      formError.value = (result as Error<AuthTokens>).failure.message;
+      return LoginResult.failure;
+    }
+  }
+}
+
