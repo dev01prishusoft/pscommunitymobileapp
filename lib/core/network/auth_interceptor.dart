@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
-import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 
 class AuthInterceptor extends Interceptor {
   AuthInterceptor({

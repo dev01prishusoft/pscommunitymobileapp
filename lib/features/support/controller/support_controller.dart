@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/constants/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../model/support_model.dart';
+import '../../../core/models/support_model.dart';
 
 class SupportController extends GetxController {
   SupportController(this._apiClient);

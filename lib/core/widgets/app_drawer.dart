@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/app/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
-import 'package:pscommunitymobileapp/core/config/app_environment.dart';
-import 'package:pscommunitymobileapp/core/constants/app_config.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
+import 'package:pscommunitymobileapp/core/network/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/features/member/domain/entities/member.dart';
-import 'package:pscommunitymobileapp/features/samaj/presentation/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 
 class DrawerUserController extends GetxController with WidgetsBindingObserver {
   final Rx<Member?> member = Rx<Member?>(null);

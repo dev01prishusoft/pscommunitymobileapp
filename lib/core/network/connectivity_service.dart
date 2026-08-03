@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:pscommunitymobileapp/core/config/app_environment.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 
 class ConnectivityService {
   ConnectivityService({required Connectivity connectivity})

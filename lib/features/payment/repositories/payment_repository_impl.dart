@@ -1,0 +1,259 @@
+import 'dart:developer';
+
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/models/payment_category.dart';
+import 'package:pscommunitymobileapp/core/models/payment_dashboard.dart';
+import 'package:pscommunitymobileapp/core/models/payment_item.dart';
+import 'package:pscommunitymobileapp/core/models/payment_mode.dart';
+import 'package:pscommunitymobileapp/core/models/payment_type.dart';
+import 'package:pscommunitymobileapp/core/models/razorpay_order.dart';
+import 'package:pscommunitymobileapp/features/payment/repositories/payment_repository.dart';
+
+class PaymentRepositoryImpl implements PaymentRepository {
+  PaymentRepositoryImpl(this._apiClient);
+
+  final ApiClient _apiClient;
+
+  @override
+  Future<List<Map<String, dynamic>>> getPaymentStatuses() async {
+    try {
+      final response = await _apiClient.getParsed<List<dynamic>>(
+        '/api/v1/PaymentStatus/dropdown',
+        fromJsonT: (json) => json as List<dynamic>,
+      );
+      if (response.isSuccess && response.dataOrNull?.data != null) {
+        final dataList = response.dataOrNull!.data!;
+        return dataList.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<PaymentDashboard> getDashboard() async {
+    try {
+      final response = await _apiClient.getParsed<PaymentDashboard>(
+        ApiEndpoints.paymentDashboard,
+        fromJsonT: (json) =>
+            PaymentDashboard.fromJson(json as Map<String, dynamic>),
+      );
+      if (response.isFailure) throw response.failureOrNull!;
+      return response.dataOrNull!.data!;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<PaymentMode>> getPaymentModes() async {
+    try {
+      final response = await _apiClient.getParsed<List<PaymentMode>>(
+        ApiEndpoints.paymentModes,
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentMode.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      if (response.isFailure) throw response.failureOrNull!;
+      return response.dataOrNull?.data ?? [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<PaymentType>> getPaymentTypes() async {
+    try {
+      final response = await _apiClient.getParsed<List<PaymentType>>(
+        ApiEndpoints.paymentTypes,
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentType.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      if (response.isFailure) throw response.failureOrNull!;
+      return response.dataOrNull?.data ?? [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<PaymentCategory>> getCategories(int paymentTypeId) async {
+    try {
+      final response = await _apiClient.getParsed<List<PaymentCategory>>(
+        ApiEndpoints.paymentCategories,
+        queryParameters: {'paymentTypeId': paymentTypeId},
+        fromJsonT: (json) => (json as List)
+            .map((e) => PaymentCategory.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+      if (response.isFailure) throw response.failureOrNull!;
+      return response.dataOrNull?.data ?? [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<RazorpayOrder> createOrder({
+    required double amount,
+    required int paymentTypeId,
+    required int paymentCategoryId,
+    int? adminPaymentRequestId,
+    String currency = 'INR',
+    int memberId = 0,
+    int paymentStatusId = 0,
+    int paymentModeId = 0,
+    String? description,
+    bool isRecurring = false,
+  }) async {
+    try {
+      final payload = {
+        'amount': amount,
+        'currency': currency,
+        'paymentTypeId': paymentTypeId,
+        'paymentCategoryId': paymentCategoryId,
+        'adminPaymentRequestId': adminPaymentRequestId ?? 0,
+        'memberId': memberId,
+        'paymentStatusId': paymentStatusId,
+        'paymentModeId': paymentModeId,
+        'description': description ?? '',
+        'isRecurring': isRecurring,
+      };
+
+      log('[Payment] createOrder → POST ${ApiEndpoints.createOrder}');
+      log('[Payment] createOrder payload: $payload');
+
+      final response = await _apiClient.postParsed<RazorpayOrder>(
+        ApiEndpoints.createOrder,
+        data: payload,
+        fromJsonT: (json) =>
+            RazorpayOrder.fromJson(json as Map<String, dynamic>),
+      );
+            
+      if (response.isFailure) {
+        log('[Payment] createOrder ERROR: ${response.failureOrNull}');
+        throw response.failureOrNull!;
+      }
+
+      log('[Payment] createOrder SUCCESS: ${response.dataOrNull?.data}');
+      return response.dataOrNull!.data!;
+    } catch (e) {
+      log('[Payment] createOrder EXCEPTION: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyPayment({
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+    required double amount,
+    required int paymentTypeId,
+    required int paymentCategoryId,
+    int? adminPaymentRequestId,
+    bool isRecurring = false,
+  }) async {
+    try {
+      final endpoint = isRecurring ? ApiEndpoints.verifySubscription : ApiEndpoints.verifyPayment;
+      
+      final Map<String, dynamic> payload;
+      if (isRecurring) {
+        payload = {
+          'paymentId': adminPaymentRequestId ?? 0,
+          'razorpayPaymentId': razorpayPaymentId,
+          'razorpaySubscriptionId': razorpayOrderId,
+          'razorpaySignature': razorpaySignature,
+        };
+      } else {
+        payload = {
+          'razorpayOrderId': razorpayOrderId,
+          'razorpayPaymentId': razorpayPaymentId,
+          'razorpaySignature': razorpaySignature,
+          'amount': amount,
+          'paymentTypeId': paymentTypeId,
+          'paymentCategoryId': paymentCategoryId,
+          if (adminPaymentRequestId != null)
+            'adminPaymentRequestId': adminPaymentRequestId,
+        };
+      }
+
+      log('[Payment] verifyPayment → POST $endpoint (isRecurring=$isRecurring)');
+      log('[Payment] verifyPayment payload: $payload');
+
+      final response = await _apiClient.postParsed<Map<String, dynamic>>(
+        endpoint,
+        data: payload,
+        fromJsonT: (json) => json as Map<String, dynamic>,
+      );
+      
+      if (response.isFailure) {
+        log('[Payment] verifyPayment ERROR: ${response.failureOrNull}');
+        throw response.failureOrNull!;
+      }
+
+      log('[Payment] verifyPayment SUCCESS: ${response.dataOrNull?.data}');
+      return response.dataOrNull?.data ?? {};
+    } catch (e) {
+      log('[Payment] verifyPayment EXCEPTION: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Result<PaginatedResponse<PaymentItem>>> getHistory({
+    int page = 1,
+    int pageSize = 20,
+    int? paymentTypeId,
+    int? categoryId,
+    int? year,
+    String? status,
+    String? search,
+  }) async {
+    try {
+      final queryParameters = <String, dynamic>{
+        'Page': page,
+        'PageSize': pageSize,
+        if (paymentTypeId != null) 'PaymentTypeId': paymentTypeId,
+        if (categoryId != null) 'CategoryId': categoryId,
+        if (year != null) 'Year': year,
+        if (status != null && status.isNotEmpty) 'Status': status,
+        if (search != null && search.isNotEmpty) 'Search': search,
+      };
+
+      return await _apiClient.getPaginated<PaymentItem>(
+        ApiEndpoints.paymentHistory,
+        listKey: 'data',
+        queryParameters: queryParameters,
+        fromJsonT: (json) => PaymentItem.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      return Error(e is Failure ? e : ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getReceipt(int receiptId) async {
+    try {
+      log('[Payment] getReceipt → GET ${ApiEndpoints.paymentReceipt}/$receiptId');
+      final response = await _apiClient.getParsed<Map<String, dynamic>>(
+        '${ApiEndpoints.paymentReceipt}/$receiptId',
+        fromJsonT: (json) => json as Map<String, dynamic>,
+      );
+      if (response.isFailure) {
+        log('[Payment] getReceipt ERROR: ${response.failureOrNull}');
+        throw response.failureOrNull!;
+      }
+      log('[Payment] getReceipt SUCCESS: ${response.dataOrNull?.data}');
+      return response.dataOrNull?.data ?? {};
+    } catch (e) {
+      log('[Payment] getReceipt EXCEPTION: $e');
+      rethrow;
+    }
+  }
+}

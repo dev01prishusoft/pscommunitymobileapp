@@ -1,16 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pscommunitymobileapp/core/config/app_environment.dart';
-import 'package:pscommunitymobileapp/core/errors/failures.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/network/auth_interceptor.dart';
-import 'package:pscommunitymobileapp/core/network/certificate_pinning.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart';
 import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
-import 'package:pscommunitymobileapp/core/storage/token_manager.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 
 class ApiClient {
   ApiClient({
@@ -26,9 +25,6 @@ class ApiClient {
          ),
        ) {
     final refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl));
-
-    CertificatePinning.configure(_dio);
-    CertificatePinning.configure(refreshDio);
 
     refreshDio.interceptors.add(
       RetryInterceptor(dio: refreshDio, maxRetries: 1),
