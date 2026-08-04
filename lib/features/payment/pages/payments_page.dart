@@ -301,7 +301,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   children: [
                     Expanded(
                       child: Text(
-                        req.amountFormatted,
+                        req.amountFormatted.contains('.')
+                            ? req.amountFormatted
+                            : '${req.amountFormatted}.00',
                         style: AppTextStyles.bodyLarge.copyWith(
                           color: AppColors.black,
                           fontWeight: FontWeight.bold,

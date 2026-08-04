@@ -22,6 +22,7 @@ class CupertinoSearchbar extends StatelessWidget {
     return SizedBox(
       height: 40.h,
       child: TextFormField(
+        autofocus: true,
         controller: controller,
         onChanged: onChanged,
         decoration: InputDecoration(

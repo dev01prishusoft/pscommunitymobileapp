@@ -79,12 +79,18 @@ class OccupationRepositoryImpl implements OccupationRepository {
   Future<List<Member>> getOccupationMembers({
     required int occupationId,
     String? search,
+    int? stateId,
+    int? districtId,
+    int? talukaId,
     int pageNumber = 1,
     int pageSize = 20,
   }) async {
     final queryParameters = <String, dynamic>{
       'occupationId': occupationId,
       if (search != null && search.isNotEmpty) 'search': search,
+      if (stateId != null) 'stateId': stateId,
+      if (districtId != null) 'districtId': districtId,
+      if (talukaId != null) 'talukaId': talukaId,
       'pageNumber': pageNumber,
       'pageSize': pageSize,
     };

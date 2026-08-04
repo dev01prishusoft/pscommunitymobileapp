@@ -83,9 +83,9 @@ class DI {
         Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
         Get.lazyPut(() => SplashController(), fenix: true);
         final memberRepository = MemberRepositoryImpl(apiClient);
-        Get.lazyPut(() => FindMemberController(memberRepository), fenix: true);
         final familyRepository = FamilyRepositoryImpl(apiClient);
         Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
+        Get.lazyPut(() => FindMemberController(memberRepository, familyRepository), fenix: true);
         final marriageRepository = MarriageRepositoryImpl(apiClient);
         Get.lazyPut(
           () => MarriageController(
@@ -99,7 +99,7 @@ class DI {
         Get.lazyPut(() => CommitteeController(committeeRepository), fenix: true);
         final occupationRepository = OccupationRepositoryImpl(apiClient);
         Get.lazyPut(
-          () => OccupationController(occupationRepository),
+          () => OccupationController(occupationRepository, familyRepository),
           fenix: true,
         );
         final PaymentRepository paymentRepository = PaymentRepositoryImpl(apiClient);

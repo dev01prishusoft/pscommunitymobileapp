@@ -697,7 +697,7 @@ class _AssetLifeSection extends StatelessWidget {
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
               ),
               Text(
-                controller.formatIncome(member),
+                controller.formatIncome(member.monthlyIncome ?? 0.0),
                 style: AppTextStyles.bodySmall.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.black,
