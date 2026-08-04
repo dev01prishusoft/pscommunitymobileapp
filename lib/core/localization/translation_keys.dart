@@ -215,6 +215,7 @@ class LK {
   static const String searchCommittees = 'Search committees...';
   static const String searchMember = 'Search member...';
   static const String searchByNameHint = 'Search by name...';
+  static const String searchByNameAndMnoAndMID = 'search_by_name_mobile_id';
   static const String familyHead = 'Family Head';
   static const String at = 'at';
   static const String totalAreasLabel = 'Total Areas in @taluka: @count';
@@ -537,4 +538,5 @@ class LK {
   static const String deleteAllNotification = 'delete_all_notification';
   static const String deleteAllNotificationDesc =
       'delete_all_notification_description';
+  static const String rejectionDetails = 'rejection_details';
 }

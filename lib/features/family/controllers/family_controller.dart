@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -357,9 +358,10 @@ class FamilyController extends GetxController {
   String formatGotra(Member member) => member.gotraName ?? LK.na;
   String formatEmail(Member member) => member.emailAddress ?? LK.na;
   String formatIncome(Member member) =>
-      '₹${_formatDouble(member.monthlyIncome)}';
+      '₹${currencyFormatter.format(member.monthlyIncome)}';
   String formatAge(Member member) =>
       member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
+  final NumberFormat currencyFormatter = NumberFormat('#,##0.##', 'en_IN');
 
   Future<void> launchSafeUrl(String urlString) async {
     try {

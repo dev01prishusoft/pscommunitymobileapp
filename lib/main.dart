@@ -75,34 +75,37 @@ class PsCommunityApp extends StatelessWidget {
             onPointerMove: (_) => Get.find<SessionManager>().userInteracted(),
             onPointerUp: (_) => Get.find<SessionManager>().userInteracted(),
             child: Obx(
-              () => GetMaterialApp(
-                title: LK.appTitle.tr,
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.light,
-                translations: AppTranslations(localization.keys),
-                locale: localization.currentLocale.value,
-                fallbackLocale: Locale('en', 'US'),
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', 'US'),
-                  Locale('gu', 'IN'),
-                ],
-                initialRoute: Get.find<AuthState>().isAuthenticated.value
-                    ? AppRouter.postLoginSplash
-                    : AppRouter.login,
-                navigatorObservers: [AppRouter.routeObserver],
-                getPages: AppRouter.pages,
-                builder: (context, child) {
-                  return Localizations.override(
-                    context: context,
-                    locale: const Locale('en', 'US'),
-                    child: child ?? const SizedBox.shrink(),
-                  );
-                },
+              () => SafeArea(
+                top: false,
+                child: GetMaterialApp(
+                  title: LK.appTitle.tr,
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.light,
+                  translations: AppTranslations(localization.keys),
+                  locale: localization.currentLocale.value,
+                  fallbackLocale: Locale('en', 'US'),
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [
+                    Locale('en', 'US'),
+                    Locale('gu', 'IN'),
+                  ],
+                  initialRoute: Get.find<AuthState>().isAuthenticated.value
+                      ? AppRouter.postLoginSplash
+                      : AppRouter.login,
+                  navigatorObservers: [AppRouter.routeObserver],
+                  getPages: AppRouter.pages,
+                  builder: (context, child) {
+                    return Localizations.override(
+                      context: context,
+                      locale: const Locale('en', 'US'),
+                      child: child ?? const SizedBox.shrink(),
+                    );
+                  },
+                ),
               ),
             ),
           );

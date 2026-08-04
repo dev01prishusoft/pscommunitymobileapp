@@ -301,7 +301,7 @@ class _ProfileHeader extends StatelessWidget {
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        'Rejection Details'.tr,
+                        LK.rejectionDetails.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.black,
@@ -330,7 +330,7 @@ class _ProfileHeader extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Get.back(),
                       child: Text(
-                        'Close'.tr,
+                        LK.close.tr,
                         style: AppTextStyles.labelLarge.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,

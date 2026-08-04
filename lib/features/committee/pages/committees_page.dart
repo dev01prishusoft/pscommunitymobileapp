@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
@@ -35,14 +34,8 @@ class _CommitteesPageState extends State<CommitteesPage> {
     return Scaffold(
       appBar: AppBar(
         title: _isSearchVisible
-            ? CupertinoTextField(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
-                prefix: Icon(
-                  Iconsax.search_normal_copy,
-                  size: 15,
-                ).paddingOnly(left: 10),
-                suffix: GestureDetector(
-                  onTap: () {
+            ? CupertinoSearchbar(
+              onTapSuffix: () {
                     _searchController.clear();
                     controller.clearSearch();
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -50,19 +43,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
                       _isSearchVisible = false;
                     });
                   },
-                  child: Icon(
-                    Iconsax.close_circle_copy,
-                    size: 20,
-                  ).paddingOnly(right: 10),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    width: 1.w,
-                  ),
-                ),
-                placeholder: LK.searchCommittees.tr,
+                hintText: LK.searchCommittees.tr,
                 controller: _searchController,
                 onChanged: (value) {
                   if (value.isEmpty) {

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,6 +9,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
@@ -66,14 +66,8 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: _isSearchVisible
-            ? CupertinoTextField(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
-                prefix: Icon(
-                  Iconsax.search_normal_copy,
-                  size: 15,
-                ).paddingOnly(left: 10),
-                suffix: GestureDetector(
-                  onTap: () {
+            ? CupertinoSearchbar(
+              onTapSuffix: () {
                     _searchController.clear();
                     controller.clearMemberSearch();
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -81,19 +75,7 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                       _isSearchVisible = false;
                     });
                   },
-                  child: Icon(
-                    Iconsax.close_circle_copy,
-                    size: 20,
-                  ).paddingOnly(right: 10),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    width: 1.w,
-                  ),
-                ),
-                placeholder: LK.searchMember.tr,
+                hintText: LK.searchMember.tr,
                 controller: _searchController,
                 onChanged: (value) {
                   if (value.isEmpty) {

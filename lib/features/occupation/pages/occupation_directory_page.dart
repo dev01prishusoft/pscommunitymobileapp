@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/occupation_item.dart';
+import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/features/occupation/controllers/occupation_controller.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
@@ -54,14 +54,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: _isSearchVisible
-            ? CupertinoTextField(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 9.h),
-                prefix: Icon(
-                  Iconsax.search_normal_copy,
-                  size: 15,
-                ).paddingOnly(left: 10),
-                suffix: GestureDetector(
-                  onTap: () {
+            ? CupertinoSearchbar(
+              onTapSuffix: () {
                     _searchController.clear();
                     _controller.clearSearch();
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -69,19 +63,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
                       _isSearchVisible = false;
                     });
                   },
-                  child: Icon(
-                    Iconsax.close_circle_copy,
-                    size: 20,
-                  ).paddingOnly(right: 10),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                    width: 1.w,
-                  ),
-                ),
-                placeholder: LK.searchOccupation.tr,
+                hintText: LK.searchOccupation.tr,
                 controller: _searchController,
                 onChanged: (value) {
                   if (value.isEmpty) {
