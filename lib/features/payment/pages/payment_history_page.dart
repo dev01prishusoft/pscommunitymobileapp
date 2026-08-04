@@ -569,7 +569,7 @@ class _PaymentCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '₹${payment.amount}',
+                            '₹${(double.tryParse(payment.amount) ?? 0).toStringAsFixed(2)}',
                             style: AppTextStyles.bodyLarge.copyWith(
                               color: AppColors.black,
                               fontWeight: FontWeight.bold,

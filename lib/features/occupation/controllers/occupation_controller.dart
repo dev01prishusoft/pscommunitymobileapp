@@ -5,12 +5,14 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/occupation_item.dart';
+import 'package:pscommunitymobileapp/features/family/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/occupation/repositories/occupation_repository.dart';
 
 class OccupationController extends GetxController {
-  OccupationController(this._repository);
+  OccupationController(this._repository, this._familyRepository);
 
   final OccupationRepository _repository;
+  final FamilyRepository _familyRepository;
 
   final Rx<AppState> state = AppState.loading.obs;
   final Rx<AppState> detailsState = AppState.loading.obs;
@@ -19,6 +21,16 @@ class OccupationController extends GetxController {
   final RxList<DropdownItem> occupationTypes = <DropdownItem>[].obs;
   final RxString searchQuery = ''.obs;
   final Rxn<DropdownItem> selectedOccupationType = Rxn<DropdownItem>();
+
+  final RxBool isStatesLoading = false.obs;
+  final RxBool isDistrictsLoading = false.obs;
+  final RxBool isTalukasLoading = false.obs;
+  final RxList<DropdownItem> states = <DropdownItem>[].obs;
+  final RxList<DropdownItem> districts = <DropdownItem>[].obs;
+  final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
+  final Rxn<DropdownItem> selectedState = Rxn<DropdownItem>();
+  final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
+  final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
 
   final Rx<AppState> membersState = AppState.loading.obs;
   final RxList<Member> occupationMembers = <Member>[].obs;
@@ -57,6 +69,52 @@ class OccupationController extends GetxController {
   Future<void> _initData() async {
     await loadOccupationTypes();
     await loadOccupations();
+    await loadStates();
+  }
+
+  Future<void> loadStates() async {
+    isStatesLoading.value = true;
+    try {
+      final results = await _familyRepository.getStates();
+      states.assignAll(results);
+    } catch (_) {
+    } finally {
+      isStatesLoading.value = false;
+    }
+  }
+
+  Future<List<DropdownItem>> fetchDistricts(int stateId) async {
+    return _familyRepository.getDistricts(stateId);
+  }
+
+  Future<List<DropdownItem>> fetchTalukas(int districtId) async {
+    return _familyRepository.getTalukas(districtId);
+  }
+
+  Future<void> applyFilters({
+    required DropdownItem? state,
+    required DropdownItem? district,
+    required DropdownItem? taluka,
+  }) async {
+    selectedState.value = state;
+    selectedDistrict.value = district;
+    selectedTaluka.value = taluka;
+
+    if (activeOccupationId.value != null) {
+      loadOccupationMembers(activeOccupationId.value!, refresh: true);
+    }
+  }
+
+  Future<void> resetFilters() async {
+    selectedState.value = null;
+    selectedDistrict.value = null;
+    selectedTaluka.value = null;
+    districts.clear();
+    talukas.clear();
+    
+    if (activeOccupationId.value != null) {
+      loadOccupationMembers(activeOccupationId.value!, refresh: true);
+    }
   }
 
   Future<void> loadOccupationTypes() async {
@@ -94,6 +152,9 @@ class OccupationController extends GetxController {
         search: memberSearchQuery.value.isNotEmpty
             ? memberSearchQuery.value
             : null,
+        stateId: selectedState.value?.id,
+        districtId: selectedDistrict.value?.id,
+        talukaId: selectedTaluka.value?.id,
         pageNumber: _membersPage,
         pageSize: _membersPageSize,
       );

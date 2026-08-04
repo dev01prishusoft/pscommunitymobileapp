@@ -10,6 +10,8 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
+import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
@@ -67,7 +69,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
                 )
               : Text(LK.findMember.tr),
           actions: [
-            if (!_isSearchVisible)
+            if (!_isSearchVisible) ...[
               IconButton(
                 icon: const Icon(Iconsax.search_normal_copy),
                 onPressed: () {
@@ -76,6 +78,14 @@ class _FindMemberPageState extends State<FindMemberPage> {
                   });
                 },
               ),
+              IconButton(
+                icon: const Icon(Iconsax.filter_search_copy),
+                tooltip: LK.locationFilters.tr,
+                onPressed: () {
+                  Get.dialog<void>(const _FindMemberFilterDialog());
+                },
+              ),
+            ],
           ],
         ),
         body: PaginatedListView<Member, FindMemberController>(
@@ -328,3 +338,293 @@ class _FindMemberCard extends StatelessWidget {
   }
 }
 
+class _FindMemberFilterDialog extends StatefulWidget {
+  const _FindMemberFilterDialog();
+
+  @override
+  State<_FindMemberFilterDialog> createState() => _FindMemberFilterDialogState();
+}
+
+class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
+  final controller = Get.find<FindMemberController>();
+
+  DropdownItem? _tempState;
+  DropdownItem? _tempDistrict;
+  DropdownItem? _tempTaluka;
+
+  List<DropdownItem> _localDistricts = [];
+  List<DropdownItem> _localTalukas = [];
+
+  bool _isDistrictsLoading = false;
+  bool _isTalukasLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tempState = controller.selectedState.value;
+    _tempDistrict = controller.selectedDistrict.value;
+    _tempTaluka = controller.selectedTaluka.value;
+
+    _localDistricts = List<DropdownItem>.from(controller.districts);
+    _localTalukas = List<DropdownItem>.from(controller.talukas);
+  }
+
+  Future<void> _onStateChanged(DropdownItem? value) async {
+    setState(() {
+      _tempState = value;
+      _tempDistrict = null;
+      _tempTaluka = null;
+      _localDistricts = [];
+      _localTalukas = [];
+      _isDistrictsLoading = value != null;
+    });
+
+    if (value != null) {
+      try {
+        final results = await controller.fetchDistricts(value.id);
+        if (mounted) {
+          setState(() {
+            _localDistricts = results;
+            _isDistrictsLoading = false;
+          });
+        }
+      } catch (_) {
+        if (mounted) setState(() => _isDistrictsLoading = false);
+      }
+    }
+  }
+
+  Future<void> _onDistrictChanged(DropdownItem? value) async {
+    setState(() {
+      _tempDistrict = value;
+      _tempTaluka = null;
+      _localTalukas = [];
+      _isTalukasLoading = value != null;
+    });
+
+    if (value != null) {
+      try {
+        final results = await controller.fetchTalukas(value.id);
+        if (mounted) {
+          setState(() {
+            _localTalukas = results;
+            _isTalukasLoading = false;
+          });
+        }
+      } catch (_) {
+        if (mounted) setState(() => _isTalukasLoading = false);
+      }
+    }
+  }
+
+  void _onTalukaChanged(DropdownItem? value) {
+    setState(() => _tempTaluka = value);
+  }
+
+  Future<void> _applyFilters() async {
+    controller.districts.assignAll(_localDistricts);
+    controller.talukas.assignAll(_localTalukas);
+
+    await controller.applyFilters(
+      state: _tempState,
+      district: _tempDistrict,
+      taluka: _tempTaluka,
+    );
+    Get.back<void>();
+  }
+
+  Future<void> _resetFilters() async {
+    await controller.resetFilters();
+    Get.back<void>();
+  }
+
+  bool get _hasSelection =>
+      _tempState != null || _tempDistrict != null || _tempTaluka != null;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(22.r),
+          border: Border.all(
+            color: AppColors.grey.withValues(alpha: 0.15),
+            width: 1.w,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Iconsax.filter_search_copy,
+                      color: AppColors.primary,
+                      size: 20.sp,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      LK.locationFilters.tr,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Get.back<void>(),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
+              Obx(
+                () => CustomDropdown<DropdownItem>(
+                  hint: LK.selectState.tr,
+                  value: _tempState,
+                  items: controller.states
+                      .map(
+                        (o) => DropdownMenuItem(
+                          value: o,
+                          child: Text(
+                            o.text,
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _onStateChanged,
+                  isLoading: controller.isStatesLoading.value,
+                ),
+              ),
+              SizedBox(height: 16.h),
+              CustomDropdown<DropdownItem>(
+                hint: LK.selectDistrict.tr,
+                value: _tempDistrict,
+                items: _localDistricts
+                    .map(
+                      (o) => DropdownMenuItem(
+                        value: o,
+                        child: Text(
+                          o.text,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: _onDistrictChanged,
+                isEnabled: _tempState != null,
+                isLoading: _isDistrictsLoading,
+              ),
+              SizedBox(height: 16.h),
+              CustomDropdown<DropdownItem>(
+                hint: LK.selectTaluka.tr,
+                value: _tempTaluka,
+                items: _localTalukas
+                    .map(
+                      (o) => DropdownMenuItem(
+                        value: o,
+                        child: Text(
+                          o.text,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: _onTalukaChanged,
+                isEnabled: _tempDistrict != null,
+                isLoading: _isTalukasLoading,
+              ),
+              if (_hasSelection) ...[
+                SizedBox(height: 24.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _applyFilters,
+                    icon: const Icon(Icons.check_rounded, size: 20),
+                    label: Text(LK.applyFilters.tr),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _resetFilters,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.grey.shade700,
+                      side: BorderSide(
+                        color: AppColors.grey.shade400,
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                    ),
+                    child: Text(
+                      LK.reset.tr,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ).paddingAll(24.w),
+        ),
+      ),
+    );
+  }
+}

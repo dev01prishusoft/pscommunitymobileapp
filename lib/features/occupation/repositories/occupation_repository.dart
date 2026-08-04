@@ -14,6 +14,9 @@ abstract class OccupationRepository {
   Future<List<Member>> getOccupationMembers({
     required int occupationId,
     String? search,
+    int? stateId,
+    int? districtId,
+    int? talukaId,
     int pageNumber = 1,
     int pageSize = 20,
   });

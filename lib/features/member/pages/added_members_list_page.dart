@@ -59,7 +59,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                         _isSearchVisible = false;
                       });
                     },
-                  hintText: LK.searchHint.tr,
+                  hintText: LK.searchByNameAndMnoAndMID.tr,
                   controller: _searchController,
                   onChanged: (value) {
                     if (value.isEmpty) {

@@ -25,6 +25,7 @@ class NotificationsPage extends GetView<NotificationController> {
           actions: [
             TextButton(
               onPressed: () {
+                if (controller.notifications.isEmpty) return;
                 Get.dialog<void>(
                   Dialog(
                     shape: RoundedRectangleBorder(
@@ -122,7 +123,9 @@ class NotificationsPage extends GetView<NotificationController> {
               child: Text(
                 "Clear All",
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.primary,
+                  color: controller.notifications.isEmpty
+                      ? AppColors.grey
+                      : AppColors.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -20,6 +20,9 @@ class MemberRepositoryImpl implements MemberRepository {
     String? query,
     int? genderId,
     bool? lookingForMarriage,
+    int? stateId,
+    int? districtId,
+    int? talukaId,
     int pageNumber = 1,
     int pageSize = 20,
     CancelToken? cancelToken,
@@ -30,6 +33,9 @@ class MemberRepositoryImpl implements MemberRepository {
       if (query != null && query.isNotEmpty) 'search': query,
       if (genderId != null) 'genderId': genderId,
       if (lookingForMarriage != null) 'lookingForMarriage': lookingForMarriage,
+      if (stateId != null) 'stateId': stateId,
+      if (districtId != null) 'districtId': districtId,
+      if (talukaId != null) 'talukaId': talukaId,
     };
 
     return await _apiClient.getPaginated<Member>(

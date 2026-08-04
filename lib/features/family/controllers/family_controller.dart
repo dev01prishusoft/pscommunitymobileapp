@@ -357,8 +357,8 @@ class FamilyController extends GetxController {
       member.emergencyContactNo ?? LK.na;
   String formatGotra(Member member) => member.gotraName ?? LK.na;
   String formatEmail(Member member) => member.emailAddress ?? LK.na;
-  String formatIncome(Member member) =>
-      '₹${currencyFormatter.format(member.monthlyIncome)}';
+  String formatIncome(double monthlyIncome) =>
+      '₹${currencyFormatter.format(monthlyIncome)}';
   String formatAge(Member member) =>
       member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
   final NumberFormat currencyFormatter = NumberFormat('#,##0.##', 'en_IN');
