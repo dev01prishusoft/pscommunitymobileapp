@@ -391,6 +391,13 @@ class _MemberDetailsSection extends StatelessWidget {
               controller.getFormattedBirthTime(member),
             ),
           ),
+          // born place
+          _buildGridItem(
+            Iconsax.location_copy,
+            LK.BornPlace.tr,
+            member.bornPlaceName ?? '-',
+          ),
+          14.verticalSpace,
           // gender and marital status
           _buildDetailRow(
             _buildGridItem(

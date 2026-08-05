@@ -198,25 +198,11 @@ class _OccupationMemberCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8.h),
-                Wrap(
-                  spacing: 6.w,
-                  runSpacing: 6.h,
-                  children: [
-                    if (member.occupation.isNotEmpty)
-                      _buildBadge(
-                        member.occupation,
-                        Icons.work_rounded,
-                        AppColors.primary.withValues(alpha: 0.05),
-                        AppColors.primary,
-                      ),
-                  ],
-                ),
                 if (member.occupationAreaName != null &&
                         member.occupationAreaName!.isNotEmpty ||
                     member.occupationTalukaName != null &&
                         member.occupationTalukaName!.isNotEmpty) ...[
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 5.h),
                   Row(
                     children: [
                       Icon(
@@ -253,43 +239,6 @@ class _OccupationMemberCard extends StatelessWidget {
               Icons.chevron_right_rounded,
               color: AppColors.primary,
               size: 20.r,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBadge(
-    String label,
-    IconData icon,
-    Color bgColor,
-    Color textColor,
-  ) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(
-          color: textColor.withValues(alpha: 0.15),
-          width: 0.5.w,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12.r, color: textColor),
-          SizedBox(width: 4.w),
-          Flexible(
-            child: Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 10.sp,
-              ),
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

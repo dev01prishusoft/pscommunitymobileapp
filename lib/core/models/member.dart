@@ -116,7 +116,6 @@ class Member {
     final String fallbackLast = nameParts.length > 1
         ? nameParts.sublist(1).join(' ')
         : '';
-    final int fallbackAge = (json['age'] as num?)?.toInt() ?? 0;
 
     final String? profilePhoto = getString(
       'profilePhotoFullUrl',

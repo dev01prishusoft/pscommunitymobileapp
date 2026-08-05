@@ -44,13 +44,36 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (query.trim().length < 3) return [];
     final String url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&key=$_googleApiKey';
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     try {
-      final response = await _dio.get(url);
+      final response = await _dio.get(
+        url,
+        queryParameters: {
+          'input': query,
+          'types': '(regions)',
+          'components': 'country:in',
+          'key': _googleApiKey,
+        },
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['status'] == 'OK') {
-          return List<Map<String, dynamic>>.from(data['predictions']);
+          var predictions = List<Map<String, dynamic>>.from(
+            (data['predictions'] as List).map(
+              (p) => Map<String, dynamic>.from(p),
+            ),
+          );
+          for (var i = 0; i < predictions.length; i++) {
+            var desc = predictions[i]['description'] as String?;
+            if (desc != null) {
+              var parts = desc.split(', ');
+              if (parts.length > 1) {
+                parts.removeLast();
+                predictions[i]['description'] = parts.join(', ');
+              }
+            }
+          }
+          return predictions;
         }
       }
     } catch (e) {
