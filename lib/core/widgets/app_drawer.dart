@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
@@ -270,6 +271,27 @@ class AppDrawer extends StatelessWidget {
                       Get.back<void>();
                       _showLogoutDialog(context, authState);
                     },
+                  ),
+                  ListTile(
+                    titleAlignment: ListTileTitleAlignment.center,
+                    title: FutureBuilder<String>(
+                      future: PackageInfo.fromPlatform().then((packageInfo) {
+                        return packageInfo.version;
+                      }),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            'version ${snapshot.data}',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    onTap: null,
                   ),
                   SizedBox(height: 20.h),
                 ],
