@@ -146,6 +146,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
   TextEditingController get lastNameEnCtrl => personalInfo.lastNameEnCtrl;
   TextEditingController get dobCtrl => personalInfo.dobCtrl;
   TextEditingController get bornPlaceCtrl => personalInfo.bornPlaceCtrl;
+  RxDouble get bornPlaceLat => personalInfo.bornPlaceLat;
+  RxDouble get bornPlaceLng => personalInfo.bornPlaceLng;
   TextEditingController get heightCtrl => personalInfo.heightCtrl;
   TextEditingController get weightCtrl => personalInfo.weightCtrl;
   TextEditingController get monthlyIncomeCtrl => personalInfo.monthlyIncomeCtrl;
@@ -307,6 +309,21 @@ class ProfileFormController extends GetxController with FormStateMixin {
       'DateOfBirthTime',
       personalInfo.tob.value,
       m.dateOfBirthTime ?? '',
+    );
+    addIfChanged(
+      'bornPlace',
+      personalInfo.bornPlace.value,
+      m.bornPlaceName ?? '',
+    );
+    addIfChanged(
+      'Latitude',
+      personalInfo.bornPlaceLat.value,
+      m.bornPlaceLatitude ?? 0.0,
+    );
+    addIfChanged(
+      'Longitude',
+      personalInfo.bornPlaceLng.value,
+      m.bornPlaceLongitude ?? 0.0,
     );
 
     double? normDouble(double? v) => (v == null || v == 0.0) ? null : v;
@@ -1860,7 +1877,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
           if (isEdit) {
             final formDataChanges = changedFormData;
             formDataMap.addAll(formDataChanges);
-
             if (personalInfo.profileImage.value != null) {
               final file = personalInfo.profileImage.value!;
               final fileName = file.path.split('/').last;
@@ -1905,6 +1921,9 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['LastNameEnglish'] = personalInfo.lastNameEnCtrl.text;
             formDataMap['DateOfBirth'] = formatDob(personalInfo.dob.value);
             formDataMap['DateOfBirthTime'] = personalInfo.tob.value;
+            formDataMap['BornPlace'] = personalInfo.bornPlaceCtrl.text;
+            formDataMap['Latitude'] = personalInfo.bornPlaceLat.value;
+            formDataMap['Longitude'] = personalInfo.bornPlaceLng.value;
             formDataMap['Weight'] = personalInfo.weightCtrl.text;
             formDataMap['Height'] = personalInfo.heightCtrl.text;
             formDataMap['GenderId'] = getId(

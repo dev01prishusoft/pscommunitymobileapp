@@ -12,6 +12,9 @@ class Member {
     this.fullNameSearchText,
     this.dateOfBirth,
     this.dateOfBirthTime,
+    this.bornPlaceName,
+    this.bornPlaceLatitude,
+    this.bornPlaceLongitude,
     this.weight,
     this.height,
     this.mobileNo,
@@ -141,7 +144,9 @@ class Member {
       fullNameSearchText: getString('fullNameSearchText'),
       dateOfBirth: getString('dateOfBirth'),
       dateOfBirthTime: getString('dateOfBirthTime'),
-      apiAge: fallbackAge,
+      bornPlaceName: getString('bornPlace'),
+      bornPlaceLatitude: (json['Latitude'] as num?)?.toDouble(),
+      bornPlaceLongitude: (json['Longitude'] as num?)?.toDouble(),
       weight: (json['weight'] as num?)?.toDouble(),
       height: (json['height'] as num?)?.toDouble(),
       mobileNo: getString('mobileNo'),
@@ -250,6 +255,9 @@ class Member {
   final String? fullNameSearchText;
   final String? dateOfBirth;
   final String? dateOfBirthTime;
+  final String? bornPlaceName;
+  final double? bornPlaceLatitude;
+  final double? bornPlaceLongitude;
   final double? weight;
   final double? height;
   final String? mobileNo;
@@ -359,6 +367,9 @@ class Member {
       'lastName': lastName,
       'dateOfBirth': dateOfBirth,
       'dateOfBirthTime': dateOfBirthTime,
+      'bornPlace': bornPlaceName,
+      'Latitude': bornPlaceLatitude,
+      'Longitude': bornPlaceLongitude,
       'weight': weight,
       'height': height,
       'mobileNo': mobileNo,

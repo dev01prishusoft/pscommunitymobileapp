@@ -13,6 +13,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_location_autocomplete.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
@@ -453,6 +454,21 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     label: LK.birthTime.tr,
                   ),
                 ),
+                Obx(
+                  () => AppLocationAutoComplete(
+                    controller: controller.bornPlaceCtrl,
+                    label: LK.BornPlace.tr,
+                    isRequired: true,
+                    onLocationSelected: (location, lat, lng) {
+                      if (location.isEmpty || location == "") return;
+                      controller.bornPlaceCtrl.text = location;
+                      controller.bornPlaceLat.value = lat;
+                      controller.bornPlaceLng.value = lng;
+                    },
+                    updateStatus: controller.getUpdateStatus('BornPlace'),
+                  ),
+                ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
