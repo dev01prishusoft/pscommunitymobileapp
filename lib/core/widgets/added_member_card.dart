@@ -8,7 +8,6 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AddedMemberCard extends StatelessWidget {
   const AddedMemberCard({super.key, required this.member});
@@ -30,56 +29,47 @@ class AddedMemberCard extends StatelessWidget {
       child: AppCard(
         padding: EdgeInsets.zero,
         child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildAvatarContainer(),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildAvatarContainer(),
-                      SizedBox(width: 14.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    member.fullName,
-                                    style: AppTextStyles.titleMedium.copyWith(
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (member.approveStatus != null &&
-                                    member.approveStatus!.isNotEmpty) ...[
-                                  SizedBox(width: 8.w),
-                                  _buildStatusBadge(member.approveStatus!),
-                                ],
-                              ],
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              member.fullName,
+                              style: AppTextStyles.titleMedium.copyWith(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(height: 6.h),
-                            _buildSubtitle(),
-                            _buildOccupation(),
-                            _buildLocation(),
+                          ),
+                          if (member.approveStatus != null &&
+                              member.approveStatus!.isNotEmpty) ...[
+                            SizedBox(width: 8.w),
+                            _buildStatusBadge(member.approveStatus!),
                           ],
-                        ),
+                        ],
                       ),
-                      SizedBox(width: 8.w),
-                      _buildCallButton(),
+                      SizedBox(height: 6.h),
+                      _buildSubtitle(),
+                      _buildOccupation(),
+                      _buildLocation(),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -230,35 +220,6 @@ class AddedMemberCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCallButton() {
-    if (member.mobileNo == null || member.mobileNo!.isEmpty)
-      return const SizedBox.shrink();
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20.r),
-        onTap: () async {
-          final uri = Uri(scheme: 'tel', path: member.mobileNo);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-          }
-        },
-        child: Container(
-          padding: EdgeInsets.all(8.r),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.primary.withValues(alpha: 0.08),
-          ),
-          child: Icon(
-            Icons.call_rounded,
-            color: AppColors.primary,
-            size: 18.sp,
-          ),
-        ),
       ),
     );
   }

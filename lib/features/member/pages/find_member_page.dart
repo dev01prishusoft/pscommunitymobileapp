@@ -263,7 +263,7 @@ class _FindMemberCard extends StatelessWidget {
                       if (member.isHead == true) _buildHeadBadge(),
                       if (member.isLookingforMarriage == true)
                         _buildMarriageBadge(),
-                      _buildGenderAgeBadge(),
+                      if (member.gender.isNotEmpty) _buildGenderAgeBadge(),
                       if (member.gotra.isNotEmpty) _buildGotraBadge(),
                     ],
                   ),
