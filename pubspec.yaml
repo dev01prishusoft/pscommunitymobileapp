@@ -59,6 +59,7 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^5.0.0
   permission_handler: ^12.0.3
+  flutter_dotenv: ^6.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -84,6 +85,7 @@ flutter:
   assets:
     - assets/images/
     - assets/locales/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

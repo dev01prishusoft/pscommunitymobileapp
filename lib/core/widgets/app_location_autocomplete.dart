@@ -2,21 +2,26 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 
 class AppLocationAutoComplete extends StatefulWidget {
   final TextEditingController controller;
   final String label;
   final bool isRequired;
   final Widget? prefixIcon;
+  final ProfileUpdateStatus? updateStatus;
   final Function(String location, double lat, double lng)? onLocationSelected;
 
   const AppLocationAutoComplete({
     super.key,
+    this.updateStatus,
     required this.controller,
     required this.label,
     this.isRequired = false,
@@ -31,19 +36,17 @@ class AppLocationAutoComplete extends StatefulWidget {
 
 class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   Timer? _debounce;
-  final String _googleApiKey = String.fromEnvironment('GOOGLEMAP_KEY');
+  final String _googleApiKey = dotenv.env['GOOGLEMAP_KEY']!;
   final Dio _dio = Dio();
 
   bool _isLoading = false;
 
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (query.trim().length < 3) return [];
-    print(_googleApiKey);
     final String url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&key=$_googleApiKey';
     try {
       final response = await _dio.get(url);
-      print(response.statusCode);
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['status'] == 'OK') {
@@ -51,10 +54,9 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
         }
       }
     } catch (e) {
-      print(e.toString());
-      debugPrint("Error fetching autocomplete: $e");
+      return <Map<String, dynamic>>[];
     }
-    return [];
+    return <Map<String, dynamic>>[];
   }
 
   Future<void> _getPlaceDetails(String placeId, String description) async {
@@ -234,6 +236,8 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                 );
               },
         ),
+        if (widget.updateStatus != null)
+          ProfileUpdateStatusBadge(status: widget.updateStatus!),
       ],
     );
   }

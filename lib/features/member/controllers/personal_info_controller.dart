@@ -103,6 +103,8 @@ class PersonalInfoController extends GetxController {
   late final TextEditingController lastNameEnCtrl;
   late final TextEditingController dobCtrl;
   late final TextEditingController bornPlaceCtrl;
+  late final TextEditingController bornPlaceLatCtrl;
+  late final TextEditingController bornPlaceLngCtrl;
   late final TextEditingController heightCtrl;
   late final TextEditingController weightCtrl;
   late final TextEditingController monthlyIncomeCtrl;
@@ -120,6 +122,8 @@ class PersonalInfoController extends GetxController {
     lastNameEnCtrl = TextEditingController();
     dobCtrl = TextEditingController();
     bornPlaceCtrl = TextEditingController();
+    bornPlaceLatCtrl = TextEditingController();
+    bornPlaceLngCtrl = TextEditingController();
     heightCtrl = TextEditingController();
     weightCtrl = TextEditingController();
     monthlyIncomeCtrl = TextEditingController();
@@ -136,6 +140,12 @@ class PersonalInfoController extends GetxController {
     lastNameEnCtrl.addListener(() => lastNameEn.value = lastNameEnCtrl.text);
     dobCtrl.addListener(() => dob.value = dobCtrl.text);
     bornPlaceCtrl.addListener(() => bornPlace.value = bornPlaceCtrl.text);
+    bornPlaceLatCtrl.addListener(
+      () => bornPlaceLat.value = double.parse(bornPlaceLatCtrl.text),
+    );
+    bornPlaceLngCtrl.addListener(
+      () => bornPlaceLng.value = double.parse(bornPlaceLngCtrl.text),
+    );
     heightCtrl.addListener(() => height.value = heightCtrl.text);
     weightCtrl.addListener(() => weight.value = weightCtrl.text);
     monthlyIncomeCtrl.addListener(
@@ -155,6 +165,8 @@ class PersonalInfoController extends GetxController {
     lastNameEnCtrl.dispose();
     dobCtrl.dispose();
     bornPlaceCtrl.dispose();
+    bornPlaceLatCtrl.dispose();
+    bornPlaceLngCtrl.dispose();
     heightCtrl.dispose();
     weightCtrl.dispose();
     monthlyIncomeCtrl.dispose();
@@ -180,6 +192,7 @@ class PersonalInfoController extends GetxController {
     lastName.value = m.lastName;
     lastNameEn.value = m.lastNameEnglish ?? '';
     dob.value = formatDob(m.dateOfBirth);
+    bornPlace.value = m.bornPlaceName ?? '';
     tob.value = m.dateOfBirthTime ?? '';
     weight.value = m.weight?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
     height.value = m.height?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
@@ -212,6 +225,11 @@ class PersonalInfoController extends GetxController {
     firstNameEnCtrl.text = firstNameEn.value;
     lastNameEnCtrl.text = lastNameEn.value;
     dobCtrl.text = dob.value;
+    bornPlaceCtrl.text = bornPlace.value;
+    bornPlaceLat.value = m.bornPlaceLatitude ?? 0.0;
+    bornPlaceLng.value = m.bornPlaceLongitude ?? 0.0;
+    bornPlaceLatCtrl.text = bornPlaceLat.value.toString();
+    bornPlaceLngCtrl.text = bornPlaceLng.value.toString();
     heightCtrl.text = height.value;
     weightCtrl.text = weight.value;
     monthlyIncomeCtrl.text = monthlyIncome.value;
