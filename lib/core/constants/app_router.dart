@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/features/committee/pages/committee_details_
 import 'package:pscommunitymobileapp/features/committee/pages/committee_members_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/committees_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/frompage_committee.dart';
+import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_members_list_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/member_profile_page.dart';
@@ -70,6 +71,7 @@ class AppRouter {
   static String notifications = '/notifications';
   static String frompageOccupation = '/frompageOccupation';
   static String frompageCommittee = '/frompageCommittee';
+  static String events = '/events';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -226,6 +228,11 @@ class AppRouter {
     GetPage<void>(
       name: frompageCommittee,
       page: () => FromPageCommittee(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: events,
+      page: () => EventsPage(),
       middlewares: [AuthGuard()],
     ),
   ];

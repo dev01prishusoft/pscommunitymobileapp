@@ -215,6 +215,14 @@ class AppDrawer extends StatelessWidget {
                   ),
                   ListTile(
                     leading: Icon(
+                      Icons.celebration_outlined,
+                      color: AppColors.black,
+                    ),
+                    title: Text(LK.events.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.events),
+                  ),
+                  ListTile(
+                    leading: Icon(
                       Icons.privacy_tip_outlined,
                       color: AppColors.black,
                     ),

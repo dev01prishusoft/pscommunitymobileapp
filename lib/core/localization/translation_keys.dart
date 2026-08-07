@@ -82,6 +82,7 @@ class LK {
   static const String updateLater = 'Update Later';
   static const String reset = 'Reset';
   static const String home = 'Home';
+  static const String events = 'Events';
   static const String samajName = '';
   static const String privacyPolicy = 'Privacy Policy';
   static const String termsAndConditions = 'Terms & Conditions';
@@ -539,4 +540,6 @@ class LK {
   static const String deleteAllNotificationDesc =
       'delete_all_notification_description';
   static const String rejectionDetails = 'rejection_details';
+  static const String myAccount = 'My Account';
+  static const String supportAndInfo = 'Support & Information';
 }
