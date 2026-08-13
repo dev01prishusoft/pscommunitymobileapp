@@ -198,7 +198,7 @@ class _FindMemberCard extends StatelessWidget {
         border: Border.all(color: AppColors.blue.shade100, width: 0.5.w),
       ),
       child: Text(
-        '${LK.gotraLabel.tr} ${member.gotra}',
+        '${LK.gotraLabel.tr}: ${member.gotra}',
         style: AppTextStyles.labelSmall.copyWith(
           color: AppColors.blue.shade900,
           fontWeight: FontWeight.w600,
