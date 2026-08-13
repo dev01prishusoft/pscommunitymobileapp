@@ -14,6 +14,7 @@ class EventModel {
   final int placesTaken;
   final bool isRegistered;
   final String status;
+  final String? imageUrl;
 
   EventModel({
     required this.id,
@@ -27,6 +28,7 @@ class EventModel {
     required this.placesTaken,
     this.isRegistered = false,
     required this.status,
+    this.imageUrl,
   });
 
   String get categoryString {

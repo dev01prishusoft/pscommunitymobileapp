@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/event_model.dart';
@@ -14,7 +16,47 @@ class EventsPage extends GetView<EventsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(LK.events.tr)),
+      appBar: AppBar(
+        title: Obx(() {
+          if (controller.isSearchVisible.value) {
+            return CupertinoSearchbar(
+              onTapSuffix: () {
+                controller.searchTextController.clear();
+                controller.searchQuery.value = '';
+                FocusManager.instance.primaryFocus?.unfocus();
+                controller.isSearchVisible.value = false;
+              },
+              hintText: 'Search events...',
+              controller: controller.searchTextController,
+              onChanged: (val) {
+                if (val.isEmpty) {
+                  controller.searchTextController.clear();
+                  controller.searchQuery.value = '';
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                } else {
+                  controller.searchQuery.value = val;
+                }
+              },
+            );
+          }
+          return Text(LK.events.tr);
+        }),
+        actions: [
+          Obx(() {
+            if (controller.isSearchVisible.value) {
+              return const SizedBox.shrink();
+            }
+
+            return IconButton(
+              icon: const Icon(Iconsax.search_normal_copy),
+              onPressed: () {
+                controller.isSearchVisible.value = true;
+              },
+            );
+          }),
+        ],
+      ),
       body: Column(
         children: [
           Divider(thickness: 1, color: AppColors.grey.shade100, height: 1),

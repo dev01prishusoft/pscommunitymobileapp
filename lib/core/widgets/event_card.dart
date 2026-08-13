@@ -43,12 +43,28 @@ class EventCard extends StatelessWidget {
   }
 
   Widget _buildContent(String timeString) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (event.imageUrl != null)
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            child: Image.network(
+              event.imageUrl!,
+              width: double.infinity,
+              height: 120,
+              fit: BoxFit.cover,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -177,6 +193,8 @@ class EventCard extends StatelessWidget {
           ),
         ],
       ),
+        ),
+      ],
     );
   }
 }

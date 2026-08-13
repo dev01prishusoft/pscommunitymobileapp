@@ -7,6 +7,10 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
   final RxInt selectedTabIndex = 0.obs;
 
   final RxList<EventModel> allEvents = <EventModel>[].obs;
+  
+  final RxBool isSearchVisible = false.obs;
+  final TextEditingController searchTextController = TextEditingController();
+  final RxString searchQuery = ''.obs;
 
   @override
   void onInit() {
@@ -20,6 +24,7 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
 
   @override
   void onClose() {
+    searchTextController.dispose();
     tabController.dispose();
     super.onClose();
   }
@@ -38,6 +43,7 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
         placesTaken: 318,
         isRegistered: true,
         status: 'Upcoming',
+        imageUrl: 'https://picsum.photos/600/300?random=1',
       ),
       EventModel(
         id: '2',
@@ -90,6 +96,7 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
         placesTaken: 120,
         isRegistered: false,
         status: 'Ongoing',
+        imageUrl: 'https://picsum.photos/600/300?random=5',
       ),
       EventModel(
         id: '4',
@@ -103,6 +110,7 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
         placesTaken: 300,
         isRegistered: true,
         status: 'Past',
+        imageUrl: 'https://picsum.photos/600/300?random=6',
       ),
       EventModel(
         id: '5',
@@ -116,14 +124,24 @@ class EventsController extends GetxController with GetSingleTickerProviderStateM
         placesTaken: 85,
         isRegistered: false,
         status: 'Past',
+        imageUrl: 'https://picsum.photos/600/300?random=7',
       ),
     ];
   }
 
+  List<EventModel> get _filteredEvents {
+    final query = searchQuery.value.trim().toLowerCase();
+    if (query.isEmpty) return allEvents;
+    return allEvents.where((e) => 
+      e.title.toLowerCase().contains(query) || 
+      e.gujaratiTitle.toLowerCase().contains(query)
+    ).toList();
+  }
+
   List<EventModel> get upcomingEvents =>
-      allEvents.where((e) => e.status == 'Upcoming').toList();
+      _filteredEvents.where((e) => e.status == 'Upcoming').toList();
   List<EventModel> get ongoingEvents =>
-      allEvents.where((e) => e.status == 'Ongoing').toList();
+      _filteredEvents.where((e) => e.status == 'Ongoing').toList();
   List<EventModel> get pastEvents =>
-      allEvents.where((e) => e.status == 'Past').toList();
+      _filteredEvents.where((e) => e.status == 'Past').toList();
 }
