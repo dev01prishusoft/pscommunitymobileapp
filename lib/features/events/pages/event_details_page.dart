@@ -213,122 +213,7 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget eventTimeLine() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: AppColors.grey.shade100),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                children: [
-                  Icon(Icons.timeline_rounded, color: AppColors.primary, size: 20.w),
-                  SizedBox(width: 8.w),
-                  Text('Event Timeline', style: AppTextStyles.titleMedium),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHorizontalTimelineItem('9:30 am', 'Registration & tea', isFirst: true),
-                  _buildHorizontalTimelineItem('10:15 am', 'Deep prakatya'),
-                  _buildHorizontalTimelineItem('10:45 am', 'Felicitation 10/12'),
-                  _buildHorizontalTimelineItem('12:30 pm', 'Felicitation graduates'),
-                  _buildHorizontalTimelineItem('1:15 pm', 'Lunch'),
-                  _buildHorizontalTimelineItem('2:15 pm', 'Career guidance'),
-                  _buildHorizontalTimelineItem('3:30 pm', 'Loans & scholarships'),
-                  _buildHorizontalTimelineItem('4:30 pm', 'Vote of thanks', isLast: true),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHorizontalTimelineItem(String time, String title, {bool isFirst = false, bool isLast = false}) {
-    return SizedBox(
-      width: 110.w,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 2.h,
-                  color: isFirst ? Colors.transparent : AppColors.primary.withValues(alpha: 0.3),
-                ),
-              ),
-              Container(
-                width: 14.w,
-                height: 14.w,
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  border: Border.all(color: AppColors.primary, width: 3),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  height: 2.h,
-                  color: isLast ? Colors.transparent : AppColors.primary.withValues(alpha: 0.3),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Text(
-              time,
-              style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w),
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.black,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return EventTimelineWidget(eventDate: event.startTime);
   }
 
   Widget _buildPleaseNoteSection() {
@@ -762,6 +647,512 @@ class EventDetailsPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TimelineEvent {
+  final DateTime dateTime;
+  final String title;
+
+  _TimelineEvent({required this.dateTime, required this.title});
+}
+
+class EventTimelineWidget extends StatefulWidget {
+  final DateTime eventDate;
+
+  const EventTimelineWidget({Key? key, required this.eventDate})
+    : super(key: key);
+
+  @override
+  State<EventTimelineWidget> createState() => _EventTimelineWidgetState();
+}
+
+class _EventTimelineWidgetState extends State<EventTimelineWidget> {
+  late ScrollController _scrollController;
+  late List<_TimelineEvent> events;
+  int _activeIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final eventDate = widget.eventDate;
+
+    // Providing a set of mock timeline events based on eventDate
+    events = [
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          9,
+          30,
+        ),
+        title: 'Registration & tea',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          10,
+          15,
+        ),
+        title: 'Deep prakatya',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          10,
+          45,
+        ),
+        title: 'Felicitation 10/12',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          12,
+          30,
+        ),
+        title: 'Felicitation graduates',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          13,
+          15,
+        ),
+        title: 'Lunch',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          14,
+          15,
+        ),
+        title: 'Career guidance',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          15,
+          30,
+        ),
+        title: 'Loans & scholarships',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          16,
+          30,
+        ),
+        title: 'Vote of thanks',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          18,
+          0,
+        ),
+        title: 'Dinner & Networking',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          19,
+          30,
+        ),
+        title: 'Cultural Program',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          21,
+          0,
+        ),
+        title: 'Award Ceremony',
+      ),
+      _TimelineEvent(
+        dateTime: DateTime(
+          eventDate.year,
+          eventDate.month,
+          eventDate.day,
+          22,
+          0,
+        ),
+        title: 'Closing Ceremony',
+      ),
+    ];
+
+    // Add a record for TODAY right now to demonstrate the ongoing highlight
+    events.add(
+      _TimelineEvent(
+        dateTime: DateTime.now().subtract(const Duration(minutes: 5)),
+        title: 'Live Ongoing Event',
+      ),
+    );
+
+    // Ensure chronological order
+    events.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+
+    _calculateActiveIndex();
+
+    // Uncomment this to test with 1 record
+    /*
+    events = [
+      _TimelineEvent(
+        dateTime: DateTime(
+          widget.eventDate.year,
+          widget.eventDate.month,
+          widget.eventDate.day,
+          9,
+          30,
+        ),
+        title: 'Registration & tea',
+      ),
+    ];
+    */
+
+    _calculateActiveIndex();
+    _scrollController = ScrollController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentTime();
+    });
+  }
+
+  void _calculateActiveIndex() {
+    if (events.isEmpty) return;
+
+    DateTime now = DateTime.now();
+    int targetIndex = -1;
+
+    for (int i = 0; i < events.length; i++) {
+      if (now.isAfter(events[i].dateTime) ||
+          now.isAtSameMomentAs(events[i].dateTime)) {
+        targetIndex = i;
+      }
+    }
+
+    _activeIndex = targetIndex;
+  }
+
+  void _scrollToCurrentTime() {
+    if (events.length <= 1) return;
+
+    int targetScrollIndex = _activeIndex >= 0 ? _activeIndex : 0;
+
+    if (_scrollController.hasClients) {
+      double itemWidth = 110.w;
+      double screenWidth = MediaQuery.of(context).size.width;
+      // Calculate offset to center the target item
+      double offset =
+          (targetScrollIndex * itemWidth) -
+          (screenWidth / 2) +
+          (itemWidth / 2) +
+          16.w;
+
+      if (offset < 0) offset = 0;
+      if (offset > _scrollController.position.maxScrollExtent) {
+        offset = _scrollController.position.maxScrollExtent;
+      }
+
+      _scrollController.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (events.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: AppColors.grey.shade100),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timeline_rounded,
+                    color: AppColors.primary,
+                    size: 20.w,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text('Event Timeline', style: AppTextStyles.titleMedium),
+                ],
+              ),
+            ),
+            SizedBox(height: 20.h),
+            if (events.length == 1)
+              Center(child: _buildSingleTimelineItem(events.first))
+            else
+              SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(events.length, (index) {
+                    final event = events[index];
+                    return _buildHorizontalTimelineItem(
+                      event,
+                      isFirst: index == 0,
+                      isLast: index == events.length - 1,
+                    );
+                  }),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSingleTimelineItem(_TimelineEvent event) {
+    final formatTime = DateFormat('h:mm a');
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.event_available,
+              color: AppColors.primary,
+              size: 24.w,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.black,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 4.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 14.w,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        formatTime.format(event.dateTime).toLowerCase(),
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHorizontalTimelineItem(
+    _TimelineEvent event, {
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    final formatTime = DateFormat('h:mm a');
+
+    int currentIndex = events.indexOf(event);
+    bool isCurrent = currentIndex == _activeIndex;
+
+    return SizedBox(
+      width: 110.w,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 24.w,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 2.h,
+                    color: isFirst
+                        ? Colors.transparent
+                        : AppColors.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+                Container(
+                  width: isCurrent ? 20.w : 14.w,
+                  height: isCurrent ? 20.w : 14.w,
+                  decoration: BoxDecoration(
+                    color: isCurrent ? AppColors.primary : AppColors.white,
+                    border: Border.all(
+                      color: isCurrent
+                          ? AppColors.primary.withValues(alpha: 0.3)
+                          : AppColors.primary,
+                      width: isCurrent ? 6 : 3,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: isCurrent
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.4),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 0),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: isCurrent
+                      ? Center(
+                          child: Container(
+                            width: 8.w,
+                            height: 8.w,
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                Expanded(
+                  child: Container(
+                    height: 2.h,
+                    color: isLast
+                        ? Colors.transparent
+                        : AppColors.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 12.h),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isCurrent ? 14.w : 10.w,
+              vertical: isCurrent ? 6.h : 4.h,
+            ),
+            decoration: BoxDecoration(
+              color: isCurrent
+                  ? AppColors.primary
+                  : AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(100.r),
+              boxShadow: isCurrent
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 0),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Text(
+              formatTime.format(event.dateTime).toLowerCase(),
+              style: AppTextStyles.labelSmall.copyWith(
+                color: isCurrent ? AppColors.white : AppColors.primary,
+                fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
+                fontSize: isCurrent ? 12.sp : null,
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
+            child: Text(
+              event.title,
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isCurrent ? AppColors.primary : AppColors.black,
+                fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
+                fontSize: isCurrent ? 13.sp : null,
+                height: 1.2,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
