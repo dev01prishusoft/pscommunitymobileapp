@@ -75,7 +75,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                       _isSearchVisible = false;
                     });
                   },
-                hintText: LK.searchByNameAndMnoAndMID.tr,
+                hintText: LK.searchByNameHint.tr,
                 controller: _searchController,
                 onChanged: (value) {
                   if (value.isEmpty) {

@@ -99,8 +99,10 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
             Obx(() {
               final roles = controller.getRoles(controller.membersList);
               return PopupMenuButton<DropdownItem?>(
-                icon: const Icon(Icons.more_vert),
-                initialValue: controller.selectedRole.value,
+                icon: const Icon(Iconsax.filter_search_copy),
+                initialValue:
+                    controller.selectedRole.value ??
+                    roles.firstWhere((r) => r?.id == -1, orElse: () => null),
                 onSelected: (DropdownItem? item) {
                   controller.selectRole(item);
                 },

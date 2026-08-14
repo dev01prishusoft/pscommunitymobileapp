@@ -68,11 +68,11 @@ class _PaymentsPageState extends State<PaymentsPage> {
           if (controller.isSearchVisible.value) {
             return CupertinoSearchbar(
               onTapSuffix: () {
-                  _searchController.clear();
-                  controller.searchDashboard('');
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  controller.isSearchVisible.value = false;
-                },
+                _searchController.clear();
+                controller.searchDashboard('');
+                FocusManager.instance.primaryFocus?.unfocus();
+                controller.isSearchVisible.value = false;
+              },
               hintText: LK.searchHint.tr,
               controller: _searchController,
               onChanged: (val) {
@@ -128,9 +128,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                         subtitle: '(${filteredList.length})',
                       ),
                       SizedBox(height: 10.h),
-                      ...filteredList.map(
-                        (req) => _buildPaidPaymentCard(req),
-                      ),
+                      ...filteredList.map((req) => _buildPaidPaymentCard(req)),
                     ],
                   ],
                 ),
@@ -139,75 +137,69 @@ class _PaymentsPageState extends State<PaymentsPage> {
           ),
         );
       }),
-      floatingActionButton: Obx(() {
-        if (controller.dashboardState.value != AppState.data) {
-          return const SizedBox.shrink();
-        }
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOutCubic,
-          width: _isVisible ? MediaQuery.of(context).size.width - 32.w : 56,
-          height: _isVisible ? 52.h : 56,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Get.toNamed<void>(AppRouter.makePayment),
-              borderRadius: BorderRadius.circular(_isVisible ? 16 : 28),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOutCubic,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.primary, AppColors.secondary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      floatingActionButton: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+        width: _isVisible ? MediaQuery.of(context).size.width - 32.w : 56,
+        height: _isVisible ? 52.h : 56,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Get.toNamed<void>(AppRouter.makePayment),
+            borderRadius: BorderRadius.circular(_isVisible ? 16 : 28),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.secondary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(_isVisible ? 16 : 28),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: _isVisible ? 12 : 16,
+                    offset: const Offset(0, 4),
                   ),
-                  borderRadius: BorderRadius.circular(_isVisible ? 16 : 28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
-                      blurRadius: _isVisible ? 12 : 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  switchInCurve: Curves.easeIn,
-                  switchOutCurve: Curves.easeOut,
-                  child: _isVisible
-                      ? Row(
-                          key: const ValueKey('expanded'),
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.add_card_rounded,
+                ],
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeIn,
+                switchOutCurve: Curves.easeOut,
+                child: _isVisible
+                    ? Row(
+                        key: const ValueKey('expanded'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.add_card_rounded,
+                            color: AppColors.white,
+                            size: 22,
+                          ),
+                          SizedBox(width: 10.w),
+                          Text(
+                            LK.makePayment.tr,
+                            style: AppTextStyles.labelLarge.copyWith(
                               color: AppColors.white,
-                              size: 22,
+                              fontWeight: FontWeight.bold,
                             ),
-                            SizedBox(width: 10.w),
-                            Text(
-                              LK.makePayment.tr,
-                              style: AppTextStyles.labelLarge.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        )
-                      : const Icon(
-                          key: ValueKey('collapsed'),
-                          Icons.add_card_rounded,
-                          color: AppColors.white,
-                          size: 24,
-                        ),
-                ),
+                          ),
+                        ],
+                      )
+                    : const Icon(
+                        key: ValueKey('collapsed'),
+                        Icons.add_card_rounded,
+                        color: AppColors.white,
+                        size: 24,
+                      ),
               ),
             ),
           ),
-        );
-      }),
+        ),
+      ),
       floatingActionButtonLocation: _isVisible
           ? FloatingActionButtonLocation.centerFloat
           : FloatingActionButtonLocation.endFloat,
