@@ -144,6 +144,16 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                         }
                         return _OccupationMemberCard(
                           member: controller.occupationMembers[index],
+                          onReturn: () {
+                            if (mounted) {
+                              _searchController.clear();
+                              controller.clearMemberSearch();
+                              controller.resetFilters();
+                              setState(() {
+                                _isSearchVisible = false;
+                              });
+                            }
+                          },
                         );
                       },
                     ),
@@ -159,8 +169,9 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
 }
 
 class _OccupationMemberCard extends StatelessWidget {
-  const _OccupationMemberCard({required this.member});
+  const _OccupationMemberCard({required this.member, this.onReturn});
   final Member member;
+  final VoidCallback? onReturn;
 
   @override
   Widget build(BuildContext context) {
@@ -171,12 +182,13 @@ class _OccupationMemberCard extends StatelessWidget {
         color: AppColors.grey.withValues(alpha: 0.12),
         width: 1.w,
       ),
-      onTap: () {
+      onTap: () async {
         FocusManager.instance.primaryFocus?.unfocus();
-        Get.toNamed<void>(
+        await Get.toNamed<void>(
           AppRouter.frompageOccupation,
           arguments: {'memberId': member.memberId},
         );
+        onReturn?.call();
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

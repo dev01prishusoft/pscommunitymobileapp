@@ -62,70 +62,6 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
       bottom: true,
       child: Scaffold(
         appBar: AppBar(title: Text(LK.makePayment.tr)),
-        bottomNavigationBar: Obx(
-          () => Container(
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            child: Row(
-              spacing: 15.w,
-              children: [
-                if (controller.selectedCategory.value?.isRecurring == true) ...[
-                  GestureDetector(
-                    onTap: controller.isProcessingPayment.value
-                        ? null
-                        : () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              controller.initiatePayment(isRecurring: true);
-                            }
-                          },
-                    child: Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 11.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.secondary),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          LK.setupAutoPayRecurring.tr,
-                          style: AppTextStyles.titleSmall.copyWith(
-                            color: AppColors.secondary,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                Expanded(
-                  child: AppPrimaryButton(
-                    height: 45.h,
-                    isLoading: controller.isProcessingPayment.value,
-                    text: LK.payNow.tr,
-                    onPressed: controller.isProcessingPayment.value
-                        ? null
-                        : () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              controller.initiatePayment();
-                            }
-                          },
-                  ),
-                ),
-              ],
-            ).paddingSymmetric(vertical: 5.h, horizontal: 16.w),
-          ),
-        ),
         body: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -390,7 +326,49 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
+
+                if (controller.selectedCategory.value?.isRecurring == true) ...[
+                  GestureDetector(
+                    onTap: controller.isProcessingPayment.value
+                        ? null
+                        : () {
+                            if (_formKey.currentState?.validate() ?? false) {
+                              controller.initiatePayment(isRecurring: true);
+                            }
+                          },
+                    child: Container(
+                      height: 50.h,
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.secondary),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        LK.setupAutoPayRecurring.tr,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: AppColors.secondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ).paddingSymmetric(horizontal: 10.w),
+                  SizedBox(height: 20.h),
+                ],
+                AppPrimaryButton(
+                  height: 50.h,
+                  isLoading: controller.isProcessingPayment.value,
+                  text: LK.payNow.tr,
+                  onPressed: controller.isProcessingPayment.value
+                      ? null
+                      : () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            controller.initiatePayment();
+                          }
+                        },
+                ).paddingSymmetric(horizontal: 10.w),
               ],
             ),
           ),
