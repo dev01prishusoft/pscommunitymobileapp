@@ -96,7 +96,12 @@ class PaymentController extends GetxController {
     try {
       final data = await _repository.getDashboard();
       dashboard.value = data;
-      dashboardState.value = AppState.data;
+      print(dashboard.value?.paidPayments.length);
+      if (dashboard.value?.paidPayments.isEmpty ?? false) {
+        dashboardState.value = AppState.empty;
+      } else {
+        dashboardState.value = AppState.data;
+      }
     } catch (e) {
       dashboardState.value = AppState.error;
     }

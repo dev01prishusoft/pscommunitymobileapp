@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
@@ -96,7 +97,12 @@ class CommitteeMembersController extends GetxController {
   }
 
   void selectRole(DropdownItem? role) {
-    selectedRole.value = role;
+    debugPrint('Selected role: ${role?.text}');
+    if (role?.id == -1) {
+      selectedRole.value = null;
+    } else {
+      selectedRole.value = role;
+    }
   }
 
   void toggleGroup(String role) {
@@ -109,7 +115,7 @@ class CommitteeMembersController extends GetxController {
         .map((m) => m.roleName)
         .where((r) => r.isNotEmpty)
         .toSet();
-    return [null, ...roles.map((r) => DropdownItem(id: 0, text: r))];
+    return [DropdownItem(id: -1, text: 'All'), ...roles.map((r) => DropdownItem(id: 0, text: r))];
   }
 
   Map<String, List<CommitteeMember>> getGroupedMembers(
