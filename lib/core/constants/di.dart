@@ -20,6 +20,8 @@ import 'package:pscommunitymobileapp/features/business/controllers/business_cont
 import 'package:pscommunitymobileapp/features/committee/repositories/committee_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/events_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/repositories/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
@@ -125,7 +127,9 @@ class DI {
         Get.lazyPut(() => SupportController(apiClient), fenix: true);
         Get.lazyPut(() => HomeController(), fenix: true);
         Get.lazyPut(() => ShareController(apiClient), fenix: true);
-        Get.lazyPut(() => EventsController(), fenix: true);
+        final eventsRepository = EventsRepositoryImpl(apiClient);
+        Get.lazyPut<EventsRepositories>(() => eventsRepository, fenix: true);
+        Get.lazyPut(() => EventsController(eventsRepository), fenix: true);
         final pushNotificationService = PushNotificationService(apiClient);
         await pushNotificationService.init();
         Get.put(pushNotificationService, permanent: true);

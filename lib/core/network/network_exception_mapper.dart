@@ -12,6 +12,7 @@ class NetworkExceptionMapper {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
+        case DioExceptionType.transformTimeout:
           return TimeoutFailure();
 
         case DioExceptionType.badResponse:

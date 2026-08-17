@@ -53,4 +53,7 @@ class ApiEndpoints {
   static String currenAppVersion(String appVersion) =>
       '/api/v1/application-link/latest-version?currentversion=$appVersion';
   static String deleteNotification = '/api/v1/daily-notification/member';
+  static String eventList = '/api/v1/Event/mobile/member/list';
+  static String eventDetails(int id) =>
+      '/api/v1/Event/mobile/member/detail/$id';
 }

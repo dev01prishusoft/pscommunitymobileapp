@@ -8,7 +8,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
-import 'package:pscommunitymobileapp/core/models/event_model.dart';
+import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -22,21 +22,14 @@ class EventsPage extends GetView<EventsController> {
             return CupertinoSearchbar(
               onTapSuffix: () {
                 controller.searchTextController.clear();
-                controller.searchQuery.value = '';
+                controller.onSearchQueryChanged('');
                 FocusManager.instance.primaryFocus?.unfocus();
                 controller.isSearchVisible.value = false;
               },
               hintText: 'Search events...',
               controller: controller.searchTextController,
               onChanged: (val) {
-                if (val.isEmpty) {
-                  controller.searchTextController.clear();
-                  controller.searchQuery.value = '';
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  controller.isSearchVisible.value = false;
-                } else {
-                  controller.searchQuery.value = val;
-                }
+                controller.onSearchQueryChanged(val);
               },
             );
           }
@@ -63,15 +56,31 @@ class EventsPage extends GetView<EventsController> {
           _buildCustomTabBar(),
           Expanded(
             child: Obx(() {
-              if (controller.allEvents.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
               return TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
                 controller: controller.tabController,
                 children: [
-                  _buildEventList(controller.upcomingEvents),
-                  _buildEventList(controller.ongoingEvents),
-                  _buildEventList(controller.pastEvents),
+                  _buildEventList(
+                    controller.upcomingEvents,
+                    controller.upcomingScrollController,
+                    controller.isLoadingUpcoming.value,
+                    controller.upcomingHasMore,
+                    1,
+                  ),
+                  _buildEventList(
+                    controller.ongoingEvents,
+                    controller.ongoingScrollController,
+                    controller.isLoadingOngoing.value,
+                    controller.ongoingHasMore,
+                    2,
+                  ),
+                  _buildEventList(
+                    controller.pastEvents,
+                    controller.pastScrollController,
+                    controller.isLoadingPast.value,
+                    controller.pastHasMore,
+                    3,
+                  ),
                 ],
               );
             }),
@@ -135,21 +144,21 @@ class EventsPage extends GetView<EventsController> {
                       _buildCustomTabItem(
                         index: 0,
                         label: 'Upcoming',
-                        count: '${controller.upcomingEvents.length}',
+                        count: '${controller.upcomingCount.value}',
                         isSelected: selectedIndex == 0,
                         defaultColor: AppColors.primary,
                       ),
                       _buildCustomTabItem(
                         index: 1,
                         label: 'Ongoing',
-                        count: '${controller.ongoingEvents.length}',
+                        count: '${controller.ongoingCount.value}',
                         isSelected: selectedIndex == 1,
                         defaultColor: AppColors.green,
                       ),
                       _buildCustomTabItem(
                         index: 2,
                         label: 'Past',
-                        count: '${controller.pastEvents.length}',
+                        count: '${controller.pastCount.value}',
                         isSelected: selectedIndex == 2,
                         defaultColor: AppColors.grey.shade600,
                       ),
@@ -207,31 +216,69 @@ class EventsPage extends GetView<EventsController> {
     );
   }
 
-  Widget _buildEventList(List<EventModel> events) {
-    if (events.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.event_busy, size: 64.w, color: AppColors.grey.shade300),
-            SizedBox(height: 16.h),
-            Text(
-              'No events found',
-              style: AppTextStyles.titleMedium.copyWith(color: AppColors.grey.shade500),
+  Widget _buildEventList(
+    List<EventsData> events,
+    ScrollController scrollController,
+    bool isLoading,
+    bool hasMore,
+    int type,
+  ) {
+    Widget content;
+
+    if (isLoading && events.isEmpty) {
+      content = const Center(child: CircularProgressIndicator());
+    } else if (events.isEmpty) {
+      content = LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Container(
+            height: constraints.maxHeight,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.event_busy,
+                  size: 64.w,
+                  color: AppColors.grey.shade300,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'No events found',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.grey.shade500,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
+    } else {
+      content = ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: scrollController,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        itemCount: events.length + (hasMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == events.length) {
+            return const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          return Padding(
+            padding: EdgeInsets.only(bottom: 16.h),
+            child: EventCard(event: events[index]),
+          );
+        },
+      );
     }
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: 16.h),
-          child: EventCard(event: events[index]),
-        );
-      },
+
+    return RefreshIndicator(
+      onRefresh: () => controller.refreshTab(type),
+      color: AppColors.primary,
+      child: content,
     );
   }
 }

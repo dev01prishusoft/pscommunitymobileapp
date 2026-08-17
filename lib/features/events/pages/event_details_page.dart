@@ -1,44 +1,100 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pscommunitymobileapp/core/models/event_model.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/event_details_controller.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class EventDetailsPage extends StatelessWidget {
-  final EventModel event;
+  final int eventId;
 
-  const EventDetailsPage({Key? key, required this.event}) : super(key: key);
+  const EventDetailsPage({Key? key, required this.eventId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(EventDetailsController(eventId, Get.find()));
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Event Details'),
-      ),
-      bottomNavigationBar: _buildBottomStaticBar(),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 50.h, top: 16.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            eventHeaderDetails(),
-            SizedBox(height: 16.h),
-            eventInfo(),
-            SizedBox(height: 16.h),
-            eventTimeLine(),
-            SizedBox(height: 16.h),
-            _buildOrganisedBySection(),
-            SizedBox(height: 16.h),
-            _buildPleaseNoteSection(),
-          ],
-        ).paddingSymmetric(horizontal: 16.w),
-      ),
+      appBar: AppBar(title: Text('Event Details')),
+      bottomNavigationBar: Obx(() {
+        if (controller.isLoading.value || controller.hasError.value)
+          return const SizedBox.shrink();
+        return _buildBottomStaticBar(controller.eventDetails.value!);
+      }),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (controller.hasError.value) {
+          return Center(child: Text(controller.errorMessage.value));
+        }
+        final event = controller.eventDetails.value!;
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: 50.h, top: 16.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildMediaCarousel(event),
+              if (event.medias != null && event.medias!.isNotEmpty)
+                SizedBox(height: 16.h),
+              eventHeaderDetails(event),
+              SizedBox(height: 16.h),
+              eventInfo(event),
+              if (event.schedules != null && event.schedules!.isNotEmpty) ...[
+                SizedBox(height: 16.h),
+                eventTimeLine(event),
+              ],
+              if (event.committeeName != null ||
+                  (event.organizerName != null &&
+                      event.organizerName!.isNotEmpty)) ...[
+                SizedBox(height: 16.h),
+                _buildOrganisedBySection(event),
+              ],
+              if ((event.termsAndConditions != null &&
+                      event.termsAndConditions!.isNotEmpty) ||
+                  (event.shortDescription != null &&
+                      event.shortDescription!.isNotEmpty)) ...[
+                SizedBox(height: 16.h),
+                _buildPleaseNoteSection(event),
+              ],
+            ],
+          ).paddingSymmetric(horizontal: 16.w),
+        );
+      }),
     );
   }
 
-  Widget eventHeaderDetails() {
+  String _formatEventDateTime(DateTime start, DateTime end) {
+    final formatTime = DateFormat('h:mm a');
+    final formatDate = DateFormat('d MMM yyyy');
+
+    final isSameDay =
+        start.year == end.year &&
+        start.month == end.month &&
+        start.day == end.day;
+
+    if (isSameDay) {
+      return '${formatDate.format(start)}, ${formatTime.format(start).toLowerCase()} to ${formatTime.format(end).toLowerCase()}';
+    } else {
+      return '${formatDate.format(start)}, ${formatTime.format(start).toLowerCase()} to ${formatDate.format(end)}, ${formatTime.format(end).toLowerCase()}';
+    }
+  }
+
+  Widget _buildMediaCarousel(EventDetailsData event) {
+    if (event.medias == null || event.medias!.isEmpty)
+      return const SizedBox.shrink();
+
+    return EventMediaCarousel(medias: event.medias!);
+  }
+
+  Widget eventHeaderDetails(EventDetailsData event) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -58,73 +114,169 @@ class EventDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20.r),
+                if (event.eventType != null && event.eventType!.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.person_pin_circle,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          event.eventType ?? 'Event',
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.person_pin_circle, size: 14.w, color: AppColors.primary),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'In person',
-                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                ],
+                if (event.eventMode != null && event.eventMode!.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.confirmation_num,
+                          size: 14,
+                          color: AppColors.green,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${event.eventMode}',
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.green,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20.r),
+                ],
+                if (event.isMemberRegistered == true) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF3E0),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          size: 14,
+                          color: Color(0xFFE65100),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Registered',
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: const Color(0xFFE65100),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.confirmation_num, size: 14.w, color: AppColors.green),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'Free',
-                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.green, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                ],
+                if (event.registrationFee != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE4F5ED),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.money, size: 14, color: Color(0xFF1A7A60)),
+                        SizedBox(width: 4),
+                        Text(
+                          'Registration Fee ${event.registrationFee}',
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: Color(0xFF1A7A60),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
-            SizedBox(height: 20.h),
-            Text(event.title, style: AppTextStyles.titleLarge.copyWith(height: 1.2)),
-            SizedBox(height: 6.h),
-            Text(
-              event.gujaratiTitle,
-              style: AppTextStyles.titleMedium.copyWith(color: AppColors.grey.shade600),
-            ),
-            SizedBox(height: 20.h),
-            Divider(color: AppColors.grey.shade100, height: 1),
-            SizedBox(height: 20.h),
-            Text(
-              'The education committee will felicitate students who have done well in their exams this year.\n\nPlease arrive by 9:30 am. The programme begins at 10:00 am sharp. Tea on arrival, lunch after the felicitation.\n\nThe afternoon session covers stream selection after standard 10 and 12, education loans and government scholarships.',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey.shade700, height: 1.6),
-            ),
+            if (event.eventName != null && event.eventName!.isNotEmpty) ...[
+              SizedBox(height: 20.h),
+              Text(
+                event.eventName!,
+                style: AppTextStyles.titleLarge.copyWith(height: 1.2),
+              ),
+            ],
+            if (event.translatedEventName != null &&
+                event.translatedEventName!.isNotEmpty) ...[
+              SizedBox(height: 6.h),
+              Text(
+                event.translatedEventName!,
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.grey.shade600,
+                ),
+              ),
+            ],
+            if (event.description != null && event.description!.isNotEmpty) ...[
+              SizedBox(height: 20.h),
+              Divider(color: AppColors.grey.shade100, height: 1),
+              SizedBox(height: 20.h),
+              Text(
+                event.description!,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.grey.shade700,
+                  height: 1.6,
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget eventInfo() {
-    final formatTime = DateFormat('h:mm a');
-    final formatDate = DateFormat('d MMM yyyy');
+  Widget eventInfo(EventDetailsData event) {
+    DateTime start =
+        DateTime.tryParse(event.startDateTime ?? '') ?? DateTime.now();
+    DateTime end = DateTime.tryParse(event.endDateTime ?? '') ?? DateTime.now();
 
-    final String timeString =
-        '${formatDate.format(event.startTime)}, ${formatTime.format(event.startTime).toLowerCase()} to ${formatTime.format(event.endTime).toLowerCase()}';
+    final String timeString = _formatEventDateTime(start, end);
 
     return Container(
       decoration: BoxDecoration(
@@ -153,43 +305,82 @@ class EventDetailsPage extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             _buildInfoRow(Icons.access_time_filled, timeString),
-            SizedBox(height: 16.h),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.location_on, size: 20.w, color: AppColors.grey.shade500),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event.location,
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black, fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'Samaj Bhavan, Chandavarkar Road 400092',
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey.shade600),
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(
-                        'Get directions',
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ],
+            if ((event.venueName != null && event.venueName!.isNotEmpty) ||
+                '${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
+                    .trim()
+                    .isNotEmpty) ...[
+              SizedBox(height: 16.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    size: 20.w,
+                    color: AppColors.grey.shade500,
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            _buildInfoRow(Icons.event_seat, '${event.placesTaken} of ${event.totalPlaces} places taken'),
-            SizedBox(height: 16.h),
-            _buildInfoRow(Icons.family_restroom, 'Up to 3 family members'),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (event.venueName != null &&
+                            event.venueName!.isNotEmpty) ...[
+                          Text(
+                            event.venueName!,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                        ],
+                        if ('${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
+                            .trim()
+                            .isNotEmpty) ...[
+                          Text(
+                            '${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
+                                .trim(),
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.grey.shade600,
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                        ],
+                        if (event.googleMapUrl != null &&
+                            event.googleMapUrl!.isNotEmpty)
+                          GestureDetector(
+                            onTap: () async {
+                              if (await canLaunchUrlString(
+                                event.googleMapUrl!,
+                              )) {
+                                await launchUrlString(event.googleMapUrl!);
+                              }
+                            },
+                            child: Text(
+                              'Get directions',
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              _buildInfoRow(
+                Icons.event_seat,
+                '${event.totalRegistrations ?? 0} places taken',
+              ),
+              SizedBox(height: 16.h),
+              _buildInfoRow(
+                Icons.family_restroom,
+                'Up to ${event.maximumGuestsPerMember} family members',
+              ),
+            ],
           ],
         ),
       ),
@@ -212,11 +403,14 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget eventTimeLine() {
-    return EventTimelineWidget(eventDate: event.startTime);
+  Widget eventTimeLine(EventDetailsData event) {
+    if (event.schedules == null || event.schedules!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return EventTimelineWidget(schedules: event.schedules!);
   }
 
-  Widget _buildPleaseNoteSection() {
+  Widget _buildPleaseNoteSection(EventDetailsData event) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.red.withValues(alpha: 0.05),
@@ -234,13 +428,18 @@ class EventDetailsPage extends StatelessWidget {
                 SizedBox(width: 8.w),
                 Text(
                   'Please Note',
-                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.red),
+                  style: AppTextStyles.titleSmall.copyWith(
+                    color: AppColors.red,
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 6.h),
             Text(
-              'Registration closes one week before so certificates can be printed. Carry your event pass and a copy of your marksheet. Seating is not guaranteed after 10:00 am.',
+              (event.termsAndConditions != null &&
+                      event.termsAndConditions!.isNotEmpty)
+                  ? event.termsAndConditions!
+                  : (event.shortDescription ?? ''),
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.red,
                 height: 1.5,
@@ -252,7 +451,7 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOrganisedBySection() {
+  Widget _buildOrganisedBySection(EventDetailsData event) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -287,7 +486,11 @@ class EventDetailsPage extends StatelessWidget {
                     color: AppColors.grey.shade50,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.group, color: AppColors.primary, size: 24.w),
+                  child: Icon(
+                    Icons.group,
+                    color: AppColors.primary,
+                    size: 24.w,
+                  ),
                 ),
                 SizedBox(width: 16.w),
                 Expanded(
@@ -295,19 +498,29 @@ class EventDetailsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Education Committee',
-                        style: AppTextStyles.titleSmall.copyWith(color: AppColors.black),
+                        event.committeeName?.toString() ?? 'Organizer',
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: AppColors.black,
+                        ),
                       ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        'Bhavesh Mehta',
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey.shade600),
-                      ),
+                      if (event.organizerName != null &&
+                          event.organizerName!.isNotEmpty) ...[
+                        SizedBox(height: 4.h),
+                        Text(
+                          event.organizerName!,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.grey.shade600,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
@@ -318,7 +531,10 @@ class EventDetailsPage extends StatelessWidget {
                       SizedBox(width: 6.w),
                       Text(
                         'Call',
-                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.green, fontWeight: FontWeight.w600),
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: AppColors.green,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -331,7 +547,7 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomStaticBar() {
+  Widget _buildBottomStaticBar(EventDetailsData event) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       decoration: BoxDecoration(
@@ -352,45 +568,67 @@ class EventDetailsPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (event.isRegistered) ...[
+                if (event.isMemberRegistered == true) ...[
                   Text(
                     'Registration 0184',
-                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey.shade500),
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.grey.shade500,
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Row(
                     children: [
-                      Icon(Icons.check_circle, size: 16.w, color: AppColors.green),
+                      Icon(
+                        Icons.check_circle,
+                        size: 16.w,
+                        color: AppColors.green,
+                      ),
                       SizedBox(width: 4.w),
                       Text(
                         'Registered',
-                        style: AppTextStyles.titleMedium.copyWith(color: AppColors.black),
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.black,
+                        ),
                       ),
                     ],
                   ),
                 ] else ...[
                   Text(
                     'Status',
-                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey.shade500),
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.grey.shade500,
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     'Not registered',
-                    style: AppTextStyles.titleMedium.copyWith(color: AppColors.black),
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.black,
+                    ),
                   ),
                 ],
               ],
             ),
-            if (event.isRegistered)
+            if (event.isMemberRegistered == true)
               ElevatedButton.icon(
-                onPressed: () => _showPassBottomSheet(Get.context!),
+                onPressed: () => _showPassBottomSheet(Get.context!, event),
                 icon: Icon(Icons.qr_code, size: 18.w, color: AppColors.white),
-                label: Text('View Pass', style: AppTextStyles.labelLarge.copyWith(color: AppColors.white)),
+                label: Text(
+                  'View Pass',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.white,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 12.h,
+                  ),
                 ),
               )
             else
@@ -399,10 +637,20 @@ class EventDetailsPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                  padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 32.w,
+                    vertical: 12.h,
+                  ),
                 ),
-                child: Text('Register', style: AppTextStyles.labelLarge.copyWith(color: AppColors.white)),
+                child: Text(
+                  'Register',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.white,
+                  ),
+                ),
               ),
           ],
         ),
@@ -410,16 +658,17 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  void _showPassBottomSheet(BuildContext context) {
+  void _showPassBottomSheet(BuildContext context, EventDetailsData event) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final formatTime = DateFormat('h:mm a');
-        final formatDate = DateFormat('d MMM yyyy');
-        final String timeString =
-            '${formatDate.format(event.startTime)}, ${formatTime.format(event.startTime).toLowerCase()} to ${formatTime.format(event.endTime).toLowerCase()}';
+        DateTime start =
+            DateTime.tryParse(event.startDateTime ?? '') ?? DateTime.now();
+        DateTime end =
+            DateTime.tryParse(event.endDateTime ?? '') ?? DateTime.now();
+        final String timeString = _formatEventDateTime(start, end);
 
         return Container(
           height: MediaQuery.of(context).size.height * 0.85,
@@ -466,18 +715,32 @@ class EventDetailsPage extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(event.title, style: AppTextStyles.titleMedium.copyWith(fontSize: 15.sp)),
+                                      Text(
+                                        event.eventName ?? '',
+                                        style: AppTextStyles.titleMedium
+                                            .copyWith(fontSize: 15.sp),
+                                      ),
                                       SizedBox(height: 4.h),
                                       Row(
                                         children: [
-                                          Icon(Icons.calendar_today, size: 12.w, color: AppColors.grey.shade600),
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 12.w,
+                                            color: AppColors.grey.shade600,
+                                          ),
                                           SizedBox(width: 4.w),
                                           Expanded(
                                             child: Text(
                                               timeString,
-                                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey.shade700, fontSize: 11.sp),
+                                              style: AppTextStyles.bodySmall
+                                                  .copyWith(
+                                                    color:
+                                                        AppColors.grey.shade700,
+                                                    fontSize: 11.sp,
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -486,25 +749,42 @@ class EventDetailsPage extends StatelessWidget {
                                   ),
                                 ),
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                    vertical: 6.h,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.green.withValues(alpha: 0.1),
+                                    color: AppColors.green.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.check_circle, size: 14.w, color: AppColors.green),
+                                      Icon(
+                                        Icons.check_circle,
+                                        size: 14.w,
+                                        color: AppColors.green,
+                                      ),
                                       SizedBox(width: 4.w),
                                       Text(
                                         'Registered',
-                                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.green, fontWeight: FontWeight.w600),
+                                        style: AppTextStyles.labelSmall
+                                            .copyWith(
+                                              color: AppColors.green,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ],
                             ).paddingAll(16.w),
-                            Divider(color: AppColors.grey.shade200, height: 1, thickness: 1),
+                            Divider(
+                              color: AppColors.grey.shade200,
+                              height: 1,
+                              thickness: 1,
+                            ),
                             // QR Code & Details
                             Padding(
                               padding: EdgeInsets.all(16.w),
@@ -515,24 +795,48 @@ class EventDetailsPage extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: AppColors.white,
                                       borderRadius: BorderRadius.circular(16.r),
-                                      border: Border.all(color: AppColors.grey.shade100),
+                                      border: Border.all(
+                                        color: AppColors.grey.shade100,
+                                      ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.black.withValues(alpha: 0.02),
+                                          color: AppColors.black.withValues(
+                                            alpha: 0.02,
+                                          ),
                                           blurRadius: 8,
                                         ),
                                       ],
                                     ),
-                                    child: Icon(Icons.qr_code_2, size: 180.w, color: AppColors.black),
+                                    child: Icon(
+                                      Icons.qr_code_2,
+                                      size: 180.w,
+                                      color: AppColors.black,
+                                    ),
                                   ),
                                   SizedBox(height: 15.h),
-                                  _buildTicketDetailRow('Attendee', 'Kirit Vasa', 'SM-004821'),
+                                  _buildTicketDetailRow(
+                                    'Attendee',
+                                    'Kirit Vasa',
+                                    'SM-004821',
+                                  ),
                                   SizedBox(height: 10.h),
-                                  _buildTicketDetailRow('Registration No', 'EDU-MELAVDO-2026/0184', ''),
+                                  _buildTicketDetailRow(
+                                    'Registration No',
+                                    'EDU-MELAVDO-2026/0184',
+                                    '',
+                                  ),
                                   SizedBox(height: 10.h),
-                                  _buildTicketDetailRow('Additional', 'Hetal Vasa (44)', 'Dhruv Vasa (17)'),
+                                  _buildTicketDetailRow(
+                                    'Additional',
+                                    'Hetal Vasa (44)',
+                                    'Dhruv Vasa (17)',
+                                  ),
                                   SizedBox(height: 10.h),
-                                  _buildTicketDetailRow('Venue', 'Vidya Bhavan Hall', 'Samaj Bhavan, Chandavarkar Road 400092'),
+                                  _buildTicketDetailRow(
+                                    'Venue',
+                                    'Vidya Bhavan Hall',
+                                    'Samaj Bhavan, Chandavarkar Road 400092',
+                                  ),
                                 ],
                               ),
                             ),
@@ -543,7 +847,9 @@ class EventDetailsPage extends StatelessWidget {
                       Text(
                         'Show this at the check-in desk. It works without internet.',
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey.shade500),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.grey.shade500,
+                        ),
                       ),
                       SizedBox(height: 10.h),
                       SizedBox(
@@ -551,14 +857,23 @@ class EventDetailsPage extends StatelessWidget {
                         child: OutlinedButton(
                           onPressed: () {},
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AppColors.red.withValues(alpha: 0.3)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                            side: BorderSide(
+                              color: AppColors.red.withValues(alpha: 0.3),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
                             padding: EdgeInsets.symmetric(vertical: 12.h),
-                            backgroundColor: AppColors.red.withValues(alpha: 0.02),
+                            backgroundColor: AppColors.red.withValues(
+                              alpha: 0.02,
+                            ),
                           ),
                           child: Text(
                             'Cancel Registration',
-                            style: AppTextStyles.labelMedium.copyWith(color: AppColors.red, fontWeight: FontWeight.w600),
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.red,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ).paddingSymmetric(horizontal: 16.w),
@@ -590,14 +905,25 @@ class EventDetailsPage extends StatelessWidget {
                         children: [
                           Text(
                             'Registration 0184',
-                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey.shade500),
+                            style: AppTextStyles.labelSmall.copyWith(
+                              color: AppColors.grey.shade500,
+                            ),
                           ),
                           SizedBox(height: 2.h),
                           Row(
                             children: [
-                              Icon(Icons.check_circle, size: 14.w, color: AppColors.green),
+                              Icon(
+                                Icons.check_circle,
+                                size: 14.w,
+                                color: AppColors.green,
+                              ),
                               SizedBox(width: 4.w),
-                              Text('Registered', style: AppTextStyles.titleSmall.copyWith(color: AppColors.black)),
+                              Text(
+                                'Registered',
+                                style: AppTextStyles.titleSmall.copyWith(
+                                  color: AppColors.black,
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -607,12 +933,20 @@ class EventDetailsPage extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.grey.shade100,
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 10.h,
+                          ),
                         ),
                         child: Text(
                           'Close',
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.black, fontWeight: FontWeight.w600),
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
@@ -632,16 +966,33 @@ class EventDetailsPage extends StatelessWidget {
       children: [
         SizedBox(
           width: 110.w,
-          child: Text(label, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey.shade500)),
+          child: Text(
+            label,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.grey.shade500,
+            ),
+          ),
         ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value1, style: AppTextStyles.titleMedium.copyWith(color: AppColors.black, fontSize: 13.sp)),
+              Text(
+                value1,
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.black,
+                  fontSize: 13.sp,
+                ),
+              ),
               if (value2.isNotEmpty) ...[
                 SizedBox(height: 2.h),
-                Text(value2, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey.shade600, fontSize: 11.sp)),
+                Text(
+                  value2,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.grey.shade600,
+                    fontSize: 11.sp,
+                  ),
+                ),
               ],
             ],
           ),
@@ -659,9 +1010,9 @@ class _TimelineEvent {
 }
 
 class EventTimelineWidget extends StatefulWidget {
-  final DateTime eventDate;
+  final List<Schedules> schedules;
 
-  const EventTimelineWidget({Key? key, required this.eventDate})
+  const EventTimelineWidget({Key? key, required this.schedules})
     : super(key: key);
 
   @override
@@ -676,162 +1027,21 @@ class _EventTimelineWidgetState extends State<EventTimelineWidget> {
   @override
   void initState() {
     super.initState();
-    final eventDate = widget.eventDate;
 
-    // Providing a set of mock timeline events based on eventDate
-    events = [
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          9,
-          30,
-        ),
-        title: 'Registration & tea',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          10,
-          15,
-        ),
-        title: 'Deep prakatya',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          10,
-          45,
-        ),
-        title: 'Felicitation 10/12',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          12,
-          30,
-        ),
-        title: 'Felicitation graduates',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          13,
-          15,
-        ),
-        title: 'Lunch',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          14,
-          15,
-        ),
-        title: 'Career guidance',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          15,
-          30,
-        ),
-        title: 'Loans & scholarships',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          16,
-          30,
-        ),
-        title: 'Vote of thanks',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          18,
-          0,
-        ),
-        title: 'Dinner & Networking',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          19,
-          30,
-        ),
-        title: 'Cultural Program',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          21,
-          0,
-        ),
-        title: 'Award Ceremony',
-      ),
-      _TimelineEvent(
-        dateTime: DateTime(
-          eventDate.year,
-          eventDate.month,
-          eventDate.day,
-          22,
-          0,
-        ),
-        title: 'Closing Ceremony',
-      ),
-    ];
-
-    // Add a record for TODAY right now to demonstrate the ongoing highlight
-    events.add(
-      _TimelineEvent(
-        dateTime: DateTime.now().subtract(const Duration(minutes: 5)),
-        title: 'Live Ongoing Event',
-      ),
-    );
+    events = widget.schedules.map((schedule) {
+      return _TimelineEvent(
+        dateTime:
+            DateTime.tryParse(schedule.scheduleStartDateTime ?? '') ??
+            DateTime.now(),
+        title: schedule.sessionName ?? '',
+      );
+    }).toList();
 
     // Ensure chronological order
     events.sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
     _calculateActiveIndex();
 
-    // Uncomment this to test with 1 record
-    /*
-    events = [
-      _TimelineEvent(
-        dateTime: DateTime(
-          widget.eventDate.year,
-          widget.eventDate.month,
-          widget.eventDate.day,
-          9,
-          30,
-        ),
-        title: 'Registration & tea',
-      ),
-    ];
-    */
-
-    _calculateActiveIndex();
     _scrollController = ScrollController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -843,16 +1053,18 @@ class _EventTimelineWidgetState extends State<EventTimelineWidget> {
     if (events.isEmpty) return;
 
     DateTime now = DateTime.now();
-    int targetIndex = -1;
+    int closestIndex = 0;
+    Duration minDifference = (now.difference(events[0].dateTime)).abs();
 
-    for (int i = 0; i < events.length; i++) {
-      if (now.isAfter(events[i].dateTime) ||
-          now.isAtSameMomentAs(events[i].dateTime)) {
-        targetIndex = i;
+    for (int i = 1; i < events.length; i++) {
+      Duration difference = (now.difference(events[i].dateTime)).abs();
+      if (difference < minDifference) {
+        minDifference = difference;
+        closestIndex = i;
       }
     }
 
-    _activeIndex = targetIndex;
+    _activeIndex = closestIndex;
   }
 
   void _scrollToCurrentTime() {
@@ -1154,5 +1366,194 @@ class _EventTimelineWidgetState extends State<EventTimelineWidget> {
         ],
       ),
     );
+  }
+}
+
+class EventMediaCarousel extends StatefulWidget {
+  final List<Medias> medias;
+
+  const EventMediaCarousel({Key? key, required this.medias}) : super(key: key);
+
+  @override
+  State<EventMediaCarousel> createState() => _EventMediaCarouselState();
+}
+
+class _EventMediaCarouselState extends State<EventMediaCarousel> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.medias.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      children: [
+        CarouselSlider.builder(
+          itemCount: widget.medias.length,
+          itemBuilder: (context, index, realIndex) {
+            final media = widget.medias[index];
+            final bool isVideo = media.type?.toLowerCase() == 'video';
+
+            if (isVideo && media.url != null) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.r),
+                  color: Colors.black,
+                ),
+                child: EventVideoPlayerWidget(
+                  url: media.url!,
+                  isActive: _currentIndex == index,
+                ),
+              );
+            }
+
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 4.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                color: AppColors.grey.shade200,
+                image: media.url != null
+                    ? DecorationImage(
+                        image: NetworkImage(media.url!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: media.url == null
+                  ? Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: AppColors.grey.shade400,
+                        size: 40.w,
+                      ),
+                    )
+                  : null,
+            );
+          },
+          options: CarouselOptions(
+            height: 200.h,
+            autoPlay: widget.medias.every(
+              (m) => m.type?.toLowerCase() != 'video',
+            ),
+            aspectRatio: 16 / 9,
+            viewportFraction: 1,
+            enableInfiniteScroll: widget.medias.length > 1,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+        ),
+        if (widget.medias.length > 1) ...[
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              widget.medias.length,
+              (index) => Container(
+                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                width: _currentIndex == index ? 24.w : 8.w,
+                height: 8.h,
+                decoration: BoxDecoration(
+                  color: _currentIndex == index
+                      ? AppColors.primary
+                      : AppColors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class EventVideoPlayerWidget extends StatefulWidget {
+  final String url;
+  final bool isActive;
+
+  const EventVideoPlayerWidget({
+    Key? key,
+    required this.url,
+    required this.isActive,
+  }) : super(key: key);
+
+  @override
+  State<EventVideoPlayerWidget> createState() => _EventVideoPlayerWidgetState();
+}
+
+class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    _videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.url),
+    );
+    await _videoPlayerController.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: widget.isActive,
+      looping: false,
+      allowMuting: true,
+      showControls: true,
+      showOptions: false,
+      allowPlaybackSpeedChanging: false,
+      cupertinoProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primary,
+      ),
+      errorBuilder: (context, errorMessage) {
+        return Center(
+          child: Text(
+            errorMessage,
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
+      },
+    );
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant EventVideoPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive != widget.isActive) {
+      if (widget.isActive) {
+        _videoPlayerController.play();
+      } else {
+        _videoPlayerController.pause();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_chewieController != null &&
+        _chewieController!.videoPlayerController.value.isInitialized) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16.r),
+        child: Chewie(controller: _chewieController!),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
   }
 }
