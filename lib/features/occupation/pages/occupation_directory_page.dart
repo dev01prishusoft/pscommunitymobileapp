@@ -55,14 +55,14 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       appBar: AppBar(
         title: _isSearchVisible
             ? CupertinoSearchbar(
-              onTapSuffix: () {
-                    _searchController.clear();
-                    _controller.clearSearch();
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    setState(() {
-                      _isSearchVisible = false;
-                    });
-                  },
+                onTapSuffix: () {
+                  _searchController.clear();
+                  _controller.clearSearch();
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  setState(() {
+                    _isSearchVisible = false;
+                  });
+                },
                 hintText: LK.searchOccupation.tr,
                 controller: _searchController,
                 onChanged: (value) {
@@ -163,12 +163,16 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       ),
       onTap: () async {
         FocusManager.instance.primaryFocus?.unfocus();
+        _searchController.clear();
+        _controller.clearSearch();
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() {
+          _isSearchVisible = false;
+        });
         await Get.toNamed<void>(
           AppRouter.occupationProfile,
           arguments: {'occupationId': occ.id, 'occupationName': occ.name},
         );
-        FocusManager.instance.primaryFocus?.unfocus();
-        _controller.loadOccupations(refresh: true);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

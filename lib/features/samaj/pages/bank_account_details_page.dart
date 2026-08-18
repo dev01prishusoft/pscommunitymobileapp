@@ -360,7 +360,7 @@ class BankAccountDetailsPage extends StatelessWidget {
               label,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.grey.shade600,
-                fontSize: 13,
+                fontSize: 12.5,
               ),
             ),
           ),
@@ -380,7 +380,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     style: AppTextStyles.labelLarge.copyWith(
                       color: AppColors.black,
                       fontWeight: FontWeight.w600,
-                      fontSize: 13,
+                      fontSize: 12.5,
                     ),
                   ),
                 ),
@@ -402,7 +402,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                       padding: const EdgeInsets.all(2.0),
                       child: Icon(
                         Icons.copy_rounded,
-                        size: 16.sp,
+                        size: 15.sp,
                         color: AppColors.primary,
                       ),
                     ),

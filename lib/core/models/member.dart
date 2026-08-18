@@ -2,6 +2,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 
 class Member {
   Member({
+    this.age,
     required this.memberId,
     this.memberNo,
     required this.firstName,
@@ -133,6 +134,7 @@ class Member {
     }
 
     return Member(
+      age: json['age'] ?? 0,
       memberId: (json['memberId'] ?? json['id']) as int? ?? 0,
       memberNo: getString('memberNo'),
       firstName: getString('firstName') ?? fallbackFirst,
@@ -153,7 +155,8 @@ class Member {
       emailAddress: getString('emailAddress'),
       genderId: (json['genderId'] ?? json['GenderId']) as int?,
       genderName: getString('genderName', 'gender'),
-      maritalStatusId: (json['maritalStatusId'] ?? json['MaritalStatusId']) as int?,
+      maritalStatusId:
+          (json['maritalStatusId'] ?? json['MaritalStatusId']) as int?,
       maritalStatusName: getString(
         'maritalStatusName',
         'maritalStatus',
@@ -166,7 +169,11 @@ class Member {
                   json['LookingforMarriage'] ??
                   json['isLookingForMarriage'])
               as bool?,
-      educationName: getString('educationName', 'educationalQualification', 'education'),
+      educationName: getString(
+        'educationName',
+        'educationalQualification',
+        'education',
+      ),
       jobPositionName: getString('jobPositionName'),
       otherJobPosition: getString('otherJobPosition'),
       monthlyIncome: (json['monthlyIncome'] as num?)?.toDouble(),
@@ -221,7 +228,8 @@ class Member {
       occupationDistrictId: json['occupationDistrictId'] as int?,
       occupationTalukaId: json['occupationTalukaId'] as int?,
       occupationAreaId: json['occupationAreaId'] as int?,
-      occupationTypeId: (json['occupationTypeId'] ?? json['OccupationTypeId']) as int?,
+      occupationTypeId:
+          (json['occupationTypeId'] ?? json['OccupationTypeId']) as int?,
       occupationId: (json['occupationId'] ?? json['OccupationId']) as int?,
       jobPositionId: (json['jobPositionId'] ?? json['JobPositionId']) as int?,
       familyId: json['familyId'] as int?,
@@ -232,18 +240,23 @@ class Member {
       gotraId: json['gotraId'] as int?,
       motherGotraId: json['motherGotraId'] as int?,
       motherStateId: (json['motherStateId'] ?? json['MotherStateId']) as int?,
-      motherDistrictId: (json['motherDistrictId'] ?? json['MotherDistrictId']) as int?,
-      motherTalukaId: (json['motherTalukaId'] ?? json['MotherTalukaId']) as int?,
+      motherDistrictId:
+          (json['motherDistrictId'] ?? json['MotherDistrictId']) as int?,
+      motherTalukaId:
+          (json['motherTalukaId'] ?? json['MotherTalukaId']) as int?,
       motherAreaId: (json['motherAreaId'] ?? json['MotherAreaId']) as int?,
       signId: (json['signId'] ?? json['SignId']) as int?,
       signName: getString('signName', 'SignName'),
-      issameAddressasMyFamilyHeadAddress: json['issameAddressasMyFamilyHeadAddress'] as bool?,
+      issameAddressasMyFamilyHeadAddress:
+          json['issameAddressasMyFamilyHeadAddress'] as bool?,
       approveStatus: getString('approveStatus', 'ApproveStatus'),
-      rejectedReasonCommentByAdmin: getString('rejectedReasonCommentByAdmin') ??
+      rejectedReasonCommentByAdmin:
+          getString('rejectedReasonCommentByAdmin') ??
           getString('rejectionReason') ??
           getString('rejectReason'),
     );
   }
+  final dynamic age;
   final int memberId;
   final String? memberNo;
   final String firstName;
@@ -313,7 +326,7 @@ class Member {
   final int? areaId;
   final int? occupationStateId;
   final int? occupationDistrictId;
-      final int? occupationTalukaId;
+  final int? occupationTalukaId;
   final int? occupationAreaId;
   final int? occupationTypeId;
   final int? occupationId;
@@ -341,21 +354,21 @@ class Member {
   String get occupation => occupationName ?? occupationTypeName ?? '';
   String get area => occupationAreaName ?? '';
   String get gotra => gotraName ?? '';
-  int get age {
-    if (dateOfBirth == null) return apiAge ?? 0;
-    try {
-      final dob = DateTime.parse(dateOfBirth!);
-      final now = DateTime.now();
-      int ageCount = now.year - dob.year;
-      if (now.month < dob.month ||
-          (now.month == dob.month && now.day < dob.day)) {
-        ageCount--;
-      }
-      return ageCount;
-    } catch (_) {
-      return apiAge ?? 0;
-    }
-  }
+  // int get age {
+  //   if (dateOfBirth == null) return apiAge ?? 0;
+  //   try {
+  //     final dob = DateTime.parse(dateOfBirth!);
+  //     final now = DateTime.now();
+  //     int ageCount = now.year - dob.year;
+  //     if (now.month < dob.month ||
+  //         (now.month == dob.month && now.day < dob.day)) {
+  //       ageCount--;
+  //     }
+  //     return ageCount;
+  //   } catch (_) {
+  //     return apiAge ?? 0;
+  //   }
+  // }
 
   Map<String, dynamic> toJson() {
     return {
