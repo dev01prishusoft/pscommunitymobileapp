@@ -17,6 +17,12 @@ class EventDetailsController extends GetxController {
   final RxString errorMessage = ''.obs;
   final Rx<EventDetailsData?> eventDetails = Rx<EventDetailsData?>(null);
 
+  final RxInt pauseVideoTrigger = 0.obs;
+
+  void triggerVideoPause() {
+    pauseVideoTrigger.value++;
+  }
+
   CancelToken? _cancelToken;
 
   @override
@@ -56,7 +62,7 @@ class EventDetailsController extends GetxController {
       hasError.value = true;
       errorMessage.value = "Failed to fetch event details.";
     }
-    
+
     isLoading.value = false;
   }
 

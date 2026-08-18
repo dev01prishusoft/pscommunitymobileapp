@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_details_controller.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final int eventId;
@@ -36,8 +38,15 @@ class EventDetailsPage extends StatelessWidget {
         }
         final event = controller.eventDetails.value!;
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: 50.h, top: 16.h),
+        return NotificationListener<UserScrollNotification>(
+          onNotification: (notification) {
+            if (notification.direction != ScrollDirection.idle) {
+              controller.triggerVideoPause();
+            }
+            return false;
+          },
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 50.h, top: 16.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -53,7 +62,9 @@ class EventDetailsPage extends StatelessWidget {
               ],
               if (event.committeeName != null ||
                   (event.organizerName != null &&
-                      event.organizerName!.isNotEmpty)) ...[
+                        event.organizerName!.isNotEmpty) ||
+                    (event.organizers != null &&
+                        event.organizers!.isNotEmpty)) ...[
                 SizedBox(height: 16.h),
                 _buildOrganisedBySection(event),
               ],
@@ -66,6 +77,7 @@ class EventDetailsPage extends StatelessWidget {
               ],
             ],
           ).paddingSymmetric(horizontal: 16.w),
+          ),
         );
       }),
     );
@@ -478,71 +490,125 @@ class EventDetailsPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 20.h),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.grey.shade50,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.group,
-                    color: AppColors.primary,
-                    size: 24.w,
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event.committeeName?.toString() ?? 'Organizer',
-                        style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.black,
-                        ),
-                      ),
-                      if (event.organizerName != null &&
-                          event.organizerName!.isNotEmpty) ...[
-                        SizedBox(height: 4.h),
-                        Text(
-                          event.organizerName!,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 8.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.call, size: 16.w, color: AppColors.green),
-                      SizedBox(width: 6.w),
-                      Text(
-                        'Call',
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.green,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            if (event.organizers != null && event.organizers!.isNotEmpty)
+              ...event.organizers!
+                  .map((organizer) => _buildOrganizerItem(organizer))
+                  .toList()
+            else
+              _buildLegacyOrganizer(event),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildOrganizerItem(Organizers organizer) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (organizer.committeeName != null &&
+            organizer.committeeName!.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h, top: 8.h),
+            child: Text(
+              organizer.committeeName!,
+              style: AppTextStyles.titleSmall.copyWith(
+                color: AppColors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        if (organizer.memberName != null && organizer.memberName!.isNotEmpty)
+          _buildPersonRow(
+            organizer.memberName,
+            organizer.mobileNo,
+            organizer.email,
+          ),
+        if (organizer.committeeMembers != null &&
+            organizer.committeeMembers!.isNotEmpty)
+          ...organizer.committeeMembers!.map(
+            (member) => _buildPersonRow(
+              member.memberName,
+              member.mobileNo,
+              member.email,
+            ),
+          ),
+        SizedBox(height: 8.h),
+      ],
+    );
+  }
+
+  Widget _buildLegacyOrganizer(EventDetailsData event) {
+    return _buildPersonRow(
+      event.organizerName,
+      event.organizerMobileNo?.toString(),
+      null,
+    );
+  }
+
+  Widget _buildPersonRow(String? name, String? mobile, String? email) {
+    if (name == null || name.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.grey.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.person, color: AppColors.primary, size: 24.w),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Text(
+              name,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey.shade800,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          if (mobile != null && mobile.isNotEmpty)
+            GestureDetector(
+              onTap: () async {
+                final url = 'tel:$mobile';
+                if (await canLaunchUrlString(url)) {
+                  await launchUrlString(url);
+                }
+              },
+              child: Container(
+                margin: EdgeInsets.only(left: 8.w),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 10.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: AppColors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(Icons.call, size: 16.w, color: AppColors.green),
+              ),
+            ),
+          if (email != null && email.isNotEmpty)
+            GestureDetector(
+              onTap: () async {
+                final url = 'mailto:$email';
+                if (await canLaunchUrlString(url)) {
+                  await launchUrlString(url);
+                }
+              },
+              child: Container(
+                margin: EdgeInsets.only(left: 8.w),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(Icons.email, size: 16.w, color: AppColors.primary),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -633,7 +699,8 @@ class EventDetailsPage extends StatelessWidget {
               )
             else
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () =>
+                    Get.toNamed(AppRouter.eventRegistration, arguments: event),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   elevation: 0,
@@ -1487,11 +1554,24 @@ class EventVideoPlayerWidget extends StatefulWidget {
 class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
+  Worker? _pauseWorker;
 
   @override
   void initState() {
     super.initState();
     _initializePlayer();
+    
+    if (Get.isRegistered<EventDetailsController>()) {
+      _pauseWorker = ever(
+        Get.find<EventDetailsController>().pauseVideoTrigger,
+        (_) {
+          if (_videoPlayerController.value.isInitialized &&
+              _videoPlayerController.value.isPlaying) {
+            _videoPlayerController.pause();
+          }
+        },
+      );
+    }
   }
 
   Future<void> _initializePlayer() async {
@@ -1539,6 +1619,7 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
 
   @override
   void dispose() {
+    _pauseWorker?.dispose();
     _videoPlayerController.dispose();
     _chewieController?.dispose();
     super.dispose();

@@ -55,6 +55,7 @@ class EventDetailsData {
   dynamic organizerMobileNo;
   List<Schedules>? schedules;
   List<Medias>? medias;
+  List<Organizers>? organizers;
 
   EventDetailsData(
       {this.eventId,
@@ -85,7 +86,8 @@ class EventDetailsData {
       this.organizerName,
       this.organizerMobileNo,
       this.schedules,
-      this.medias});
+      this.medias,
+      this.organizers});
 
   EventDetailsData.fromJson(Map<String, dynamic> json) {
     eventId = json['eventId'];
@@ -127,6 +129,12 @@ class EventDetailsData {
         medias!.add(new Medias.fromJson(v));
       });
     }
+    if (json['organizers'] != null) {
+      organizers = <Organizers>[];
+      json['organizers'].forEach((v) {
+        organizers!.add(new Organizers.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -163,6 +171,9 @@ class EventDetailsData {
     }
     if (this.medias != null) {
       data['medias'] = this.medias!.map((v) => v.toJson()).toList();
+    }
+    if (this.organizers != null) {
+      data['organizers'] = this.organizers!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -270,6 +281,92 @@ class Medias {
     data['alternativeText'] = this.alternativeText;
     data['isCoverImage'] = this.isCoverImage;
     data['isGalleryVisible'] = this.isGalleryVisible;
+    return data;
+  }
+}
+
+class Organizers {
+  int? eventOrganizerId;
+  int? memberId;
+  int? committeeId;
+  String? committeeName;
+  String? memberName;
+  String? mobileNo;
+  String? email;
+  List<CommitteeMembers>? committeeMembers;
+
+  Organizers(
+      {this.eventOrganizerId,
+      this.memberId,
+      this.committeeId,
+      this.committeeName,
+      this.memberName,
+      this.mobileNo,
+      this.email,
+      this.committeeMembers});
+
+  Organizers.fromJson(Map<String, dynamic> json) {
+    eventOrganizerId = json['eventOrganizerId'];
+    memberId = json['memberId'];
+    committeeId = json['committeeId'];
+    committeeName = json['committeeName'];
+    memberName = json['memberName'];
+    mobileNo = json['mobileNo'];
+    email = json['email'];
+    if (json['committeeMembers'] != null) {
+      committeeMembers = <CommitteeMembers>[];
+      json['committeeMembers'].forEach((v) {
+        committeeMembers!.add(new CommitteeMembers.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['eventOrganizerId'] = this.eventOrganizerId;
+    data['memberId'] = this.memberId;
+    data['committeeId'] = this.committeeId;
+    data['committeeName'] = this.committeeName;
+    data['memberName'] = this.memberName;
+    data['mobileNo'] = this.mobileNo;
+    data['email'] = this.email;
+    if (this.committeeMembers != null) {
+      data['committeeMembers'] =
+          this.committeeMembers!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class CommitteeMembers {
+  int? committeeMemberId;
+  int? memberId;
+  String? memberName;
+  String? mobileNo;
+  String? email;
+
+  CommitteeMembers(
+      {this.committeeMemberId,
+      this.memberId,
+      this.memberName,
+      this.mobileNo,
+      this.email});
+
+  CommitteeMembers.fromJson(Map<String, dynamic> json) {
+    committeeMemberId = json['committeeMemberId'];
+    memberId = json['memberId'];
+    memberName = json['memberName'];
+    mobileNo = json['mobileNo'];
+    email = json['email'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['committeeMemberId'] = this.committeeMemberId;
+    data['memberId'] = this.memberId;
+    data['memberName'] = this.memberName;
+    data['mobileNo'] = this.mobileNo;
+    data['email'] = this.email;
     return data;
   }
 }

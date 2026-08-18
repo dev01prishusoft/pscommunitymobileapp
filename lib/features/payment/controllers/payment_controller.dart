@@ -153,6 +153,22 @@ class PaymentController extends GetxController {
       enteredAmount.value = cat.defaultAmount;
     }
   }
+  Future<void> initiateDirectPayment(double amount) async {
+    if (paymentTypes.isEmpty) await loadPaymentTypes();
+    if (paymentModes.isEmpty) await loadPaymentModes();
+
+    if (paymentTypes.isNotEmpty) {
+      await onTypeChanged(paymentTypes.first);
+    }
+    if (paymentModes.isNotEmpty) {
+      selectedMode.value = paymentModes.first;
+    }
+    if (categories.isNotEmpty) {
+      selectedCategory.value = categories.first;
+    }
+
+    await initiatePayment(customAmount: amount);
+  }
 
   Future<void> initiatePayment({
     int? adminPaymentRequestId,
