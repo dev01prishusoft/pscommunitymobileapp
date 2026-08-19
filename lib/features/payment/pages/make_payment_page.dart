@@ -328,35 +328,47 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                 ),
                 SizedBox(height: 20.h),
 
-                if (controller.selectedCategory.value?.isRecurring == true) ...[
-                  GestureDetector(
-                    onTap: controller.isProcessingPayment.value
-                        ? null
-                        : () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              controller.initiatePayment(isRecurring: true);
-                            }
-                          },
-                    child: Container(
-                      height: 50.h,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.secondary),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        LK.setupAutoPayRecurring.tr,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.secondary,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ).paddingSymmetric(horizontal: 10.w),
-                  SizedBox(height: 20.h),
-                ],
+                Obx(
+                  () => controller.selectedCategory.value?.isRecurring == true
+                      ? Column(
+                          children: [
+                            GestureDetector(
+                              onTap: controller.isProcessingPayment.value
+                                  ? null
+                                  : () {
+                                      if (_formKey.currentState?.validate() ??
+                                          false) {
+                                        controller.initiatePayment(
+                                          isRecurring: true,
+                                        );
+                                      }
+                                    },
+                              child: Container(
+                                height: 50.h,
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: AppColors.secondary,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  LK.setupAutoPayRecurring.tr,
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyles.titleSmall.copyWith(
+                                    color: AppColors.secondary,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ).paddingSymmetric(horizontal: 10.w),
+                            SizedBox(height: 20.h),
+                          ],
+                        )
+                      : SizedBox.shrink(),
+                ),
+
                 AppPrimaryButton(
                   height: 50.h,
                   isLoading: controller.isProcessingPayment.value,
