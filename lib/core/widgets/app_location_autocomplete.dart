@@ -40,6 +40,13 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   final Dio _dio = Dio();
 
   bool _isLoading = false;
+  String? _lastSelectedLocation;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastSelectedLocation = widget.controller.text;
+  }
 
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (query.trim().length < 3) return [];
@@ -161,6 +168,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
               option['description'],
           onSelected: (Map<String, dynamic> selection) {
             widget.controller.text = selection['description'];
+            _lastSelectedLocation = selection['description'];
             _getPlaceDetails(selection['place_id'], selection['description']);
           },
           fieldViewBuilder:
@@ -183,6 +191,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                 });
 
                 return TextFormField(
+                  maxLength: 250,
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -213,6 +222,11 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                     if (widget.isRequired &&
                         (value == null || value.trim().isEmpty)) {
                       return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+                    }
+                    if (value != null &&
+                        value.trim().isNotEmpty &&
+                        value != _lastSelectedLocation) {
+                      return LK.selectValidLocation.tr;
                     }
                     return null;
                   },

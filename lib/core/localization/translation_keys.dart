@@ -539,4 +539,5 @@ class LK {
   static const String deleteAllNotificationDesc =
       'delete_all_notification_description';
   static const String rejectionDetails = 'rejection_details';
+  static const String selectValidLocation = 'select_valid_location';
 }
