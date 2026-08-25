@@ -55,7 +55,8 @@ class PaymentController extends GetxController {
       return p.title.toLowerCase().contains(query) ||
           p.memberName.toLowerCase().contains(query) ||
           p.amountFormatted.toLowerCase().contains(query) ||
-          p.status.toLowerCase().contains(query);
+          p.status.toLowerCase().contains(query) ||
+          p.recurringType.toLowerCase().contains(query);
     }).toList();
   }
 

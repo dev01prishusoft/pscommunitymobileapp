@@ -23,16 +23,21 @@ class MaritalStatusMapper {
 
     switch (normalized) {
       case 'married':
+      case 'પરિણીત':
         return LK.married;
       case 'unmarried':
-        return LK.unmarried;
       case 'single':
+      case 'અપરિણીત':
+      case 'સિંગલ':
         return LK.unmarried;
       case 'widow':
+      case 'વિધવા':
         return LK.widow;
       case 'widower':
+      case 'વિધુર':
         return LK.widower;
       case 'divorced':
+      case 'છૂટાછેડા':
         return LK.divorced;
       default:
         return null;

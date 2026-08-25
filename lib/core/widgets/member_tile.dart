@@ -105,6 +105,12 @@ class MemberTile extends StatelessWidget {
                               color: AppColors.grey,
                             ),
                           );
+                          
+                          String cleanString(String value) {
+                            return value
+                                .replaceAll(RegExp(r'\s*\([^)]*\)'), '')
+                                .trim();
+                          }
 
                           return Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
@@ -112,19 +118,21 @@ class MemberTile extends StatelessWidget {
                               Text(
                                 genderKey != null
                                     ? genderKey.tr
-                                    : member.gender,
+                                    : cleanString(member.gender),
                                 style: metaStyle,
                               ),
                               dot,
                               Text(
-                                relKey != null ? relKey.tr : member.relation,
+                                relKey != null
+                                    ? relKey.tr
+                                    : cleanString(member.relation),
                                 style: metaStyle,
                               ),
                               dot,
                               Text(
                                 statusKey != null
                                     ? statusKey.tr
-                                    : member.maritalStatus,
+                                    : cleanString(member.maritalStatus),
                                 style: metaStyle,
                               ),
                               if (member.occupation.isNotEmpty &&
@@ -132,7 +140,10 @@ class MemberTile extends StatelessWidget {
                                   member.occupation.toLowerCase() !=
                                       'none') ...[
                                 dot,
-                                Text(member.occupation, style: metaStyle),
+                                Text(
+                                  cleanString(member.occupation),
+                                  style: metaStyle,
+                                ),
                               ],
                             ],
                           );
