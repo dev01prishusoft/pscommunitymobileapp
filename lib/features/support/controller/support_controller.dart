@@ -53,5 +53,7 @@ class SupportController extends GetxController {
     await launchUrl(uri);
   }
 
-  void launchSafeUrl(String s) {}
+  void launchSafeUrl(String s) async {
+    await launchUrl(Uri.parse(s));
+  }
 }

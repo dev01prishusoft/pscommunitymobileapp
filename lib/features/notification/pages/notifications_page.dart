@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -147,9 +149,11 @@ class NotificationsPage extends GetView<NotificationController> {
 
           if (controller.notifications.isEmpty) {
             return Center(
-              child: Text(
-                LK.noNotificationsFound.tr,
-                style: AppTextStyles.bodyLarge.copyWith(color: AppColors.grey),
+              child: AppEmptyState(
+                icon: Iconsax.notification,
+                secondaryIcon: Iconsax.search_normal_copy,
+                subtitle: "",
+                title: LK.noNotificationsFound.tr,
               ),
             );
           }
