@@ -98,14 +98,14 @@ class EventCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 5,
+                runSpacing: 5,
                 children: [
                   if (event.eventType != null &&
                       event.eventType!.isNotEmpty) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 10,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
@@ -123,7 +123,7 @@ class EventCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             event.eventType ?? 'Event',
-                            style: AppTextStyles.labelMedium.copyWith(
+                            style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                             ),
@@ -136,7 +136,7 @@ class EventCard extends StatelessWidget {
                       event.eventMode!.isNotEmpty) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 10,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
@@ -154,7 +154,7 @@ class EventCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${event.eventMode}',
-                            style: AppTextStyles.labelMedium.copyWith(
+                            style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.green,
                               fontWeight: FontWeight.w600,
                             ),
@@ -166,7 +166,7 @@ class EventCard extends StatelessWidget {
                   if (event.isMemberRegistered == true) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 10,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
@@ -184,7 +184,7 @@ class EventCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             'Registered',
-                            style: AppTextStyles.labelMedium.copyWith(
+                            style: AppTextStyles.labelSmall.copyWith(
                               color: const Color(0xFFE65100),
                               fontWeight: FontWeight.w600,
                             ),
@@ -196,8 +196,8 @@ class EventCard extends StatelessWidget {
                   if (event.registrationFee != null) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                        horizontal: 10,
+                        vertical: 5,
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE4F5ED),
@@ -210,7 +210,7 @@ class EventCard extends StatelessWidget {
                           SizedBox(width: 4),
                           Text(
                             'Registration Fee ${event.registrationFee}',
-                            style: AppTextStyles.labelMedium.copyWith(
+                            style: AppTextStyles.labelSmall.copyWith(
                               color: Color(0xFF1A7A60),
                               fontWeight: FontWeight.w600,
                             ),

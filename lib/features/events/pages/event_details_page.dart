@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +14,7 @@ import 'package:pscommunitymobileapp/features/events/controllers/event_details_c
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_pdf_viewer_page.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final int eventId;
@@ -47,36 +50,33 @@ class EventDetailsPage extends StatelessWidget {
           },
           child: SingleChildScrollView(
             padding: EdgeInsets.only(bottom: 50.h, top: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildMediaCarousel(event),
-              if (event.medias != null && event.medias!.isNotEmpty)
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildMediaCarousel(event),
+                if (event.medias != null && event.medias!.isNotEmpty)
+                  SizedBox(height: 16.h),
+                eventHeaderDetails(event),
                 SizedBox(height: 16.h),
-              eventHeaderDetails(event),
-              SizedBox(height: 16.h),
-              eventInfo(event),
-              if (event.schedules != null && event.schedules!.isNotEmpty) ...[
-                SizedBox(height: 16.h),
-                eventTimeLine(event),
-              ],
-              if (event.committeeName != null ||
-                  (event.organizerName != null &&
+                eventInfo(event),
+                if (event.committeeName != null ||
+                    (event.organizerName != null &&
                         event.organizerName!.isNotEmpty) ||
                     (event.organizers != null &&
                         event.organizers!.isNotEmpty)) ...[
-                SizedBox(height: 16.h),
-                _buildOrganisedBySection(event),
+                  SizedBox(height: 16.h),
+                  _buildOrganisedBySection(event),
+                ],
+                _buildDocumentsSection(event),
+                if ((event.termsAndConditions != null &&
+                        event.termsAndConditions!.isNotEmpty) ||
+                    (event.shortDescription != null &&
+                        event.shortDescription!.isNotEmpty)) ...[
+                  SizedBox(height: 16.h),
+                  _buildPleaseNoteSection(event),
+                ],
               ],
-              if ((event.termsAndConditions != null &&
-                      event.termsAndConditions!.isNotEmpty) ||
-                  (event.shortDescription != null &&
-                      event.shortDescription!.isNotEmpty)) ...[
-                SizedBox(height: 16.h),
-                _buildPleaseNoteSection(event),
-              ],
-            ],
-          ).paddingSymmetric(horizontal: 16.w),
+            ).paddingSymmetric(horizontal: 10.w),
           ),
         );
       }),
@@ -100,10 +100,17 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget _buildMediaCarousel(EventDetailsData event) {
-    if (event.medias == null || event.medias!.isEmpty)
+    if (event.medias == null || event.medias!.isEmpty) {
       return const SizedBox.shrink();
+    }
 
-    return EventMediaCarousel(medias: event.medias!);
+    final carouselMedias = event.medias!
+        .where((m) => !(m.url?.toLowerCase().contains('.pdf') ?? false))
+        .toList();
+
+    if (carouselMedias.isEmpty) return const SizedBox.shrink();
+
+    return EventMediaCarousel(medias: carouselMedias);
   }
 
   Widget eventHeaderDetails(EventDetailsData event) {
@@ -127,13 +134,13 @@ class EventDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 5,
+              runSpacing: 5,
               children: [
                 if (event.eventType != null && event.eventType!.isNotEmpty) ...[
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 10,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
@@ -151,7 +158,7 @@ class EventDetailsPage extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           event.eventType ?? 'Event',
-                          style: AppTextStyles.labelMedium.copyWith(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -163,7 +170,7 @@ class EventDetailsPage extends StatelessWidget {
                 if (event.eventMode != null && event.eventMode!.isNotEmpty) ...[
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 10,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
@@ -181,7 +188,7 @@ class EventDetailsPage extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${event.eventMode}',
-                          style: AppTextStyles.labelMedium.copyWith(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.green,
                             fontWeight: FontWeight.w600,
                           ),
@@ -193,7 +200,7 @@ class EventDetailsPage extends StatelessWidget {
                 if (event.isMemberRegistered == true) ...[
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: 10,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
@@ -211,7 +218,7 @@ class EventDetailsPage extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           'Registered',
-                          style: AppTextStyles.labelMedium.copyWith(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: const Color(0xFFE65100),
                             fontWeight: FontWeight.w600,
                           ),
@@ -223,8 +230,8 @@ class EventDetailsPage extends StatelessWidget {
                 if (event.registrationFee != null) ...[
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 10,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE4F5ED),
@@ -237,7 +244,7 @@ class EventDetailsPage extends StatelessWidget {
                         SizedBox(width: 4),
                         Text(
                           'Registration Fee ${event.registrationFee}',
-                          style: AppTextStyles.labelMedium.copyWith(
+                          style: AppTextStyles.labelSmall.copyWith(
                             color: Color(0xFF1A7A60),
                             fontWeight: FontWeight.w600,
                           ),
@@ -284,12 +291,6 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget eventInfo(EventDetailsData event) {
-    DateTime start =
-        DateTime.tryParse(event.startDateTime ?? '') ?? DateTime.now();
-    DateTime end = DateTime.tryParse(event.endDateTime ?? '') ?? DateTime.now();
-
-    final String timeString = _formatEventDateTime(start, end);
-
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -316,82 +317,22 @@ class EventDetailsPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 20.h),
-            _buildInfoRow(Icons.access_time_filled, timeString),
-            if ((event.venueName != null && event.venueName!.isNotEmpty) ||
-                '${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
-                    .trim()
-                    .isNotEmpty) ...[
-              SizedBox(height: 16.h),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 20.w,
-                    color: AppColors.grey.shade500,
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (event.venueName != null &&
-                            event.venueName!.isNotEmpty) ...[
-                          Text(
-                            event.venueName!,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                        ],
-                        if ('${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
-                            .trim()
-                            .isNotEmpty) ...[
-                          Text(
-                            '${event.addressLine1 ?? ''} ${event.addressLine2 ?? ''} ${event.landmark ?? ''} ${event.pincode ?? ''}'
-                                .trim(),
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.grey.shade600,
-                            ),
-                          ),
-                          SizedBox(height: 6.h),
-                        ],
-                        if (event.googleMapUrl != null &&
-                            event.googleMapUrl!.isNotEmpty)
-                          GestureDetector(
-                            onTap: () async {
-                              if (await canLaunchUrlString(
-                                event.googleMapUrl!,
-                              )) {
-                                await launchUrlString(event.googleMapUrl!);
-                              }
-                            },
-                            child: Text(
-                              'Get directions',
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              _buildInfoRow(
-                Icons.event_seat,
-                '${event.totalRegistrations ?? 0} places taken',
-              ),
-              SizedBox(height: 16.h),
+            _buildInfoRow(
+              Icons.event_seat,
+              '${event.totalRegistrations ?? 0} places taken',
+            ),
+            SizedBox(height: 16.h),
+            if (event.maximumGuestsPerMember != 0) ...[
               _buildInfoRow(
                 Icons.family_restroom,
-                'Up to ${event.maximumGuestsPerMember} family members',
+                'Up to ${event.maximumGuestsPerMember} Guest members',
               ),
+            ],
+            if (event.schedules != null && event.schedules!.isNotEmpty) ...[
+              SizedBox(height: 16.h),
+              Divider(color: AppColors.grey.shade100, height: 1),
+              SizedBox(height: 16.h),
+              eventTimeLine(event),
             ],
           ],
         ),
@@ -533,7 +474,6 @@ class EventDetailsPage extends StatelessWidget {
               member.email,
             ),
           ),
-        SizedBox(height: 8.h),
       ],
     );
   }
@@ -549,17 +489,16 @@ class EventDetailsPage extends StatelessWidget {
   Widget _buildPersonRow(String? name, String? mobile, String? email) {
     if (name == null || name.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.only(bottom: 15.h),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
               color: AppColors.grey.shade50,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.person, color: AppColors.primary, size: 24.w),
+            child: Icon(Icons.person, color: AppColors.primary, size: 22.w),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -581,8 +520,7 @@ class EventDetailsPage extends StatelessWidget {
               },
               child: Container(
                 margin: EdgeInsets.only(left: 8.w),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
                 decoration: BoxDecoration(
                   color: AppColors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
@@ -609,6 +547,152 @@ class EventDetailsPage extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentsSection(EventDetailsData event) {
+    if (event.medias == null || event.medias!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final pdfMedias = event.medias!
+        .where((m) => m.url?.toLowerCase().contains('.pdf') ?? false)
+        .toList();
+
+    if (pdfMedias.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: EdgeInsets.only(top: 16.h),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: AppColors.grey.shade100),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Iconsax.document_1_copy,
+                  color: AppColors.primary,
+                  size: 20.w,
+                ),
+                SizedBox(width: 8.w),
+                Text('Documents', style: AppTextStyles.titleMedium),
+              ],
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'Brochures, rule sheets or consent forms members can download.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.grey.shade500,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10.r),
+                border: Border.all(color: AppColors.grey.shade200),
+              ),
+              child: Column(
+                children: pdfMedias.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final media = entry.value;
+                  String pdfName = 'Document';
+                  try {
+                    if (media.url != null) {
+                      pdfName = Uri.decodeComponent(media.url!.split('/').last);
+                    }
+                  } catch (_) {}
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 12.h,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9),
+                                borderRadius: BorderRadius.circular(16.r),
+                              ),
+                              child: Text(
+                                'PDF',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: const Color(0xFF2E7D32),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10.sp,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: Text(
+                                pdfName,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            TextButton(
+                              onPressed: () {
+                                if (media.url != null) {
+                                  Get.to(
+                                    () => AppPdfViewerPage(
+                                      title: pdfName,
+                                      pdfUrl: media.url!,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                'Open',
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (index < pdfMedias.length - 1)
+                        Divider(color: AppColors.grey.shade200, height: 1),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1069,369 +1153,319 @@ class EventDetailsPage extends StatelessWidget {
   }
 }
 
-class _TimelineEvent {
-  final DateTime dateTime;
-  final String title;
-
-  _TimelineEvent({required this.dateTime, required this.title});
-}
-
-class EventTimelineWidget extends StatefulWidget {
+class EventTimelineWidget extends StatelessWidget {
   final List<Schedules> schedules;
 
   const EventTimelineWidget({Key? key, required this.schedules})
     : super(key: key);
 
   @override
-  State<EventTimelineWidget> createState() => _EventTimelineWidgetState();
-}
-
-class _EventTimelineWidgetState extends State<EventTimelineWidget> {
-  late ScrollController _scrollController;
-  late List<_TimelineEvent> events;
-  int _activeIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    events = widget.schedules.map((schedule) {
-      return _TimelineEvent(
-        dateTime:
-            DateTime.tryParse(schedule.scheduleStartDateTime ?? '') ??
-            DateTime.now(),
-        title: schedule.sessionName ?? '',
-      );
-    }).toList();
-
-    // Ensure chronological order
-    events.sort((a, b) => a.dateTime.compareTo(b.dateTime));
-
-    _calculateActiveIndex();
-
-    _scrollController = ScrollController();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrentTime();
-    });
-  }
-
-  void _calculateActiveIndex() {
-    if (events.isEmpty) return;
-
-    DateTime now = DateTime.now();
-    int closestIndex = 0;
-    Duration minDifference = (now.difference(events[0].dateTime)).abs();
-
-    for (int i = 1; i < events.length; i++) {
-      Duration difference = (now.difference(events[i].dateTime)).abs();
-      if (difference < minDifference) {
-        minDifference = difference;
-        closestIndex = i;
-      }
-    }
-
-    _activeIndex = closestIndex;
-  }
-
-  void _scrollToCurrentTime() {
-    if (events.length <= 1) return;
-
-    int targetScrollIndex = _activeIndex >= 0 ? _activeIndex : 0;
-
-    if (_scrollController.hasClients) {
-      double itemWidth = 110.w;
-      double screenWidth = MediaQuery.of(context).size.width;
-      // Calculate offset to center the target item
-      double offset =
-          (targetScrollIndex * itemWidth) -
-          (screenWidth / 2) +
-          (itemWidth / 2) +
-          16.w;
-
-      if (offset < 0) offset = 0;
-      if (offset > _scrollController.position.maxScrollExtent) {
-        offset = _scrollController.position.maxScrollExtent;
-      }
-
-      _scrollController.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (events.isEmpty) return const SizedBox.shrink();
+    if (schedules.isEmpty) return const SizedBox.shrink();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: AppColors.grey.shade100),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    // Group schedules by date
+    Map<DateTime, List<Schedules>> groupedSchedules = {};
+    for (var schedule in schedules) {
+      DateTime dt =
+          DateTime.tryParse(schedule.scheduleStartDateTime ?? '') ??
+          DateTime.now();
+      DateTime date = DateTime(dt.year, dt.month, dt.day);
+      groupedSchedules.putIfAbsent(date, () => []).add(schedule);
+    }
+
+    final sortedDates = groupedSchedules.keys.toList()..sort();
+    final DateFormat titleDateFormat = DateFormat('EEEE, d MMM yyyy');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.timeline_rounded,
-                    color: AppColors.primary,
-                    size: 20.w,
-                  ),
-                  SizedBox(width: 8.w),
-                  Text('Event Timeline', style: AppTextStyles.titleMedium),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.h),
-            if (events.length == 1)
-              Center(child: _buildSingleTimelineItem(events.first))
-            else
-              SingleChildScrollView(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(events.length, (index) {
-                    final event = events[index];
-                    return _buildHorizontalTimelineItem(
-                      event,
-                      isFirst: index == 0,
-                      isLast: index == events.length - 1,
-                    );
-                  }),
-                ),
-              ),
+            Icon(Icons.timeline_rounded, color: AppColors.primary, size: 24.w),
+            SizedBox(width: 8.w),
+            Text('Event Timeline', style: AppTextStyles.titleMedium),
           ],
         ),
-      ),
+        SizedBox(height: 16.h),
+        ...sortedDates.asMap().entries.map((entry) {
+          int index = entry.key;
+          DateTime date = entry.value;
+          List<Schedules> daySchedules = groupedSchedules[date]!;
+          daySchedules.sort((a, b) {
+            DateTime timeA =
+                DateTime.tryParse(a.scheduleStartDateTime ?? '') ??
+                DateTime.now();
+            DateTime timeB =
+                DateTime.tryParse(b.scheduleStartDateTime ?? '') ??
+                DateTime.now();
+            return timeA.compareTo(timeB);
+          });
+
+          return Container(
+            margin: EdgeInsets.only(bottom: 12.h),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(color: AppColors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.r),
+              child: Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  dense: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  collapsedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  initiallyExpanded: index == 0,
+                  iconColor: AppColors.primary,
+                  collapsedIconColor: AppColors.grey.shade500,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.02),
+                  tilePadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 4.h,
+                  ),
+                  title: Text(
+                    'Day ${index + 1} - ${titleDateFormat.format(date)}',
+                    style: AppTextStyles.titleSmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: 16.w,
+                        right: 16.w,
+                        bottom: 16.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: daySchedules.asMap().entries.map((schEntry) {
+                          int j = schEntry.key;
+                          bool isLastSchedule = j == daySchedules.length - 1;
+                          return _buildTimelineItem(
+                            context: context,
+                            isLast: isLastSchedule,
+                            content: _buildScheduleContent(
+                              context,
+                              schEntry.value,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ],
     );
   }
 
-  Widget _buildSingleTimelineItem(_TimelineEvent event) {
-    final formatTime = DateFormat('h:mm a');
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 20.w),
-      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(12.w),
+  Widget _buildTimelineItem({
+    required BuildContext context,
+    required Widget content,
+    bool isLast = false,
+  }) {
+    return Stack(
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: 7.w, top: 6.h),
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: isLast
+                    ? Colors.transparent
+                    : AppColors.primary.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+          ),
+          padding: EdgeInsets.only(left: 24.w, bottom: isLast ? 0 : 28.h),
+          child: content,
+        ),
+        Positioned(
+          left: 0,
+          top: 6.h,
+          child: Container(
+            width: 16.w,
+            height: 16.w,
             decoration: BoxDecoration(
               color: AppColors.white,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.event_available,
-              color: AppColors.primary,
-              size: 24.w,
+              border: Border.all(color: AppColors.primary, width: 3),
             ),
           ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event.title,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.black,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 4.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 14.w,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        formatTime.format(event.dateTime).toLowerCase(),
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildHorizontalTimelineItem(
-    _TimelineEvent event, {
-    bool isFirst = false,
-    bool isLast = false,
-  }) {
+  Widget _buildScheduleContent(BuildContext context, Schedules schedule) {
+    DateTime startTime =
+        DateTime.tryParse(schedule.scheduleStartDateTime ?? '') ??
+        DateTime.now();
+    DateTime endTime =
+        DateTime.tryParse(schedule.scheduleEndDateTime ?? '') ??
+        startTime.add(const Duration(hours: 1));
     final formatTime = DateFormat('h:mm a');
+    String timeString =
+        '${formatTime.format(startTime).toLowerCase()} to ${formatTime.format(endTime).toLowerCase()}';
 
-    int currentIndex = events.indexOf(event);
-    bool isCurrent = currentIndex == _activeIndex;
-
-    return SizedBox(
-      width: 110.w,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 24.w,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 2.h,
-                    color: isFirst
-                        ? Colors.transparent
-                        : AppColors.primary.withValues(alpha: 0.3),
-                  ),
-                ),
-                Container(
-                  width: isCurrent ? 20.w : 14.w,
-                  height: isCurrent ? 20.w : 14.w,
-                  decoration: BoxDecoration(
-                    color: isCurrent ? AppColors.primary : AppColors.white,
-                    border: Border.all(
-                      color: isCurrent
-                          ? AppColors.primary.withValues(alpha: 0.3)
-                          : AppColors.primary,
-                      width: isCurrent ? 6 : 3,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: isCurrent
-                        ? [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.4),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                              offset: const Offset(0, 0),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: isCurrent
-                      ? Center(
-                          child: Container(
-                            width: 8.w,
-                            height: 8.w,
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      : null,
-                ),
-                Expanded(
-                  child: Container(
-                    height: 2.h,
-                    color: isLast
-                        ? Colors.transparent
-                        : AppColors.primary.withValues(alpha: 0.3),
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          timeString,
+          style: AppTextStyles.labelMedium.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
           ),
-          SizedBox(height: 12.h),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isCurrent ? 14.w : 10.w,
-              vertical: isCurrent ? 6.h : 4.h,
-            ),
-            decoration: BoxDecoration(
-              color: isCurrent
-                  ? AppColors.primary
-                  : AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(100.r),
-              boxShadow: isCurrent
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 0),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Text(
-              formatTime.format(event.dateTime).toLowerCase(),
-              style: AppTextStyles.labelSmall.copyWith(
-                color: isCurrent ? AppColors.white : AppColors.primary,
-                fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
-                fontSize: isCurrent ? 12.sp : null,
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          schedule.sessionName ?? 'Session',
+          style: AppTextStyles.titleMedium.copyWith(
+            color: AppColors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        if (schedule.speakerName != null &&
+            schedule.speakerName!.isNotEmpty) ...[
+          SizedBox(height: 6.h),
+          Row(
+            children: [
+              Icon(Icons.person, size: 16.w, color: AppColors.grey.shade500),
+              SizedBox(width: 6.w),
+              Text(
+                schedule.speakerName!,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.grey.shade700,
+                ),
               ),
-            ),
+            ],
           ),
+        ],
+        if (schedule.sessionDescription != null &&
+            schedule.sessionDescription!.isNotEmpty) ...[
           SizedBox(height: 8.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w),
-            child: Text(
-              event.title,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: isCurrent ? AppColors.primary : AppColors.black,
-                fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
-                fontSize: isCurrent ? 13.sp : null,
-                height: 1.2,
-              ),
+          Text(
+            schedule.sessionDescription!,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.grey.shade600,
+              height: 1.4,
             ),
           ),
         ],
-      ),
+        if ((schedule.scheduleVenueName != null &&
+                schedule.scheduleVenueName!.isNotEmpty) ||
+            '${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
+                .trim()
+                .isNotEmpty) ...[
+          SizedBox(height: 12.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.location_on,
+                size: 16.w,
+                color: AppColors.grey.shade500,
+              ),
+              SizedBox(width: 4.w),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (schedule.scheduleVenueName != null &&
+                              schedule.scheduleVenueName!.isNotEmpty)
+                            Text(
+                              schedule.scheduleVenueName!,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          if ('${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
+                              .trim()
+                              .isNotEmpty) ...[
+                            SizedBox(height: 2.h),
+                            Text(
+                              '${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
+                                  .trim(),
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (schedule.scheduleGoogleMapUrl != null &&
+                        schedule.scheduleGoogleMapUrl!.isNotEmpty) ...[
+                      IconButton(
+                        onPressed: () async {
+                          String? url = schedule.scheduleGoogleMapUrl;
+                          if (url == null) return;
+                          if (Platform.isIOS) {
+                            String address =
+                                '${schedule.scheduleVenueName ?? ''} ${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
+                                    .trim();
+                            if (address.isNotEmpty) {
+                              url =
+                                  'http://maps.apple.com/?q=${Uri.encodeComponent(address)}';
+                            }
+                          }
+                          if (await canLaunchUrlString(url)) {
+                            await launchUrlString(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          } else if (Platform.isIOS &&
+                              await canLaunchUrlString(
+                                schedule.scheduleGoogleMapUrl!,
+                              )) {
+                            await launchUrlString(
+                              schedule.scheduleGoogleMapUrl!,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.directions, size: 20.w),
+                        style: ButtonStyle(
+                          foregroundColor: WidgetStatePropertyAll(
+                            AppColors.primary,
+                          ),
+                          backgroundColor: WidgetStatePropertyAll(
+                            AppColors.primary.withValues(alpha: 0.05),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }
@@ -1459,7 +1493,6 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
           itemBuilder: (context, index, realIndex) {
             final media = widget.medias[index];
             final bool isVideo = media.type?.toLowerCase() == 'video';
-
             if (isVideo && media.url != null) {
               return Container(
                 margin: EdgeInsets.symmetric(horizontal: 4.w),
@@ -1469,6 +1502,7 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
                 ),
                 child: EventVideoPlayerWidget(
                   url: media.url!,
+                  thumbnailUrl: media.thumbnailUrl,
                   isActive: _currentIndex == index,
                 ),
               );
@@ -1500,7 +1534,9 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
           options: CarouselOptions(
             height: 200.h,
             autoPlay: widget.medias.every(
-              (m) => m.type?.toLowerCase() != 'video',
+              (m) =>
+                  m.type?.toLowerCase() != 'video' &&
+                  !(m.url?.toLowerCase().contains('.pdf') ?? false),
             ),
             aspectRatio: 16 / 9,
             viewportFraction: 1,
@@ -1539,11 +1575,13 @@ class _EventMediaCarouselState extends State<EventMediaCarousel> {
 
 class EventVideoPlayerWidget extends StatefulWidget {
   final String url;
+  final String? thumbnailUrl;
   final bool isActive;
 
   const EventVideoPlayerWidget({
     Key? key,
     required this.url,
+    this.thumbnailUrl,
     required this.isActive,
   }) : super(key: key);
 
@@ -1555,12 +1593,13 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
   Worker? _pauseWorker;
+  bool _hasStartedPlaying = false;
 
   @override
   void initState() {
     super.initState();
     _initializePlayer();
-    
+
     if (Get.isRegistered<EventDetailsController>()) {
       _pauseWorker = ever(
         Get.find<EventDetailsController>().pauseVideoTrigger,
@@ -1578,16 +1617,41 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
     _videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(widget.url),
     );
+
+    // Listen to video state to hide thumbnail if played via other means
+    _videoPlayerController.addListener(() {
+      if (_videoPlayerController.value.isPlaying && !_hasStartedPlaying) {
+        if (mounted) {
+          setState(() {
+            _hasStartedPlaying = true;
+          });
+        }
+      }
+    });
+
     await _videoPlayerController.initialize();
 
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
-      autoPlay: widget.isActive,
+      autoPlay: false,
       looping: false,
       allowMuting: true,
       showControls: true,
       showOptions: false,
       allowPlaybackSpeedChanging: false,
+      overlay: widget.thumbnailUrl != null && widget.thumbnailUrl!.isNotEmpty
+          ? ValueListenableBuilder<VideoPlayerValue>(
+              valueListenable: _videoPlayerController,
+              builder: (context, value, child) {
+                if (value.isPlaying || value.position > Duration.zero) {
+                  return const SizedBox.shrink();
+                }
+                return SizedBox.expand(
+                  child: Image.network(widget.thumbnailUrl!, fit: BoxFit.cover),
+                );
+              },
+            )
+          : null,
       cupertinoProgressColors: ChewieProgressColors(
         playedColor: AppColors.primary,
       ),
@@ -1609,9 +1673,7 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
   void didUpdateWidget(covariant EventVideoPlayerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isActive != widget.isActive) {
-      if (widget.isActive) {
-        _videoPlayerController.play();
-      } else {
+      if (!widget.isActive) {
         _videoPlayerController.pause();
       }
     }
@@ -1634,6 +1696,21 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
         child: Chewie(controller: _chewieController!),
       );
     } else {
+      if (widget.thumbnailUrl != null && widget.thumbnailUrl!.isNotEmpty) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16.r),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(widget.thumbnailUrl!, fit: BoxFit.cover),
+              Container(color: Colors.black.withValues(alpha: 0.3)),
+              const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      }
       return const Center(child: CircularProgressIndicator());
     }
   }

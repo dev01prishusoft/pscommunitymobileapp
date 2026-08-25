@@ -60,172 +60,262 @@ class EventRegistrationPage extends StatelessWidget {
       body: Form(
         key: controller.formKey,
         child: Obx(() {
-          final showMembers = controller.isLoadingMembers.value || controller.familyMembers.isNotEmpty;
+          final showMembers =
+              controller.isLoadingMembers.value ||
+              controller.familyMembers.isNotEmpty;
           final showGuests = controller.customGuests.isNotEmpty;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          return ListView(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
             children: [
               if (showMembers)
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('My Member List').paddingOnly(left: 5.w),
-                      SizedBox(height: 15.h),
-                      Expanded(child: _buildMemberListContainer(controller)),
-                    ],
+                Theme(
+                  data: Theme.of(
+                    context,
+                  ).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    collapsedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.05),
+                    collapsedBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.05,
+                    ),
+                    controller: controller.membersTileController,
+                    initiallyExpanded: true,
+                    tilePadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 4.h,
+                    ),
+                    title: _buildSectionTitle('My Member List', Iconsax.people),
+                    onExpansionChanged: (expanded) {
+                      if (expanded && showGuests) {
+                        controller.guestsTileController.collapse();
+                      }
+                    },
+                    children: [_buildMemberListContainer(controller)],
                   ),
                 ),
               if (showMembers && showGuests) SizedBox(height: 15.h),
               if (showGuests)
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('Guest Members').paddingOnly(left: 5.w),
-                      SizedBox(height: 15.h),
-                      Expanded(child: _buildCustomGuestsList(controller)),
-                    ],
+                Theme(
+                  data: Theme.of(
+                    context,
+                  ).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    collapsedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.05),
+                    collapsedBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.05,
+                    ),
+                    controller: controller.guestsTileController,
+                    initiallyExpanded: !showMembers,
+                    tilePadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 4.h,
+                    ),
+                    title: _buildSectionTitle(
+                      'Guest Members',
+                      Iconsax.user_add,
+                    ),
+                    onExpansionChanged: (expanded) {
+                      if (expanded && showMembers) {
+                        controller.membersTileController.collapse();
+                      }
+                    },
+                    children: [_buildCustomGuestsList(controller)],
                   ),
                 ),
             ],
-          ).paddingSymmetric(horizontal: 20.w, vertical: 15.h);
+          );
         }),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.titleMedium.copyWith(
-        color: AppColors.primary,
-        fontWeight: FontWeight.bold,
-      ),
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.primary, size: 22.w),
+        SizedBox(width: 10.w),
+        Text(
+          title,
+          style: AppTextStyles.titleMedium.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildMemberListContainer(EventRegistrationController controller) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.grey.shade50,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            child: AppTextField(
-              controller: controller.searchController,
-              onChanged: controller.onSearchChanged,
-              hint: 'Search members...',
-              icon: Icons.search,
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: AppTextField(
+            controller: controller.searchController,
+            onChanged: controller.onSearchChanged,
+            hint: 'Search members...',
+            icon: Icons.search,
           ),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoadingMembers.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final members = controller.filteredFamilyMembers;
-              
-              if (members.isEmpty) {
-                return Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Center(
-                    child: Text(
-                      controller.memberSearchQuery.value.isNotEmpty
-                          ? 'No members found matching "${controller.memberSearchQuery.value}"'
-                          : 'No approved family members found.',
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey.shade600),
-                      textAlign: TextAlign.center,
-                    ),
+        ),
+        Obx(() {
+          if (controller.isLoadingMembers.value) {
+            return const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          final members = controller.filteredFamilyMembers;
+
+          if (members.isEmpty) {
+            return Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Center(
+                child: Text(
+                  controller.memberSearchQuery.value.isNotEmpty
+                      ? 'No members found matching "${controller.memberSearchQuery.value}"'
+                      : 'No approved family members found.',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.grey.shade600,
                   ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(vertical: 0.h),
+            itemCount: members.length,
+            separatorBuilder: (context, index) =>
+                Divider(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              height: 1,
+            ),
+            itemBuilder: (context, index) {
+              final member = members[index];
+              return Obx(() {
+                final isSelected = controller.selectedMemberIds.contains(
+                  member.memberId,
                 );
-              }
-    
-              return ListView.separated(
-                padding: EdgeInsets.symmetric(vertical: 0.h),
-                itemCount: members.length,
-                separatorBuilder: (context, index) =>
-                    Divider(color: AppColors.grey.shade300, height: 1),
-                itemBuilder: (context, index) {
-                  final member = members[index];
-                  return Obx(() {
-                    final isSelected = controller.selectedMemberIds.contains(
-                      member.memberId,
-                    );
-    
-                    return Material(
-                      color: AppColors.transparent,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                        leading: SizedBox(
+
+                return Material(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                    leading: SizedBox(
+                      width: 40.w,
+                      height: 40.w,
+                      child: ClipOval(
+                        child: CachedImg(
+                          url: member.profilePhotoFullUrl ?? '',
                           width: 40.w,
                           height: 40.w,
-                          child: ClipOval(
-                            child: CachedImg(
-                              url: member.profilePhotoFullUrl ?? '',
-                              width: 40.w,
-                              height: 40.w,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => Container(
-                                color: AppColors.grey.shade200,
-                                child: Icon(
-                                  Icons.person,
-                                  size: 24.w,
-                                  color: AppColors.grey.shade500,
-                                ),
-                              ),
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) => Container(
+                            color: AppColors.grey.shade200,
+                            child: Icon(
+                              Icons.person,
+                              size: 24.w,
+                              color: AppColors.grey.shade500,
                             ),
                           ),
                         ),
-                        title: Text(
-                          member.fullName,
-                          style: AppTextStyles.bodyLarge,
-                        ),
-                        trailing: Checkbox(
-                          value: isSelected,
-                          onChanged: (val) =>
-                              controller.toggleMemberSelection(member.memberId),
-                          activeColor: AppColors.primary,
-                        ),
-                        onTap: () =>
-                            controller.toggleMemberSelection(member.memberId),
                       ),
-                    );
-                  });
-                },
-              );
-            }),
-          ),
-        ],
-      ),
+                    ),
+                    title: Text(
+                      member.fullName,
+                      style: AppTextStyles.bodyLarge,
+                    ),
+                    trailing: Checkbox(
+                      value: isSelected,
+                      onChanged: (val) =>
+                          controller.toggleMemberSelection(member.memberId),
+                      activeColor: AppColors.primary,
+                    ),
+                    onTap: () =>
+                        controller.toggleMemberSelection(member.memberId),
+                  ),
+                );
+              });
+            },
+          );
+        }),
+      ],
     );
   }
 
   Widget _buildCustomGuestsList(EventRegistrationController controller) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: AppColors.grey.shade50,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.grey.shade200),
-      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: ListView.separated(
         shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: controller.customGuests.length,
-        separatorBuilder: (context, index) => SizedBox(height: 12.h),
+        separatorBuilder: (context, index) => SizedBox(height: 16.h),
         itemBuilder: (context, index) {
-          final textController = controller.customGuests[index];
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: AppFormTextField(
-                  controller: textController,
+          final guestForm = controller.customGuests[index];
+          return Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: AppColors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.02),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Guest ${index + 1}',
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => controller.removeCustomGuest(index),
+                      borderRadius: BorderRadius.circular(20.r),
+                      child: Container(
+                        padding: EdgeInsets.all(6.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.red.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Iconsax.trash_copy,
+                          color: AppColors.red,
+                          size: 16.w,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                AppFormTextField(
+                  controller: guestForm.nameController,
                   hint: 'Full Name',
                   prefixIcon: Icon(
                     Icons.person_outline,
@@ -234,17 +324,44 @@ class EventRegistrationPage extends StatelessWidget {
                   validator: (value) =>
                       value == null || value.isEmpty ? 'Required field' : null,
                 ),
-              ),
-              SizedBox(width: 8.w),
-              IconButton(
-                onPressed: () => controller.removeCustomGuest(index),
-                icon: Icon(
-                  Iconsax.trash_copy,
-                  color: AppColors.red,
-                  size: 24.w,
+                SizedBox(height: 12.h),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: AppFormTextField(
+                        maxLength: 2,
+                        controller: guestForm.ageController,
+                        hint: 'Age',
+                        keyboardType: TextInputType.number,
+                        prefixIcon: Icon(
+                          Icons.cake_outlined,
+                          color: AppColors.grey.shade400,
+                        ),
+                        validator: (value) =>
+                            value == null || value.isEmpty ? 'Required' : null,
+                      ),
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      flex: 2,
+                      child: AppFormTextField(
+                        maxLength: 10,
+                        controller: guestForm.mobileController,
+                        hint: 'Mobile Number',
+                        keyboardType: TextInputType.phone,
+                        prefixIcon: Icon(
+                          Icons.phone_outlined,
+                          color: AppColors.grey.shade400,
+                        ),
+                        validator: (value) =>
+                            value == null || value.isEmpty ? 'Required' : null,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),

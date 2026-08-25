@@ -6,6 +6,18 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/features/payment/controllers/payment_controller.dart';
 
+class CustomGuestForm {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+
+  void dispose() {
+    nameController.dispose();
+    ageController.dispose();
+    mobileController.dispose();
+  }
+}
+
 class EventRegistrationController extends GetxController {
   final EventDetailsData event;
   EventRegistrationController({required this.event});
@@ -22,7 +34,10 @@ class EventRegistrationController extends GetxController {
   
   final RxList<int> selectedMemberIds = <int>[].obs;
   
-  final RxList<TextEditingController> customGuests = <TextEditingController>[].obs;
+  final RxList<CustomGuestForm> customGuests = <CustomGuestForm>[].obs;
+
+  final ExpansionTileController membersTileController = ExpansionTileController();
+  final ExpansionTileController guestsTileController = ExpansionTileController();
 
   @override
   void onInit() {
@@ -99,7 +114,7 @@ class EventRegistrationController extends GetxController {
 
   void addCustomGuest() {
     if (customGuests.length < (event.maximumGuestsPerMember ?? 0)) {
-      customGuests.add(TextEditingController());
+      customGuests.add(CustomGuestForm());
     } else {
       Get.snackbar('Limit Reached', 'You cannot add more custom guests for this event.');
     }
@@ -145,8 +160,8 @@ class EventRegistrationController extends GetxController {
   @override
   void onClose() {
     searchController.dispose();
-    for (var controller in customGuests) {
-      controller.dispose();
+    for (var form in customGuests) {
+      form.dispose();
     }
     super.onClose();
   }
