@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/committee/pages/committees_page.da
 import 'package:pscommunitymobileapp/features/committee/pages/frompage_committee.dart';
 import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_registration_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_members_list_page.dart';
@@ -75,6 +76,7 @@ class AppRouter {
   static String frompageCommittee = '/frompageCommittee';
   static String events = '/events';
   static String eventRegistration = '/event-registration';
+  static String myEvents = '/my-events';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -244,6 +246,11 @@ class AppRouter {
         final event = Get.arguments as EventDetailsData;
         return EventRegistrationPage(event: event);
       },
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: myEvents,
+      page: () => const MyEventsPage(),
       middlewares: [AuthGuard()],
     ),
   ];

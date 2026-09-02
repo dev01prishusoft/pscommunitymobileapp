@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
@@ -27,6 +28,8 @@ class EventsController extends GetxController
   final RxBool isLoadingUpcoming = false.obs;
   final RxBool isLoadingOngoing = false.obs;
   final RxBool isLoadingPast = false.obs;
+
+  final RxBool isFabVisible = true.obs;
 
   int upcomingPage = 1, ongoingPage = 1, pastPage = 1;
   bool upcomingHasMore = true, ongoingHasMore = true, pastHasMore = true;
@@ -72,7 +75,27 @@ class EventsController extends GetxController
       }
     });
 
+    _setupFabScrollListener(upcomingScrollController);
+    _setupFabScrollListener(ongoingScrollController);
+    _setupFabScrollListener(pastScrollController);
+
     _initialLoadAll();
+  }
+
+  void _setupFabScrollListener(ScrollController scrollController) {
+    scrollController.addListener(() {
+      if (scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (isFabVisible.value) {
+          isFabVisible.value = false;
+        }
+      } else if (scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!isFabVisible.value) {
+          isFabVisible.value = true;
+        }
+      }
+    });
   }
 
   @override
@@ -130,6 +153,17 @@ class EventsController extends GetxController
       pastHasMore = true;
     }
     await _fetchEvents(type, isRefresh: true);
+  }
+
+  Future<void> refreshEventsSilently() async {
+    upcomingPage = 1;
+    ongoingPage = 1;
+    pastPage = 1;
+    await Future.wait([
+      _fetchEvents(1, isRefresh: true),
+      _fetchEvents(2, isRefresh: true),
+      _fetchEvents(3, isRefresh: true),
+    ]);
   }
 
   Future<void> _loadMore(int type) async {

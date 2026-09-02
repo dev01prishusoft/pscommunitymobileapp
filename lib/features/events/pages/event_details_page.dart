@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_pdf_viewer_page.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final int eventId;
@@ -81,22 +82,6 @@ class EventDetailsPage extends StatelessWidget {
         );
       }),
     );
-  }
-
-  String _formatEventDateTime(DateTime start, DateTime end) {
-    final formatTime = DateFormat('h:mm a');
-    final formatDate = DateFormat('d MMM yyyy');
-
-    final isSameDay =
-        start.year == end.year &&
-        start.month == end.month &&
-        start.day == end.day;
-
-    if (isSameDay) {
-      return '${formatDate.format(start)}, ${formatTime.format(start).toLowerCase()} to ${formatTime.format(end).toLowerCase()}';
-    } else {
-      return '${formatDate.format(start)}, ${formatTime.format(start).toLowerCase()} to ${formatDate.format(end)}, ${formatTime.format(end).toLowerCase()}';
-    }
   }
 
   Widget _buildMediaCarousel(EventDetailsData event) {
@@ -698,6 +683,7 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget _buildBottomStaticBar(EventDetailsData event) {
+    if (event.isMemberRegistered == true) return SizedBox.shrink();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       decoration: BoxDecoration(
@@ -718,73 +704,37 @@ class EventDetailsPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (event.isMemberRegistered == true) ...[
-                  Text(
-                    'Registration 0184',
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.grey.shade500,
-                    ),
+                Text(
+                  'Status',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.grey.shade500,
                   ),
-                  SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 16.w,
-                        color: AppColors.green,
-                      ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        'Registered',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.black,
-                        ),
-                      ),
-                    ],
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Not registered',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.black,
                   ),
-                ] else ...[
-                  Text(
-                    'Status',
-                    style: AppTextStyles.labelMedium.copyWith(
-                      color: AppColors.grey.shade500,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Not registered',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.black,
-                    ),
-                  ),
-                ],
+                ),
               ],
             ),
-            if (event.isMemberRegistered == true)
-              ElevatedButton.icon(
-                onPressed: () => _showPassBottomSheet(Get.context!, event),
-                icon: Icon(Icons.qr_code, size: 18.w, color: AppColors.white),
-                label: Text(
-                  'View Pass',
-                  style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 12.h,
-                  ),
-                ),
-              )
-            else
+            if (event.isMemberRegistered == false)
               ElevatedButton(
-                onPressed: () =>
-                    Get.toNamed(AppRouter.eventRegistration, arguments: event),
+                onPressed: () async {
+                  await Get.toNamed(
+                    AppRouter.eventRegistration,
+                    arguments: event,
+                  );
+                  if (Get.isRegistered<EventDetailsController>()) {
+                    Get.find<EventDetailsController>().fetchEventDetails(
+                      isSilent: true,
+                    );
+                  }
+                  if (Get.isRegistered<EventsController>()) {
+                    Get.find<EventsController>().refreshEventsSilently();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   elevation: 0,
@@ -806,349 +756,6 @@ class EventDetailsPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showPassBottomSheet(BuildContext context, EventDetailsData event) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        DateTime start =
-            DateTime.tryParse(event.startDateTime ?? '') ?? DateTime.now();
-        DateTime end =
-            DateTime.tryParse(event.endDateTime ?? '') ?? DateTime.now();
-        final String timeString = _formatEventDateTime(start, end);
-
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: AppColors.grey.shade50,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  margin: EdgeInsets.only(top: 12.h, bottom: 16.h),
-                  width: 48.w,
-                  height: 6.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.grey.shade300,
-                    borderRadius: BorderRadius.circular(3.r),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(20.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.04),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                          border: Border.all(color: AppColors.grey.shade100),
-                        ),
-                        child: Column(
-                          children: [
-                            // Ticket Header
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        event.eventName ?? '',
-                                        style: AppTextStyles.titleMedium
-                                            .copyWith(fontSize: 15.sp),
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.calendar_today,
-                                            size: 12.w,
-                                            color: AppColors.grey.shade600,
-                                          ),
-                                          SizedBox(width: 4.w),
-                                          Expanded(
-                                            child: Text(
-                                              timeString,
-                                              style: AppTextStyles.bodySmall
-                                                  .copyWith(
-                                                    color:
-                                                        AppColors.grey.shade700,
-                                                    fontSize: 11.sp,
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 6.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.green.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(16.r),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        size: 14.w,
-                                        color: AppColors.green,
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        'Registered',
-                                        style: AppTextStyles.labelSmall
-                                            .copyWith(
-                                              color: AppColors.green,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ).paddingAll(16.w),
-                            Divider(
-                              color: AppColors.grey.shade200,
-                              height: 1,
-                              thickness: 1,
-                            ),
-                            // QR Code & Details
-                            Padding(
-                              padding: EdgeInsets.all(16.w),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(4.w),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      border: Border.all(
-                                        color: AppColors.grey.shade100,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.black.withValues(
-                                            alpha: 0.02,
-                                          ),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.qr_code_2,
-                                      size: 180.w,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 15.h),
-                                  _buildTicketDetailRow(
-                                    'Attendee',
-                                    'Kirit Vasa',
-                                    'SM-004821',
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  _buildTicketDetailRow(
-                                    'Registration No',
-                                    'EDU-MELAVDO-2026/0184',
-                                    '',
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  _buildTicketDetailRow(
-                                    'Additional',
-                                    'Hetal Vasa (44)',
-                                    'Dhruv Vasa (17)',
-                                  ),
-                                  SizedBox(height: 10.h),
-                                  _buildTicketDetailRow(
-                                    'Venue',
-                                    'Vidya Bhavan Hall',
-                                    'Samaj Bhavan, Chandavarkar Road 400092',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-                      Text(
-                        'Show this at the check-in desk. It works without internet.',
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.grey.shade500,
-                        ),
-                      ),
-                      SizedBox(height: 10.h),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: AppColors.red.withValues(alpha: 0.3),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            padding: EdgeInsets.symmetric(vertical: 12.h),
-                            backgroundColor: AppColors.red.withValues(
-                              alpha: 0.02,
-                            ),
-                          ),
-                          child: Text(
-                            'Cancel Registration',
-                            style: AppTextStyles.labelMedium.copyWith(
-                              color: AppColors.red,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ).paddingSymmetric(horizontal: 16.w),
-                      SizedBox(height: 20.h),
-                    ],
-                  ),
-                ),
-              ),
-              // Fixed Bottom Bar for Bottom Sheet
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.black.withValues(alpha: 0.05),
-                      blurRadius: 16,
-                      offset: const Offset(0, -4),
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Registration 0184',
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.grey.shade500,
-                            ),
-                          ),
-                          SizedBox(height: 2.h),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.check_circle,
-                                size: 14.w,
-                                color: AppColors.green,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                'Registered',
-                                style: AppTextStyles.titleSmall.copyWith(
-                                  color: AppColors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.grey.shade100,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 10.h,
-                          ),
-                        ),
-                        child: Text(
-                          'Close',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.black,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTicketDetailRow(String label, String value1, String value2) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 110.w,
-          child: Text(
-            label,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.grey.shade500,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value1,
-                style: AppTextStyles.titleMedium.copyWith(
-                  color: AppColors.black,
-                  fontSize: 13.sp,
-                ),
-              ),
-              if (value2.isNotEmpty) ...[
-                SizedBox(height: 2.h),
-                Text(
-                  value2,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.grey.shade600,
-                    fontSize: 11.sp,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

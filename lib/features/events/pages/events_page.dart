@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
@@ -15,79 +16,148 @@ class EventsPage extends GetView<EventsController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Obx(() {
-          if (controller.isSearchVisible.value) {
-            return CupertinoSearchbar(
-              onTapSuffix: () {
-                controller.searchTextController.clear();
-                controller.onSearchQueryChanged('');
-                FocusManager.instance.primaryFocus?.unfocus();
-                controller.isSearchVisible.value = false;
-              },
-              hintText: 'Search events...',
-              controller: controller.searchTextController,
-              onChanged: (val) {
-                controller.onSearchQueryChanged(val);
-              },
-            );
-          }
-          return Text(LK.events.tr);
-        }),
-        actions: [
-          Obx(() {
+    return Obx(() {
+      final isFabVisible = controller.isFabVisible.value;
+      return Scaffold(
+        appBar: AppBar(
+          title: Obx(() {
             if (controller.isSearchVisible.value) {
-              return const SizedBox.shrink();
+              return CupertinoSearchbar(
+                onTapSuffix: () {
+                  controller.searchTextController.clear();
+                  controller.onSearchQueryChanged('');
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  controller.isSearchVisible.value = false;
+                },
+                hintText: 'Search events...',
+                controller: controller.searchTextController,
+                onChanged: (val) {
+                  controller.onSearchQueryChanged(val);
+                },
+              );
             }
-
-            return IconButton(
-              icon: const Icon(Iconsax.search_normal_copy),
-              onPressed: () {
-                controller.isSearchVisible.value = true;
-              },
-            );
+            return Text(LK.events.tr);
           }),
-        ],
-      ),
-      body: Column(
-        children: [
-          Divider(thickness: 1, color: AppColors.grey.shade100, height: 1),
-          _buildCustomTabBar(),
-          Expanded(
-            child: Obx(() {
-              return TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: controller.tabController,
-                children: [
-                  _buildEventList(
-                    controller.upcomingEvents,
-                    controller.upcomingScrollController,
-                    controller.isLoadingUpcoming.value,
-                    controller.upcomingHasMore,
-                    1,
-                  ),
-                  _buildEventList(
-                    controller.ongoingEvents,
-                    controller.ongoingScrollController,
-                    controller.isLoadingOngoing.value,
-                    controller.ongoingHasMore,
-                    2,
-                  ),
-                  _buildEventList(
-                    controller.pastEvents,
-                    controller.pastScrollController,
-                    controller.isLoadingPast.value,
-                    controller.pastHasMore,
-                    3,
-                  ),
-                ],
+          actions: [
+            Obx(() {
+              if (controller.isSearchVisible.value) {
+                return const SizedBox.shrink();
+              }
+
+              return IconButton(
+                icon: const Icon(Iconsax.search_normal_copy),
+                onPressed: () {
+                  controller.isSearchVisible.value = true;
+                },
               );
             }),
+          ],
+        ),
+        body: Column(
+          children: [
+            Divider(thickness: 1, color: AppColors.grey.shade100, height: 1),
+            _buildCustomTabBar(),
+            Expanded(
+              child: Obx(() {
+                return TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: controller.tabController,
+                  children: [
+                    _buildEventList(
+                      controller.upcomingEvents,
+                      controller.upcomingScrollController,
+                      controller.isLoadingUpcoming.value,
+                      controller.upcomingHasMore,
+                      1,
+                    ),
+                    _buildEventList(
+                      controller.ongoingEvents,
+                      controller.ongoingScrollController,
+                      controller.isLoadingOngoing.value,
+                      controller.ongoingHasMore,
+                      2,
+                    ),
+                    _buildEventList(
+                      controller.pastEvents,
+                      controller.pastScrollController,
+                      controller.isLoadingPast.value,
+                      controller.pastHasMore,
+                      3,
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+        floatingActionButton: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOutCubic,
+          width: isFabVisible ? MediaQuery.of(context).size.width - 32.w : 56,
+          height: isFabVisible ? 52.h : 56,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Get.toNamed<void>(AppRouter.myEvents),
+              borderRadius: BorderRadius.circular(isFabVisible ? 16 : 28),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubic,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.primary, AppColors.secondary],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(isFabVisible ? 16 : 28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: isFabVisible ? 12 : 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  switchInCurve: Curves.easeIn,
+                  switchOutCurve: Curves.easeOut,
+                  child: isFabVisible
+                      ? Row(
+                          key: const ValueKey('expanded'),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.event_available_rounded,
+                              color: AppColors.white,
+                              size: 22,
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              'My Events',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Icon(
+                          key: ValueKey('collapsed'),
+                          Icons.event_available_rounded,
+                          color: AppColors.white,
+                          size: 24,
+                        ),
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
-    );
+        ),
+        floatingActionButtonLocation: isFabVisible
+            ? FloatingActionButtonLocation.centerFloat
+            : FloatingActionButtonLocation.endFloat,
+      );
+    });
   }
 
   Widget _buildCustomTabBar() {
@@ -258,7 +328,12 @@ class EventsPage extends GetView<EventsController> {
       content = ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         controller: scrollController,
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.only(
+          left: 16.w,
+          right: 16.w,
+          top: 10.h,
+          bottom: 100.h,
+        ),
         itemCount: events.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == events.length) {

@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
+import 'package:pscommunitymobileapp/core/models/gender_model.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_registration_controller.dart';
 
-class EventRegistrationPage extends StatelessWidget {
+class EventRegistrationPage extends GetView<EventRegistrationController> {
   final EventDetailsData event;
 
   const EventRegistrationPage({Key? key, required this.event})
@@ -18,8 +21,6 @@ class EventRegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(EventRegistrationController(event: event));
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Event Registration'),
@@ -30,7 +31,7 @@ class EventRegistrationPage extends StatelessWidget {
                 onPressed:
                     controller.customGuests.length <
                         (event.maximumGuestsPerMember ?? 0)
-                    ? controller.addCustomGuest
+                    ? () => controller.addCustomGuest(event: event)
                     : null,
                 icon: Icon(
                   Icons.add,
@@ -200,8 +201,7 @@ class EventRegistrationPage extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.symmetric(vertical: 0.h),
             itemCount: members.length,
-            separatorBuilder: (context, index) =>
-                Divider(
+            separatorBuilder: (context, index) => Divider(
               color: AppColors.primary.withValues(alpha: 0.1),
               height: 1,
             ),
@@ -360,6 +360,33 @@ class EventRegistrationPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                SizedBox(height: 12.h),
+                Obx(() {
+                  final selectedGender = controller.genderList.firstWhereOrNull(
+                    (g) => g.genderId == guestForm.selectedGenderID.value,
+                  );
+
+                  return AppFormDropdown<GenderData>(
+                    value: selectedGender,
+                    items: controller.genderList
+                        .map(
+                          (e) => DropdownMenuItem<GenderData>(
+                            value: e,
+                            child: Text(e.name?.tr ?? ''),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) {
+                      if (v != null) {
+                        guestForm.selectedGenderID.value = v.genderId;
+                        guestForm.gender.value = v.name ?? '';
+                        controller.gender.value = v;
+                      }
+                    },
+                    label: LK.gender.tr,
+                    isRequired: true,
+                  );
+                }),
               ],
             ),
           );
@@ -404,21 +431,36 @@ class EventRegistrationPage extends StatelessWidget {
             ),
             SizedBox(width: 16.w),
             Expanded(
-              child: ElevatedButton(
-                onPressed: controller.registerNow,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+              child: Obx(
+                () => ElevatedButton(
+                  onPressed: controller.isValidating.value
+                      ? null
+                      : () => controller.registerNow(event: event),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    disabledBackgroundColor:
+                        AppColors.primary.withValues(alpha: 0.6),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                ),
-                child: Text(
-                  'Register Now',
-                  style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.white,
-                  ),
+                  child: controller.isValidating.value
+                      ? SizedBox(
+                          width: 20.w,
+                          height: 20.w,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.white,
+                          ),
+                        )
+                      : Text(
+                          'Register Now',
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.white,
+                          ),
+                        ),
                 ),
               ),
             ),

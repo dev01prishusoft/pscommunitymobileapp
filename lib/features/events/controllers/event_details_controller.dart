@@ -37,33 +37,40 @@ class EventDetailsController extends GetxController {
     super.onClose();
   }
 
-  Future<void> fetchEventDetails() async {
+  Future<void> fetchEventDetails({bool isSilent = false}) async {
     _cancelToken?.cancel();
     _cancelToken = CancelToken();
 
-    isLoading.value = true;
-    hasError.value = false;
+    if (!isSilent) {
+      isLoading.value = true;
+      hasError.value = false;
+    }
 
     final result = await _repository.getEventDetails(
       id: eventId,
       cancelToken: _cancelToken,
     );
-
+    print("EventDetails ${result.dataOrNull?.data?.eventId}");
     if (result is Success<ApiResponse<EventDetailsData>>) {
       final data = result.data.data;
       if (data != null) {
         _formatImageUrls(data);
         eventDetails.value = data;
-      } else {
+        if (isSilent) {
+          hasError.value = false;
+        }
+      } else if (!isSilent) {
         hasError.value = true;
         errorMessage.value = "Details not found.";
       }
-    } else if (result is Error) {
+    } else if (result is Error && !isSilent) {
       hasError.value = true;
       errorMessage.value = "Failed to fetch event details.";
     }
 
-    isLoading.value = false;
+    if (!isSilent) {
+      isLoading.value = false;
+    }
   }
 
   void _formatImageUrls(EventDetailsData data) {

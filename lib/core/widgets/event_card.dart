@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_details_page.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 
 class EventCard extends StatelessWidget {
   final EventsData event;
@@ -52,9 +53,12 @@ class EventCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
+          onTap: () async {
             if (event.eventId != null) {
-              Get.to(() => EventDetailsPage(eventId: event.eventId!));
+              await Get.to(() => EventDetailsPage(eventId: event.eventId!));
+              if (Get.isRegistered<EventsController>()) {
+                Get.find<EventsController>().refreshEventsSilently();
+              }
             }
           },
           child: _buildContent(timeString),
