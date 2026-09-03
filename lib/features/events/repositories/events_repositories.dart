@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
+import 'package:pscommunitymobileapp/core/models/registered_event_details_model.dart';
 
 abstract class EventsRepositories {
   Future<Result<PaginatedResponse<EventsData>>> getEvents({
@@ -70,9 +71,24 @@ abstract class EventsRepositories {
     CancelToken? cancelToken,
   });
 
-  Future<Result<ApiResponse<RegisteredEventData>>> getMyRegisteredEvents({
-    int page = 1,
-    int pageSize = 10,
+  Future<Result<PaginatedResponse<RegisteredEventItem>>> getMyRegisteredEvents({
+    String? searchQuery,
+    String? type,
+    int pageNumber = 1,
+    int pageSize = 20,
+    CancelToken? cancelToken,
+  });
+
+  Future<Result<ApiResponse<RegisteredEventsDetailsData>>>
+  getMyRegisteredEventDetail({
+    required String registrationId,
+    CancelToken? cancelToken,
+  });
+
+  Future<Result<ApiResponse<Map<String, dynamic>>>> cancelRegistration({
+    required int eventRegistrationId,
+    required int memberId,
+    String? cancellationReason,
     CancelToken? cancelToken,
   });
 }

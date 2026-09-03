@@ -1,17 +1,19 @@
-class registeredEventsDetailsModel {
+class RegisteredEventsDetailsModel {
   int? statusCode;
   bool? succeeded;
   String? message;
-  Data? data;
+  RegisteredEventsDetailsData? data;
 
-  registeredEventsDetailsModel(
+  RegisteredEventsDetailsModel(
       {this.statusCode, this.succeeded, this.message, this.data});
 
-  registeredEventsDetailsModel.fromJson(Map<String, dynamic> json) {
+  RegisteredEventsDetailsModel.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     succeeded = json['succeeded'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? new RegisteredEventsDetailsData.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -26,11 +28,20 @@ class registeredEventsDetailsModel {
   }
 }
 
-class Data {
+class RegisteredEventsDetailsData {
   int? eventRegistrationId;
   int? eventId;
   String? eventName;
   String? eventCode;
+  String? eventStartDateTime;
+  String? eventEndDateTime;
+  String? timePeriod;
+  String? eventTypeName;
+  String? venueName;
+  String? venueAddress;
+  double? venueLatitude;
+  double? venueLongitude;
+  dynamic venueGoogleMapUrl;
   int? memberId;
   String? memberName;
   String? memberNo;
@@ -43,21 +54,30 @@ class Data {
   dynamic cancelledAt;
   dynamic cancellationReason;
   int? paymentId;
-  int? eventCouponId;
-  String? couponCode;
+  dynamic eventCouponId;
+  dynamic couponCode;
   String? notes;
-  double? finalAmount;
-  double? discountAmount;
-  int? originalAmount;
+  num? finalAmount;
+  num? discountAmount;
+  num? originalAmount;
   String? createdAt;
   String? qrCodeData;
   List<Guests>? guests;
 
-  Data(
+  RegisteredEventsDetailsData(
       {this.eventRegistrationId,
       this.eventId,
       this.eventName,
       this.eventCode,
+    this.eventStartDateTime,
+    this.eventEndDateTime,
+    this.timePeriod,
+    this.eventTypeName,
+    this.venueName,
+    this.venueAddress,
+    this.venueLatitude,
+    this.venueLongitude,
+    this.venueGoogleMapUrl,
       this.memberId,
       this.memberName,
       this.memberNo,
@@ -80,11 +100,22 @@ class Data {
       this.qrCodeData,
       this.guests});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  RegisteredEventsDetailsData.fromJson(Map<String, dynamic> json) {
     eventRegistrationId = json['eventRegistrationId'];
     eventId = json['eventId'];
     eventName = json['eventName'];
     eventCode = json['eventCode'];
+    eventStartDateTime = json['eventStartDateTime'];
+    eventEndDateTime = json['eventEndDateTime'];
+    timePeriod = json['timePeriod'];
+    eventTypeName = json['eventTypeName'];
+    venueName = json['venueName'];
+    venueAddress = json['venueAddress'];
+    venueLatitude = (json['venueLatitude'] as num?)?.toDouble() ??
+        double.tryParse(json['venueLatitude']?.toString() ?? '');
+    venueLongitude = (json['venueLongitude'] as num?)?.toDouble() ??
+        double.tryParse(json['venueLongitude']?.toString() ?? '');
+    venueGoogleMapUrl = json['venueGoogleMapUrl'];
     memberId = json['memberId'];
     memberName = json['memberName'];
     memberNo = json['memberNo'];
@@ -100,16 +131,27 @@ class Data {
     eventCouponId = json['eventCouponId'];
     couponCode = json['couponCode'];
     notes = json['notes'];
-    finalAmount = json['finalAmount'];
-    discountAmount = json['discountAmount'];
-    originalAmount = json['originalAmount'];
+    finalAmount = json['finalAmount'] is num
+        ? json['finalAmount']
+        : num.tryParse(json['finalAmount']?.toString() ?? '');
+    discountAmount = json['discountAmount'] is num
+        ? json['discountAmount']
+        : num.tryParse(json['discountAmount']?.toString() ?? '');
+    originalAmount = json['originalAmount'] is num
+        ? json['originalAmount']
+        : num.tryParse(json['originalAmount']?.toString() ?? '');
     createdAt = json['createdAt'];
     qrCodeData = json['qrCodeData'];
-    if (json['guests'] != null) {
+    final rawGuests = json['guests'] ?? json['Guests'];
+    if (rawGuests != null && rawGuests is List) {
       guests = <Guests>[];
-      json['guests'].forEach((v) {
-        guests!.add(new Guests.fromJson(v));
-      });
+      for (final v in rawGuests) {
+        if (v is Map<String, dynamic>) {
+          guests!.add(Guests.fromJson(v));
+        } else if (v is Map) {
+          guests!.add(Guests.fromJson(Map<String, dynamic>.from(v)));
+        }
+      }
     }
   }
 
@@ -119,6 +161,15 @@ class Data {
     data['eventId'] = this.eventId;
     data['eventName'] = this.eventName;
     data['eventCode'] = this.eventCode;
+    data['eventStartDateTime'] = this.eventStartDateTime;
+    data['eventEndDateTime'] = this.eventEndDateTime;
+    data['timePeriod'] = this.timePeriod;
+    data['eventTypeName'] = this.eventTypeName;
+    data['venueName'] = this.venueName;
+    data['venueAddress'] = this.venueAddress;
+    data['venueLatitude'] = this.venueLatitude;
+    data['venueLongitude'] = this.venueLongitude;
+    data['venueGoogleMapUrl'] = this.venueGoogleMapUrl;
     data['memberId'] = this.memberId;
     data['memberName'] = this.memberName;
     data['memberNo'] = this.memberNo;
@@ -175,18 +226,26 @@ class Guests {
       this.createdAt});
 
   Guests.fromJson(Map<String, dynamic> json) {
-    eventRegistrationGuestId = json['eventRegistrationGuestId'];
-    eventRegistrationId = json['eventRegistrationId'];
+    eventRegistrationGuestId = json['eventRegistrationGuestId'] is num
+        ? (json['eventRegistrationGuestId'] as num).toInt()
+        : int.tryParse(json['eventRegistrationGuestId']?.toString() ?? '');
+    eventRegistrationId = json['eventRegistrationId'] is num
+        ? (json['eventRegistrationId'] as num).toInt()
+        : int.tryParse(json['eventRegistrationId']?.toString() ?? '');
     memberId = json['memberId'];
-    memberName = json['memberName'];
-    guestName = json['guestName'];
-    mobileNo = json['mobileNo'];
-    age = json['age'];
-    genderId = json['genderId'];
-    genderName = json['genderName'];
+    memberName = json['memberName']?.toString();
+    guestName = (json['guestName'] ?? json['memberName'])?.toString();
+    mobileNo = json['mobileNo']?.toString();
+    age = json['age'] is num
+        ? (json['age'] as num).toInt()
+        : int.tryParse(json['age']?.toString() ?? '');
+    genderId = json['genderId'] is num
+        ? (json['genderId'] as num).toInt()
+        : int.tryParse(json['genderId']?.toString() ?? '');
+    genderName = json['genderName']?.toString();
     isAttended = json['isAttended'];
     checkedInAt = json['checkedInAt'];
-    createdAt = json['createdAt'];
+    createdAt = json['createdAt']?.toString();
   }
 
   Map<String, dynamic> toJson() {

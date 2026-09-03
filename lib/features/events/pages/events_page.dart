@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -11,6 +12,7 @@ import 'package:pscommunitymobileapp/features/events/controllers/events_controll
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_scanner_page.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository_impl.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -51,7 +53,11 @@ class EventsPage extends GetView<EventsController> {
                   IconButton(
                     icon: const Icon(Iconsax.scan_barcode_copy),
                     onPressed: () {
-                      Get.to(() => const EventScannerPage());
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (ctx) => const _TokenInputDialog(),
+                      );
                     },
                   ),
                   IconButton(
@@ -374,6 +380,262 @@ class EventsPage extends GetView<EventsController> {
       onRefresh: () => controller.refreshTab(type),
       color: AppColors.primary,
       child: content,
+    );
+  }
+}
+
+class _TokenInputDialog extends StatefulWidget {
+  const _TokenInputDialog({Key? key}) : super(key: key);
+
+  @override
+  State<_TokenInputDialog> createState() => _TokenInputDialogState();
+}
+
+class _TokenInputDialogState extends State<_TokenInputDialog> {
+  late final TextEditingController _tokenController;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _tokenController = TextEditingController(
+      text: EventAttendanceRepositoryImpl.globalCustomToken,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tokenController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data?.text != null && data!.text!.trim().isNotEmpty) {
+      setState(() {
+        _tokenController.text = data.text!.trim();
+        _errorMessage = null;
+      });
+    }
+  }
+
+  void _onSave() {
+    final token = _tokenController.text.trim();
+    if (token.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter a valid token to proceed';
+      });
+      return;
+    }
+
+    EventAttendanceRepositoryImpl.updateToken(token);
+    Navigator.of(context).pop();
+    Get.to(() => EventScannerPage(customToken: token));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+      backgroundColor: AppColors.white,
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Iconsax.scan_barcode_copy,
+                    color: AppColors.primary,
+                    size: 22.w,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'QR Scanner Token',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.sp,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        'Enter custom token to authorize scanner',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.grey.shade600,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'Custom Token',
+              style: AppTextStyles.bodySmall.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            TextField(
+              controller: _tokenController,
+              maxLines: 4,
+              minLines: 2,
+              style: AppTextStyles.bodySmall.copyWith(
+                fontSize: 12.sp,
+                color: AppColors.black,
+              ),
+              onChanged: (_) {
+                if (_errorMessage != null) {
+                  setState(() {
+                    _errorMessage = null;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                hintText: 'Paste or enter your custom token here...',
+                hintStyle: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.grey.shade400,
+                  fontSize: 12.sp,
+                ),
+                contentPadding: EdgeInsets.all(12.w),
+                fillColor: AppColors.grey.shade50,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(color: AppColors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(
+                    color: _errorMessage != null
+                        ? AppColors.error
+                        : AppColors.grey.shade300,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(
+                    color: _errorMessage != null
+                        ? AppColors.error
+                        : AppColors.primary,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            if (_errorMessage != null) ...[
+              SizedBox(height: 6.h),
+              Text(
+                _errorMessage!,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.error,
+                  fontSize: 11.sp,
+                ),
+              ),
+            ],
+            SizedBox(height: 8.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: _pasteFromClipboard,
+                  icon: Icon(
+                    Icons.paste_rounded,
+                    size: 16.sp,
+                    color: AppColors.primary,
+                  ),
+                  label: Text(
+                    'Paste from clipboard',
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (_tokenController.text.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _tokenController.clear();
+                        _errorMessage = null;
+                      });
+                    },
+                    child: Text(
+                      'Clear',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: AppColors.grey.shade600,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      side: BorderSide(color: AppColors.grey.shade300),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.grey.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _onSave,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      elevation: 0,
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    child: Text(
+                      'Save',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

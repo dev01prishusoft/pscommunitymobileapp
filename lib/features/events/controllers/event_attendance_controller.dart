@@ -23,6 +23,12 @@ class EventAttendanceController extends GetxController {
 
   CancelToken? _cancelToken;
 
+  void setCustomToken(String token) {
+    _repository.setCustomToken(token);
+  }
+
+  String get customToken => _repository.customToken;
+
   @override
   void onClose() {
     _cancelToken?.cancel();

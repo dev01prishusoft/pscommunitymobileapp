@@ -267,7 +267,9 @@ class AppRouter {
     ),
     GetPage<void>(
       name: eventScanner,
-      page: () => const EventScannerPage(),
+      page: () => EventScannerPage(
+        customToken: Get.arguments is String ? Get.arguments as String : null,
+      ),
       middlewares: [AuthGuard()],
     ),
   ];

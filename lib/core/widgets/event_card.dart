@@ -255,12 +255,19 @@ class EventCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.money, size: 14, color: Color(0xFF1A7A60)),
-                          SizedBox(width: 4),
+                          const Icon(
+                            Icons.money,
+                            size: 14,
+                            color: Color(0xFF1A7A60),
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            'Registration Fee ${event.registrationFee}',
+                            (event.registrationFee == 0 ||
+                                    event.registrationFee == 0.0)
+                                ? 'Free'
+                                : 'Registration Fee ${event.registrationFee}',
                             style: AppTextStyles.labelSmall.copyWith(
-                              color: Color(0xFF1A7A60),
+                              color: const Color(0xFF1A7A60),
                               fontWeight: FontWeight.w600,
                             ),
                           ),

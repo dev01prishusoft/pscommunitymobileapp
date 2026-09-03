@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
+import 'package:pscommunitymobileapp/core/models/registered_event_details_model.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 
 class EventsRepositoryImpl implements EventsRepositories {
@@ -186,17 +187,67 @@ class EventsRepositoryImpl implements EventsRepositories {
   }
 
   @override
-  Future<Result<ApiResponse<RegisteredEventData>>> getMyRegisteredEvents({
-    int page = 1,
-    int pageSize = 10,
+  Future<Result<PaginatedResponse<RegisteredEventItem>>> getMyRegisteredEvents({
+    String? searchQuery,
+    String? type,
+    int pageNumber = 1,
+    int pageSize = 20,
     CancelToken? cancelToken,
   }) async {
-    return await _apiClient.getParsed<RegisteredEventData>(
+    final Map<String, dynamic> params = {
+      'Page': pageNumber,
+      'PageSize': pageSize,
+    };
+
+    if (type != null && type.isNotEmpty && type != 'All') {
+      params['EventTypeName'] = type;
+    }
+
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      params['Search'] = searchQuery;
+    }
+
+    return await _apiClient.getPaginated<RegisteredEventItem>(
       ApiEndpoints.myRegisteredEvents,
-      queryParameters: {"Page": page, "PageSize": pageSize},
+      queryParameters: params,
+      cancelToken: cancelToken,
+      listKey: 'items',
+      fromJsonT: (json) =>
+          RegisteredEventItem.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Future<Result<ApiResponse<RegisteredEventsDetailsData>>>
+  getMyRegisteredEventDetail({
+    required String registrationId,
+    CancelToken? cancelToken,
+  }) async {
+    return await _apiClient.getParsed<RegisteredEventsDetailsData>(
+      ApiEndpoints.myRegisteredEventDetail(registrationId),
       cancelToken: cancelToken,
       fromJsonT: (json) =>
-          RegisteredEventData.fromJson(json as Map<String, dynamic>),
+          RegisteredEventsDetailsData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  @override
+  Future<Result<ApiResponse<Map<String, dynamic>>>> cancelRegistration({
+    required int eventRegistrationId,
+    required int memberId,
+    String? cancellationReason,
+    CancelToken? cancelToken,
+  }) async {
+    return await _apiClient.postParsed<Map<String, dynamic>>(
+      ApiEndpoints.cancelRegistration,
+      data: {
+        'eventRegistrationId': eventRegistrationId,
+        'memberId': memberId,
+        'cancellationReason': cancellationReason ?? 'Cancelled by user',
+      },
+      cancelToken: cancelToken,
+      fromJsonT: (json) =>
+          json is Map<String, dynamic> ? json : <String, dynamic>{},
     );
   }
 }

@@ -11,9 +11,11 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_attendance_controller.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository_impl.dart';
 
 class EventScannerPage extends StatefulWidget {
-  const EventScannerPage({Key? key}) : super(key: key);
+  final String? customToken;
+  const EventScannerPage({Key? key, this.customToken}) : super(key: key);
 
   @override
   State<EventScannerPage> createState() => _EventScannerPageState();
@@ -30,6 +32,9 @@ class _EventScannerPageState extends State<EventScannerPage>
   @override
   void initState() {
     super.initState();
+    if (widget.customToken != null && widget.customToken!.trim().isNotEmpty) {
+      EventAttendanceRepositoryImpl.updateToken(widget.customToken!);
+    }
     // Fixed back camera view as requested: no camera rotation allowed
     // Using DetectionSpeed.normal so rescan works on the exact same barcode immediately
     _scannerController = MobileScannerController(
