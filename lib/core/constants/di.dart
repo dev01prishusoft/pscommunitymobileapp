@@ -22,8 +22,11 @@ import 'package:pscommunitymobileapp/features/committee/controllers/committee_co
 import 'package:pscommunitymobileapp/features/events/controllers/event_registration_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/my_events_controller.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/event_attendance_controller.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/repositories/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
@@ -137,6 +140,16 @@ class DI {
           fenix: true,
         );
         Get.lazyPut(() => MyEventsController(eventsRepository), fenix: true);
+        final eventAttendanceRepository =
+            EventAttendanceRepositoryImpl(apiClient);
+        Get.lazyPut<EventAttendanceRepository>(
+          () => eventAttendanceRepository,
+          fenix: true,
+        );
+        Get.lazyPut(
+          () => EventAttendanceController(eventAttendanceRepository),
+          fenix: true,
+        );
 
         final pushNotificationService = PushNotificationService(apiClient);
         await pushNotificationService.init();

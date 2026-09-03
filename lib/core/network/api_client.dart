@@ -169,9 +169,15 @@ class ApiClient {
     dynamic data,
     CancelToken? cancelToken,
     T Function(Object? json)? fromJsonT,
+    Options? options,
   }) async {
     try {
-      final response = await post(path, data: data, cancelToken: cancelToken);
+      final response = await post(
+        path,
+        data: data,
+        cancelToken: cancelToken,
+        options: options,
+      );
       return Success(
         ApiResponse<T>.fromJson(
           response.data as Map<String, dynamic>,

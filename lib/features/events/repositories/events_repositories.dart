@@ -70,7 +70,7 @@ abstract class EventsRepositories {
     CancelToken? cancelToken,
   });
 
-  Future<Result<ApiResponse<RegisteredEventsData>>> getMyRegisteredEvents({
+  Future<Result<ApiResponse<RegisteredEventData>>> getMyRegisteredEvents({
     int page = 1,
     int pageSize = 10,
     CancelToken? cancelToken,

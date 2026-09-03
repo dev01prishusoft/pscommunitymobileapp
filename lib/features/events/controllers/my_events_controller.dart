@@ -6,13 +6,9 @@ import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 
-class MyEventsController extends GetxController
-    with GetSingleTickerProviderStateMixin {
+class MyEventsController extends GetxController {
   MyEventsController(this._repository);
   final EventsRepositories _repository;
-
-  late TabController tabController;
-  final RxInt selectedTabIndex = 0.obs;
 
   final RxBool isLoading = false.obs;
   final RxBool isLoadingMore = false.obs;
@@ -20,14 +16,11 @@ class MyEventsController extends GetxController
   final RxString errorMessage = ''.obs;
 
   final RxList<RegisteredEventItem> allItems = <RegisteredEventItem>[].obs;
-  final RxList<RegisteredEventItem> upcomingEvents =
-      <RegisteredEventItem>[].obs;
-  final RxList<RegisteredEventItem> ongoingEvents = <RegisteredEventItem>[].obs;
-  final RxList<RegisteredEventItem> pastEvents = <RegisteredEventItem>[].obs;
 
-  final RxInt upcomingCount = 0.obs;
-  final RxInt ongoingCount = 0.obs;
-  final RxInt pastCount = 0.obs;
+  // Filter properties when redirected from a specific event
+  final RxnInt targetEventId = RxnInt();
+  final RxnString targetEventName = RxnString();
+  final RxnString targetStatus = RxnString();
 
   int page = 1;
   final int pageSize = 20;
@@ -39,13 +32,6 @@ class MyEventsController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 3, vsync: this);
-    tabController.addListener(() {
-      if (selectedTabIndex.value != tabController.index) {
-        selectedTabIndex.value = tabController.index;
-      }
-    });
-
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
           scrollController.position.maxScrollExtent - 200) {
@@ -59,14 +45,41 @@ class MyEventsController extends GetxController
   @override
   void onClose() {
     _cancelToken?.cancel();
-    tabController.dispose();
     scrollController.dispose();
     super.onClose();
   }
 
-  void onTabChanged(int index) {
-    selectedTabIndex.value = index;
-    tabController.animateTo(index);
+  void setFilter({int? eventId, String? eventName, String? status}) {
+    targetEventId.value = eventId;
+    targetEventName.value = eventName;
+    targetStatus.value = status;
+  }
+
+  void clearFilter() {
+    targetEventId.value = null;
+    targetEventName.value = null;
+    targetStatus.value = null;
+  }
+
+  List<RegisteredEventItem> get displayedEvents {
+    if (targetEventId.value != null) {
+      final matches = allItems
+          .where((e) => e.eventId == targetEventId.value)
+          .toList();
+      if (matches.isNotEmpty) {
+        return matches;
+      }
+      if (targetEventName.value != null &&
+          targetEventName.value!.isNotEmpty) {
+        final nameMatches = allItems
+            .where((e) =>
+                (e.eventName ?? '').toLowerCase() ==
+                targetEventName.value!.toLowerCase())
+            .toList();
+        if (nameMatches.isNotEmpty) return nameMatches;
+      }
+    }
+    return allItems;
   }
 
   Future<void> fetchRegisteredEvents({bool isRefresh = false}) async {
@@ -92,10 +105,15 @@ class MyEventsController extends GetxController
     printInfo(
       info: 'totalCount: ${result.dataOrNull?.data?.totalCount.toString()}',
     );
+    printInfo(
+      info:
+          'items length: ${result.dataOrNull?.data?.items?.length.toString()}',
+    );
+
     isLoading.value = false;
     isLoadingMore.value = false;
 
-    if (result is Success<ApiResponse<RegisteredEventsData>>) {
+    if (result is Success<ApiResponse<RegisteredEventData>>) {
       final items = result.data.data?.items ?? [];
       final total = result.data.data?.totalCount ?? 0;
 
@@ -106,8 +124,7 @@ class MyEventsController extends GetxController
       }
 
       hasMore = allItems.length < total && items.isNotEmpty;
-      _categorizeEvents();
-    } else if (result is Error<ApiResponse<RegisteredEventsData>>) {
+    } else if (result is Error<ApiResponse<RegisteredEventData>>) {
       if (page == 1) {
         hasError.value = true;
         errorMessage.value = result.failure.message;
@@ -120,66 +137,5 @@ class MyEventsController extends GetxController
     isLoadingMore.value = true;
     page++;
     await fetchRegisteredEvents();
-  }
-
-  void _categorizeEvents() {
-    final now = DateTime.now();
-    final List<RegisteredEventItem> upcoming = [];
-    final List<RegisteredEventItem> ongoing = [];
-    final List<RegisteredEventItem> past = [];
-
-    for (final item in allItems) {
-      final statusName = (item.registrationStatusName ?? '').toLowerCase();
-      final notes = (item.notes ?? '').toLowerCase();
-
-      // Explicit cancellation or completed status
-      if (item.cancelledAt != null ||
-          statusName.contains('cancel') ||
-          notes.contains('over') ||
-          notes.contains('completed')) {
-        past.add(item);
-        continue;
-      }
-
-      DateTime? regDate = DateTime.tryParse(item.registeredAt ?? '');
-      if (regDate != null) {
-        if (now.year == regDate.year &&
-            now.month == regDate.month &&
-            now.day == regDate.day) {
-          ongoing.add(item);
-        } else if (now.isAfter(regDate)) {
-          past.add(item);
-        } else {
-          upcoming.add(item);
-        }
-      } else {
-        if (statusName.contains('past') || statusName.contains('complete')) {
-          past.add(item);
-        } else {
-          upcoming.add(item);
-        }
-      }
-    }
-
-    upcomingEvents.assignAll(upcoming);
-    ongoingEvents.assignAll(ongoing);
-    pastEvents.assignAll(past);
-
-    upcomingCount.value = upcoming.length;
-    ongoingCount.value = ongoing.length;
-    pastCount.value = past.length;
-  }
-
-  List<RegisteredEventItem> get currentTabEvents {
-    switch (selectedTabIndex.value) {
-      case 0:
-        return upcomingEvents;
-      case 1:
-        return ongoingEvents;
-      case 2:
-        return pastEvents;
-      default:
-        return upcomingEvents;
-    }
   }
 }

@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/features/committee/pages/frompage_committee
 import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_registration_page.dart';
 import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/event_scanner_page.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_members_list_page.dart';
@@ -77,6 +78,7 @@ class AppRouter {
   static String events = '/events';
   static String eventRegistration = '/event-registration';
   static String myEvents = '/my-events';
+  static String eventScanner = '/event-scanner';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -250,7 +252,22 @@ class AppRouter {
     ),
     GetPage<void>(
       name: myEvents,
-      page: () => const MyEventsPage(),
+      page: () {
+        final args = Get.arguments;
+        if (args is Map<String, dynamic>) {
+          return MyEventsPage(
+            targetEventId: args['targetEventId'] as int?,
+            targetEventName: args['targetEventName'] as String?,
+            targetStatus: args['targetStatus'] as String?,
+          );
+        }
+        return const MyEventsPage();
+      },
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: eventScanner,
+      page: () => const EventScannerPage(),
       middlewares: [AuthGuard()],
     ),
   ];

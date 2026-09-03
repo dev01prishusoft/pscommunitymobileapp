@@ -35,9 +35,12 @@ class AuthInterceptor extends Interceptor {
       }
     }
 
-    final token = _tokenManager.accessToken;
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    final existingAuth = options.headers['Authorization'];
+    if (existingAuth == null || existingAuth.toString().isEmpty) {
+      final token = _tokenManager.accessToken;
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }

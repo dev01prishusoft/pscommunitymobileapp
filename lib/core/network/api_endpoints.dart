@@ -66,4 +66,7 @@ class ApiEndpoints {
   static String myRegisteredEvents = "/api/v1/EventRegistration/list";
   static String myRegisteredEventDetail(String registrationId) =>
       "/api/v1/EventRegistration/$registrationId";
+  static String scanEventBarcode = "/api/v1/EventAttendance/ScanQR";
+  static String checkInEventByQr = "/api/v1/EventAttendance/CheckIn-by-QR";
+  
 }

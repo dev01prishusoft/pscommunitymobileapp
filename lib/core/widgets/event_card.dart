@@ -5,12 +5,46 @@ import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_details_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 
 class EventCard extends StatelessWidget {
   final EventsData event;
+  final String? eventStatus;
 
-  const EventCard({Key? key, required this.event}) : super(key: key);
+  const EventCard({
+    Key? key,
+    required this.event,
+    this.eventStatus,
+  }) : super(key: key);
+
+  String _determineEventStatus(EventsData event) {
+    if (eventStatus != null && eventStatus!.isNotEmpty) {
+      return eventStatus!;
+    }
+    final now = DateTime.now();
+    final start = DateTime.tryParse(event.startDateTime ?? '');
+    final end = DateTime.tryParse(event.endDateTime ?? '');
+
+    if (start != null) {
+      if (end != null) {
+        if (now.isBefore(start)) return 'Upcoming';
+        if (now.isAfter(end)) return 'Past';
+        return 'Ongoing';
+      } else {
+        if (now.year == start.year &&
+            now.month == start.month &&
+            now.day == start.day) {
+          return 'Ongoing';
+        } else if (now.isAfter(start)) {
+          return 'Past';
+        } else {
+          return 'Upcoming';
+        }
+      }
+    }
+    return 'Upcoming';
+  }
 
   String _formatEventDateTime(DateTime start, DateTime end) {
     final formatTime = DateFormat('h:mm a');
@@ -55,7 +89,18 @@ class EventCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           onTap: () async {
             if (event.eventId != null) {
-              await Get.to(() => EventDetailsPage(eventId: event.eventId!));
+              if (event.isMemberRegistered == true) {
+                final status = _determineEventStatus(event);
+                await Get.to(
+                  () => MyEventsPage(
+                    targetEventId: event.eventId,
+                    targetEventName: event.eventName,
+                    targetStatus: status,
+                  ),
+                );
+              } else {
+                await Get.to(() => EventDetailsPage(eventId: event.eventId!));
+              }
               if (Get.isRegistered<EventsController>()) {
                 Get.find<EventsController>().refreshEventsSilently();
               }

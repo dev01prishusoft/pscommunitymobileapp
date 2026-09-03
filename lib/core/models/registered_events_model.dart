@@ -2,7 +2,7 @@ class registeredEventsModel {
   int? statusCode;
   bool? succeeded;
   String? message;
-  RegisteredEventsData? data;
+  RegisteredEventData? data;
 
   registeredEventsModel(
       {this.statusCode, this.succeeded, this.message, this.data});
@@ -11,7 +11,9 @@ class registeredEventsModel {
     statusCode = json['statusCode'];
     succeeded = json['succeeded'];
     message = json['message'];
-    data = json['data'] != null ? new RegisteredEventsData.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? new RegisteredEventData.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -26,13 +28,13 @@ class registeredEventsModel {
   }
 }
 
-class RegisteredEventsData {
+class RegisteredEventData {
   int? totalCount;
   List<RegisteredEventItem>? items;
 
-  RegisteredEventsData({this.totalCount, this.items});
+  RegisteredEventData({this.totalCount, this.items});
 
-  RegisteredEventsData.fromJson(Map<String, dynamic> json) {
+  RegisteredEventData.fromJson(Map<String, dynamic> json) {
     totalCount = json['totalCount'];
     if (json['items'] != null) {
       items = <RegisteredEventItem>[];
@@ -52,14 +54,16 @@ class RegisteredEventsData {
   }
 }
 
-typedef Items = RegisteredEventItem;
-typedef RegisteredEventsItem = RegisteredEventItem;
-
 class RegisteredEventItem {
   int? eventRegistrationId;
   int? eventId;
   String? eventName;
   String? eventCode;
+  String? eventStartDateTime;
+  String? eventEndDateTime;
+  dynamic timePeriod;
+  dynamic eventTypeName;
+  dynamic venueName;
   int? memberId;
   String? memberName;
   String? memberNo;
@@ -75,9 +79,9 @@ class RegisteredEventItem {
   int? eventCouponId;
   String? couponCode;
   String? notes;
-  int? originalAmount;
-  double? discountAmount;
-  double? finalAmount;
+  dynamic originalAmount;
+  dynamic discountAmount;
+  dynamic finalAmount;
   String? createdAt;
 
   RegisteredEventItem(
@@ -85,6 +89,11 @@ class RegisteredEventItem {
       this.eventId,
       this.eventName,
       this.eventCode,
+    this.eventStartDateTime,
+    this.eventEndDateTime,
+    this.timePeriod,
+    this.eventTypeName,
+    this.venueName,
       this.memberId,
       this.memberName,
       this.memberNo,
@@ -110,6 +119,11 @@ class RegisteredEventItem {
     eventId = json['eventId'];
     eventName = json['eventName'];
     eventCode = json['eventCode'];
+    eventStartDateTime = json['eventStartDateTime'];
+    eventEndDateTime = json['eventEndDateTime'];
+    timePeriod = json['timePeriod'];
+    eventTypeName = json['eventTypeName'];
+    venueName = json['venueName'];
     memberId = json['memberId'];
     memberName = json['memberName'];
     memberNo = json['memberNo'];
@@ -137,6 +151,11 @@ class RegisteredEventItem {
     data['eventId'] = this.eventId;
     data['eventName'] = this.eventName;
     data['eventCode'] = this.eventCode;
+    data['eventStartDateTime'] = this.eventStartDateTime;
+    data['eventEndDateTime'] = this.eventEndDateTime;
+    data['timePeriod'] = this.timePeriod;
+    data['eventTypeName'] = this.eventTypeName;
+    data['venueName'] = this.venueName;
     data['memberId'] = this.memberId;
     data['memberName'] = this.memberName;
     data['memberNo'] = this.memberNo;

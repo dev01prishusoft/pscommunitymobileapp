@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
+import 'package:pscommunitymobileapp/features/events/pages/event_scanner_page.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -44,11 +45,22 @@ class EventsPage extends GetView<EventsController> {
                 return const SizedBox.shrink();
               }
 
-              return IconButton(
-                icon: const Icon(Iconsax.search_normal_copy),
-                onPressed: () {
-                  controller.isSearchVisible.value = true;
-                },
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Iconsax.scan_barcode_copy),
+                    onPressed: () {
+                      Get.to(() => const EventScannerPage());
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Iconsax.search_normal_copy),
+                    onPressed: () {
+                      controller.isSearchVisible.value = true;
+                    },
+                  ),
+                ],
               );
             }),
           ],
@@ -342,9 +354,17 @@ class EventsPage extends GetView<EventsController> {
               child: Center(child: CircularProgressIndicator()),
             );
           }
+          final String status = type == 1
+              ? 'Upcoming'
+              : type == 2
+                  ? 'Ongoing'
+                  : 'Past';
           return Padding(
             padding: EdgeInsets.only(bottom: 16.h),
-            child: EventCard(event: events[index]),
+            child: EventCard(
+              event: events[index],
+              eventStatus: status,
+            ),
           );
         },
       );

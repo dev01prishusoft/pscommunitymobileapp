@@ -186,17 +186,17 @@ class EventsRepositoryImpl implements EventsRepositories {
   }
 
   @override
-  Future<Result<ApiResponse<RegisteredEventsData>>> getMyRegisteredEvents({
+  Future<Result<ApiResponse<RegisteredEventData>>> getMyRegisteredEvents({
     int page = 1,
     int pageSize = 10,
     CancelToken? cancelToken,
   }) async {
-    return await _apiClient.postParsed<RegisteredEventsData>(
+    return await _apiClient.getParsed<RegisteredEventData>(
       ApiEndpoints.myRegisteredEvents,
-      data: {"Page": page, "PageSize": pageSize},
+      queryParameters: {"Page": page, "PageSize": pageSize},
       cancelToken: cancelToken,
       fromJsonT: (json) =>
-          RegisteredEventsData.fromJson(json as Map<String, dynamic>),
+          RegisteredEventData.fromJson(json as Map<String, dynamic>),
     );
   }
 }
