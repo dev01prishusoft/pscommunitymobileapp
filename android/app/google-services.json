@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "413758830617",
-    "project_id": "pscommunity-9145d",
-    "storage_bucket": "pscommunity-9145d.firebasestorage.app"
+    "project_number": "738194812656",
+    "project_id": "unviora-20720",
+    "storage_bucket": "unviora-20720.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:413758830617:android:f10f3b8f44b8c311d11288",
+        "mobilesdk_app_id": "1:738194812656:android:c0e9ea522d3afdf2ed1c35",
         "android_client_info": {
-          "package_name": "com.sajivan.app"
+          "package_name": "com.unviora.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBkCvS-gfO7KtN2pv_D9Fl5SgFjk_LDr-Y"
+          "current_key": "AIzaSyB8b540lEKoEO32xG_rkc1hd8YLM67fuVk"
         }
       ],
       "services": {

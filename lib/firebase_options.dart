@@ -50,18 +50,18 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBkCvS-gfO7KtN2pv_D9Fl5SgFjk_LDr-Y',
-    appId: '1:413758830617:android:f10f3b8f44b8c311d11288',
-    messagingSenderId: '413758830617',
-    projectId: 'pscommunity-9145d',
-    storageBucket: 'pscommunity-9145d.firebasestorage.app',
+    apiKey: 'AIzaSyB8b540lEKoEO32xG_rkc1hd8YLM67fuVk',
+    appId: '1:738194812656:android:c0e9ea522d3afdf2ed1c35',
+    messagingSenderId: '738194812656',
+    projectId: 'unviora-20720',
+    storageBucket: 'unviora-20720.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCcJGJ6FGyPIxe-hRT9iKA09vziVNXCMPs',
-    appId: '1:413758830617:ios:7366127923550ebdd11288',
-    messagingSenderId: '413758830617',
-    projectId: 'pscommunity-9145d',
-    storageBucket: 'pscommunity-9145d.firebasestorage.app',
-    iosBundleId: 'com.sajivan.app',
+    apiKey: 'AIzaSyBXGomTcEJgA8oOzQcIsWqrNbwgpnPPQrk',
+    appId: '1:738194812656:ios:dc61adbe4e0f42abed1c35',
+    messagingSenderId: '738194812656',
+    projectId: 'unviora-20720',
+    storageBucket: 'unviora-20720.firebasestorage.app',
+    iosBundleId: 'com.unviora.app',
   );
 }

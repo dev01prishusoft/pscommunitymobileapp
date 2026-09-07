@@ -1,4 +1,4 @@
-package com.sajivan.app
+package com.unviora.app
 
 import io.flutter.embedding.android.FlutterActivity
 

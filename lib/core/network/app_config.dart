@@ -3,4 +3,4 @@ const bool kUiReviewMode = bool.fromEnvironment(
   defaultValue: false,
 );
 
-String FallBackImage = "assets/images/sajivan.png";
+String FallBackImage = "assets/images/banner_logo.png";

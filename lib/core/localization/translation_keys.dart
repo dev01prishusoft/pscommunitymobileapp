@@ -2,12 +2,12 @@ class LK {
   static const String reviewAndSaveChanges = 'Review & Save changes';
   static const String reviewAndSaveChangesDesc = 'reviewAndSaveChangesDesc';
 
-  static const String appTitle = 'Sajivan';
-  static const String welcome = 'Welcome to PrishuSoft Samaj';
+  static const String appTitle = 'Unviora';
+  static const String welcome = 'Welcome to Unviora';
   static const String welcomesYou = 'welcomes you';
   static const String signIn = 'Sign In';
   static const String welcomeBack = 'Welcome Back';
-  static const String loginSubtitle = 'Sign in to your PSCommunity account';
+  static const String loginSubtitle = 'Sign in to your Unviora account';
   static const String mobileNumber = 'Mobile Number';
   static const String mobileHint = 'Enter 10-digit mobile number';
   static const String password = 'Password';
@@ -87,7 +87,6 @@ class LK {
   static const String termsAndConditions = 'Terms & Conditions';
   static const String privacyContent = 'privacy_content';
   static const String needHelp = 'Need help?';
-  static const String supportEmail = 'support_email';
   static const String supportPhone = 'support_phone';
   static const String supportHours = 'support_hours';
   static const String searchHint = 'Search...';
@@ -485,7 +484,6 @@ class LK {
   static const String grade = 'Grade';
   static const String institute = 'Institute';
   static const String qualification = 'Qualification';
-  static const String memberNoHint = 'PSC-2026-0512160358';
 
   static const String mother = 'Mother';
   static const String oPositive = 'O+';
