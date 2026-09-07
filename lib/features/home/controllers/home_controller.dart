@@ -51,7 +51,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     ),
     MenuItem(
       icon: Icons.wc,
-      labelKey: LK.matrimonial,
+      labelKey: LK.marriage,
       route: AppRouter.marriage,
     ),
     MenuItem(icon: Icons.share, labelKey: LK.share, route: AppRouter.shareApp),
