@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -171,7 +172,7 @@ class EventCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            event.eventType ?? 'Event',
+                            event.eventType ?? LK.events_title.tr,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,
@@ -232,7 +233,7 @@ class EventCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Registered',
+                            LK.events_badge_registered.tr,
                             style: AppTextStyles.labelSmall.copyWith(
                               color: const Color(0xFFE65100),
                               fontWeight: FontWeight.w600,
@@ -264,8 +265,8 @@ class EventCard extends StatelessWidget {
                           Text(
                             (event.registrationFee == 0 ||
                                     event.registrationFee == 0.0)
-                                ? 'Free'
-                                : 'Registration Fee ${event.registrationFee}',
+                                ? LK.events_fee_free.tr
+                                : '${LK.events_reg_fee_prefix.tr} ${event.registrationFee}',
                             style: AppTextStyles.labelSmall.copyWith(
                               color: const Color(0xFF1A7A60),
                               fontWeight: FontWeight.w600,
@@ -364,7 +365,7 @@ class EventCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${event.totalRegistrations ?? 0} of ${event.maximumCapacity ?? 0} places taken',
+                      '${event.totalRegistrations ?? 0} of ${event.maximumCapacity ?? 0} ${LK.events_places_taken_progress.tr}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF64748B),

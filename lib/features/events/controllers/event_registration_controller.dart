@@ -138,15 +138,67 @@ class EventRegistrationController extends GetxController {
     memberSearchQuery.value = query;
   }
 
-  void _loadCurrentUser() {
+  Future<void> _loadCurrentUser() async {
     if (Get.isRegistered<DrawerUserController>()) {
       currentUser.value = Get.find<DrawerUserController>().member.value;
     }
+    if (currentUser.value == null && Get.isRegistered<TokenManager>()) {
+      final memberId = Get.find<TokenManager>().memberId;
+      if (memberId != null) {
+        try {
+          final response = await _apiClient.getParsed<Member>(
+            '/api/v1/member/$memberId',
+            fromJsonT: (json) => Member.fromJson(json as Map<String, dynamic>),
+          );
+          if (response.dataOrNull?.data != null) {
+            currentUser.value = response.dataOrNull!.data;
+          }
+        } catch (_) {}
+      }
+    }
+  }
+
+  bool _isApproved(String? status) {
+    if (status == null || status.trim().isEmpty) {
+      return true;
+    }
+    final s = status.trim().toLowerCase();
+
+    // Check for explicit rejection or pending status in English and Gujarati
+    final isRejected = s == 'rejected' ||
+        s == 'અસ્વીકૃત' ||
+        s == 'Rejected'.tr.toLowerCase();
+    final isRequested = s == 'requested' ||
+        s == 'pending' ||
+        s == 'વિનંતી કરેલ' ||
+        s == 'પેન્ડિંગ' ||
+        s == 'Requested'.tr.toLowerCase() ||
+        s == 'Pending'.tr.toLowerCase();
+
+    if (isRejected || isRequested) {
+      return false;
+    }
+
+    // Explicit approved keywords in English, Gujarati, etc.
+    if (s == 'approved' ||
+        s == 'મંજૂર' ||
+        s == 'મંજૂરી' ||
+        s == 'મંજૂર થયેલ' ||
+        s == 'મંજૂર કરેલ' ||
+        s == 'Approved'.tr.toLowerCase() ||
+        s == 'active' ||
+        s == 'સક્રિય') {
+      return true;
+    }
+
+    return true;
   }
 
   Future<void> _fetchFamilyMembers() async {
     isLoadingMembers.value = true;
     try {
+      await _loadCurrentUser();
+
       final response = await _apiClient.get(
         '/api/v1/member/mobile/list',
         queryParameters: {
@@ -163,9 +215,9 @@ class EventRegistrationController extends GetxController {
               .map((e) => Member.fromJson(e as Map<String, dynamic>))
               .toList();
 
-          // Filter for approved members
+          // Filter for approved members (safe for all languages)
           var approvedMembers = allMembers
-              .where((m) => m.approveStatus?.toLowerCase() == 'approved')
+              .where((m) => _isApproved(m.approveStatus))
               .toList();
 
           // Add the current user to the list if not already present
@@ -196,10 +248,22 @@ class EventRegistrationController extends GetxController {
   void addCustomGuest({required EventDetailsData event}) {
     if (customGuests.length < (event.maximumGuestsPerMember ?? 0)) {
       customGuests.add(CustomGuestForm());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          if (membersTileController.isExpanded) {
+            membersTileController.collapse();
+          }
+        } catch (_) {}
+        try {
+          if (!guestsTileController.isExpanded) {
+            guestsTileController.expand();
+          }
+        } catch (_) {}
+      });
     } else {
       _showToast(
         LK.error.tr,
-        'You cannot add more custom guests for this event.',
+        LK.event_pay_guest_limit_err.tr,
         isError: true,
       );
     }
@@ -216,19 +280,19 @@ class EventRegistrationController extends GetxController {
     final coupon = couponController.text.trim();
     if (coupon.isEmpty) {
       hasError.value = true;
-      errorMessage.value = 'Please enter a coupon code.';
+      errorMessage.value = LK.event_pay_coupon_empty_err.tr;
       return;
     }
 
     if (event.eventId == null) {
       hasError.value = true;
-      errorMessage.value = 'Invalid event details. Event ID is missing.';
+      errorMessage.value = LK.event_pay_invalid_event_err.tr;
       return;
     }
 
     if (currentUser.value?.memberId == null) {
       hasError.value = true;
-      errorMessage.value = 'Member details not found. Please log in again.';
+      errorMessage.value = LK.event_pay_member_not_found_err.tr;
       return;
     }
 
@@ -257,19 +321,19 @@ class EventRegistrationController extends GetxController {
         } else {
           appliedCoupon.value = null;
           hasError.value = true;
-          errorMessage.value = result.data.message ?? "Failed to apply coupon.";
+          errorMessage.value = result.data.message ?? LK.event_pay_coupon_fail_err.tr;
         }
       } else if (result is Error<ApiResponse<CouponApplyData>>) {
         appliedCoupon.value = null;
         hasError.value = true;
         errorMessage.value = result.failure.message.isNotEmpty
             ? result.failure.message
-            : "Failed to apply coupon.";
+            : LK.event_pay_coupon_fail_err.tr;
       }
     } catch (e) {
       appliedCoupon.value = null;
       hasError.value = true;
-      errorMessage.value = 'Something went wrong. Please try again.';
+      errorMessage.value = LK.event_pay_generic_err.tr;
     } finally {
       isLoadingCoupon.value = false;
     }
@@ -281,7 +345,7 @@ class EventRegistrationController extends GetxController {
     if (selectedMemberIds.isEmpty && customGuests.isEmpty) {
       _showToast(
         LK.error.tr,
-        'Please select at least one member or add a guest.',
+        LK.event_pay_select_member_err.tr,
         isError: true,
       );
       return;
@@ -293,7 +357,7 @@ class EventRegistrationController extends GetxController {
       if ((g.selectedGenderID.value ?? 0) <= 0) {
         _showToast(
           LK.error.tr,
-          'Please select gender for Guest ${i + 1}.',
+          '${LK.event_pay_select_gender_err.tr} ${i + 1}.',
           isError: true,
         );
         return;
@@ -337,7 +401,7 @@ class EventRegistrationController extends GetxController {
     if (eventId == null || memberId == null) {
       _showToast(
         LK.error.tr,
-        'Missing event or member details.',
+        LK.event_pay_missing_details_err.tr,
         isError: true,
       );
       return;
@@ -370,14 +434,14 @@ class EventRegistrationController extends GetxController {
           LK.error.tr,
           result.failure.message.isNotEmpty
               ? result.failure.message
-              : 'Failed to validate registration.',
+              : LK.event_pay_validate_fail_err.tr,
           isError: true,
         );
       }
     } catch (e) {
       _showToast(
         LK.error.tr,
-        'Something went wrong while validating registration.',
+        LK.event_pay_validate_generic_err.tr,
         isError: true,
       );
     } finally {
@@ -411,7 +475,7 @@ class EventRegistrationController extends GetxController {
         } else {
           _showToast(
             LK.error.tr,
-            'Invalid order response from server.',
+            LK.event_pay_order_invalid_err.tr,
             isError: true,
           );
         }
@@ -420,7 +484,7 @@ class EventRegistrationController extends GetxController {
           LK.error.tr,
           result.failure.message.isNotEmpty
               ? result.failure.message
-              : 'Failed to create payment order.',
+              : LK.event_pay_order_create_fail_err.tr,
           isError: true,
         );
       }
@@ -428,7 +492,7 @@ class EventRegistrationController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
       _showToast(
         LK.error.tr,
-        'Something went wrong while creating order.',
+        LK.event_pay_order_generic_err.tr,
         isError: true,
       );
     }
@@ -682,7 +746,7 @@ class EventRegistrationController extends GetxController {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Registration Summary',
+                        LK.event_pay_summary_title.tr,
                         style: AppTextStyles.titleMedium.copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.grey.shade900,
@@ -690,7 +754,7 @@ class EventRegistrationController extends GetxController {
                       ),
                       SizedBox(height: 2.h),
                       Text(
-                        'Review details before making payment',
+                        LK.event_pay_summary_subtitle.tr,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.grey.shade500,
                         ),
@@ -760,14 +824,14 @@ class EventRegistrationController extends GetxController {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Registration Fee',
+                                    LK.events_reg_fee_prefix.tr,
                                     style: AppTextStyles.bodyMedium.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.grey.shade800,
                                     ),
                                   ),
                                   Text(
-                                    'Base amount',
+                                    LK.event_pay_base_amount_desc.tr,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.grey.shade500,
                                       fontSize: 11.sp,
@@ -825,7 +889,7 @@ class EventRegistrationController extends GetxController {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Coupon Discount',
+                                      LK.event_pay_coupon_discount.tr,
                                       style: AppTextStyles.bodyMedium.copyWith(
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.green,
@@ -836,7 +900,7 @@ class EventRegistrationController extends GetxController {
                                           ? couponController.text
                                                 .trim()
                                                 .toUpperCase()
-                                          : 'Discount applied',
+                                          : LK.event_pay_discount_applied.tr,
                                       style: AppTextStyles.bodySmall.copyWith(
                                         color: AppColors.green,
                                         fontSize: 11.sp,
@@ -875,14 +939,14 @@ class EventRegistrationController extends GetxController {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Total Payable',
+                                LK.event_pay_total_payable.tr,
                                 style: AppTextStyles.titleSmall.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.grey.shade900,
                                 ),
                               ),
                               Text(
-                                'Final amount to pay',
+                                LK.event_pay_final_amount_desc.tr,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.grey.shade500,
                                   fontSize: 11.sp,
@@ -907,7 +971,7 @@ class EventRegistrationController extends GetxController {
 
               // Coupon Header
               Text(
-                'Apply Coupon',
+                LK.event_pay_apply_coupon_title.tr,
                 style: AppTextStyles.titleSmall.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.grey.shade800,
@@ -918,7 +982,7 @@ class EventRegistrationController extends GetxController {
               Obx(
                 () => AppTextField(
                   controller: couponController,
-                  hint: 'Enter coupon code',
+                  hint: LK.event_pay_coupon_hint.tr,
                   icon: Iconsax.ticket_discount,
                   readOnly: appliedCoupon.value != null,
                   onChanged: (_) {
@@ -951,7 +1015,7 @@ class EventRegistrationController extends GetxController {
                             errorMessage.value = '';
                           },
                           child: Text(
-                            'Remove',
+                            LK.event_pay_coupon_remove_btn.tr,
                             style: AppTextStyles.labelMedium.copyWith(
                               color: AppColors.red,
                               fontWeight: FontWeight.bold,
@@ -961,7 +1025,7 @@ class EventRegistrationController extends GetxController {
                       : TextButton(
                           onPressed: () => _applyCoupon(event: event),
                           child: Text(
-                            'Apply',
+                            LK.event_pay_coupon_apply_btn.tr,
                             style: AppTextStyles.labelMedium.copyWith(
                               color: AppColors.blue,
                               fontWeight: FontWeight.bold,
@@ -1025,7 +1089,7 @@ class EventRegistrationController extends GetxController {
                             SizedBox(width: 8.w),
                             Expanded(
                               child: Text(
-                                'Coupon applied! You save ₹${appliedCoupon.value?.discountAmount ?? 0}',
+                                '${LK.event_pay_coupon_applied_success.tr} ₹${appliedCoupon.value?.discountAmount ?? 0}',
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.green,
                                   fontWeight: FontWeight.w600,
@@ -1048,7 +1112,7 @@ class EventRegistrationController extends GetxController {
                     event.registrationFee ??
                     0;
                 final num finalAmount = coupon?.finalAmount ?? origAmount;
-                final String buttonText = 'Pay Now · ₹$finalAmount';
+                final String buttonText = '${LK.event_pay_now_btn.tr} · ₹$finalAmount';
 
                 return AppPrimaryButton(
                   onPressed: () {
@@ -1157,7 +1221,7 @@ class EventRegistrationController extends GetxController {
         if (Get.isBottomSheetOpen ?? false) Get.back();
         _showToast(
           LK.success.tr,
-          result.data.message ?? 'Registration successful!',
+          result.data.message ?? LK.event_pay_reg_success.tr,
         );
         navigateBackAfterRegister();
       } else if (result is Error<ApiResponse<Map<String, dynamic>>>) {
@@ -1165,7 +1229,7 @@ class EventRegistrationController extends GetxController {
           LK.error.tr,
           result.failure.message.isNotEmpty
               ? result.failure.message
-              : 'Registration failed.',
+              : LK.event_pay_reg_failed.tr,
           isError: true,
         );
       }
@@ -1173,7 +1237,7 @@ class EventRegistrationController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
       _showToast(
         LK.error.tr,
-        'Something went wrong while registering.',
+        LK.event_pay_reg_generic_err.tr,
         isError: true,
       );
     }

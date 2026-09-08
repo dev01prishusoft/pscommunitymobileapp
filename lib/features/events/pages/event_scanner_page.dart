@@ -1,3 +1,4 @@
+/*
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -162,7 +163,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 ),
                 SizedBox(height: 20.h),
                 Text(
-                  'Verifying QR Code...',
+                  LK.scanner_verifying_title.tr,
                   style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 17.sp,
@@ -171,7 +172,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  'Checking event registration and attendance',
+                  LK.scanner_verifying_desc.tr,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.grey.shade600,
                     fontSize: 12.sp,
@@ -226,7 +227,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Verification Failed',
+                  LK.scanner_failed_title.tr,
                   style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.sp,
@@ -235,7 +236,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Unable to complete attendance check-in',
+                  LK.scanner_failed_subtitle.tr,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade600,
                     fontSize: 13.sp,
@@ -267,7 +268,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                         child: Text(
                           errorMsg.isNotEmpty
                               ? errorMsg
-                              : 'Invalid QR Code or attendance already marked.',
+                              : LK.scanner_failed_default_msg.tr,
                           style: TextStyle(
                             color: const Color(0xFFC5221F),
                             fontSize: 14.sp,
@@ -307,7 +308,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                     onPressed: _rescan,
                     icon: const Icon(Icons.refresh_rounded, size: 20),
                     label: Text(
-                      'Scan Again',
+                      LK.scanner_scan_again_btn.tr,
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
@@ -328,7 +329,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 TextButton(
                   onPressed: () => Get.back(),
                   child: Text(
-                    'Done',
+                    LK.scanner_done_btn.tr,
                     style: TextStyle(
                       color: AppColors.grey.shade600,
                       fontSize: 14.sp,
@@ -367,7 +368,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'Check-In Successful!',
+                  LK.scanner_success_title.tr,
                   style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.sp,
@@ -378,7 +379,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 Text(
                   successMsg.isNotEmpty
                       ? successMsg
-                      : 'Attendance verified and marked successfully',
+                      : LK.scanner_success_subtitle.tr,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade700,
                     fontSize: 13.sp,
@@ -403,7 +404,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow(
-                        'QR DATA',
+                        LK.scanner_label_qr_data.tr,
                         value,
                         icon: Icons.qr_code_2_rounded,
                       ),
@@ -419,7 +420,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                         ),
                         SizedBox(height: 8.h),
                         _buildDetailRow(
-                          'MEMBER NAME',
+                          LK.scanner_label_member_name.tr,
                           '${scannedMap['memberName'] ?? scannedMap['fullName'] ?? checkInMap['memberName'] ?? checkInMap['fullName']}',
                           icon: Icons.person_outline_rounded,
                         ),
@@ -434,7 +435,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                         ),
                         SizedBox(height: 8.h),
                         _buildDetailRow(
-                          'EVENT',
+                          LK.scanner_label_event.tr,
                           '${scannedMap['eventName'] ?? checkInMap['eventName']}',
                           icon: Icons.event_available_rounded,
                         ),
@@ -450,7 +451,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                         ),
                         SizedBox(height: 8.h),
                         _buildDetailRow(
-                          'ATTENDEES',
+                          LK.scanner_label_attendees.tr,
                           '${scannedMap['numberOfUsers'] ?? scannedMap['numberOfGuests'] ?? checkInMap['numberOfUsers']}',
                           icon: Icons.people_outline_rounded,
                         ),
@@ -468,7 +469,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                     onPressed: _rescan,
                     icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
                     label: Text(
-                      'Scan Next Code',
+                      LK.scanner_scan_next_btn.tr,
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
@@ -489,7 +490,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                 TextButton(
                   onPressed: () => Get.back(),
                   child: Text(
-                    'Done',
+                    LK.scanner_done_btn.tr,
                     style: TextStyle(
                       color: AppColors.grey.shade600,
                       fontSize: 14.sp,
@@ -653,7 +654,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          'Align QR code inside the frame',
+                          LK.scanner_align_instruction.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 13.sp,
@@ -795,7 +796,7 @@ class _EventScannerPageState extends State<EventScannerPage>
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    'Event Scanner',
+                    LK.scanner_title.tr,
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 11.sp,
@@ -989,3 +990,4 @@ class _ScannerHolePainter extends CustomPainter {
         oldDelegate.cornerColor != cornerColor;
   }
 }
+*/

@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/models/registered_event_details_model.
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/my_event_details_controller.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
@@ -38,7 +39,7 @@ class MyEventDetailsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('Event Registration'),
+        title: Text(LK.event_reg_title.tr),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -65,7 +66,7 @@ class MyEventDetailsPage extends StatelessWidget {
                   Text(
                     controller.errorMessage.value.isNotEmpty
                         ? controller.errorMessage.value
-                        : 'Failed to load event details',
+                        : LK.my_event_details_load_err.tr,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.grey.shade700,
                     ),
@@ -81,7 +82,7 @@ class MyEventDetailsPage extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Retry',
+                      LK.retry.tr,
                       style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.white,
                       ),
@@ -97,7 +98,9 @@ class MyEventDetailsPage extends StatelessWidget {
 
         // Resolve display values from detail API or initialItem fallback
         final String eventName =
-            detail?.eventName ?? initialItem?.eventName ?? 'Event Details';
+            detail?.eventName ??
+            initialItem?.eventName ??
+            LK.event_details_title.tr;
 
         final String dateTimeStr = _formatDateTime(
           startStr:
@@ -140,7 +143,9 @@ class MyEventDetailsPage extends StatelessWidget {
             'REG-$eventRegistrationId';
 
         final String memberName =
-            detail?.memberName ?? initialItem?.memberName ?? 'Member';
+            detail?.memberName ??
+            initialItem?.memberName ??
+            LK.my_event_details_member_default.tr;
         final String memberNo = detail?.memberNo ?? initialItem?.memberNo ?? '';
 
         final detailGuests = detail?.guests;
@@ -259,7 +264,7 @@ class MyEventDetailsPage extends StatelessWidget {
                           ),
                           SizedBox(height: 14.h),
                           Text(
-                            'Registration number',
+                            LK.my_event_details_reg_number.tr,
                             style: TextStyle(
                               fontSize: 11.sp,
                               color: const Color(0xFF6B7280),
@@ -385,7 +390,7 @@ class MyEventDetailsPage extends StatelessWidget {
                               ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              tooltip: 'Open in Google Maps',
+                              tooltip: LK.my_event_details_open_maps.tr,
                             ),
                           ],
                         ),
@@ -414,7 +419,7 @@ class MyEventDetailsPage extends StatelessWidget {
                       foregroundColor: AppColors.error,
                     ),
                     child: Text(
-                      'Cancel My Registration',
+                      LK.my_event_details_cancel_btn.tr,
                       style: TextStyle(
                         color: AppColors.error,
                         fontSize: 15,
@@ -496,11 +501,11 @@ class MyEventDetailsPage extends StatelessWidget {
           .toList();
 
       if (guestStrings.isNotEmpty) {
-        return 'With ${guestStrings.join(', ')}';
+        return '${LK.my_event_details_with_prefix.tr} ${guestStrings.join(', ')}';
       }
     }
     if (numberOfGuests != null && numberOfGuests > 0) {
-      return 'With $numberOfGuests ${numberOfGuests == 1 ? 'Guest' : 'Guests'}';
+      return '${LK.my_event_details_with_prefix.tr} $numberOfGuests ${numberOfGuests == 1 ? LK.my_event_guest.tr : LK.my_event_guests.tr}';
     }
     return null;
   }
@@ -537,7 +542,7 @@ class MyEventDetailsPage extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
-                    'Cancel Registration',
+                    LK.cancel_registration.tr,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 17.sp,
@@ -548,7 +553,7 @@ class MyEventDetailsPage extends StatelessWidget {
               ],
             ),
             content: Text(
-              'Are you sure you want to cancel your registration for this event?',
+              LK.my_event_details_dialog_msg.tr,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.grey.shade700,
                 fontSize: 14.sp,
@@ -572,7 +577,7 @@ class MyEventDetailsPage extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'No',
+                        LK.no.tr,
                         style: TextStyle(
                           color: AppColors.grey.shade700,
                           fontWeight: FontWeight.w600,
@@ -592,9 +597,9 @@ class MyEventDetailsPage extends StatelessWidget {
                               Navigator.of(dialogContext).pop();
                               if (success) {
                                 PSDelightToastBar(
-                                  builder: (context) => const ToastCard(
+                                  builder: (context) => ToastCard(
                                     title:
-                                        'Registration cancelled successfully',
+                                        LK.my_event_details_cancel_success.tr,
                                     isErrorMessage: false,
                                   ),
                                 ).show();
@@ -605,7 +610,7 @@ class MyEventDetailsPage extends StatelessWidget {
                                     title:
                                         controller.errorMessage.value.isNotEmpty
                                         ? controller.errorMessage.value
-                                        : 'Failed to cancel registration',
+                                        : LK.my_event_details_cancel_failed.tr,
                                     isErrorMessage: true,
                                   ),
                                 ).show();
@@ -631,9 +636,9 @@ class MyEventDetailsPage extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Yes',
-                              style: TextStyle(
+                          : Text(
+                              LK.yes.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
@@ -673,7 +678,7 @@ class MyEventDetailsPage extends StatelessWidget {
     if (targetUrl != null && await canLaunchUrlString(targetUrl)) {
       await launchUrlString(targetUrl, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('Error', 'Unable to open map');
+      Get.snackbar(LK.error.tr, LK.my_event_details_map_error.tr);
     }
   }
 
@@ -745,7 +750,7 @@ class MyEventDetailsPage extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         Text(
-          'QR Code Not Available',
+          LK.my_event_details_qr_na.tr,
           style: TextStyle(
             fontSize: 12.5.sp,
             fontWeight: FontWeight.w600,

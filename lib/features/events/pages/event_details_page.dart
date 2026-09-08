@@ -1,16 +1,19 @@
 import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_details_controller.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
@@ -27,7 +30,7 @@ class EventDetailsPage extends StatelessWidget {
     final controller = Get.put(EventDetailsController(eventId, Get.find()));
 
     return Scaffold(
-      appBar: AppBar(title: Text('Event Details')),
+      appBar: AppBar(title: Text(LK.event_details_title.tr)),
       bottomNavigationBar: Obx(() {
         if (controller.isLoading.value || controller.hasError.value)
           return const SizedBox.shrink();
@@ -142,7 +145,7 @@ class EventDetailsPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          event.eventType ?? 'Event',
+                          event.eventType ?? LK.events_type_default.tr,
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
@@ -202,7 +205,7 @@ class EventDetailsPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Registered',
+                          LK.events_badge_registered.tr,
                           style: AppTextStyles.labelSmall.copyWith(
                             color: const Color(0xFFE65100),
                             fontWeight: FontWeight.w600,
@@ -234,8 +237,8 @@ class EventDetailsPage extends StatelessWidget {
                         Text(
                           (event.registrationFee == 0 ||
                                   event.registrationFee == 0.0)
-                              ? 'Free'
-                              : 'Registration Fee ${event.registrationFee}',
+                              ? LK.events_fee_free.tr
+                              : '${LK.events_reg_fee_prefix.tr} ${event.registrationFee}',
                           style: AppTextStyles.labelSmall.copyWith(
                             color: const Color(0xFF1A7A60),
                             fontWeight: FontWeight.w600,
@@ -256,7 +259,7 @@ class EventDetailsPage extends StatelessWidget {
             ],
             if (event.translatedEventName != null &&
                 event.translatedEventName!.isNotEmpty) ...[
-              SizedBox(height: 6.h),
+              SizedBox(height: 2.h),
               Text(
                 event.translatedEventName!,
                 style: AppTextStyles.titleMedium.copyWith(
@@ -265,11 +268,11 @@ class EventDetailsPage extends StatelessWidget {
               ),
             ],
             if (event.description != null && event.description!.isNotEmpty) ...[
-              SizedBox(height: 20.h),
+              SizedBox(height: 5.h),
               Divider(color: AppColors.grey.shade100, height: 1),
-              SizedBox(height: 20.h),
+              SizedBox(height: 5.h),
               Text(
-                event.description!,
+                event.description!.trim(),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.grey.shade700,
                   height: 1.6,
@@ -305,19 +308,22 @@ class EventDetailsPage extends StatelessWidget {
               children: [
                 Icon(Icons.info_outline, color: AppColors.primary, size: 20.w),
                 SizedBox(width: 8.w),
-                Text('Event Details', style: AppTextStyles.titleMedium),
+                Text(
+                  LK.event_details_title.tr,
+                  style: AppTextStyles.titleMedium,
+                ),
               ],
             ),
             SizedBox(height: 20.h),
             _buildInfoRow(
               Icons.event_seat,
-              '${event.totalRegistrations ?? 0} places taken',
+              '${event.totalRegistrations ?? 0} ${LK.events_places_taken_progress.tr}',
             ),
             SizedBox(height: 16.h),
             if (event.maximumGuestsPerMember != 0) ...[
               _buildInfoRow(
                 Icons.family_restroom,
-                'Up to ${event.maximumGuestsPerMember} Guest members',
+                '${event.maximumGuestsPerMember} ${LK.event_details_guest_limit.tr}',
               ),
             ],
             if (event.schedules != null && event.schedules!.isNotEmpty) ...[
@@ -372,7 +378,7 @@ class EventDetailsPage extends StatelessWidget {
                 Icon(Icons.error_outline, color: AppColors.red, size: 16.w),
                 SizedBox(width: 8.w),
                 Text(
-                  'Please Note',
+                  LK.event_details_please_note.tr,
                   style: AppTextStyles.titleSmall.copyWith(
                     color: AppColors.red,
                   ),
@@ -397,6 +403,58 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget _buildOrganisedBySection(EventDetailsData event) {
+    final hasOrganizers =
+        event.organizers != null && event.organizers!.isNotEmpty;
+    final Map<String, List<_OrganizerPerson>> grouped = {};
+
+    if (hasOrganizers) {
+      for (final org in event.organizers!) {
+        String committeeTitle = '';
+        if (org.committeeName != null &&
+            org.committeeName.toString().trim().isNotEmpty) {
+          committeeTitle = _formatName(org.committeeName.toString().trim());
+        } else if (event.committeeName != null &&
+            event.committeeName.toString().trim().isNotEmpty) {
+          committeeTitle = _formatName(event.committeeName.toString().trim());
+        }
+
+        final list = grouped.putIfAbsent(
+          committeeTitle,
+          () => <_OrganizerPerson>[],
+        );
+
+        // 1. Add organizer primary member
+        if (org.memberName != null && org.memberName!.trim().isNotEmpty) {
+          final person = _OrganizerPerson(
+            id: org.memberId,
+            name: _formatName(org.memberName),
+            mobile: org.mobileNo?.toString().trim(),
+            email: org.email?.toString().trim(),
+          );
+          if (!_containsPerson(list, person)) {
+            list.add(person);
+          }
+        }
+
+        // 2. Add committeeMembers if any
+        if (org.committeeMembers != null) {
+          for (final cm in org.committeeMembers!) {
+            if (cm.memberName != null && cm.memberName!.trim().isNotEmpty) {
+              final subPerson = _OrganizerPerson(
+                id: cm.memberId ?? cm.committeeMemberId,
+                name: _formatName(cm.memberName),
+                mobile: cm.mobileNo?.toString().trim(),
+                email: cm.email?.toString().trim(),
+              );
+              if (!_containsPerson(list, subPerson)) {
+                list.add(subPerson);
+              }
+            }
+          }
+        }
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -419,14 +477,37 @@ class EventDetailsPage extends StatelessWidget {
               children: [
                 Icon(Icons.business, color: AppColors.primary, size: 20.w),
                 SizedBox(width: 8.w),
-                Text('Organised By', style: AppTextStyles.titleMedium),
+                Text(
+                  LK.event_details_organised_by.tr,
+                  style: AppTextStyles.titleMedium,
+                ),
               ],
             ),
-            SizedBox(height: 20.h),
-            if (event.organizers != null && event.organizers!.isNotEmpty)
-              ...event.organizers!
-                  .map((organizer) => _buildOrganizerItem(organizer))
-                  .toList()
+            SizedBox(height: 16.h),
+            if (hasOrganizers && grouped.isNotEmpty)
+              ...grouped.entries.toList().asMap().entries.map((entry) {
+                final index = entry.key;
+                final committeeEntry = entry.value;
+                final committeeName = committeeEntry.key;
+                final members = committeeEntry.value;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (index > 0) SizedBox(height: 8.h),
+                    if (committeeName.isNotEmpty)
+                      _buildCommitteeHeader(committeeName, isFirst: index == 0),
+                    if (members.isNotEmpty)
+                      ...members.map(
+                        (person) => _buildPersonRow(
+                          person.name,
+                          person.mobile,
+                          person.email,
+                        ),
+                      ),
+                  ],
+                );
+              })
             else
               _buildLegacyOrganizer(event),
           ],
@@ -435,46 +516,68 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOrganizerItem(Organizers organizer) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (organizer.committeeName != null &&
-            organizer.committeeName!.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h, top: 8.h),
-            child: Text(
-              organizer.committeeName!,
-              style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        if (organizer.memberName != null && organizer.memberName!.isNotEmpty)
-          _buildPersonRow(
-            organizer.memberName,
-            organizer.mobileNo,
-            organizer.email,
-          ),
-        if (organizer.committeeMembers != null &&
-            organizer.committeeMembers!.isNotEmpty)
-          ...organizer.committeeMembers!.map(
-            (member) => _buildPersonRow(
-              member.memberName,
-              member.mobileNo,
-              member.email,
-            ),
-          ),
-      ],
+  Widget _buildCommitteeHeader(String committeeName, {bool isFirst = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Text(
+        committeeName,
+        style: AppTextStyles.titleSmall.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 13.sp,
+          decoration: TextDecoration.underline,
+          decorationColor: AppColors.primary,
+          decorationThickness: 1,
+        ),
+      ),
     );
   }
 
+  String _formatName(String? text) {
+    if (text == null || text.trim().isEmpty) return '';
+    final trimmed = text.trim();
+    if (trimmed.contains(' ')) {
+      return trimmed;
+    }
+    return trimmed.replaceAllMapped(
+      RegExp(r'([a-z])([A-Z])'),
+      (match) => '${match.group(1)} ${match.group(2)}',
+    );
+  }
+
+  bool _containsPerson(List<_OrganizerPerson> list, _OrganizerPerson person) {
+    return list.any((existing) {
+      if (person.id != null && existing.id != null) {
+        return person.id == existing.id;
+      }
+      return existing.name.toLowerCase() == person.name.toLowerCase() &&
+          existing.mobile == person.mobile;
+    });
+  }
+
   Widget _buildLegacyOrganizer(EventDetailsData event) {
-    return _buildPersonRow(
-      event.organizerName,
-      event.organizerMobileNo?.toString(),
-      null,
+    final committee = event.committeeName?.toString().trim();
+    final formattedCommittee = _formatName(committee);
+    final hasCommittee = formattedCommittee.isNotEmpty;
+    final hasOrganizer =
+        event.organizerName != null && event.organizerName!.trim().isNotEmpty;
+
+    if (!hasCommittee && !hasOrganizer) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (hasCommittee)
+          _buildCommitteeHeader(formattedCommittee, isFirst: true),
+        if (hasOrganizer)
+          _buildPersonRow(
+            _formatName(event.organizerName),
+            event.organizerMobileNo?.toString(),
+            null,
+          ),
+      ],
     );
   }
 
@@ -581,12 +684,15 @@ class EventDetailsPage extends StatelessWidget {
                   size: 20.w,
                 ),
                 SizedBox(width: 8.w),
-                Text('Documents', style: AppTextStyles.titleMedium),
+                Text(
+                  LK.event_details_documents.tr,
+                  style: AppTextStyles.titleMedium,
+                ),
               ],
             ),
             SizedBox(height: 4.h),
             Text(
-              'Brochures, rule sheets or consent forms members can download.',
+              LK.event_details_documents_desc.tr,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.grey.shade500,
               ),
@@ -602,7 +708,7 @@ class EventDetailsPage extends StatelessWidget {
                 children: pdfMedias.asMap().entries.map((entry) {
                   final index = entry.key;
                   final media = entry.value;
-                  String pdfName = 'Document';
+                  String pdfName = LK.event_details_documents.tr;
                   try {
                     if (media.url != null) {
                       pdfName = Uri.decodeComponent(media.url!.split('/').last);
@@ -628,7 +734,7 @@ class EventDetailsPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16.r),
                               ),
                               child: Text(
-                                'PDF',
+                                LK.event_details_pdf_tag.tr,
                                 style: AppTextStyles.labelSmall.copyWith(
                                   color: const Color(0xFF2E7D32),
                                   fontWeight: FontWeight.bold,
@@ -664,7 +770,7 @@ class EventDetailsPage extends StatelessWidget {
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: Text(
-                                'Open',
+                                LK.event_details_open_pdf.tr,
                                 style: AppTextStyles.labelMedium.copyWith(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w600,
@@ -712,14 +818,14 @@ class EventDetailsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Status',
+                  LK.event_details_status.tr,
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.grey.shade500,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Not registered',
+                  LK.event_details_not_registered.tr,
                   style: AppTextStyles.titleMedium.copyWith(
                     color: AppColors.black,
                   ),
@@ -754,7 +860,7 @@ class EventDetailsPage extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Register',
+                  LK.event_details_register_btn.tr,
                   style: AppTextStyles.labelLarge.copyWith(
                     color: AppColors.white,
                   ),
@@ -797,7 +903,10 @@ class EventTimelineWidget extends StatelessWidget {
           children: [
             Icon(Icons.timeline_rounded, color: AppColors.primary, size: 24.w),
             SizedBox(width: 8.w),
-            Text('Event Timeline', style: AppTextStyles.titleMedium),
+            Text(
+              LK.event_details_timeline.tr,
+              style: AppTextStyles.titleMedium,
+            ),
           ],
         ),
         SizedBox(height: 16.h),
@@ -852,7 +961,7 @@ class EventTimelineWidget extends StatelessWidget {
                     vertical: 4.h,
                   ),
                   title: Text(
-                    'Day ${index + 1} - ${titleDateFormat.format(date)}',
+                    '${LK.event_details_day_prefix.tr} ${index + 1} - ${titleDateFormat.format(date)}',
                     style: AppTextStyles.titleSmall.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.bold,
@@ -952,134 +1061,45 @@ class EventTimelineWidget extends StatelessWidget {
           ),
         ),
         SizedBox(height: 6.h),
-        Text(
-          schedule.sessionName ?? 'Session',
-          style: AppTextStyles.titleMedium.copyWith(
-            color: AppColors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        if (schedule.speakerName != null &&
-            schedule.speakerName!.isNotEmpty) ...[
-          SizedBox(height: 6.h),
-          Row(
-            children: [
-              Icon(Icons.person, size: 16.w, color: AppColors.grey.shade500),
-              SizedBox(width: 6.w),
-              Text(
-                schedule.speakerName!,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.grey.shade700,
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                schedule.sessionName ?? "",
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
-        ],
-        if (schedule.sessionDescription != null &&
-            schedule.sessionDescription!.isNotEmpty) ...[
-          SizedBox(height: 8.h),
-          Text(
-            schedule.sessionDescription!,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.grey.shade600,
-              height: 1.4,
             ),
-          ),
-        ],
-        if ((schedule.scheduleVenueName != null &&
-                schedule.scheduleVenueName!.isNotEmpty) ||
-            '${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
-                .trim()
-                .isNotEmpty) ...[
-          SizedBox(height: 12.h),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.location_on,
-                size: 16.w,
-                color: AppColors.grey.shade500,
-              ),
-              SizedBox(width: 4.w),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (schedule.scheduleVenueName != null &&
-                              schedule.scheduleVenueName!.isNotEmpty)
-                            Text(
-                              schedule.scheduleVenueName!,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          if ('${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
-                              .trim()
-                              .isNotEmpty) ...[
-                            SizedBox(height: 2.h),
-                            Text(
-                              '${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleAddressLine2 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
-                                  .trim(),
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    if (schedule.scheduleGoogleMapUrl != null &&
-                        schedule.scheduleGoogleMapUrl!.isNotEmpty) ...[
-                      IconButton(
-                        onPressed: () async {
-                          String? url = schedule.scheduleGoogleMapUrl;
-                          if (url == null) return;
-                          if (Platform.isIOS) {
-                            String address =
-                                '${schedule.scheduleVenueName ?? ''} ${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
-                                    .trim();
-                            if (address.isNotEmpty) {
-                              url =
-                                  'http://maps.apple.com/?q=${Uri.encodeComponent(address)}';
-                            }
-                          }
-                          if (await canLaunchUrlString(url)) {
-                            await launchUrlString(
-                              url,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          } else if (Platform.isIOS &&
-                              await canLaunchUrlString(
-                                schedule.scheduleGoogleMapUrl!,
-                              )) {
-                            await launchUrlString(
-                              schedule.scheduleGoogleMapUrl!,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                        icon: Icon(Icons.directions, size: 20.w),
-                        style: ButtonStyle(
-                          foregroundColor: WidgetStatePropertyAll(
-                            AppColors.primary,
-                          ),
-                          backgroundColor: WidgetStatePropertyAll(
-                            AppColors.primary.withValues(alpha: 0.05),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+            SizedBox(width: 6.w),
+            GestureDetector(
+              onTap: () => _showSessionDetailsTooltip(context, schedule),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: 18.w,
+                  color: AppColors.primary,
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ],
+    );
+  }
+
+  void _showSessionDetailsTooltip(BuildContext context, Schedules schedule) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => _SessionDetailsTooltipDialog(schedule: schedule),
     );
   }
 }
@@ -1327,5 +1347,371 @@ class _EventVideoPlayerWidgetState extends State<EventVideoPlayerWidget> {
       }
       return const Center(child: CircularProgressIndicator());
     }
+  }
+}
+
+class _OrganizerPerson {
+  final int? id;
+  final String name;
+  final String? mobile;
+  final String? email;
+
+  _OrganizerPerson({this.id, required this.name, this.mobile, this.email});
+}
+
+class _SessionDetailsTooltipDialog extends StatelessWidget {
+  final Schedules schedule;
+
+  const _SessionDetailsTooltipDialog({Key? key, required this.schedule})
+    : super(key: key);
+
+  String _formatDateTime(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return "—";
+    DateTime? dt = DateTime.tryParse(raw);
+    if (dt == null) {
+      try {
+        dt = DateFormat('dd/MM/yyyy HH:mm').parse(raw);
+      } catch (_) {
+        try {
+          dt = DateFormat('dd-MM-yyyy HH:mm').parse(raw);
+        } catch (_) {
+          return raw;
+        }
+      }
+    }
+    return DateFormat('dd/MM/yyyy hh:mm a').format(dt);
+  }
+
+  String _getVenueString() {
+    final List<String> parts = [];
+    if (schedule.scheduleVenueName != null &&
+        schedule.scheduleVenueName!.trim().isNotEmpty) {
+      parts.add(schedule.scheduleVenueName!.trim());
+    }
+    final address = [
+      schedule.scheduleAddressLine1,
+      schedule.scheduleAddressLine2,
+      schedule.scheduleLandmark,
+      schedule.schedulePincode,
+    ].where((e) => e != null && e.trim().isNotEmpty).join(', ');
+    if (address.isNotEmpty) {
+      parts.add(address);
+    }
+    return parts.isEmpty ? "—" : parts.join('\n');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sessionName =
+        (schedule.sessionName != null &&
+            schedule.sessionName!.trim().isNotEmpty)
+        ? schedule.sessionName!.trim()
+        : "—";
+
+    final starts = _formatDateTime(schedule.scheduleStartDateTime);
+    final ends = _formatDateTime(schedule.scheduleEndDateTime);
+
+    final speaker =
+        (schedule.speakerName != null &&
+            schedule.speakerName!.trim().isNotEmpty)
+        ? schedule.speakerName!.trim()
+        : "—";
+
+    final venue = _getVenueString();
+
+    final meetingLink =
+        (schedule.onlineMeetingLink != null &&
+            schedule.onlineMeetingLink!.trim().isNotEmpty)
+        ? schedule.onlineMeetingLink!.trim()
+        : "—";
+
+    final description =
+        (schedule.sessionDescription != null &&
+            schedule.sessionDescription!.trim().isNotEmpty)
+        ? schedule.sessionDescription!.trim()
+        : "—";
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      backgroundColor: AppColors.white,
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 420.w,
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Dialog Header
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 14.h, 10.w, 10.h),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.info_outline_rounded,
+                      color: AppColors.primary,
+                      size: 18.w,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      LK.event_session_venue_details.tr,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 20.w,
+                      color: AppColors.grey.shade600,
+                    ),
+                    splashRadius: 18.r,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, thickness: 1, color: AppColors.grey.shade200),
+
+            // Content Fields
+            Flexible(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. Session Name
+                    _buildField(
+                      context: context,
+                      label: LK.event_session_name.tr,
+                      value: sessionName,
+                      icon: Icons.bookmark_border_rounded,
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // 2. Starts & Ends
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _buildField(
+                            context: context,
+                            label: LK.event_session_starts.tr,
+                            value: starts,
+                            icon: Icons.calendar_today_outlined,
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: _buildField(
+                            context: context,
+                            label: LK.event_session_ends.tr,
+                            value: ends,
+                            icon: Icons.event_available_outlined,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // 3. Speaker / Lead
+                    _buildField(
+                      context: context,
+                      label: LK.event_session_speaker_lead.tr,
+                      value: speaker,
+                      icon: Icons.person_outline_rounded,
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // 4. Venue
+                    _buildField(
+                      context: context,
+                      label: LK.event_session_venue.tr,
+                      value: venue,
+                      icon: Icons.location_city_outlined,
+                      trailing:
+                          (schedule.scheduleGoogleMapUrl != null &&
+                              schedule.scheduleGoogleMapUrl!.trim().isNotEmpty)
+                          ? InkWell(
+                              onTap: () async {
+                                String? url = schedule.scheduleGoogleMapUrl;
+                                if (url == null || url.trim().isEmpty) return;
+                                if (Platform.isIOS) {
+                                  String address =
+                                      '${schedule.scheduleVenueName ?? ''} ${schedule.scheduleAddressLine1 ?? ''} ${schedule.scheduleLandmark ?? ''} ${schedule.schedulePincode ?? ''}'
+                                          .trim();
+                                  if (address.isNotEmpty) {
+                                    url =
+                                        'http://maps.apple.com/?q=${Uri.encodeComponent(address)}';
+                                  }
+                                }
+                                if (await canLaunchUrlString(url)) {
+                                  await launchUrlString(
+                                    url,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                } else if (schedule.scheduleGoogleMapUrl !=
+                                        null &&
+                                    await canLaunchUrlString(
+                                      schedule.scheduleGoogleMapUrl!,
+                                    )) {
+                                  await launchUrlString(
+                                    schedule.scheduleGoogleMapUrl!,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.directions_rounded,
+                                    color: AppColors.primary,
+                                    size: 15.w,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "Directions",
+                                    style: AppTextStyles.labelSmall.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10.sp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : null,
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // 5. Online Meeting Link
+                    _buildField(
+                      context: context,
+                      label: LK.event_session_online_meeting_link.tr,
+                      value: meetingLink,
+                      icon: Icons.link_rounded,
+                      isLink: meetingLink != "—",
+                      onLinkTap: meetingLink != "—"
+                          ? () {
+                              String url = meetingLink;
+                              if (!url.startsWith('http://') &&
+                                  !url.startsWith('https://')) {
+                                url = 'https://$url';
+                              }
+                              Get.to(
+                                () => AppWebViewPage(
+                                  title:
+                                      (schedule.sessionName != null &&
+                                          schedule.sessionName!
+                                              .trim()
+                                              .isNotEmpty)
+                                      ? schedule.sessionName!.trim()
+                                      : LK.event_session_online_meeting.tr,
+                                  url: url,
+                                  allowAllUrls: true,
+                                ),
+                              );
+                            }
+                          : null,
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // 6. Session Description
+                    _buildField(
+                      context: context,
+                      label: LK.event_session_description.tr,
+                      value: description,
+                      icon: Icons.notes_rounded,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required BuildContext context,
+    required String label,
+    required String value,
+    required IconData icon,
+    bool isLink = false,
+    VoidCallback? onLinkTap,
+    Widget? trailing,
+  }) {
+    final bool isEmpty = value == "—";
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.grey.shade50,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: AppColors.grey.shade200, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14.w, color: AppColors.grey.shade600),
+              SizedBox(width: 6.w),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.grey.shade600,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 10.sp,
+                  ),
+                ),
+              ),
+              if (trailing != null) trailing,
+            ],
+          ),
+          SizedBox(height: 4.h),
+          if (isLink && !isEmpty)
+            InkWell(
+              onTap: onLinkTap,
+              child: Text(
+                value,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.primary,
+                  fontSize: 12.sp,
+                ),
+              ),
+            )
+          else
+            Text(
+              value,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isEmpty ? AppColors.grey.shade400 : AppColors.black,
+                fontStyle: isEmpty ? FontStyle.italic : FontStyle.normal,
+                fontSize: 12.sp,
+                height: 1.3,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

@@ -1,8 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/constants/failures.dart';
-import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository.dart';
 
 class EventAttendanceController extends GetxController {
@@ -41,7 +38,7 @@ class EventAttendanceController extends GetxController {
     if (val is num) return val.toInt();
     return int.tryParse(val.toString()) ?? defaultValue;
   }
-
+/*
   Future<void> handleQrScan({required String qrData}) async {
     print("qrData :::: $qrData");
     currentQrData.value = qrData;
@@ -67,7 +64,7 @@ class EventAttendanceController extends GetxController {
       hasError.value = true;
       errorMessage.value = scanResult.failure.message.isNotEmpty
           ? scanResult.failure.message
-          : 'Invalid QR Code or event attendance verification failed.';
+          : LK.scanner_api_err_msg.tr;
       HapticFeedback.vibrate();
       return;
     }
@@ -105,19 +102,19 @@ print(checkInResult.dataOrNull);
       if (checkInResult is Success<ApiResponse<Map<String, dynamic>>>) {
         isSuccess.value = true;
         successMessage.value =
-            checkInResult.data.message ?? 'Attendee checked in successfully!';
+            checkInResult.data.message ?? LK.scanner_api_success_msg.tr;
         checkInResponse.value = checkInResult.data.data ?? <String, dynamic>{};
         HapticFeedback.heavyImpact();
       } else if (checkInResult is Error<ApiResponse<Map<String, dynamic>>>) {
         hasError.value = true;
         errorMessage.value = checkInResult.failure.message.isNotEmpty
             ? checkInResult.failure.message
-            : 'Check-in failed.';
+            : LK.scanner_api_checkin_fail.tr;
         HapticFeedback.vibrate();
       }
     }
   }
-
+*/
   void reset() {
     isLoading.value = false;
     hasError.value = false;

@@ -192,6 +192,7 @@ class Schedules {
   String? scheduleAddressLine2;
   String? schedulePincode;
   String? scheduleLandmark;
+  String? onlineMeetingLink;
 
   Schedules(
       {this.sessionName,
@@ -205,7 +206,8 @@ class Schedules {
       this.scheduleAddressLine1,
       this.scheduleAddressLine2,
       this.schedulePincode,
-      this.scheduleLandmark});
+      this.scheduleLandmark,
+      this.onlineMeetingLink});
 
   Schedules.fromJson(Map<String, dynamic> json) {
     sessionName = json['sessionName'];
@@ -220,6 +222,10 @@ class Schedules {
     scheduleAddressLine2 = json['scheduleAddressLine2'];
     schedulePincode = json['schedulePincode'];
     scheduleLandmark = json['scheduleLandmark'];
+    onlineMeetingLink = json['onlineMeetingLink'] ??
+        json['onlineMeetingUrl'] ??
+        json['meetingLink'] ??
+        json['meetingUrl'];
   }
 
   Map<String, dynamic> toJson() {
@@ -236,6 +242,7 @@ class Schedules {
     data['scheduleAddressLine2'] = this.scheduleAddressLine2;
     data['schedulePincode'] = this.schedulePincode;
     data['scheduleLandmark'] = this.scheduleLandmark;
+    data['onlineMeetingLink'] = this.onlineMeetingLink;
     return data;
   }
 }

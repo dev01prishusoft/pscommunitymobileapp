@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
@@ -50,7 +51,6 @@ class EventDetailsController extends GetxController {
       id: eventId,
       cancelToken: _cancelToken,
     );
-    print("EventDetails ${result.dataOrNull?.data?.eventId}");
     if (result is Success<ApiResponse<EventDetailsData>>) {
       final data = result.data.data;
       if (data != null) {
@@ -61,11 +61,11 @@ class EventDetailsController extends GetxController {
         }
       } else if (!isSilent) {
         hasError.value = true;
-        errorMessage.value = "Details not found.";
+        errorMessage.value = LK.event_details_not_found.tr;
       }
     } else if (result is Error && !isSilent) {
       hasError.value = true;
-      errorMessage.value = "Failed to fetch event details.";
+      errorMessage.value = LK.event_details_fetch_failed.tr;
     }
 
     if (!isSilent) {

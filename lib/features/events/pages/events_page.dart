@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -11,8 +10,6 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
-import 'package:pscommunitymobileapp/features/events/pages/event_scanner_page.dart';
-import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository_impl.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -32,14 +29,14 @@ class EventsPage extends GetView<EventsController> {
                   FocusManager.instance.primaryFocus?.unfocus();
                   controller.isSearchVisible.value = false;
                 },
-                hintText: 'Search events...',
+                hintText: LK.events_search_hint.tr,
                 controller: controller.searchTextController,
                 onChanged: (val) {
                   controller.onSearchQueryChanged(val);
                 },
               );
             }
-            return Text(LK.events.tr);
+            return Text(LK.events_title.tr);
           }),
           actions: [
             Obx(() {
@@ -50,16 +47,17 @@ class EventsPage extends GetView<EventsController> {
               return Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  /*
                   IconButton(
                     icon: const Icon(Iconsax.scan_barcode_copy),
                     onPressed: () {
-                      showDialog(
+                      /* showDialog(
                         context: context,
                         barrierDismissible: false,
                         builder: (ctx) => const _TokenInputDialog(),
-                      );
+                      );*/
                     },
-                  ),
+                  ),*/
                   IconButton(
                     icon: const Icon(Iconsax.search_normal_copy),
                     onPressed: () {
@@ -152,7 +150,7 @@ class EventsPage extends GetView<EventsController> {
                             ),
                             SizedBox(width: 10.w),
                             Text(
-                              'My Events',
+                              LK.events_my_events_btn.tr,
                               style: AppTextStyles.labelLarge.copyWith(
                                 color: AppColors.white,
                                 fontWeight: FontWeight.bold,
@@ -231,21 +229,21 @@ class EventsPage extends GetView<EventsController> {
                     children: [
                       _buildCustomTabItem(
                         index: 0,
-                        label: 'Upcoming',
+                        label: LK.events_tab_upcoming.tr,
                         count: '${controller.upcomingCount.value}',
                         isSelected: selectedIndex == 0,
                         defaultColor: AppColors.primary,
                       ),
                       _buildCustomTabItem(
                         index: 1,
-                        label: 'Ongoing',
+                        label: LK.events_tab_ongoing.tr,
                         count: '${controller.ongoingCount.value}',
                         isSelected: selectedIndex == 1,
                         defaultColor: AppColors.green,
                       ),
                       _buildCustomTabItem(
                         index: 2,
-                        label: 'Past',
+                        label: LK.events_tab_past.tr,
                         count: '${controller.pastCount.value}',
                         isSelected: selectedIndex == 2,
                         defaultColor: AppColors.grey.shade600,
@@ -332,7 +330,7 @@ class EventsPage extends GetView<EventsController> {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'No events found',
+                  LK.no_events_found.tr,
                   style: AppTextStyles.titleMedium.copyWith(
                     color: AppColors.grey.shade500,
                   ),
@@ -384,6 +382,8 @@ class EventsPage extends GetView<EventsController> {
   }
 }
 
+/*
+
 class _TokenInputDialog extends StatefulWidget {
   const _TokenInputDialog({Key? key}) : super(key: key);
 
@@ -423,7 +423,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
     final token = _tokenController.text.trim();
     if (token.isEmpty) {
       setState(() {
-        _errorMessage = 'Please enter a valid token to proceed';
+        _errorMessage = LK.events_token_error.tr;
       });
       return;
     }
@@ -465,7 +465,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'QR Scanner Token',
+                        LK.events_qr_scanner_token.tr,
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 16.sp,
@@ -474,7 +474,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                       ),
                       SizedBox(height: 2.h),
                       Text(
-                        'Enter custom token to authorize scanner',
+                        LK.events_token_dialog_desc.tr,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.grey.shade600,
                           fontSize: 12.sp,
@@ -487,7 +487,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
             ),
             SizedBox(height: 16.h),
             Text(
-              'Custom Token',
+              LK.events_custom_token_label.tr,
               style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.black,
@@ -510,7 +510,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Paste or enter your custom token here...',
+                hintText: LK.events_token_hint.tr,
                 hintStyle: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.grey.shade400,
                   fontSize: 12.sp,
@@ -563,7 +563,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                     color: AppColors.primary,
                   ),
                   label: Text(
-                    'Paste from clipboard',
+                    LK.events_paste_clipboard.tr,
                     style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -579,7 +579,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                       });
                     },
                     child: Text(
-                      'Clear',
+                      LK.events_clear.tr,
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.grey.shade600,
                       ),
@@ -601,7 +601,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                       side: BorderSide(color: AppColors.grey.shade300),
                     ),
                     child: Text(
-                      'Cancel',
+                      LK.events_cancel.tr,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.grey.shade700,
                         fontWeight: FontWeight.w600,
@@ -623,7 +623,7 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
                       ),
                     ),
                     child: Text(
-                      'Save',
+                      LK.events_save.tr,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.white,
                         fontWeight: FontWeight.w600,
@@ -639,3 +639,5 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
     );
   }
 }
+
+*/

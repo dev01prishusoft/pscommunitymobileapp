@@ -23,7 +23,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event Registration'),
+        title: Text(LK.event_reg_title.tr),
         actions: [
           if ((event.maximumGuestsPerMember ?? 0) > 0)
             Obx(
@@ -43,7 +43,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                   size: 18.w,
                 ),
                 label: Text(
-                  'Add Guest',
+                  LK.event_details_add_guest.tr,
                   style: TextStyle(
                     color:
                         controller.customGuests.length <
@@ -61,46 +61,44 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
       body: Form(
         key: controller.formKey,
         child: Obx(() {
-          final showMembers =
-              controller.isLoadingMembers.value ||
-              controller.familyMembers.isNotEmpty;
           final showGuests = controller.customGuests.isNotEmpty;
-
           return ListView(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
             children: [
-              if (showMembers)
-                Theme(
-                  data: Theme.of(
-                    context,
-                  ).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    collapsedShape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.05),
-                    collapsedBackgroundColor: AppColors.primary.withValues(
-                      alpha: 0.05,
-                    ),
-                    controller: controller.membersTileController,
-                    initiallyExpanded: true,
-                    tilePadding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 4.h,
-                    ),
-                    title: _buildSectionTitle('My Member List', Iconsax.people),
-                    onExpansionChanged: (expanded) {
-                      if (expanded && showGuests) {
-                        controller.guestsTileController.collapse();
-                      }
-                    },
-                    children: [_buildMemberListContainer(controller)],
+              Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
+                  collapsedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.05),
+                  collapsedBackgroundColor: AppColors.primary.withValues(
+                    alpha: 0.05,
+                  ),
+                  controller: controller.membersTileController,
+                  initiallyExpanded: true,
+                  tilePadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 4.h,
+                  ),
+                  title: _buildSectionTitle(
+                    LK.event_reg_my_member_list.tr,
+                    Iconsax.people,
+                  ),
+                  onExpansionChanged: (expanded) {
+                    if (expanded && showGuests) {
+                      controller.guestsTileController.collapse();
+                    }
+                  },
+                  children: [_buildMemberListContainer(controller)],
                 ),
-              if (showMembers && showGuests) SizedBox(height: 15.h),
+              ),
+              if (showGuests) SizedBox(height: 15.h),
               if (showGuests)
                 Theme(
                   data: Theme.of(
@@ -118,17 +116,17 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                       alpha: 0.05,
                     ),
                     controller: controller.guestsTileController,
-                    initiallyExpanded: !showMembers,
+                    initiallyExpanded: true,
                     tilePadding: EdgeInsets.symmetric(
                       horizontal: 16.w,
                       vertical: 4.h,
                     ),
                     title: _buildSectionTitle(
-                      'Guest Members',
+                      LK.event_reg_guest_members.tr,
                       Iconsax.user_add,
                     ),
                     onExpansionChanged: (expanded) {
-                      if (expanded && showMembers) {
+                      if (expanded) {
                         controller.membersTileController.collapse();
                       }
                     },
@@ -166,7 +164,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
           child: AppTextField(
             controller: controller.searchController,
             onChanged: controller.onSearchChanged,
-            hint: 'Search members...',
+            hint: LK.event_reg_search_members_hint.tr,
             icon: Icons.search,
           ),
         ),
@@ -185,8 +183,8 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
               child: Center(
                 child: Text(
                   controller.memberSearchQuery.value.isNotEmpty
-                      ? 'No members found matching "${controller.memberSearchQuery.value}"'
-                      : 'No approved family members found.',
+                      ? '${LK.event_reg_no_members_match.tr} "${controller.memberSearchQuery.value}"'
+                      : LK.event_reg_no_approved_members.tr,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade600,
                   ),
@@ -289,7 +287,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Guest ${index + 1}',
+                      '${LK.event_reg_guest_prefix.tr} ${index + 1}',
                       style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -316,13 +314,13 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                 SizedBox(height: 12.h),
                 AppFormTextField(
                   controller: guestForm.nameController,
-                  hint: 'Full Name',
+                  hint: LK.event_reg_fullname_hint.tr,
                   prefixIcon: Icon(
                     Icons.person_outline,
                     color: AppColors.grey.shade400,
                   ),
                   validator: (value) =>
-                      value == null || value.isEmpty ? 'Required field' : null,
+                      value == null || value.isEmpty ? LK.isRequired.tr : null,
                 ),
                 SizedBox(height: 12.h),
                 Row(
@@ -332,14 +330,15 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                       child: AppFormTextField(
                         maxLength: 2,
                         controller: guestForm.ageController,
-                        hint: 'Age',
+                        hint: LK.ageColon.tr,
                         keyboardType: TextInputType.number,
                         prefixIcon: Icon(
                           Icons.cake_outlined,
                           color: AppColors.grey.shade400,
                         ),
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'Required' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? LK.isRequired.tr
+                            : null,
                       ),
                     ),
                     SizedBox(width: 10.w),
@@ -348,14 +347,15 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                       child: AppFormTextField(
                         maxLength: 10,
                         controller: guestForm.mobileController,
-                        hint: 'Mobile Number',
+                        hint: LK.mobileNumber.tr,
                         keyboardType: TextInputType.phone,
                         prefixIcon: Icon(
                           Icons.phone_outlined,
                           color: AppColors.grey.shade400,
                         ),
-                        validator: (value) =>
-                            value == null || value.isEmpty ? 'Required' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? LK.isRequired.tr
+                            : null,
                       ),
                     ),
                   ],
@@ -422,7 +422,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                 ),
                 child: Text(
-                  'Cancel',
+                  LK.cancel.tr,
                   style: AppTextStyles.labelLarge.copyWith(
                     color: AppColors.grey.shade700,
                   ),
@@ -438,8 +438,9 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                       : () => controller.registerNow(event: event),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    disabledBackgroundColor:
-                        AppColors.primary.withValues(alpha: 0.6),
+                    disabledBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.6,
+                    ),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.r),
@@ -456,7 +457,7 @@ class EventRegistrationPage extends GetView<EventRegistrationController> {
                           ),
                         )
                       : Text(
-                          'Register Now',
+                          LK.event_details_register_btn.tr,
                           style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.white,
                           ),

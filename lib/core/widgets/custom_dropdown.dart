@@ -44,12 +44,7 @@ class CustomDropdown<T> extends StatelessWidget {
             : AppColors.grey.withValues(alpha: 0.05)),
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: isEnabled
-              ? (value != null
-                    ? AppColors.primary.withValues(alpha: 0.4)
-                    : AppColors.grey.withValues(alpha: 0.25))
-              : AppColors.grey.withValues(alpha: 0.15),
-          width: 1.2.w,
+          color: AppColors.primary, width: 1.w,
         ),
       ),
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),

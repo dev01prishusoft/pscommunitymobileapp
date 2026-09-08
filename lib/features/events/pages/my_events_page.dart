@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/my_events_controller.dart';
 import 'package:pscommunitymobileapp/features/events/pages/my_event_details_page.dart';
 
@@ -73,14 +74,14 @@ class _MyEventsPageState extends State<MyEventsPage> {
                 FocusManager.instance.primaryFocus?.unfocus();
                 controller.isSearchVisible.value = false;
               },
-              hintText: 'Search registered events...',
+              hintText: LK.my_events_search_hint.tr,
               controller: controller.searchTextController,
               onChanged: (val) {
                 controller.onSearchQueryChanged(val);
               },
             );
           }
-          return const Text('My Events');
+          return Text(LK.events_my_events_btn.tr);
         }),
         actions: [
           Obx(() {
@@ -120,7 +121,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                   Text(
                     controller.errorMessage.value.isNotEmpty
                         ? controller.errorMessage.value
-                        : 'Failed to load registered events',
+                        : LK.my_events_load_failed.tr,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.grey.shade700,
                     ),
@@ -137,7 +138,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                       ),
                     ),
                     child: Text(
-                      'Retry',
+                      LK.retry.tr,
                       style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.white,
                       ),
@@ -182,7 +183,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                         children: [
                           Text(
                             controller.targetEventName.value ??
-                                'Selected Event',
+                                LK.my_events_selected_event.tr,
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
@@ -196,7 +197,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                             Row(
                               children: [
                                 Text(
-                                  'Status: ',
+                                  '${LK.event_details_status.tr}: ',
                                   style: TextStyle(
                                     fontSize: 11.sp,
                                     color: AppColors.grey.shade600,
@@ -227,7 +228,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                         ),
                       ),
                       child: Text(
-                        'Show All',
+                        LK.my_events_show_all.tr,
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
@@ -263,9 +264,12 @@ class _MyEventsPageState extends State<MyEventsPage> {
                               SizedBox(height: 12.h),
                               Text(
                                 controller.searchQuery.value.trim().isNotEmpty
-                                    ? 'No registered events found matching "${controller.searchQuery.value.trim()}"'
+                                    ? LK.my_events_no_match.tr
                                     : (isFiltered
-                                          ? 'Registration for "${controller.targetEventName.value ?? 'this event'}" was not found'
+                                          ? (controller.targetEventName.value !=
+                                                    null
+                                                ? LK.my_events_no_match.tr
+                                                : LK.my_events_no_match.tr)
                                           : _getEmptyMessage(
                                               controller.selectedTabIndex.value,
                                             )),
@@ -286,7 +290,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                                     ),
                                   ),
                                   child: Text(
-                                    'View All Registered Events',
+                                    LK.my_events_show_all.tr,
                                     style: AppTextStyles.labelMedium.copyWith(
                                       color: AppColors.white,
                                     ),
@@ -394,21 +398,21 @@ class _MyEventsPageState extends State<MyEventsPage> {
                     children: [
                       _buildTabItem(
                         index: 0,
-                        label: 'Upcoming',
+                        label: LK.events_tab_upcoming.tr,
                         count: '${controller.upcomingCount}',
                         isSelected: selectedIndex == 0,
                         defaultColor: AppColors.primary,
                       ),
                       _buildTabItem(
                         index: 1,
-                        label: 'Ongoing',
+                        label: LK.events_tab_ongoing.tr,
                         count: '${controller.ongoingCount}',
                         isSelected: selectedIndex == 1,
                         defaultColor: AppColors.green,
                       ),
                       _buildTabItem(
                         index: 2,
-                        label: 'Past',
+                        label: LK.events_tab_past.tr,
                         count: '${controller.pastCount}',
                         isSelected: selectedIndex == 2,
                         defaultColor: AppColors.grey.shade600,
@@ -470,13 +474,13 @@ class _MyEventsPageState extends State<MyEventsPage> {
   String _getEmptyMessage(int tabIndex) {
     switch (tabIndex) {
       case 0:
-        return 'No upcoming registered events found';
+        return LK.no.tr + "" + LK.events_tab_upcoming.tr + "" + LK.event_register_event_not_found_suffix.tr;
       case 1:
-        return 'No ongoing registered events found';
+        return LK.no.tr + "" + LK.events_tab_ongoing.tr + "" + LK.event_register_event_not_found_suffix.tr;
       case 2:
-        return 'No past registered events found';
+        return LK.no.tr + "" + LK.events_tab_past.tr + "" + LK.event_register_event_not_found_suffix.tr;
       default:
-        return 'No registered events found';
+        return LK.my_events_no_match.tr;
     }
   }
 
@@ -618,48 +622,26 @@ class _MyEventsPageState extends State<MyEventsPage> {
 
   Widget _buildStatusChip(String status) {
     Color textColor;
-    Color bgColor;
-    IconData icon;
 
     switch (status.toLowerCase()) {
       case 'ongoing':
         textColor = AppColors.warning;
-        bgColor = AppColors.warningLight;
-        icon = Icons.play_circle_fill_rounded;
         break;
       case 'past':
         textColor = AppColors.neutral;
-        bgColor = AppColors.neutralLight;
-        icon = Icons.history_rounded;
         break;
       case 'upcoming':
       default:
         textColor = AppColors.info;
-        bgColor = AppColors.infoLight;
-        icon = Icons.upcoming_rounded;
         break;
     }
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(6.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12.w, color: textColor),
-          SizedBox(width: 3.w),
-          Text(
-            status,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+    return Text(
+      status,
+      style: TextStyle(
+        color: textColor,
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
@@ -700,10 +682,13 @@ class _MyEventsPageState extends State<MyEventsPage> {
   String _getStatusNote(RegisteredEventItem item) {
     if (item.cancelledAt != null ||
         (item.registrationStatusName ?? '').toLowerCase().contains('cancel')) {
-      return item.cancellationReason?.toString() ?? 'Registration cancelled';
+      return item.cancellationReason?.toString() ??
+          LK.my_events_note_cancelled.tr;
     }
     if ((item.notes ?? '').toLowerCase().contains('over')) {
-      return item.notes?.isNotEmpty == true ? item.notes! : 'Event is over';
+      return item.notes?.isNotEmpty == true
+          ? item.notes!
+          : LK.my_events_note_over.tr;
     }
     return item.notes ?? '';
   }

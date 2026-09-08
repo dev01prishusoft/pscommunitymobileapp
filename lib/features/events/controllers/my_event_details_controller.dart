@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/models/registered_event_details_model.dart';
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 
@@ -82,7 +83,7 @@ class MyEventDetailsController extends GetxController {
     final result = await _repository.cancelRegistration(
       eventRegistrationId: regId,
       memberId: memId,
-      cancellationReason: reason ?? 'Cancelled by user',
+      cancellationReason: reason ?? LK.my_event_details_cancel_by_user.tr,
     );
 
     isCancelling.value = false;
