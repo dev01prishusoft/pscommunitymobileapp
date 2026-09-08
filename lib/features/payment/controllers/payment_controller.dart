@@ -33,6 +33,7 @@ class PaymentController extends GetxController {
   bool get isAmountFixed => selectedCategory.value?.isAmountFixed ?? false;
 
   final RxBool isProcessingPayment = false.obs;
+  final RxBool isProcessingRecurring = false.obs;
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
   final RxString selectedYear = ''.obs;
@@ -118,12 +119,20 @@ class PaymentController extends GetxController {
     try {
       final modes = await _repository.getPaymentModes();
       paymentModes.assignAll(modes);
+      final onlineMode = modes.firstWhereOrNull(
+        (m) => m.name.trim().toLowerCase() == 'online',
+      );
+      if (onlineMode != null) {
+        selectedMode.value = onlineMode;
+      }
     } catch (_) {}
   }
 
   void resetPaymentForm() {
     selectedType.value = null;
-    selectedMode.value = null;
+    selectedMode.value = paymentModes.firstWhereOrNull(
+      (m) => m.name.trim().toLowerCase() == 'online',
+    );
     selectedCategory.value = null;
     categories.clear();
     enteredAmount.value = 0.0;
@@ -175,7 +184,7 @@ class PaymentController extends GetxController {
     double? customAmount,
     bool isRecurring = false,
   }) async {
-    if (isProcessingPayment.value) return;
+    if (isProcessingPayment.value || isProcessingRecurring.value) return;
 
     final amount = customAmount ?? enteredAmount.value;
 
@@ -231,7 +240,11 @@ class PaymentController extends GetxController {
       }
     }
 
-    isProcessingPayment.value = true;
+    if (isRecurring) {
+      isProcessingRecurring.value = true;
+    } else {
+      isProcessingPayment.value = true;
+    }
     _pendingAdminRequestId = adminPaymentRequestId;
     _isCurrentPaymentRecurring = isRecurring;
 
@@ -248,6 +261,8 @@ class PaymentController extends GetxController {
             isErrorMessage: true,
           ),
         ).show();
+        isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
         return;
       }
 
@@ -278,6 +293,7 @@ class PaymentController extends GetxController {
           ),
         ).show();
         isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
         return;
       }
 
@@ -331,6 +347,7 @@ class PaymentController extends GetxController {
         ),
       ).show();
       isProcessingPayment.value = false;
+      isProcessingRecurring.value = false;
       _pendingAdminRequestId = null;
     }
   }
@@ -397,6 +414,7 @@ class PaymentController extends GetxController {
       ).show();
     } finally {
       isProcessingPayment.value = false;
+      isProcessingRecurring.value = false;
       _pendingAdminRequestId = null;
     }
   }
@@ -419,6 +437,7 @@ class PaymentController extends GetxController {
 
     _showErrorSnackbar(message);
     isProcessingPayment.value = false;
+    isProcessingRecurring.value = false;
     _pendingAdminRequestId = null;
   }
 

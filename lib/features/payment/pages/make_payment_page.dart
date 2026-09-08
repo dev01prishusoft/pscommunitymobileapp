@@ -10,7 +10,6 @@ import 'package:pscommunitymobileapp/core/widgets/custom_dropdown_form_field.dar
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/features/payment/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/core/models/payment_type.dart';
-import 'package:pscommunitymobileapp/core/models/payment_mode.dart';
 import 'package:pscommunitymobileapp/core/models/payment_category.dart';
 
 class MakePaymentPage extends StatefulWidget {
@@ -97,26 +96,6 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                             );
                           }).toList(),
                           onChanged: (type) => controller.onTypeChanged(type),
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      _buildSectionHeader(LK.paymentModeHeader.tr),
-                      Obx(
-                        () => CustomDropdownFormField<PaymentMode>(
-                          hint: LK.selectPaymentMode.tr,
-                          value: controller.selectedMode.value,
-                          items: controller.paymentModes.map((mode) {
-                            return DropdownMenuItem<PaymentMode>(
-                              value: mode,
-                              child: Text(
-                                mode.name,
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (mode) => controller.onModeChanged(mode),
                         ),
                       ),
                       SizedBox(height: 20.h),
@@ -327,48 +306,75 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                   ),
                 ),
                 SizedBox(height: 20.h),
+                Obx(() {
+                  if (controller.selectedCategory.value?.isRecurring != true) {
+                    return const SizedBox.shrink();
+                  }
+                  final isRecurringLoading =
+                      controller.isProcessingRecurring.value;
+                  final isAnyLoading =
+                      controller.isProcessingPayment.value ||
+                      isRecurringLoading;
 
-                if (controller.selectedCategory.value?.isRecurring == true) ...[
-                  GestureDetector(
-                    onTap: controller.isProcessingPayment.value
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: isAnyLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  controller.initiatePayment(isRecurring: true);
+                                }
+                              },
+                        child: Container(
+                          height: 50.h,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.secondary),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: isRecurringLoading
+                              ? SizedBox(
+                                  width: 22.w,
+                                  height: 22.w,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppColors.secondary,
+                                  ),
+                                )
+                              : Text(
+                                  LK.setupAutoPayRecurring.tr,
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyles.titleSmall.copyWith(
+                                    color: AppColors.secondary,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                        ),
+                      ).paddingSymmetric(horizontal: 10.w),
+                      SizedBox(height: 20.h),
+                    ],
+                  );
+                }),
+                Obx(
+                  () => AppPrimaryButton(
+                    height: 50.h,
+                    isLoading: controller.isProcessingPayment.value,
+                    text: LK.payNow.tr,
+                    onPressed:
+                        (controller.isProcessingPayment.value ||
+                            controller.isProcessingRecurring.value)
                         ? null
                         : () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              controller.initiatePayment(isRecurring: true);
+                              controller.initiatePayment();
                             }
                           },
-                    child: Container(
-                      height: 50.h,
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.secondary),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        LK.setupAutoPayRecurring.tr,
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.secondary,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
                   ).paddingSymmetric(horizontal: 10.w),
-                  SizedBox(height: 20.h),
-                ],
-                AppPrimaryButton(
-                  height: 50.h,
-                  isLoading: controller.isProcessingPayment.value,
-                  text: LK.payNow.tr,
-                  onPressed: controller.isProcessingPayment.value
-                      ? null
-                      : () {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            controller.initiatePayment();
-                          }
-                        },
-                ).paddingSymmetric(horizontal: 10.w),
+                ),
               ],
             ),
           ),
