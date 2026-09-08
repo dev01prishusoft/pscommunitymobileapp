@@ -7,6 +7,7 @@ class ApiEndpoints {
   static String memberUpdatePassword = '/api/v1/auth/member-update-password';
   static String memberRefreshToken = '/api/v1/auth/member-refresh-token';
   static String memberRevokeToken = '/api/v1/auth/member-revoke-token';
+  static String myModules = '/api/v1/samaj-module/my-modules';
   static String members = '/api/v1/member/list';
   static String memberSearch = '/api/v1/member/MemberSearch';
   static String memberUsingOccupation = '/api/v1/member/MemberUsingOccupation';

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 
@@ -127,6 +129,12 @@ class AuthInterceptor extends Interceptor {
           refresh,
           isDefaultPassword: _tokenManager.isDefaultPassword,
         );
+
+        final rawModules = authData['modules'] ?? authData['user']?['modules'];
+        if (rawModules != null && Get.isRegistered<ModulePermissionService>()) {
+          Get.find<ModulePermissionService>().updateFromRawList(rawModules);
+        }
+
         c.complete(access);
       } else {
         if (kDebugMode) {}

@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/responsive_helper.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
@@ -69,7 +70,12 @@ class _HomePageState extends State<HomePage> with RouteAware {
         child: RefreshIndicator(
           color: AppColors.primary,
           onRefresh: () async {
-            await Get.find<SamajController>().fetchAll();
+            await Future.wait([
+              Get.find<SamajController>().fetchAll(),
+              if (Get.isRegistered<ModulePermissionService>())
+                Get.find<ModulePermissionService>().fetchMyModules(),
+              Get.find<HomeController>().fetchUnreadNotificationCount(),
+            ]);
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -152,29 +158,35 @@ class _HomeMenuGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
-            context,
-            desiredItemWidth: 110.w,
-          );
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.menuItems.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 14.h,
-              crossAxisSpacing: 14.w,
-              childAspectRatio: 0.84,
-            ),
-            itemBuilder: (context, index) {
-              final item = controller.menuItems[index];
-              return _MenuCard(item: item);
-            },
-          );
-        },
-      ),
+      child: Obx(() {
+        if (Get.isRegistered<ModulePermissionService>()) {
+          Get.find<ModulePermissionService>().modules.length;
+        }
+        final items = controller.menuItems;
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount = ResponsiveHelper.calculateGridCrossAxisCount(
+              context,
+              desiredItemWidth: 110.w,
+            );
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 14.h,
+                crossAxisSpacing: 14.w,
+                childAspectRatio: 0.84,
+              ),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return _MenuCard(item: item);
+              },
+            );
+          },
+        );
+      }),
     );
   }
 }
@@ -351,10 +363,17 @@ class _NotificationMenu extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Obx(() {
-        final count = controller.unreadNotificationCount.value;
-        return Stack(
+    return Obx(() {
+      if (Get.isRegistered<ModulePermissionService>()) {
+        final hasAccess = ModulePermissionService.to.isAccessible(AppModule.dailyNotification);
+        if (!hasAccess) {
+          return const SizedBox.shrink();
+        }
+      }
+
+      final count = controller.unreadNotificationCount.value;
+      return IconButton(
+        icon: Stack(
           clipBehavior: Clip.none,
           children: [
             Icon(Iconsax.notification_copy, color: AppColors.black),
@@ -377,13 +396,13 @@ class _NotificationMenu extends GetView<HomeController> {
               ),
             ],
           ],
-        );
-      }),
-      onPressed: () {
-        Get.toNamed<void>('/notifications')?.then((_) {
-          controller.fetchUnreadNotificationCount();
-        });
-      },
-    );
+        ),
+        onPressed: () {
+          Get.toNamed<void>('/notifications')?.then((_) {
+            controller.fetchUnreadNotificationCount();
+          });
+        },
+      );
+    });
   }
 }

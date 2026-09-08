@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_guard.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/auth/pages/login_page.dart';
 import 'package:pscommunitymobileapp/features/auth/pages/reset_password_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/committee_details_page.dart';
@@ -92,22 +93,22 @@ class AppRouter {
     GetPage<void>(
       name: makePayment,
       page: () => MakePaymentPage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.payment)],
     ),
     GetPage<void>(
       name: paymentHistory,
       page: () => PaymentHistoryPage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.payment)],
     ),
     GetPage<void>(
       name: paymentReceipt,
       page: () => PaymentReceiptPage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.payment)],
     ),
     GetPage<void>(
       name: payments,
       page: () => PaymentsPage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.payment)],
     ),
     GetPage<void>(
       name: customerSupport,
@@ -143,12 +144,12 @@ class AppRouter {
     GetPage<void>(
       name: marriage,
       page: () => MarriagePage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.matrimonial)],
     ),
     GetPage<void>(
       name: occupationDirectory,
       page: () => OccupationDirectoryPage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.occupation)],
     ),
     GetPage<void>(
       name: committeeMembers,
@@ -168,7 +169,7 @@ class AppRouter {
     GetPage<void>(
       name: occupationProfile,
       page: () => OccupationProfilePage(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.occupation)],
     ),
     GetPage<void>(
       name: memberProfile,
@@ -216,12 +217,12 @@ class AppRouter {
           ),
         );
       }),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.dailyNotification)],
     ),
     GetPage<void>(
       name: frompageOccupation,
       page: () => FromPageOccupation(),
-      middlewares: [AuthGuard()],
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.occupation)],
     ),
     GetPage<void>(
       name: frompageCommittee,
