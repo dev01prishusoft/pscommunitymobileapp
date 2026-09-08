@@ -53,4 +53,20 @@ class ApiEndpoints {
   static String currenAppVersion(String appVersion) =>
       '/api/v1/application-link/latest-version?currentversion=$appVersion';
   static String deleteNotification = '/api/v1/daily-notification/member';
+  static String eventList = '/api/v1/Event/mobile/member/list';
+  static String eventDetails(int id) =>
+      '/api/v1/Event/mobile/member/detail/$id';
+  static String applyCoupon = '/api/v1/EventRegistration/apply-coupon';
+  static String EventRegistrationValdiate =
+      "/api/v1/EventRegistration/validate";
+  static String genderDropdown = '/api/v1/gender/dropdown';
+  static String eventFreeRegister = "/api/v1/EventRegistration/register";
+  static String eventCreateOrder = "/api/v1/EventRegistration/create-order";
+  static String eventVerifyPayment = "/api/v1/EventRegistration/verify-payment";
+  static String myRegisteredEvents = "/api/v1/EventRegistration/list";
+  static String myRegisteredEventDetail(String registrationId) =>
+      "/api/v1/EventRegistration/$registrationId";
+  static String scanEventBarcode = "/api/v1/EventAttendance/ScanQR";
+  static String checkInEventByQr = "/api/v1/EventAttendance/CheckIn-by-QR";
+  static String cancelRegistration = "/api/v1/EventRegistration/cancel";
 }

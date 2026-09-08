@@ -16,6 +16,18 @@ class AppColors {
   static Color primary = const Color(0xFF042563);
   static Color secondary = const Color(0xFF0d85dc);
 
+  // Status & badge colors
+  static const Color success = Color(0xFF1E8E3E);
+  static const Color successLight = Color(0xFFE6F4EA);
+  static const Color error = Color(0xFFD93025);
+  static const Color errorLight = Color(0xFFFCE8E6);
+  static const Color warning = Color(0xFFE37400);
+  static const Color warningLight = Color(0xFFFEF7E0);
+  static const Color info = Color(0xFF1A73E8);
+  static const Color infoLight = Color(0xFFE8F0FE);
+  static const Color neutral = Color(0xFF5F6368);
+  static const Color neutralLight = Color(0xFFF1F3F4);
+
   static const Color defaultPrimary = Color(0xFF042563);
   static const Color defaultSecondary = Color(0xFF0d85dc);
 

@@ -7,6 +7,10 @@ import 'package:pscommunitymobileapp/features/committee/pages/committee_details_
 import 'package:pscommunitymobileapp/features/committee/pages/committee_members_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/committees_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/frompage_committee.dart';
+import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/event_registration_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
+import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_members_list_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/member_profile_page.dart';
@@ -70,6 +74,10 @@ class AppRouter {
   static String notifications = '/notifications';
   static String frompageOccupation = '/frompageOccupation';
   static String frompageCommittee = '/frompageCommittee';
+  static String events = '/events';
+  static String eventRegistration = '/event-registration';
+  static String myEvents = '/my-events';
+  static String eventScanner = '/event-scanner';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -228,5 +236,40 @@ class AppRouter {
       page: () => FromPageCommittee(),
       middlewares: [AuthGuard()],
     ),
+    GetPage<void>(
+      name: events,
+      page: () => EventsPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: eventRegistration,
+      page: () {
+        final event = Get.arguments as EventDetailsData;
+        return EventRegistrationPage(event: event);
+      },
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: myEvents,
+      page: () {
+        final args = Get.arguments;
+        if (args is Map<String, dynamic>) {
+          return MyEventsPage(
+            targetEventId: args['targetEventId'] as int?,
+            targetEventName: args['targetEventName'] as String?,
+            targetStatus: args['targetStatus'] as String?,
+          );
+        }
+        return const MyEventsPage();
+      },
+      middlewares: [AuthGuard()],
+    ),
+    /*GetPage<void>(
+      name: eventScanner,
+      page: () => EventScannerPage(
+        customToken: Get.arguments is String ? Get.arguments as String : null,
+      ),
+      middlewares: [AuthGuard()],
+    ),*/
   ];
 }

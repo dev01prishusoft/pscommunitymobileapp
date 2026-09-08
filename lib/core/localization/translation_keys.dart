@@ -538,4 +538,148 @@ class LK {
       'delete_all_notification_description';
   static const String rejectionDetails = 'rejection_details';
   static const String selectValidLocation = 'select_valid_location';
+  static const String myAccount = 'My Account';
+  static const String supportAndInfo = 'Support & Information';
+
+  // Events
+  static const String events_title = "events_title";
+  static const String events_search_hint = "events_search_hint";
+  static const String events_tab_upcoming = "events_tab_upcoming";
+  static const String events_tab_ongoing = "events_tab_ongoing";
+  static const String events_tab_past = "events_tab_past";
+  static const String events_my_events_btn = "events_my_events_btn";
+  static const String events_no_events_found = "events_no_events_found";
+  static const String no_events_found = "events_no_events_found";
+  static const String events_type_default = "events_type_default";
+  static const String events_badge_registered = "events_badge_registered";
+  static const String events_fee_free = "events_fee_free";
+  static const String events_reg_fee_prefix = "events_reg_fee_prefix";
+  static const String events_places_taken_progress =
+      "events_places_taken_progress";
+
+  // Event Details
+  static const String event_details_title = "event_details_title";
+  static const String event_details_status = "event_details_status";
+  static const String event_details_not_registered =
+      "event_details_not_registered";
+  static const String event_details_guest_limit = "event_details_guest_limit";
+  static const String event_details_timeline = "event_details_timeline";
+  static const String event_details_organised_by = "event_details_organised_by";
+  static const String event_details_documents = "event_details_documents";
+  static const String event_details_documents_desc =
+      "event_details_documents_desc";
+  static const String event_details_pdf_tag = "event_details_pdf_tag";
+  static const String event_details_open_pdf = "event_details_open_pdf";
+  static const String event_details_not_found = "event_details_not_found";
+  static const String event_details_fetch_failed = "event_details_fetch_failed";
+  static const String event_details_day_prefix = "event_details_day_prefix";
+  static const String event_details_please_note = "event_details_please_note";
+
+  // Event Registration
+  static const String event_reg_title = "event_reg_title";
+  static const String event_reg_add_guest = "event_reg_add_guest";
+  static const String event_details_add_guest = "event_reg_add_guest";
+  static const String event_reg_my_member_list = "event_reg_my_member_list";
+  static const String event_reg_guest_members = "event_reg_guest_members";
+  static const String event_reg_search_members_hint =
+      "event_reg_search_members_hint";
+  static const String event_reg_no_members_match = "event_reg_no_members_match";
+  static const String event_reg_no_approved_members =
+      "event_reg_no_approved_members";
+  static const String event_reg_register_now = "event_reg_register_now";
+  static const String event_details_register_btn = "event_reg_register_now";
+  static const String event_reg_guest_prefix = "event_reg_guest_prefix";
+  static const String event_reg_age_hint = "event_reg_age_hint";
+  static const String event_reg_fullname_hint = "event_reg_fullname_hint";
+
+  // Event Payment & Coupon
+  static const String event_pay_summary_title = "event_pay_summary_title";
+  static const String event_pay_summary_subtitle = "event_pay_summary_subtitle";
+  static const String event_pay_base_amount_desc = "event_pay_base_amount_desc";
+  static const String event_pay_discount_applied = "event_pay_discount_applied";
+  static const String event_pay_total_payable = "event_pay_total_payable";
+  static const String event_pay_final_amount_desc =
+      "event_pay_final_amount_desc";
+  static const String event_pay_apply_coupon_title =
+      "event_pay_apply_coupon_title";
+  static const String event_pay_coupon_hint = "event_pay_coupon_hint";
+  static const String event_pay_coupon_apply_btn = "event_pay_coupon_apply_btn";
+  static const String event_pay_coupon_remove_btn =
+      "event_pay_coupon_remove_btn";
+  static const String event_pay_now_btn = "event_pay_now_btn";
+  static const String event_pay_coupon_empty_err = "event_pay_coupon_empty_err";
+  static const String event_pay_invalid_event_err =
+      "event_pay_invalid_event_err";
+  static const String event_pay_member_not_found_err =
+      "event_pay_member_not_found_err";
+  static const String event_pay_coupon_fail_err = "event_pay_coupon_fail_err";
+  static const String event_pay_generic_err = "event_pay_generic_err";
+  static const String event_pay_select_member_err =
+      "event_pay_select_member_err";
+  static const String event_pay_select_gender_err =
+      "event_pay_select_gender_err";
+  static const String event_pay_missing_details_err =
+      "event_pay_missing_details_err";
+  static const String event_pay_validate_fail_err =
+      "event_pay_validate_fail_err";
+
+  static const String event_pay_guest_limit_err = "event_pay_guest_limit_err";
+  static const String my_events_show_all = "my_events_show_all";
+  static const String my_event_details_reg_number =
+      "my_event_details_reg_number";
+  static const String my_event_details_cancel_btn =
+      "my_event_details_cancel_btn";
+  static const String event_pay_validate_generic_err =
+      "event_pay_validate_generic_err";
+  static const String event_pay_order_invalid_err =
+      "event_pay_order_invalid_err";
+  static const String event_pay_order_create_fail_err =
+      "event_pay_order_create_fail_err";
+  static const String event_pay_order_generic_err =
+      "event_pay_order_generic_err";
+  static const String event_pay_coupon_discount = "event_pay_coupon_discount";
+  static const String event_pay_coupon_applied_success =
+      "event_pay_coupon_applied_success";
+  static const String event_pay_reg_failed = "event_pay_reg_failed";
+  static const String event_pay_reg_success = "event_pay_reg_success";
+  static const String event_pay_reg_generic_err = "event_pay_reg_generic_err";
+  static const String my_event_details_cancel_by_user =
+      "my_event_details_cancel_by_user";
+  static const String my_event_details_load_err = "my_event_details_load_err";
+  static const String my_event_details_member_default =
+      "my_event_details_member_default";
+  static const String my_event_details_open_maps = "my_event_details_open_maps";
+  static const String my_event_details_with_prefix =
+      "my_event_details_with_prefix";
+  static const String my_event_guest = "my_event_guest";
+  static const String my_event_guests = "my_event_guests";
+  static const String cancel_registration = "cancel_registration";
+  static const String my_event_details_dialog_msg =
+      "my_event_details_dialog_msg";
+  static const String my_event_details_cancel_success =
+      "my_event_details_cancel_success";
+  static const String my_event_details_cancel_failed =
+      "my_event_details_cancel_failed";
+  static const String my_event_details_map_error = "my_event_details_map_error";
+  static const String my_event_details_qr_na = "my_event_details_qr_na";
+  static const String my_events_search_hint = "my_events_search_hint";
+  static const String my_events_load_failed = "my_events_load_failed";
+  static const String my_events_selected_event = "my_events_selected_event";
+  static const String my_events_no_match = "my_events_no_match";
+  static const String event_register_event_not_found_suffix =
+      "event_register_event_not_found_suffix";
+  static const String my_events_note_cancelled = "my_events_note_cancelled";
+  static const String my_events_note_over = "my_events_note_over";
+  static const String event_session_venue_details =
+      "event_session_venue_details";
+  static const String event_session_name = "event_session_name";
+  static const String event_session_starts = "event_session_starts";
+  static const String event_session_ends = "event_session_ends";
+  static const String event_session_speaker_lead = "event_session_speaker_lead";
+  static const String event_session_venue = "event_session_venue";
+  static const String event_session_online_meeting =
+      "event_session_online_meeting";
+  static const String event_session_online_meeting_link =
+      "event_session_online_meeting_link";
+  static const String event_session_description = "event_session_description";
 }

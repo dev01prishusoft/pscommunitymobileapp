@@ -13,7 +13,7 @@ class AppFormTextField extends StatelessWidget {
     super.key,
     this.controller,
     this.initialValue,
-    required this.label,
+    this.label,
     this.hint,
     this.isRequired = false,
     this.readOnly = false,
@@ -33,7 +33,7 @@ class AppFormTextField extends StatelessWidget {
   });
   final TextEditingController? controller;
   final String? initialValue;
-  final String label;
+  final String? label;
   final String? hint;
   final bool isRequired;
   final bool readOnly;
@@ -56,21 +56,22 @@ class AppFormTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
-            children: [
-              if (isRequired)
-                TextSpan(
-                  text: ' *',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.red,
+        if (label != null && label!.isNotEmpty)
+          RichText(
+            text: TextSpan(
+              text: label,
+              style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
+              children: [
+                if (isRequired)
+                  TextSpan(
+                    text: ' *',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.red,
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ).paddingOnly(left: 5.w, bottom: 6.h),
+              ],
+            ),
+          ).paddingOnly(left: 5.w, bottom: 6.h),
         TextFormField(
           controller: controller,
           initialValue: initialValue,
@@ -95,7 +96,11 @@ class AppFormTextField extends StatelessWidget {
             color: readOnly ? AppColors.grey : AppColors.black,
           ),
           decoration: InputDecoration(
-            hintText: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
+            hintText:
+                hint ??
+                (label != null && label!.isNotEmpty
+                    ? '${LK.enter.tr} ${label!.replaceAll('*', '').trim()}'
+                    : null),
             prefixIcon: prefixIcon != null
                 ? IconTheme(
                     data: const IconThemeData(size: 20),
@@ -112,7 +117,8 @@ class AppFormTextField extends StatelessWidget {
           validator: (value) {
             if (isRequired && (value == null || value.trim().isEmpty)) {
               if (originalValue == null || originalValue!.trim().isNotEmpty) {
-                return '${label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+                return '${(label ?? '').replaceAll('*', '').trim()} ${LK.isRequired.tr}'
+                    .trim();
               }
             }
             if (validator != null) {
