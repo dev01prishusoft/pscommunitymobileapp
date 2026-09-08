@@ -1,3 +1,9 @@
+import 'package:pscommunitymobileapp/core/module_permission/models/module_permission_model.dart';
+
+export 'package:pscommunitymobileapp/core/module_permission/models/module_permission_model.dart';
+
+typedef Modules = ModulePermissionModel;
+
 class AuthTokens {
   AuthTokens({
     required this.accessToken,
@@ -13,6 +19,7 @@ class AuthTokens {
     this.deviceUniqueId,
     this.primaryColor,
     this.secondaryColor,
+    this.modules,
   });
   final String accessToken;
   final String refreshToken;
@@ -27,4 +34,5 @@ class AuthTokens {
   final String? deviceUniqueId;
   final String? primaryColor;
   final String? secondaryColor;
+  final List<ModulePermissionModel>? modules;
 }

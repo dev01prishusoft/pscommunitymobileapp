@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/localization/localization_service.dart
 import 'package:pscommunitymobileapp/core/network/api_client.dart'
     as pscommunitymobileapp_api_client;
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 
@@ -26,6 +27,9 @@ class AuthState {
   void logout() {
     _revokeTokenCall();
     _tokenManager.clearTokens();
+    if (Get.isRegistered<ModulePermissionService>()) {
+      Get.find<ModulePermissionService>().clear();
+    }
     if (Get.isRegistered<SamajController>()) {
       Get.find<SamajController>().clear();
     }
@@ -76,6 +80,9 @@ class AuthState {
     try {
       await _revokeTokenCall();
       await _tokenManager.clearTokens();
+      if (Get.isRegistered<ModulePermissionService>()) {
+        await Get.find<ModulePermissionService>().clear();
+      }
       if (Get.isRegistered<SamajController>()) {
         Get.find<SamajController>().clear();
       }

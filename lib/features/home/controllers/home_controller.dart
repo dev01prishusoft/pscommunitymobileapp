@@ -13,17 +13,24 @@ import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/core/models/app_link_model.dart';
 import 'package:pscommunitymobileapp/core/models/member_notification.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/check_updated_version.dart';
 
 class MenuItem {
-  MenuItem({required this.icon, required this.labelKey, required this.route});
+  MenuItem({
+    required this.icon,
+    required this.labelKey,
+    required this.route,
+    this.module,
+  });
   final IconData icon;
   final String labelKey;
   final String route;
+  final AppModule? module;
 }
 
 class HomeController extends GetxController with WidgetsBindingObserver {
-  final List<MenuItem> menuItems = [
+  final List<MenuItem> _allMenuItems = [
     MenuItem(
       icon: Icons.family_restroom,
       labelKey: LK.family,
@@ -43,16 +50,19 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       icon: Icons.account_balance_wallet,
       labelKey: LK.payment,
       route: AppRouter.payments,
+      module: AppModule.payment,
     ),
     MenuItem(
       icon: Icons.work,
       labelKey: LK.occupationDirectory,
       route: AppRouter.occupationDirectory,
+      module: AppModule.occupation,
     ),
     MenuItem(
       icon: Icons.wc,
       labelKey: LK.marriage,
       route: AppRouter.marriage,
+      module: AppModule.matrimonial,
     ),
     MenuItem(
       icon: Icons.event,
@@ -72,6 +82,18 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     ),
   ];
 
+  /// Returns only the menu items that are permitted/accessible for this member's Samaj.
+  List<MenuItem> get menuItems {
+    if (!Get.isRegistered<ModulePermissionService>()) {
+      return _allMenuItems;
+    }
+    final permissionService = ModulePermissionService.to;
+    return _allMenuItems.where((item) {
+      if (item.module == null) return true;
+      return permissionService.isAccessible(item.module!);
+    }).toList();
+  }
+
   String version = '';
   final RxInt unreadNotificationCount = 0.obs;
 
@@ -81,9 +103,11 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     Get.find<LocalizationService>().fetchLanguages();
     checkAppVersion();
+    if (Get.isRegistered<ModulePermissionService>()) {
+      Get.find<ModulePermissionService>().fetchMyModules();
+    }
     fetchUnreadNotificationCount();
   }
-
 
   @override
   void onClose() {
@@ -99,12 +123,21 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         Navigator.of(Get.context!, rootNavigator: true).pop();
       }
       await checkAppVersion();
+      if (Get.isRegistered<ModulePermissionService>()) {
+        await Get.find<ModulePermissionService>().fetchMyModules();
+      }
       await fetchUnreadNotificationCount();
     }
   }
 
   Future<void> fetchUnreadNotificationCount() async {
     try {
+      if (Get.isRegistered<ModulePermissionService>()) {
+        if (!ModulePermissionService.to.isAccessible(AppModule.dailyNotification)) {
+          unreadNotificationCount.value = 0;
+          return;
+        }
+      }
       final apiClient = Get.find<ApiClient>();
       final result = await apiClient.getPaginated<MemberNotification>(
         ApiEndpoints.notifications,

@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -63,6 +64,14 @@ class DI {
 
         Get.put(tokenManager, permanent: true);
 
+        final modulePermissionStorage = ModulePermissionStorage(secureStorage);
+        Get.put(modulePermissionStorage, permanent: true);
+        final modulePermissionService = ModulePermissionService(
+          storage: modulePermissionStorage,
+        );
+        await modulePermissionService.bootstrap();
+        Get.put(modulePermissionService, permanent: true);
+
         final connectivityPlugin = Connectivity();
         final connectivity = ConnectivityService(
           connectivity: connectivityPlugin,
@@ -82,10 +91,16 @@ class DI {
         );
         Get.put(apiClient, permanent: true);
 
+        modulePermissionService.attachApiClient(apiClient);
+
         final localization = LocalizationService(secureStorage);
         await localization.bootstrap();
         Get.put(localization, permanent: true);
-        final authRepository = AuthRepositoryImpl(apiClient, tokenManager);
+        final authRepository = AuthRepositoryImpl(
+          apiClient,
+          tokenManager,
+          modulePermissionService,
+        );
         final loginUseCase = LoginUseCase(authRepository);
         Get.put(loginUseCase, permanent: true);
         Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
