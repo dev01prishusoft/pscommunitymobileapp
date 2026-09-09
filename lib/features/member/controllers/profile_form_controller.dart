@@ -1853,7 +1853,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ProfileFormController._loadMotherLocationDropdowns failed',
+      );
     } finally {
       _initialDropdownValues['MotherStateId'] = personalInfo.motherState.value;
       _initialDropdownValues['MotherDistrictId'] =

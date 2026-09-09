@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -65,7 +66,12 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
       } else {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AppWebViewPage._launchExternalUrl failed for $urlString',
+      );
     }
   }
 

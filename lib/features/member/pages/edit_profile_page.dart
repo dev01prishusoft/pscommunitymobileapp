@@ -50,11 +50,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadMemberData() async {
-    try {
-      final tokenManager = Get.find<TokenManager>();
-      final memberId = tokenManager.memberId;
-      if (memberId == null) return;
+    final tokenManager = Get.find<TokenManager>();
+    final memberId = tokenManager.memberId;
+    if (memberId == null) return;
 
+    try {
       final apiClient = Get.find<ApiClient>();
       final response = await apiClient.getParsed<Member>(
         '/api/v1/member/$memberId',
@@ -65,7 +65,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (member != null) {
         controller.loadFromMember(member);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EditProfilePage._loadMemberProfile failed for member $memberId',
+      );
     } finally {
       if (mounted) {
         setState(() {

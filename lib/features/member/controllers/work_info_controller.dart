@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 
 class WorkInfoController extends GetxController {
@@ -453,7 +454,12 @@ class WorkInfoController extends GetxController {
           return;
         }
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'WorkInfoController.fetchDropdown failed for $path',
+      );
     }
     targetList.assignAll(fallbacks);
   }
