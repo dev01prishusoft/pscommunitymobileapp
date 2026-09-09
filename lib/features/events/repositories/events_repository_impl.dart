@@ -64,7 +64,6 @@ class EventsRepositoryImpl implements EventsRepositories {
     required List<Map<String, dynamic>> guests,
     CancelToken? cancelToken,
   }) async {
-    print({"eventId": eventId, "memberId": memberId, "guests": guests});
     return await _apiClient.postParsed<EventValidateData>(
       ApiEndpoints.EventRegistrationValdiate,
       data: {"eventId": eventId, "memberId": memberId, "guests": guests},

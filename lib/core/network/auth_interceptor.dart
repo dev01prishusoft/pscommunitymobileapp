@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
@@ -90,8 +89,7 @@ class AuthInterceptor extends Interceptor {
       } else {
         _onAuthFailure();
       }
-    } catch (e) {
-      if (kDebugMode) {}
+    } catch (_) {
       _onAuthFailure();
     }
 
@@ -140,11 +138,9 @@ class AuthInterceptor extends Interceptor {
 
         c.complete(access);
       } else {
-        if (kDebugMode) {}
         c.complete(null);
       }
     } catch (e) {
-      if (kDebugMode) {}
       c.completeError(e);
     } finally {
       _refreshCompleter = null;

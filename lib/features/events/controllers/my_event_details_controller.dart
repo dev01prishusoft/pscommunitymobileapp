@@ -58,11 +58,7 @@ class MyEventDetailsController extends GetxController {
 
     if (result is Success<ApiResponse<RegisteredEventsDetailsData>>) {
       detail.value = result.data.data;
-      // ignore: avoid_print
-      print('getMyRegisteredEventDetail SUCCESS: ${result.data.data?.eventName}, guests count: ${result.data.data?.guests?.length}');
     } else if (result is Error<ApiResponse<RegisteredEventsDetailsData>>) {
-      // ignore: avoid_print
-      print('getMyRegisteredEventDetail ERROR: ${result.failure.message}');
       if (detail.value == null && initialItem == null) {
         hasError.value = true;
         errorMessage.value = result.failure.message;

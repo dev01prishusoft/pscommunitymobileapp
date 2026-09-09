@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/module_permission/models/module_permission_model.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 
@@ -17,11 +16,7 @@ class ModulePermissionStorage {
       final jsonList = modules.map((m) => m.toJson()).toList();
       final jsonString = jsonEncode(jsonList);
       await _storage.write(_storageKey, jsonString);
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionStorage] Error saving modules: $e');
-      }
-    }
+    } catch (_) {}
   }
 
   /// Loads the cached list of module permissions from secure storage.
@@ -39,10 +34,7 @@ class ModulePermissionStorage {
             .toList();
       }
       return <ModulePermissionModel>[];
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionStorage] Error loading modules: $e');
-      }
+    } catch (_) {
       return <ModulePermissionModel>[];
     }
   }
@@ -51,10 +43,6 @@ class ModulePermissionStorage {
   Future<void> clear() async {
     try {
       await _storage.delete(_storageKey);
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionStorage] Error clearing modules: $e');
-      }
-    }
+    } catch (_) {}
   }
 }

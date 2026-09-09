@@ -44,7 +44,6 @@ class EventAttendanceRepositoryImpl implements EventAttendanceRepository {
     required String qrData,
     CancelToken? cancelToken,
   }) async {
-    print({"qrData": qrData});
     return await _apiClient.postParsed<Map<String, dynamic>>(
       ApiEndpoints.scanEventBarcode,
       data: {"qrData": qrData},
@@ -63,12 +62,6 @@ class EventAttendanceRepositoryImpl implements EventAttendanceRepository {
     required int numberOfUsers,
     CancelToken? cancelToken,
   }) async {
-    print({
-      "eventId": eventId,
-      "eventRegistrationId": eventRegistrationId,
-      "memberId": memberId,
-      "numberOfUsers": numberOfUsers,
-    });
     return await _apiClient.postParsed<Map<String, dynamic>>(
       ApiEndpoints.checkInEventByQr,
       data: {

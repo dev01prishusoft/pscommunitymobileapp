@@ -1,13 +1,10 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
   SecureStorageService()
     : _storage = FlutterSecureStorage(
-        aOptions: AndroidOptions(
-          resetOnError: true,
-        ),
+        aOptions: AndroidOptions(resetOnError: true),
         iOptions: IOSOptions(
           accessibility: KeychainAccessibility.first_unlock_this_device,
           synchronizable: false,
@@ -17,7 +14,6 @@ class SecureStorageService {
   final FlutterSecureStorage _storage;
 
   void _reportError(Object error, StackTrace stack, {required String reason}) {
-    debugPrint('[SecureStorageService] $reason: $error');
     try {
       FirebaseCrashlytics.instance.recordError(
         error,
@@ -25,9 +21,7 @@ class SecureStorageService {
         reason: reason,
         fatal: false,
       );
-    } catch (_) {
-      // Prevents crash if Crashlytics is not ready or during tests
-    }
+    } catch (_) {}
   }
 
   Future<void> write(String key, String? value) async {

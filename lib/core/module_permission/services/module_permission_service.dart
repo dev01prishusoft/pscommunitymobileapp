@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
@@ -40,17 +39,7 @@ class ModulePermissionService extends GetxService {
     try {
       final cached = await _storage.loadModules();
       _setModulesInternal(cached);
-      if (kDebugMode) {
-        debugPrint(
-          '[ModulePermissionService] Loaded ${cached.length} modules from cache: '
-          '${cached.map((m) => '${m.code}:${m.isAccessible}').join(', ')}',
-        );
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionService] Bootstrap error: $e');
-      }
-    }
+    } catch (_) {}
   }
 
   /// Check if a strongly-typed module is accessible (purchased and active).
@@ -107,11 +96,7 @@ class ModulePermissionService extends GetxService {
         }
       }
       await updateModules(parsed);
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionService] Error parsing raw modules: $e');
-      }
-    }
+    } catch (_) {}
   }
 
   /// Replaces active permissions and persists them to secure storage.
@@ -144,17 +129,8 @@ class ModulePermissionService extends GetxService {
       final fetchedList = response.dataOrNull?.data;
       if (fetchedList != null) {
         await updateModules(fetchedList);
-        if (kDebugMode) {
-          debugPrint(
-            '[ModulePermissionService] Successfully fetched ${fetchedList.length} modules from API: '
-            '${fetchedList.map((m) => '${m.code}:${m.isAccessible}').join(', ')}',
-          );
-        }
       }
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[ModulePermissionService] fetchMyModules error: $e');
-      }
       if (!silent) rethrow;
     } finally {
       isLoading.value = false;
@@ -167,9 +143,6 @@ class ModulePermissionService extends GetxService {
     modules.clear();
     _moduleMap.clear();
     await _storage.clear();
-    if (kDebugMode) {
-      debugPrint('[ModulePermissionService] Permissions cleared');
-    }
   }
 
   void _setModulesInternal(List<ModulePermissionModel> list) {

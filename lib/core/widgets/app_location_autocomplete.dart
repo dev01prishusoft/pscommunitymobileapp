@@ -111,9 +111,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
           }
         }
       }
-    } catch (e) {
-      debugPrint("Error fetching place details: $e");
-    }
+    } catch (_) {}
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -41,13 +40,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     if (result is Success<PaginatedResponse<CommitteeNode>>) {
       final list = result.data.data;
       final tree = _buildTree(list);
-
-      if (kDebugMode) {
-        for (var root in tree) {
-          _printNode(root, 0);
-        }
-      }
-
       return Success(tree);
     } else {
       return Error((result as Error).failure);
@@ -87,12 +79,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     }
   }
 
-  void _printNode(CommitteeNode node, int depth) {
-    for (var child in node.children) {
-      _printNode(child, depth + 1);
-    }
-  }
-
   List<CommitteeNode> _buildTree(List<CommitteeNode> flatList) {
     final Map<int, CommitteeNode> allNodes = {for (var n in flatList) n.id: n};
     final List<CommitteeNode> roots = [];
@@ -117,13 +103,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     }
 
     final tree = roots.map((r) => link(r)).toList();
-
-    if (kDebugMode) {
-      for (var root in tree) {
-        _printNode(root, 0);
-      }
-    }
-
     return tree;
   }
 }

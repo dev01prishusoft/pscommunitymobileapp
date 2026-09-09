@@ -1214,7 +1214,6 @@ class EventRegistrationController extends GetxController {
         guests: formattedGuests,
         cancelToken: _cancelToken,
       );
-      print("result.failureOrNull?.message : ${result.failureOrNull?.message}");
       if (Get.isDialogOpen ?? false) Get.back();
 
       if (result is Success<ApiResponse<Map<String, dynamic>>>) {

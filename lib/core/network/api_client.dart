@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
@@ -210,9 +209,6 @@ class ApiClient {
 
   Future<void> _checkConnectivity() async {
     final hasConnection = await _connectivity.hasConnection();
-    if (kDebugMode && !hasConnection) {
-      if (kDebugMode) {}
-    }
     if (!hasConnection) {
       throw NetworkFailure();
     }

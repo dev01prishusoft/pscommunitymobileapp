@@ -34,11 +34,8 @@ def process_file(filepath):
     if new_content != content:
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(new_content)
-        print(f"Updated {filepath}")
 
 for root, dirs, files in os.walk(lib_dir):
     for file in files:
         if file.endswith('.dart'):
             process_file(os.path.join(root, file))
-
-print("Done")
