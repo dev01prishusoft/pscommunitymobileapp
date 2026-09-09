@@ -32,6 +32,10 @@ class LK {
   static const String errorTimeout = 'Request Timeout';
   static const String errorCertificatePinning = 'Security Error';
   static const String errorValidation = 'Validation Error';
+  static const String accessRestricted = 'Access Restricted';
+  static const String moduleAccessRestrictedSubtitle =
+      'This Samaj has not purchased the @module module.';
+  static const String events = 'Events';
   static const String invalidCredentials = 'Invalid credentials';
   static const String invalidMobileOrPassword =
       'Invalid Mobile number or password';

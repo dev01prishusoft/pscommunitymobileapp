@@ -1,3 +1,6 @@
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+
 /// Enum representing the core modules supported by the application.
 /// Values match the backend codes specified in the module permission API documentation.
 enum AppModule {
@@ -9,6 +12,25 @@ enum AppModule {
 
   final String code;
   const AppModule(this.code);
+
+  /// Translation key for the user-facing name of this module.
+  String get displayNameKey {
+    switch (this) {
+      case AppModule.payment:
+        return LK.payment;
+      case AppModule.matrimonial:
+        return LK.matrimonial;
+      case AppModule.occupation:
+        return LK.occupation;
+      case AppModule.event:
+        return LK.events;
+      case AppModule.dailyNotification:
+        return LK.notifications;
+    }
+  }
+
+  /// Localized, user-friendly display name of the module.
+  String get localizedName => displayNameKey.tr;
 
   /// Safe lookup from string code (case-insensitive, trimmed).
   static AppModule? fromCode(String? code) {
