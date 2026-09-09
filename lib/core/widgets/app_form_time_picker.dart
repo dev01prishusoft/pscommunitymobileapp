@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 
@@ -98,7 +99,13 @@ class _AppFormTimePickerState extends State<AppFormTimePicker> {
             minute: int.parse(parts[1]),
           );
         }
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'AppFormTimePicker: failed to parse time "${widget.controller.text}"',
+        );
+      }
     }
 
     final TimeOfDay? picked = await showTimePicker(

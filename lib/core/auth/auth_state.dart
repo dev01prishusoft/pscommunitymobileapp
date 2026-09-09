@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart'
     as pscommunitymobileapp_api_client;
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
@@ -64,14 +65,32 @@ class AuthState {
                       '"$token"',
                 )
                 .timeout(const Duration(seconds: 5));
-          } catch (_) {}
+          } catch (e, stack) {
+            CrashReporter.recordError(
+              e,
+              stack,
+              reason: 'AuthState._revokeTokenCall: API revoke token failed',
+            );
+          }
         }
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'AuthState._revokeTokenCall: failed',
+        );
+      }
     }
 
     try {
       await FirebaseMessaging.instance.deleteToken();
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthState._revokeTokenCall: deleteToken failed',
+      );
+    }
   }
 
   Future<void> logoutAndRedirect() async {

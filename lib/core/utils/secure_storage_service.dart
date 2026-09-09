@@ -1,4 +1,4 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
@@ -14,14 +14,7 @@ class SecureStorageService {
   final FlutterSecureStorage _storage;
 
   void _reportError(Object error, StackTrace stack, {required String reason}) {
-    try {
-      FirebaseCrashlytics.instance.recordError(
-        error,
-        stack,
-        reason: reason,
-        fatal: false,
-      );
-    } catch (_) {}
+    CrashReporter.recordError(error, stack, reason: reason);
   }
 
   Future<void> write(String key, String? value) async {

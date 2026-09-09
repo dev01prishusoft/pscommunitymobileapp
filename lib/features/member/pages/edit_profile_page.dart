@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
@@ -2751,7 +2752,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             if (dobDate != null && year < dobDate.year) {
                               return 'Passing Year cannot be before year of birth';
                             }
-                          } catch (_) {}
+                          } catch (e, stack) {
+                            CrashReporter.recordError(
+                              e,
+                              stack,
+                              reason: 'EditProfilePage passing year date parse failed',
+                            );
+                          }
                         }
                       }
                       return null;

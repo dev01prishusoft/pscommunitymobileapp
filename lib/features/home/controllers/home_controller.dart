@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/share_controller.dart';
@@ -150,7 +151,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       if (result.isSuccess) {
         unreadNotificationCount.value = result.dataOrNull?.unreadCount ?? 0;
       }
-    } catch (e) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'HomeController.fetchUnreadNotificationsCount failed',
+      );
+    }
   }
 
   void changeLocale(LocalizationService loc, String? code) {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 
@@ -32,7 +33,13 @@ class AuthInterceptor extends Interceptor {
       if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenNearExpiry) {
         try {
           await _refreshSingleFlight(_tokenManager.refreshToken!);
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'AuthInterceptor.onRequest: proactive refresh single flight failed',
+          );
+        }
       }
     }
 

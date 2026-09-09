@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/module_permission/models/app_module.dart';
 import 'package:pscommunitymobileapp/core/module_permission/models/module_permission_model.dart';
 import 'package:pscommunitymobileapp/core/module_permission/storage/module_permission_storage.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 
 /// Central reactive service for managing and querying Samaj module permissions.
 class ModulePermissionService extends GetxService {
@@ -39,7 +40,13 @@ class ModulePermissionService extends GetxService {
     try {
       final cached = await _storage.loadModules();
       _setModulesInternal(cached);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionService.bootstrap failed',
+      );
+    }
   }
 
   /// Check if a strongly-typed module is accessible (purchased and active).
@@ -96,7 +103,13 @@ class ModulePermissionService extends GetxService {
         }
       }
       await updateModules(parsed);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionService.updateFromRawList failed',
+      );
+    }
   }
 
   /// Replaces active permissions and persists them to secure storage.
@@ -130,7 +143,12 @@ class ModulePermissionService extends GetxService {
       if (fetchedList != null) {
         await updateModules(fetchedList);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionService.fetchMyModules failed',
+      );
       if (!silent) rethrow;
     } finally {
       isLoading.value = false;

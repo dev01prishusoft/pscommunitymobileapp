@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/models/language.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart'
     as pscommunitymobileapp_token_manager;
@@ -50,11 +51,23 @@ class LocalizationService {
           );
           keys[localeKey]!.addAll(cachedKeys);
         }
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'LocalizationService.bootstrap: failed to read cached locale $localeKey',
+        );
+      }
     }
     try {
       unawaited(fetchLanguagesAndAllResources());
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationService.bootstrap: fetchLanguagesAndAllResources invocation failed',
+      );
+    }
 
     final savedLocale = await _storage.read(_localeKey);
     if (savedLocale != null) {
@@ -64,7 +77,13 @@ class LocalizationService {
         currentLocale.value = locale;
         try {
           await Get.updateLocale(locale);
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'LocalizationService.bootstrap: Get.updateLocale failed for $locale',
+          );
+        }
       }
     }
   }
@@ -78,14 +97,26 @@ class LocalizationService {
         currentLocale.value = locale;
         try {
           await Get.updateLocale(locale);
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'LocalizationService.restoreSavedLocale: Get.updateLocale failed for $locale',
+          );
+        }
       }
     } else {
       final defaultLocale = const Locale('en', 'US');
       currentLocale.value = defaultLocale;
       try {
         await Get.updateLocale(defaultLocale);
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'LocalizationService.restoreSavedLocale: Get.updateLocale failed for defaultLocale',
+        );
+      }
     }
   }
 
@@ -93,7 +124,13 @@ class LocalizationService {
     try {
       await fetchLanguages();
       await Future.wait(languages.map((l) => fetchLanguageResources(l.code)));
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationService.fetchLanguagesAndAllResources failed',
+      );
+    }
   }
 
   Future<void> fetchLanguages() async {
@@ -131,7 +168,12 @@ class LocalizationService {
           }
         }
       }
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationService.fetchLanguages failed',
+      );
     } finally {
       _isFetchingLanguages = false;
     }
@@ -172,12 +214,24 @@ class LocalizationService {
           try {
             final file = await _getLocalFile(localeKey);
             await file.writeAsString(jsonEncode(keys[localeKey]));
-          } catch (_) {}
+          } catch (e, stack) {
+            CrashReporter.recordError(
+              e,
+              stack,
+              reason: 'LocalizationService.fetchLanguageResources: failed to cache $localeKey',
+            );
+          }
 
           Get.appendTranslations({localeKey: remoteKeys});
         }
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationService.fetchLanguageResources failed for $langCode',
+      );
+    }
   }
 
   Future<void> changeLocale(String langCode, String countryCode) async {
@@ -187,7 +241,13 @@ class LocalizationService {
     await _storage.write(_localeKey, '${langCode}_$countryCode');
     try {
       unawaited(fetchLanguageResources(langCode));
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationService.changeLocale: fetchLanguageResources failed for $langCode',
+      );
+    }
   }
 
   void clearLanguages() {

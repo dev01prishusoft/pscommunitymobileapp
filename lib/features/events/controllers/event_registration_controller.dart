@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -121,7 +122,13 @@ class EventRegistrationController extends GetxController {
           genderList.assignAll(list);
         }
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController._loadGenderDropdown failed',
+      );
+    }
   }
 
   List<Member> get filteredFamilyMembers {
@@ -153,7 +160,13 @@ class EventRegistrationController extends GetxController {
           if (response.dataOrNull?.data != null) {
             currentUser.value = response.dataOrNull!.data;
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'EventRegistrationController._loadCurrentUser failed for member $memberId',
+          );
+        }
       }
     }
   }
@@ -253,12 +266,24 @@ class EventRegistrationController extends GetxController {
           if (membersTileController.isExpanded) {
             membersTileController.collapse();
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'EventRegistrationController: membersTileController.collapse failed',
+          );
+        }
         try {
           if (!guestsTileController.isExpanded) {
             guestsTileController.expand();
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'EventRegistrationController: guestsTileController.expand failed',
+          );
+        }
       });
     } else {
       _showToast(

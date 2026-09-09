@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/models/auth_tokens.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
@@ -76,7 +77,13 @@ class AuthRepositoryImpl implements AuthRepository {
         deviceType = 'ios';
       }
       deviceToken = await FirebaseMessaging.instance.getToken() ?? '';
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthRepositoryImpl.memberLogin: FirebaseMessaging.getToken failed',
+      );
+    }
 
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,

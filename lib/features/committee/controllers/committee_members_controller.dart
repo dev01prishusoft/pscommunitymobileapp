@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/localization/localization_service.dart
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -61,7 +62,13 @@ class CommitteeMembersController extends GetxController {
       if (result is Success<ApiResponse<List<DropdownItem>>>) {
         availableRoles.value = result.data.data ?? [];
       }
-    } catch (e) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'CommitteeMembersController._fetchRoles failed',
+      );
+    }
   }
 
   Future<void> _fetchMembers(int id) async {

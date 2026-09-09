@@ -3,6 +3,7 @@ import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
@@ -71,7 +72,13 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
             final activeMembers = fetchedMembers.where((m) => !isDateInPast(m.endDate)).toList();
             return Success(detail.copyWith(members: activeMembers));
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'CommitteeRepositoryImpl.getCommitteeDetail: fetch members failed for committee $id',
+          );
+        }
       }
       return Success(detail);
     } else {

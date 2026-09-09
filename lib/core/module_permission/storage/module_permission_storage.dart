@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:pscommunitymobileapp/core/module_permission/models/module_permission_model.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 
 /// Handles persistent encrypted storage of module permissions
@@ -16,7 +17,13 @@ class ModulePermissionStorage {
       final jsonList = modules.map((m) => m.toJson()).toList();
       final jsonString = jsonEncode(jsonList);
       await _storage.write(_storageKey, jsonString);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionStorage.saveModules failed',
+      );
+    }
   }
 
   /// Loads the cached list of module permissions from secure storage.
@@ -34,7 +41,12 @@ class ModulePermissionStorage {
             .toList();
       }
       return <ModulePermissionModel>[];
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionStorage.loadModules failed',
+      );
       return <ModulePermissionModel>[];
     }
   }
@@ -43,6 +55,12 @@ class ModulePermissionStorage {
   Future<void> clear() async {
     try {
       await _storage.delete(_storageKey);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ModulePermissionStorage.clear failed',
+      );
+    }
   }
 }

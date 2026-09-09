@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/services/location_service.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
@@ -861,7 +862,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
         fieldStatuses.value = newStatuses;
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ProfileFormController.fetchProfileUpdateStatus failed for member ${_currentMember?.memberId}',
+      );
+    }
   }
 
   ProfileUpdateStatus? getUpdateStatus(
@@ -956,7 +963,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
           status: status.status,
           rawJson: status.rawJson,
         );
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'ProfileFormController._formatStatusValue: DateOfBirth parse failed for ${status.newValue}',
+        );
+      }
     }
     if (keyName == 'DateOfBirthTime' && status.newValue != null) {
       try {
@@ -981,7 +994,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
             rawJson: status.rawJson,
           );
         }
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'ProfileFormController._formatStatusValue: DateOfBirthTime parse failed for ${status.newValue}',
+        );
+      }
     }
 
     return status;
@@ -1067,7 +1086,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
         );
         _checkAndTakeSnapshot();
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ProfileFormController.loadEducation failed for member $memberId',
+      );
+    }
   }
 
   Future<void> loadAddresses(int memberId) async {
@@ -1248,7 +1273,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
         );
         _checkAndTakeSnapshot();
       }
-    } catch (e) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ProfileFormController.loadAddresses failed for member $memberId',
+      );
+    }
   }
 
   void markAsAddMode() {
@@ -2183,7 +2214,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/member-address/mobile/upsert',
                     data: addressesPayload,
                   );
-                } catch (_) {}
+                } catch (e, stack) {
+                  CrashReporter.recordError(
+                    e,
+                    stack,
+                    reason: 'ProfileFormController._saveMember member-address/mobile/upsert failed',
+                  );
+                }
 
                 try {
                   final educationsPayload = {
@@ -2210,7 +2247,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/MemberEducation/mobile/upsert',
                     data: educationsPayload,
                   );
-                } catch (_) {}
+                } catch (e, stack) {
+                  CrashReporter.recordError(
+                    e,
+                    stack,
+                    reason: 'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
+                  );
+                }
               }
             }
 
@@ -2224,7 +2267,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     'rejectedReasonCommentByAdmin': null,
                   },
                 );
-              } catch (_) {}
+              } catch (e, stack) {
+                CrashReporter.recordError(
+                  e,
+                  stack,
+                  reason: 'ProfileFormController._saveMember authorized-comment failed',
+                );
+              }
             }
           } else if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
             final apiClient = Get.find<ApiClient>();
@@ -2237,7 +2286,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   'rejectedReasonCommentByAdmin': null,
                 },
               );
-            } catch (_) {}
+            } catch (e, stack) {
+              CrashReporter.recordError(
+                e,
+                stack,
+                reason: 'ProfileFormController._saveMember authorized-comment (no-updates) failed',
+              );
+            }
           }
 
           bool hasProfileUpdates = formDataMap.isNotEmpty;
@@ -2279,7 +2334,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     '/api/v1/MemberEducation/mobile/upsert',
                     data: educationsPayload,
                   );
-                } catch (_) {}
+                } catch (e, stack) {
+                  CrashReporter.recordError(
+                    e,
+                    stack,
+                    reason: 'ProfileFormController._saveMember edit MemberEducation/mobile/upsert failed',
+                  );
+                }
               }
             }
           }

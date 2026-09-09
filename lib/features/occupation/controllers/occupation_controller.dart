@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/occupation_item.dart';
@@ -121,7 +122,13 @@ class OccupationController extends GetxController {
     try {
       final results = await _repository.getOccupationDropdown();
       occupationTypes.assignAll([DropdownItem(id: 0, text: 'All'), ...results]);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'OccupationController.loadOccupationTypes failed',
+      );
+    }
   }
 
   void onOccupationTypeChanged(DropdownItem? type) {
