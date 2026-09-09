@@ -160,54 +160,64 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   Future<void> checkAppVersion() async {
     if (Get.context == null) return;
-    PackageInfo.fromPlatform().then((value) async {
+    try {
+      final value = await PackageInfo.fromPlatform();
       version = value.version;
       update();
-      if (version.isNotEmpty) {
-        await Get.find<ShareController>().fetchAppLinks();
+      if (version.trim().isEmpty) return;
 
-        final appLinks = Get.find<ShareController>().appLinks;
-        if (appLinks.isNotEmpty) {
-          final AppLinkModel data = appLinks.firstWhere(
-            (e) => e.appType == (Platform.isAndroid ? 'Android' : 'iOS'),
+      if (!Get.isRegistered<ShareController>()) return;
+      await Get.find<ShareController>().fetchAppLinks();
+
+      final appLinks = Get.find<ShareController>().appLinks;
+      if (appLinks.isEmpty) return;
+
+      final targetPlatform = Platform.isAndroid ? 'android' : 'ios';
+      final AppLinkModel? data = appLinks
+          .where((e) => e.appType.trim().toLowerCase() == targetPlatform)
+          .firstOrNull;
+
+      if (data == null) return;
+
+      final String latestVersion = data.currentVersion.trim();
+      if (latestVersion.isEmpty) return;
+
+      final bool forceUpdate = data.appUpdateRequired;
+      final String appLink = data.appLink.trim();
+
+      final bool wentForUpdate = await SecureStorageService().getBool(
+        LK.wentForUpdate,
+      );
+
+      if (!isVersionGreater(latestVersion, version) && wentForUpdate) {
+        if (isUpdateSheetOpen && Get.context != null && Get.context!.mounted) {
+          Navigator.of(Get.context!, rootNavigator: true).pop();
+        }
+        await SecureStorageService().setBool(LK.wentForUpdate, false);
+        if (Get.context != null && Get.context!.mounted) {
+          PSDelightToastBar(
+            snackbarDuration: const Duration(seconds: 3),
+            builder: (context) => ToastCard(
+              title: LK.appUpdatedSuccessfully.tr,
+              leading: Icons.check_circle,
+            ),
+          ).show();
+        }
+        return;
+      }
+
+      if (isVersionGreater(latestVersion, version)) {
+        if (Get.context != null && Get.context!.mounted) {
+          showAppUpdateBottomSheet(
+            Get.context!,
+            forceUpdate: forceUpdate,
+            androidUrl: Platform.isAndroid ? appLink : '',
+            iosUrl: Platform.isIOS ? appLink : '',
           );
-
-          if (data.appType.isNotEmpty) {
-            final String latestVersion = data.currentVersion;
-            final bool forceUpdate = data.appUpdateRequired;
-            final String appLink = data.appLink;
-
-            final bool wentForUpdate = await SecureStorageService().getBool(
-              LK.wentForUpdate,
-            );
-
-            if (!isVersionGreater(latestVersion, version) && wentForUpdate) {
-              if (isUpdateSheetOpen && Get.context!.mounted) {
-                Navigator.of(Get.context!, rootNavigator: true).pop();
-              }
-              await SecureStorageService().setBool(LK.wentForUpdate, false);
-              if (Get.context!.mounted) {
-                PSDelightToastBar(
-                  snackbarDuration: const Duration(seconds: 3),
-                  builder: (context) => ToastCard(
-                    title: LK.appUpdatedSuccessfully.tr,
-                    leading: Icons.check_circle,
-                  ),
-                ).show();
-              }
-              return;
-            }
-            if (isVersionGreater(latestVersion, version)) {
-              showAppUpdateBottomSheet(
-                Get.context!,
-                forceUpdate: forceUpdate,
-                androidUrl: Platform.isAndroid ? appLink : '',
-                iosUrl: Platform.isIOS ? appLink : '',
-              );
-            }
-          }
         }
       }
-    });
+    } catch (_) {
+      // Gracefully prevent unhandled exceptions from breaking app lifecycle or startup
+    }
   }
 }

@@ -139,18 +139,40 @@ void _openStore({required String androidUrl, required String iosUrl}) async {
 }
 
 bool isVersionGreater(String latest, String current) {
-  final List<int> latestParts = latest
+  String clean(String v) {
+    var s = v.trim();
+    if (s.startsWith('v') || s.startsWith('V')) {
+      s = s.substring(1).trim();
+    }
+    final plusIndex = s.indexOf('+');
+    if (plusIndex != -1) {
+      s = s.substring(0, plusIndex);
+    }
+    final dashIndex = s.indexOf('-');
+    if (dashIndex != -1) {
+      s = s.substring(0, dashIndex);
+    }
+    return s;
+  }
+
+  final List<int> latestParts = clean(latest)
       .split('.')
-      .map((e) => int.tryParse(e) ?? 0)
+      .map((e) => int.tryParse(e.trim()) ?? 0)
       .toList();
-  final List<int> currentParts = current
+  final List<int> currentParts = clean(current)
       .split('.')
-      .map((e) => int.tryParse(e) ?? 0)
+      .map((e) => int.tryParse(e.trim()) ?? 0)
       .toList();
 
-  for (int i = 0; i < latestParts.length; i++) {
-    if (latestParts[i] > currentParts[i]) return true;
-    if (latestParts[i] < currentParts[i]) return false;
+  final int maxLength = latestParts.length > currentParts.length
+      ? latestParts.length
+      : currentParts.length;
+
+  for (int i = 0; i < maxLength; i++) {
+    final int l = i < latestParts.length ? latestParts[i] : 0;
+    final int c = i < currentParts.length ? currentParts[i] : 0;
+    if (l > c) return true;
+    if (l < c) return false;
   }
   return false;
 }
