@@ -11,7 +11,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
-import 'package:pscommunitymobileapp/core/auth/session_manager.dart';
 import 'package:pscommunitymobileapp/core/constants/di.dart';
 import 'package:pscommunitymobileapp/core/constants/app_lifecycle_observer.dart';
 import 'package:pscommunitymobileapp/core/localization/app_translations.dart';
@@ -43,7 +42,7 @@ Future<void> _bootstrap() async {
 
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     await DI.bootstrap();
-    
+
     AppLifecycleObserver.instance.init();
 
     if (kDebugMode) {
@@ -70,43 +69,37 @@ class PsCommunityApp extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
-          return Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) => Get.find<SessionManager>().userInteracted(),
-            onPointerMove: (_) => Get.find<SessionManager>().userInteracted(),
-            onPointerUp: (_) => Get.find<SessionManager>().userInteracted(),
-            child: Obx(
-              () => SafeArea(
-                top: false,
-                child: GetMaterialApp(
-                  title: LK.appTitle.tr,
-                  debugShowCheckedModeBanner: false,
-                  theme: AppTheme.light,
-                  translations: AppTranslations(localization.keys),
-                  locale: localization.currentLocale.value,
-                  fallbackLocale: Locale('en', 'US'),
-                  localizationsDelegates: const [
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                    GlobalCupertinoLocalizations.delegate,
-                  ],
-                  supportedLocales: const [
-                    Locale('en', 'US'),
-                    Locale('gu', 'IN'),
-                  ],
-                  initialRoute: Get.find<AuthState>().isAuthenticated.value
-                      ? AppRouter.postLoginSplash
-                      : AppRouter.login,
-                  navigatorObservers: [AppRouter.routeObserver],
-                  getPages: AppRouter.pages,
-                  builder: (context, child) {
-                    return Localizations.override(
-                      context: context,
-                      locale: const Locale('en', 'US'),
-                      child: child ?? const SizedBox.shrink(),
-                    );
-                  },
-                ),
+          return Obx(
+            () => SafeArea(
+              top: false,
+              child: GetMaterialApp(
+                title: LK.appTitle.tr,
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light,
+                translations: AppTranslations(localization.keys),
+                locale: localization.currentLocale.value,
+                fallbackLocale: Locale('en', 'US'),
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en', 'US'),
+                  Locale('gu', 'IN'),
+                ],
+                initialRoute: Get.find<AuthState>().isAuthenticated.value
+                    ? AppRouter.postLoginSplash
+                    : AppRouter.login,
+                navigatorObservers: [AppRouter.routeObserver],
+                getPages: AppRouter.pages,
+                builder: (context, child) {
+                  return Localizations.override(
+                    context: context,
+                    locale: const Locale('en', 'US'),
+                    child: child ?? const SizedBox.shrink(),
+                  );
+                },
               ),
             ),
           );

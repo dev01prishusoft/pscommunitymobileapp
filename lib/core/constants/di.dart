@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
-import 'package:pscommunitymobileapp/core/auth/session_manager.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -63,9 +62,6 @@ class DI {
 
         final authState = AuthState(tokenManager);
         Get.put(authState, permanent: true);
-        
-        final sessionManager = SessionManager(authState);
-        Get.put(sessionManager, permanent: true);
         
         final apiClient = ApiClient(
           tokenManager: tokenManager,
