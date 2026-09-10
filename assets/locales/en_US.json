@@ -497,5 +497,9 @@
     "Payment Filters": "Payment Filters",
     "Community Portal": "Community Portal",
     "Initiated Payments": "Initiated Payments",
-    "Completed Payments": "Completed Payments"
+    "Completed Payments": "Completed Payments",
+    "Access Restricted": "Access Restricted",
+    "This Samaj has not purchased the @module module.": "This Samaj has not purchased the @module module.",
+    "Events": "Events",
+    "events_title": "Events"
 }

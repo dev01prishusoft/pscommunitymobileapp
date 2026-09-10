@@ -16,6 +16,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 
 class DrawerUserController extends GetxController with WidgetsBindingObserver {
@@ -76,6 +77,7 @@ class AppDrawer extends StatelessWidget {
       top: false,
       bottom: true,
       child: Drawer(
+        backgroundColor: Colors.white,
         shape: BeveledRectangleBorder(),
         child: Column(
           children: [
@@ -173,14 +175,23 @@ class AppDrawer extends StatelessWidget {
                     title: Text(LK.findMember.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.findMember),
                   ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.favorite_outline,
-                      color: AppColors.black,
-                    ),
-                    title: Text(LK.marriage.tr),
-                    onTap: () => Get.toNamed<void>(AppRouter.marriage),
-                  ),
+                  Obx(() {
+                    if (Get.isRegistered<ModulePermissionService>()) {
+                      final isAccessible = ModulePermissionService.to
+                          .isAccessible(AppModule.matrimonial);
+                      if (!isAccessible) {
+                        return const SizedBox.shrink();
+                      }
+                    }
+                    return ListTile(
+                      leading: Icon(
+                        Icons.favorite_outline,
+                        color: AppColors.black,
+                      ),
+                      title: Text(LK.marriage.tr),
+                      onTap: () => Get.toNamed<void>(AppRouter.marriage),
+                    );
+                  }),
                   ListTile(
                     leading: Icon(Icons.edit_outlined, color: AppColors.black),
                     title: Text(LK.editProfile.tr),
@@ -212,6 +223,14 @@ class AppDrawer extends StatelessWidget {
                     ),
                     title: Text(LK.addedMembers.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.addedMembers),
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.event,
+                      color: AppColors.black,
+                    ),
+                    title: Text(LK.events_title.tr),
+                    onTap: () => Get.toNamed<void>(AppRouter.events),
                   ),
                   ListTile(
                     leading: Icon(
@@ -272,28 +291,32 @@ class AppDrawer extends StatelessWidget {
                       _showLogoutDialog(context, authState);
                     },
                   ),
-                  ListTile(
-                    titleAlignment: ListTileTitleAlignment.center,
-                    title: FutureBuilder<String>(
-                      future: PackageInfo.fromPlatform().then((packageInfo) {
-                        return packageInfo.version;
-                      }),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(
-                            'version ${snapshot.data}',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.grey,
-                            ),
-                            textAlign: TextAlign.center,
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    onTap: null,
+                  SizedBox(height: 15.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset("assets/images/logo.png", width: 25),
+                      SizedBox(width: 10.w),
+                      FutureBuilder<String>(
+                        future: PackageInfo.fromPlatform().then((packageInfo) {
+                          return packageInfo.version;
+                        }),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              'version ${snapshot.data}',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 15.h),
                 ],
               ),
             ),

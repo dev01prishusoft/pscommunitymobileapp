@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -202,14 +203,26 @@ class MarriageController extends GetxController {
           }
         }
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'MarriageController._fetchMyGotra failed',
+      );
+    }
   }
 
   Future<void> loadLocations() async {
     try {
       final s = await _familyRepository.getStates();
       states.assignAll(s);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'MarriageController.loadLocations failed',
+      );
+    }
   }
 
   Future<void> onStateChanged(String stateName) async {

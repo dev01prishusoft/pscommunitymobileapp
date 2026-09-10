@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 
@@ -58,8 +57,7 @@ class TokenManager {
         secondaryColor: results[6],
       );
       userPhoneRx.value = results[3] ?? '';
-    } catch (e) {
-      if (kDebugMode) {}
+    } catch (_) {
       authState.value = TokenPair();
     }
   }
@@ -102,8 +100,7 @@ class TokenManager {
         primaryColor: primaryColor ?? authState.value.primaryColor,
         secondaryColor: secondaryColor ?? authState.value.secondaryColor,
       );
-    } catch (e) {
-      if (kDebugMode) {}
+    } catch (_) {
       rethrow;
     }
   }
@@ -116,8 +113,7 @@ class TokenManager {
       
       AppColors.updateColors(null, null);
       Get.changeTheme(AppTheme.light);
-    } catch (e) {
-      if (kDebugMode) {}
+    } catch (_) {
       rethrow;
     }
   }

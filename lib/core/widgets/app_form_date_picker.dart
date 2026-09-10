@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 
@@ -39,7 +40,13 @@ class AppFormDatePicker extends StatelessWidget {
     if (parsedDate == null && controller.text.isNotEmpty) {
       try {
         parsedDate = DateFormat('dd-MM-yyyy').parse(controller.text);
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'AppFormDatePicker: failed to parse date "${controller.text}"',
+        );
+      }
     }
 
     final DateTime? picked = await showDatePicker(

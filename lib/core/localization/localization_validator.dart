@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 
 class LocalizationValidator {
   static Future<void> validate() async {
@@ -17,6 +18,12 @@ class LocalizationValidator {
       if (guDecoded is! Map<String, dynamic>) {
         throw Exception('Invalid localization JSON structure in gu_IN.json');
       }
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'LocalizationValidator.validate failed',
+      );
+    }
   }
 }

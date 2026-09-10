@@ -498,5 +498,9 @@
     "Representative": "પ્રતિનિધિ",
     "WhatsApp Support": "WhatsApp સપોર્ટ",
     "Email Support": "ઇમેઇલ સપોર્ટ",
-    "Payment Filters": "ચૂકવણી ફિલ્ટર્સ"
+    "Payment Filters": "ચૂકવણી ફિલ્ટર્સ",
+    "Access Restricted": "પ્રવેશ પ્રતિબંધિત",
+    "This Samaj has not purchased the @module module.": "આ સમાજે @module મોડ્યુલ ખરીદેલ નથી.",
+    "Events": "કાર્યક્રમો",
+    "events_title": "કાર્યક્રમો"
 }

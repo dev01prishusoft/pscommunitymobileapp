@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -33,6 +34,7 @@ class PaymentController extends GetxController {
   bool get isAmountFixed => selectedCategory.value?.isAmountFixed ?? false;
 
   final RxBool isProcessingPayment = false.obs;
+  final RxBool isProcessingRecurring = false.obs;
   final Rx<AppState> historyState = AppState.loading.obs;
   final RxList<PaymentItem> payments = <PaymentItem>[].obs;
   final RxString selectedYear = ''.obs;
@@ -97,7 +99,6 @@ class PaymentController extends GetxController {
     try {
       final data = await _repository.getDashboard();
       dashboard.value = data;
-      print(dashboard.value?.paidPayments.length);
       if (dashboard.value?.paidPayments.isEmpty ?? false) {
         dashboardState.value = AppState.empty;
       } else {
@@ -112,19 +113,39 @@ class PaymentController extends GetxController {
     try {
       final types = await _repository.getPaymentTypes();
       paymentTypes.assignAll(types);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.loadPaymentTypes failed',
+      );
+    }
   }
 
   Future<void> loadPaymentModes() async {
     try {
       final modes = await _repository.getPaymentModes();
       paymentModes.assignAll(modes);
-    } catch (_) {}
+      final onlineMode = modes.firstWhereOrNull(
+        (m) => m.name.trim().toLowerCase() == 'online',
+      );
+      if (onlineMode != null) {
+        selectedMode.value = onlineMode;
+      }
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.loadPaymentModes failed',
+      );
+    }
   }
 
   void resetPaymentForm() {
     selectedType.value = null;
-    selectedMode.value = null;
+    selectedMode.value = paymentModes.firstWhereOrNull(
+      (m) => m.name.trim().toLowerCase() == 'online',
+    );
     selectedCategory.value = null;
     categories.clear();
     enteredAmount.value = 0.0;
@@ -140,7 +161,13 @@ class PaymentController extends GetxController {
       try {
         final results = await _repository.getCategories(type.id);
         categories.assignAll(results);
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'PaymentController.onTypeChanged: getCategories failed for type ${type.id}',
+        );
+      }
     }
   }
 
@@ -154,13 +181,29 @@ class PaymentController extends GetxController {
       enteredAmount.value = cat.defaultAmount;
     }
   }
+  Future<void> initiateDirectPayment(double amount) async {
+    if (paymentTypes.isEmpty) await loadPaymentTypes();
+    if (paymentModes.isEmpty) await loadPaymentModes();
+
+    if (paymentTypes.isNotEmpty) {
+      await onTypeChanged(paymentTypes.first);
+    }
+    if (paymentModes.isNotEmpty) {
+      selectedMode.value = paymentModes.first;
+    }
+    if (categories.isNotEmpty) {
+      selectedCategory.value = categories.first;
+    }
+
+    await initiatePayment(customAmount: amount);
+  }
 
   Future<void> initiatePayment({
     int? adminPaymentRequestId,
     double? customAmount,
     bool isRecurring = false,
   }) async {
-    if (isProcessingPayment.value) return;
+    if (isProcessingPayment.value || isProcessingRecurring.value) return;
 
     final amount = customAmount ?? enteredAmount.value;
 
@@ -216,7 +259,11 @@ class PaymentController extends GetxController {
       }
     }
 
-    isProcessingPayment.value = true;
+    if (isRecurring) {
+      isProcessingRecurring.value = true;
+    } else {
+      isProcessingPayment.value = true;
+    }
     _pendingAdminRequestId = adminPaymentRequestId;
     _isCurrentPaymentRecurring = isRecurring;
 
@@ -233,6 +280,8 @@ class PaymentController extends GetxController {
             isErrorMessage: true,
           ),
         ).show();
+        isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
         return;
       }
 
@@ -263,6 +312,7 @@ class PaymentController extends GetxController {
           ),
         ).show();
         isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
         return;
       }
 
@@ -316,6 +366,7 @@ class PaymentController extends GetxController {
         ),
       ).show();
       isProcessingPayment.value = false;
+      isProcessingRecurring.value = false;
       _pendingAdminRequestId = null;
     }
   }
@@ -382,6 +433,7 @@ class PaymentController extends GetxController {
       ).show();
     } finally {
       isProcessingPayment.value = false;
+      isProcessingRecurring.value = false;
       _pendingAdminRequestId = null;
     }
   }
@@ -404,6 +456,7 @@ class PaymentController extends GetxController {
 
     _showErrorSnackbar(message);
     isProcessingPayment.value = false;
+    isProcessingRecurring.value = false;
     _pendingAdminRequestId = null;
   }
 
@@ -444,7 +497,13 @@ class PaymentController extends GetxController {
     try {
       final results = await _repository.getCategories(typeId);
       historyCategories.assignAll(results);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.fetchHistoryCategories failed for type $typeId',
+      );
+    }
   }
 
   Future<void> onHistoryTypeChanged(PaymentType? type) async {
@@ -492,7 +551,12 @@ class PaymentController extends GetxController {
         }
         historyState.value = payments.isEmpty ? AppState.empty : AppState.data;
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.loadHistory failed',
+      );
       historyState.value = AppState.error;
     }
   }
@@ -521,7 +585,12 @@ class PaymentController extends GetxController {
           _hasMoreData = false;
         }
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.fetchMoreHistory failed',
+      );
       _currentPage--;
     }
 
@@ -540,7 +609,13 @@ class PaymentController extends GetxController {
     try {
       final statuses = await _repository.getPaymentStatuses();
       paymentStatuses.assignAll(statuses);
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.loadPaymentStatuses failed',
+      );
+    }
   }
 
   void _showErrorSnackbar(String message) {

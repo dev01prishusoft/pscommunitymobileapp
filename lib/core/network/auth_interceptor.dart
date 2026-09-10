@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 
@@ -31,13 +33,22 @@ class AuthInterceptor extends Interceptor {
       if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenNearExpiry) {
         try {
           await _refreshSingleFlight(_tokenManager.refreshToken!);
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'AuthInterceptor.onRequest: proactive refresh single flight failed',
+          );
+        }
       }
     }
 
-    final token = _tokenManager.accessToken;
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+    final existingAuth = options.headers['Authorization'];
+    if (existingAuth == null || existingAuth.toString().isEmpty) {
+      final token = _tokenManager.accessToken;
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -85,8 +96,7 @@ class AuthInterceptor extends Interceptor {
       } else {
         _onAuthFailure();
       }
-    } catch (e) {
-      if (kDebugMode) {}
+    } catch (_) {
       _onAuthFailure();
     }
 
@@ -127,13 +137,17 @@ class AuthInterceptor extends Interceptor {
           refresh,
           isDefaultPassword: _tokenManager.isDefaultPassword,
         );
+
+        final rawModules = authData['modules'] ?? authData['user']?['modules'];
+        if (rawModules != null && Get.isRegistered<ModulePermissionService>()) {
+          Get.find<ModulePermissionService>().updateFromRawList(rawModules);
+        }
+
         c.complete(access);
       } else {
-        if (kDebugMode) {}
         c.complete(null);
       }
     } catch (e) {
-      if (kDebugMode) {}
       c.completeError(e);
     } finally {
       _refreshCompleter = null;

@@ -1,0 +1,14 @@
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "build/**"
+  errors:
+    empty_catches: error
+
+linter:
+  rules:
+    empty_catches: true
+    avoid_empty_else: true
+    cancel_subscriptions: true
+    close_sinks: true

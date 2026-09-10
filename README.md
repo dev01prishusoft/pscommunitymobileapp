@@ -27,20 +27,10 @@ flutter test
 ```
 
 ### Static Analysis
-Before committing code, verify the absence of invalid translation uses and analyzer warnings:
+Before committing code, verify the absence of analyzer warnings:
 
 ```bash
-# Check for analyzer errors
 flutter analyze
-
-# Scan for unsafe .tr bindings in UI files
-dart run tool/check_invalid_tr_usage.dart
-
-# Check for duplicate localization keys
-dart run tool/check_duplicate_lk_values.dart
-
-# Ensure no test files reside under lib/
-dart run tool/check_no_test_files_in_lib.dart
 ```
 
 ## Localization

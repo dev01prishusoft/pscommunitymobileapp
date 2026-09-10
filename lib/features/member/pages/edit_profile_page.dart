@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
@@ -49,11 +50,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadMemberData() async {
-    try {
-      final tokenManager = Get.find<TokenManager>();
-      final memberId = tokenManager.memberId;
-      if (memberId == null) return;
+    final tokenManager = Get.find<TokenManager>();
+    final memberId = tokenManager.memberId;
+    if (memberId == null) return;
 
+    try {
       final apiClient = Get.find<ApiClient>();
       final response = await apiClient.getParsed<Member>(
         '/api/v1/member/$memberId',
@@ -64,7 +65,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (member != null) {
         controller.loadFromMember(member);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EditProfilePage._loadMemberProfile failed for member $memberId',
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -2751,7 +2757,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             if (dobDate != null && year < dobDate.year) {
                               return 'Passing Year cannot be before year of birth';
                             }
-                          } catch (_) {}
+                          } catch (e, stack) {
+                            CrashReporter.recordError(
+                              e,
+                              stack,
+                              reason: 'EditProfilePage passing year date parse failed',
+                            );
+                          }
                         }
                       }
                       return null;

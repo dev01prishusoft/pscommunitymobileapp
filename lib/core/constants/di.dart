@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -19,6 +20,14 @@ import 'package:pscommunitymobileapp/features/business/repositories/business_rep
 import 'package:pscommunitymobileapp/features/business/controllers/business_controller.dart';
 import 'package:pscommunitymobileapp/features/committee/repositories/committee_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/event_registration_controller.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/my_events_controller.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/event_attendance_controller.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/events_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository.dart';
+import 'package:pscommunitymobileapp/features/events/repositories/event_attendance_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/repositories/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
@@ -47,13 +56,21 @@ class DI {
         Get.put(secureStorage, permanent: true);
         final tokenManager = TokenManager(secureStorage);
         await tokenManager.bootstrap();
-        
+
         AppColors.updateColors(
           tokenManager.authState.value.primaryColor,
           tokenManager.authState.value.secondaryColor,
         );
-        
+
         Get.put(tokenManager, permanent: true);
+
+        final modulePermissionStorage = ModulePermissionStorage(secureStorage);
+        Get.put(modulePermissionStorage, permanent: true);
+        final modulePermissionService = ModulePermissionService(
+          storage: modulePermissionStorage,
+        );
+        await modulePermissionService.bootstrap();
+        Get.put(modulePermissionService, permanent: true);
 
         final connectivityPlugin = Connectivity();
         final connectivity = ConnectivityService(
@@ -63,10 +80,10 @@ class DI {
 
         final authState = AuthState(tokenManager);
         Get.put(authState, permanent: true);
-        
+
         final sessionManager = SessionManager(authState);
         Get.put(sessionManager, permanent: true);
-        
+
         final apiClient = ApiClient(
           tokenManager: tokenManager,
           connectivity: connectivity,
@@ -74,10 +91,16 @@ class DI {
         );
         Get.put(apiClient, permanent: true);
 
+        modulePermissionService.attachApiClient(apiClient);
+
         final localization = LocalizationService(secureStorage);
         await localization.bootstrap();
         Get.put(localization, permanent: true);
-        final authRepository = AuthRepositoryImpl(apiClient, tokenManager);
+        final authRepository = AuthRepositoryImpl(
+          apiClient,
+          tokenManager,
+          modulePermissionService,
+        );
         final loginUseCase = LoginUseCase(authRepository);
         Get.put(loginUseCase, permanent: true);
         Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
@@ -85,7 +108,10 @@ class DI {
         final memberRepository = MemberRepositoryImpl(apiClient);
         final familyRepository = FamilyRepositoryImpl(apiClient);
         Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
-        Get.lazyPut(() => FindMemberController(memberRepository, familyRepository), fenix: true);
+        Get.lazyPut(
+          () => FindMemberController(memberRepository, familyRepository),
+          fenix: true,
+        );
         final marriageRepository = MarriageRepositoryImpl(apiClient);
         Get.lazyPut(
           () => MarriageController(
@@ -96,13 +122,18 @@ class DI {
           fenix: true,
         );
         final committeeRepository = CommitteeRepositoryImpl(apiClient);
-        Get.lazyPut(() => CommitteeController(committeeRepository), fenix: true);
+        Get.lazyPut(
+          () => CommitteeController(committeeRepository),
+          fenix: true,
+        );
         final occupationRepository = OccupationRepositoryImpl(apiClient);
         Get.lazyPut(
           () => OccupationController(occupationRepository, familyRepository),
           fenix: true,
         );
-        final PaymentRepository paymentRepository = PaymentRepositoryImpl(apiClient);
+        final PaymentRepository paymentRepository = PaymentRepositoryImpl(
+          apiClient,
+        );
         Get.lazyPut(() => PaymentController(paymentRepository), fenix: true);
         final businessRepository = BusinessRepositoryImpl(apiClient);
         Get.lazyPut(() => BusinessController(businessRepository), fenix: true);
@@ -111,19 +142,37 @@ class DI {
           SamajController(samajRepository),
           permanent: true,
         );
-        
+
         Get.lazyPut(() => BankAccountController(samajRepository), fenix: true);
         Get.lazyPut(() => SupportController(apiClient), fenix: true);
         Get.lazyPut(() => HomeController(), fenix: true);
         Get.lazyPut(() => ShareController(apiClient), fenix: true);
-        
+        final eventsRepository = EventsRepositoryImpl(apiClient);
+        Get.lazyPut<EventsRepositories>(() => eventsRepository, fenix: true);
+        Get.lazyPut(() => EventsController(eventsRepository), fenix: true);
+        Get.lazyPut(
+          () => EventRegistrationController(repository: eventsRepository),
+          fenix: true,
+        );
+        Get.lazyPut(() => MyEventsController(eventsRepository), fenix: true);
+        final eventAttendanceRepository =
+            EventAttendanceRepositoryImpl(apiClient);
+        Get.lazyPut<EventAttendanceRepository>(
+          () => eventAttendanceRepository,
+          fenix: true,
+        );
+        Get.lazyPut(
+          () => EventAttendanceController(eventAttendanceRepository),
+          fenix: true,
+        );
+
         final pushNotificationService = PushNotificationService(apiClient);
         await pushNotificationService.init();
-        Get.put(pushNotificationService, permanent: true);   
+        Get.put(pushNotificationService, permanent: true);
 
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
-        }   
+        }
       }).timeout(const Duration(seconds: 15));
     } catch (e) {
       rethrow;
