@@ -24,11 +24,44 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
   late final TextEditingController amountController;
   late final Worker _amountListener;
   final _formKey = GlobalKey<FormState>();
+  final _amountError = ValueNotifier<String>('');
+
+  void _validateAmount(String? val) {
+    if (val == null || val.isEmpty) {
+      _amountError.value = LK.fieldRequired.tr;
+      return;
+    }
+    final amt = double.tryParse(val);
+    if (amt == null || amt <= 0) {
+      _amountError.value = LK.amountMustBeGreaterThanZero.tr;
+      return;
+    }
+    final cat = controller.selectedCategory.value;
+    if (cat != null && !controller.isAmountFixed) {
+      if (cat.minAmount > 0 && amt < cat.minAmount) {
+        _amountError.value =
+            '${LK.amountMustBeAtLeast.tr} ${cat.minAmount.toInt()}';
+        return;
+      }
+      if (cat.maxAmount > 0 && amt > cat.maxAmount) {
+        _amountError.value =
+            '${LK.amountCannotExceed.tr} ${cat.maxAmount.toInt()}';
+        return;
+      }
+    }
+    _amountError.value = '';
+  }
 
   @override
   void initState() {
     super.initState();
     controller.resetPaymentForm();
+    if (controller.paymentModes.isEmpty) {
+      controller.loadPaymentModes();
+    }
+    if (controller.paymentTypes.isEmpty) {
+      controller.loadPaymentTypes();
+    }
 
     amountController = TextEditingController();
     _amountListener = ever(controller.enteredAmount, (double val) {
@@ -51,6 +84,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
   void dispose() {
     _amountListener.dispose();
     amountController.dispose();
+    _amountError.dispose();
     super.dispose();
   }
 
@@ -115,7 +149,10 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (cat) => controller.onCategoryChanged(cat),
+                          onChanged: (cat) {
+                            controller.onCategoryChanged(cat);
+                            _validateAmount(amountController.text);
+                          },
                           isEnabled: controller.selectedType.value != null,
                         ),
                       ),
@@ -167,96 +204,106 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                 ),
                                 SizedBox(width: 6.w),
                                 Expanded(
-                                  child: Obx(() {
-                                    final isFixed = controller.isAmountFixed;
-                                    return TextFormField(
-                                      controller: amountController,
-                                      cursorColor: AppColors.primary,
-                                      readOnly: isFixed,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                            decimal: true,
+                                  // Wrapping TextFormField inside Obx causes it to
+                                  // be recreated on rebuild, detaching from FormState.
+                                  // Use IgnorePointer+Obx to control readOnly safely.
+                                  child: Obx(
+                                    () => IgnorePointer(
+                                      ignoring: controller.isAmountFixed,
+                                      child: TextFormField(
+                                        key: const ValueKey('amountField'),
+                                        controller: amountController,
+                                        cursorColor: AppColors.primary,
+                                        keyboardType:
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'^\d*\.?\d{0,2}'),
                                           ),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d*\.?\d{0,2}'),
-                                        ),
-                                        LengthLimitingTextInputFormatter(8),
-                                        TextInputFormatter.withFunction((
-                                          oldValue,
-                                          newValue,
-                                        ) {
-                                          if (newValue.text.isEmpty)
+                                          LengthLimitingTextInputFormatter(8),
+                                          TextInputFormatter.withFunction((
+                                            oldValue,
+                                            newValue,
+                                          ) {
+                                            if (newValue.text.isEmpty)
+                                              return newValue;
+                                            if (newValue.text == '.')
+                                              return newValue;
+                                            final val = double.tryParse(
+                                              newValue.text,
+                                            );
+                                            if (val == null) return oldValue;
+                                            final maxAmount =
+                                                controller
+                                                    .selectedCategory
+                                                    .value
+                                                    ?.maxAmount ??
+                                                0;
+                                            if (maxAmount > 0 &&
+                                                val > maxAmount) {
+                                              return oldValue;
+                                            }
                                             return newValue;
-                                          if (newValue.text == '.')
-                                            return newValue;
-                                          final val = double.tryParse(
-                                            newValue.text,
-                                          );
-                                          if (val == null) return oldValue;
-                                          final maxAmount =
-                                              controller
-                                                  .selectedCategory
-                                                  .value
-                                                  ?.maxAmount ??
-                                              0;
-                                          if (maxAmount > 0 &&
-                                              val > maxAmount) {
-                                            return oldValue;
-                                          }
-                                          return newValue;
-                                        }),
-                                      ],
-                                      onChanged: (val) =>
+                                          }),
+                                        ],
+                                        onChanged: (val) {
                                           controller.enteredAmount.value =
-                                              double.tryParse(val) ?? 0,
-                                      validator: (val) {
-                                        if (val == null || val.isEmpty)
-                                          return LK.fieldRequired.tr;
-                                        final amt = double.tryParse(val);
-                                        if (amt == null || amt <= 0)
-                                          return LK
-                                              .amountMustBeGreaterThanZero
-                                              .tr;
-                                        final cat =
-                                            controller.selectedCategory.value;
-                                        if (cat != null &&
-                                            !controller.isAmountFixed) {
-                                          if (cat.minAmount > 0 &&
-                                              amt < cat.minAmount)
-                                            return '${LK.amountMustBeAtLeast.tr}${cat.minAmount.toInt()}';
-                                          if (cat.maxAmount > 0 &&
-                                              amt > cat.maxAmount)
-                                            return '${LK.amountCannotExceed.tr}${cat.maxAmount.toInt()}';
-                                        }
-                                        return null;
-                                      },
-                                      style: AppTextStyles.displaySmall
-                                          .copyWith(
-                                            color: isFixed
-                                                ? AppColors.grey.shade600
-                                                : AppColors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        errorBorder: InputBorder.none,
-                                        focusedErrorBorder: InputBorder.none,
-                                        filled: false,
-                                        contentPadding: EdgeInsets.zero,
-                                        hintText: '0',
-                                        hintStyle: AppTextStyles.displaySmall
+                                              double.tryParse(val) ?? 0;
+                                          _validateAmount(val);
+                                        },
+                                        validator: (val) {
+                                          if (val == null || val.isEmpty)
+                                            return LK.fieldRequired.tr;
+                                          final amt = double.tryParse(val);
+                                          if (amt == null || amt <= 0)
+                                            return LK
+                                                .amountMustBeGreaterThanZero
+                                                .tr;
+                                          final cat =
+                                              controller.selectedCategory.value;
+                                          if (cat != null &&
+                                              !controller.isAmountFixed) {
+                                            if (cat.minAmount > 0 &&
+                                                amt < cat.minAmount)
+                                              return '${LK.amountMustBeAtLeast.tr} ${cat.minAmount.toInt()}';
+                                            if (cat.maxAmount > 0 &&
+                                                amt > cat.maxAmount)
+                                              return '${LK.amountCannotExceed.tr} ${cat.maxAmount.toInt()}';
+                                          }
+                                          return null;
+                                        },
+                                        style: AppTextStyles.displaySmall
                                             .copyWith(
-                                              color: AppColors.grey.shade600,
+                                              color: controller.isAmountFixed
+                                                  ? AppColors.grey.shade600
+                                                  : AppColors.black,
                                               fontWeight: FontWeight.bold,
                                             ),
-                                        errorStyle: AppTextStyles.bodySmall
-                                            .copyWith(color: Colors.red),
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          focusedErrorBorder: InputBorder.none,
+                                          filled: false,
+                                          contentPadding: EdgeInsets.zero,
+                                          hintText: '0',
+                                          hintStyle: AppTextStyles.displaySmall
+                                              .copyWith(
+                                                color: AppColors.grey.shade600,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                          // Error shown below chips
+                                          errorStyle: const TextStyle(
+                                            height: 0,
+                                            fontSize: 0,
+                                          ),
+                                        ),
                                       ),
-                                    );
-                                  }),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -268,40 +315,35 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                           ],
                         ),
                       ),
-                      Obx(() {
-                        final cat = controller.selectedCategory.value;
-                        if (cat != null && !controller.isAmountFixed) {
-                          final min = cat.minAmount;
-                          final max = cat.maxAmount;
-                          if (min > 0 || max > 0) {
-                            return Padding(
-                              padding: EdgeInsets.only(top: 12.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (min > 0)
-                                    Text(
-                                      '${LK.amountMustBeAtLeast.tr}${min.toInt()}',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                      // Reactive error shown below chips
+                      ValueListenableBuilder<String>(
+                        valueListenable: _amountError,
+                        builder: (context, error, _) {
+                          if (error.isEmpty) return const SizedBox.shrink();
+                          return Padding(
+                            padding: EdgeInsets.only(top: 8.h),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 13,
+                                  color: Colors.red.shade400,
+                                ),
+                                const SizedBox(width: 5),
+                                Flexible(
+                                  child: Text(
+                                    error,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: Colors.red.shade500,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  if (max > 0)
-                                    Text(
-                                      '${LK.amountCannotExceed.tr}${max.toInt()}',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            );
-                          }
-                        }
-                        return SizedBox.shrink();
-                      }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -323,6 +365,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                         onTap: isAnyLoading
                             ? null
                             : () {
+                                _validateAmount(amountController.text);
                                 if (_formKey.currentState?.validate() ??
                                     false) {
                                   controller.initiatePayment(isRecurring: true);
@@ -369,6 +412,7 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                             controller.isProcessingRecurring.value)
                         ? null
                         : () {
+                            _validateAmount(amountController.text);
                             if (_formKey.currentState?.validate() ?? false) {
                               controller.initiatePayment();
                             }

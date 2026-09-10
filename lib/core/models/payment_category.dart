@@ -29,4 +29,14 @@ class PaymentCategory {
   final double maxAmount;
   final bool isRecurring;
   final bool isAmountFixed;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PaymentCategory &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

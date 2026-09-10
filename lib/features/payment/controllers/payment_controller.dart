@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -85,6 +86,19 @@ class PaymentController extends GetxController {
       loadPaymentStatuses(),
       loadHistory(),
     ]);
+
+    if (Get.isRegistered<LocalizationService>()) {
+      ever(Get.find<LocalizationService>().currentLocale, (_) async {
+        await Future.wait([
+          loadPaymentTypes(),
+          loadPaymentModes(),
+          loadPaymentStatuses(),
+        ]);
+        if (selectedMode.value == null && paymentModes.isNotEmpty) {
+          selectedMode.value = _findDefaultOnlineMode(paymentModes);
+        }
+      });
+    }
   }
 
   @override
@@ -122,16 +136,24 @@ class PaymentController extends GetxController {
     }
   }
 
+  PaymentMode? _findDefaultOnlineMode(List<PaymentMode> modes) {
+    if (modes.isEmpty) return null;
+    return modes.firstWhereOrNull((m) {
+          final n = m.name.trim().toLowerCase();
+          return n == 'online' ||
+              n.contains('online') ||
+              n.contains('ઓનલાઇન') ||
+              n.contains('ઓનલાઈન');
+        }) ??
+        modes.first;
+  }
+
   Future<void> loadPaymentModes() async {
     try {
       final modes = await _repository.getPaymentModes();
       paymentModes.assignAll(modes);
-      final onlineMode = modes.firstWhereOrNull(
-        (m) => m.name.trim().toLowerCase() == 'online',
-      );
-      if (onlineMode != null) {
-        selectedMode.value = onlineMode;
-      }
+      // Auto-select 'online' mode; fallback to first available mode
+      selectedMode.value = _findDefaultOnlineMode(modes);
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
@@ -143,9 +165,7 @@ class PaymentController extends GetxController {
 
   void resetPaymentForm() {
     selectedType.value = null;
-    selectedMode.value = paymentModes.firstWhereOrNull(
-      (m) => m.name.trim().toLowerCase() == 'online',
-    );
+    selectedMode.value = _findDefaultOnlineMode(paymentModes);
     selectedCategory.value = null;
     categories.clear();
     enteredAmount.value = 0.0;
@@ -218,17 +238,8 @@ class PaymentController extends GetxController {
         _showErrorSnackbar(LK.pleaseSelectPaymentType.tr);
         return;
       }
-      if (selectedMode.value == null) {
-        _showErrorSnackbar(LK.pleaseSelectPaymentMode.tr);
-        return;
-      }
       if (categoryId == null) {
         _showErrorSnackbar(LK.pleaseSelectCategory.tr);
-        return;
-      }
-    } else {
-      if (selectedMode.value == null) {
-        _showErrorSnackbar(LK.pleaseSelectPaymentMode.tr);
         return;
       }
     }
@@ -285,7 +296,31 @@ class PaymentController extends GetxController {
         return;
       }
 
-      final int paymentModeId = selectedMode.value?.id ?? 0;
+      if (paymentModes.isEmpty) {
+        await loadPaymentModes();
+      }
+      if (selectedMode.value == null && paymentModes.isNotEmpty) {
+        selectedMode.value = _findDefaultOnlineMode(paymentModes);
+      }
+
+      final int paymentModeId = selectedMode.value?.id ??
+          _findDefaultOnlineMode(paymentModes)?.id ??
+          0;
+
+      if (paymentModeId == 0) {
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.pleaseSelectPaymentMode.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
+        isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
+        return;
+      }
+
       final int paymentStatusId = 0;
 
       final order = await _repository.createOrder(
@@ -296,7 +331,7 @@ class PaymentController extends GetxController {
         memberId: memberId,
         paymentModeId: paymentModeId,
         paymentStatusId: paymentStatusId,
-        description: LK.paymentForCommunity.tr,
+        description: LK.paymentForCommunity,
         isRecurring: isRecurring,
       );
 
@@ -316,9 +351,13 @@ class PaymentController extends GetxController {
         return;
       }
 
-      final String samajName = Get.isRegistered<SamajController>()
-          ? (Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr)
-          : LK.samajName.tr;
+      String samajName = '';
+      if (Get.isRegistered<SamajController>()) {
+        samajName = Get.find<SamajController>().samaj.value?.name ?? '';
+      }
+      if (samajName.trim().isEmpty) {
+        samajName = 'PS Community';
+      }
 
       final String? samajLogoUrl = Get.isRegistered<SamajController>()
           ? Get.find<SamajController>().samaj.value?.logoUrl
@@ -328,7 +367,7 @@ class PaymentController extends GetxController {
         'key': key,
         'amount': order.amountInPaise,
         'name': samajName,
-        'description': LK.paymentForCommunity.tr,
+        'description': LK.paymentForCommunity,
         'timeout': 300,
         if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
           'image': samajLogoUrl,
