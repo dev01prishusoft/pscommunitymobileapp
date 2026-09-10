@@ -88,7 +88,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   }
 
   String _formatDate(dynamic dateStr) {
-    if (dateStr == null) return 'N/A';
+    if (dateStr == null) return '-';
     final str = dateStr.toString();
     try {
       DateTime dt;
@@ -124,11 +124,11 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
       'name':
           (data['name'] ?? data['memberName'] ?? data['fullName'])
               ?.toString() ??
-          'N/A',
-      'memberNo': data['memberNo']?.toString() ?? 'N/A',
+          '-',
+      'memberNo': data['memberNo']?.toString() ?? '-',
       'planName':
           (data['planName'] ?? data['plan'])?.toString() ??
-          (_planNameArg.isNotEmpty ? _planNameArg : 'N/A'),
+          (_planNameArg.isNotEmpty ? _planNameArg : '-'),
       'isRecurring':
           (data['isRecurring']?.toString() == 'true' ||
               data['isRecurring'] == true ||
@@ -137,30 +137,30 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           : (data['isRecurring']?.toString() == 'false' ||
                 data['isRecurring'] == false)
           ? LK.no.tr
-          : 'N/A',
+          : '-',
       'recurringPaymentType':
           (data['recurringPaymentType'] ??
                   data['recurringType'] ??
                   data['recurringTypeName'] ??
                   data['recurringPaymentTypeName'])
               ?.toString() ??
-          'N/A',
+          '-',
       'type':
           ((data['type'] ?? data['paymentType'] ?? data['paymentTypeName'])
                       ?.toString() ??
-                  'N/A')
+                  '-')
               .tr,
       'category':
           (data['category'] ??
                   data['paymentCategory'] ??
                   data['paymentCategoryName'])
               ?.toString() ??
-          'N/A',
-      'amount': (data['amount'] ?? data['paymentAmount'])?.toString() ?? 'N/A',
+          '-',
+      'amount': (data['amount'] ?? data['paymentAmount'])?.toString() ?? '-',
       'mode':
           ((data['mode'] ?? data['paymentMode'] ?? data['paymentModeName'])
                       ?.toString() ??
-                  'N/A')
+                  '-')
               .tr,
       'status':
           ((data['status'] ??
@@ -168,7 +168,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   data['subscriptionStatus'] ??
                   data['paymentStatusName'])
               ?.toString() ??
-          'N/A'),
+          '-'),
       'transactionId':
           (data['transactionId'] ??
                   data['paymentTransactionId'] ??
@@ -177,8 +177,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   data['referenceNo'] ??
                   data['bankTransactionId'])
               ?.toString() ??
-          'N/A',
-      'receiptNo': data['receiptNo']?.toString() ?? 'N/A',
+          '-',
+      'receiptNo': data['receiptNo']?.toString() ?? '-',
     };
   }
 
@@ -317,7 +317,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                       ),
                       _buildReceiptSectionHeader(LK.paymentDetailsLabel.tr),
 
-                      if (data['recurringPaymentType'] != 'N/A' &&
+                      if (data['recurringPaymentType'] != '-' &&
                           data['recurringPaymentType']!.isNotEmpty)
                         _buildInfoRow(
                           LK.recurringTypeLabel.tr,
@@ -326,7 +326,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                       _buildInfoRow(LK.typeLabel.tr, data['type']!),
                       _buildInfoRow(LK.modeLabel.tr, data['mode']!),
                       _buildInfoRow(LK.statusLabel.tr, data['status']!),
-                      if (data['transactionId'] != 'N/A' &&
+                      if (data['transactionId'] != '-' &&
                           data['transactionId']!.isNotEmpty)
                         _buildInfoRow(
                           LK.transactionIdLabel.tr,
@@ -637,13 +637,13 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                   _buildPdfTableCell(LK.typeLabel.tr, data['type']!),
                   _buildPdfTableCell(LK.modeLabel.tr, data['mode']!),
 
-                  if (data['recurringPaymentType'] != 'N/A' &&
+                  if (data['recurringPaymentType'] != '-' &&
                       data['recurringPaymentType']!.isNotEmpty)
                     _buildPdfTableCell(
                       LK.recurringTypeLabel.tr,
                       data['recurringPaymentType']!.tr,
                     ),
-                  if (data['transactionId'] != 'N/A' &&
+                  if (data['transactionId'] != '-' &&
                       data['transactionId']!.isNotEmpty)
                     _buildPdfTableCell(
                       LK.transactionIdLabel.tr,

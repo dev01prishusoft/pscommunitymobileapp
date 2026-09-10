@@ -209,7 +209,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                   ),
                   _buildDivider(),
                   _buildDetailItem(
-                    icon: Icons.code_rounded,
+                    icon: Icons.password,
                     label: LK.ifscCodeLabel.tr,
                     value: bank.ifscCode ?? '-',
                     showCopyAction: true,

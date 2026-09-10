@@ -183,7 +183,7 @@ class LK {
   static const String close = 'Close';
   static const String gender = 'Gender';
   static const String birthDate = 'Date of Birth';
-  static const String na = 'N/A';
+  static const String na = '-';
   static const String occupationLabel = 'Occupation';
   static const String occupation = 'Occupation';
   static const String occupationType = 'Occupation Type';

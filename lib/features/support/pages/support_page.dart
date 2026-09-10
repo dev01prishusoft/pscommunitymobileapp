@@ -146,7 +146,7 @@ class SupportPage extends StatelessWidget {
                                 child: ExpansionTile(
                                   tilePadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
-                                    vertical: 8,
+                                    vertical: 6,
                                   ),
                                   iconColor: AppColors.primary,
                                   collapsedIconColor: Colors.grey.shade400,
@@ -164,12 +164,38 @@ class SupportPage extends StatelessWidget {
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
-                                  subtitle: Text(
-                                    LK.representative.tr,
-                                    style: AppTextStyles.labelSmall.copyWith(
-                                      color: Colors.grey.shade500,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                  // Representative label + View Profile in one row
+                                  subtitle: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        LK.representative.tr,
+                                        style: AppTextStyles.labelSmall
+                                            .copyWith(
+                                              color: Colors.grey.shade500,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.toNamed<void>(
+                                            AppRouter.memberProfile,
+                                            arguments: {
+                                              'memberId': member.memberId,
+                                            },
+                                          );
+                                        },
+                                        child: Text(
+                                          LK.viewProfile.tr,
+                                          style: AppTextStyles.labelSmall
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   childrenPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -179,105 +205,84 @@ class SupportPage extends StatelessWidget {
                                       color: Colors.grey.shade100,
                                       height: 1,
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(height: 10),
-                                            if (member.mobileNumber != null &&
-                                                member
-                                                    .mobileNumber!
-                                                    .isNotEmpty) ...[
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.phone_rounded,
-                                                    size: 16,
-                                                    color: Colors.grey.shade600,
+                                    // Phone + Email in one horizontal row
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          if (member.mobileNumber != null &&
+                                              member
+                                                  .mobileNumber!
+                                                  .isNotEmpty) ...[
+                                            Icon(
+                                              Icons.phone_rounded,
+                                              size: 15,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  controller.launchSafeUrl(
+                                                    'tel:${member.mobileNumber}',
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  GestureDetector(
-                                                    onTap: () => controller
-                                                        .launchSafeUrl(
-                                                          'tel:${member.mobileNumber}',
-                                                        ),
-                                                    child: Text(
-                                                      member.mobileNumber!,
-                                                      style: AppTextStyles
-                                                          .bodyMedium
-                                                          .copyWith(
-                                                            color:
-                                                                AppColors.blue,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
+                                              child: Text(
+                                                member.mobileNumber!,
+                                                style: AppTextStyles.bodyMedium
+                                                    .copyWith(
+                                                      color: AppColors.blue,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
-                                                  ),
-                                                ],
                                               ),
-                                            ],
-                                            if (member.email != null &&
-                                                member.email!.isNotEmpty) ...[
-                                              const SizedBox(height: 8),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.email_rounded,
-                                                    size: 16,
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  GestureDetector(
-                                                    onTap: () => controller
-                                                        .launchSafeUrl(
-                                                          'mailto:${member.email}',
-                                                        ),
-                                                    child: Text(
-                                                      member.email!,
-                                                      style: AppTextStyles
-                                                          .bodyMedium
-                                                          .copyWith(
-                                                            color:
-                                                                AppColors.blue,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                            ),
                                           ],
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Get.toNamed<void>(
-                                              AppRouter.memberProfile,
-                                              arguments: {
-                                                'memberId': member.memberId,
-                                              },
-                                            );
-                                          },
-                                          style: TextButton.styleFrom(
-                                            foregroundColor: AppColors.primary,
-                                            textStyle: AppTextStyles.labelLarge
-                                                .copyWith(
-                                                  fontWeight: FontWeight.w800,
+                                          if (member.mobileNumber != null &&
+                                              member.mobileNumber!.isNotEmpty &&
+                                              member.email != null &&
+                                              member.email!.isNotEmpty)
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                              ),
+                                              width: 1,
+                                              height: 14,
+                                              color: Colors.grey.shade300,
+                                            ),
+                                          if (member.email != null &&
+                                              member.email!.isNotEmpty) ...[
+                                            Icon(
+                                              Icons.email_rounded,
+                                              size: 15,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Flexible(
+                                              child: GestureDetector(
+                                                onTap: () =>
+                                                    controller.launchSafeUrl(
+                                                      'mailto:${member.email}',
+                                                    ),
+                                                child: Text(
+                                                  member.email!,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppTextStyles
+                                                      .bodyMedium
+                                                      .copyWith(
+                                                        color: AppColors.blue,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                 ),
-                                            padding: EdgeInsets.zero,
-                                            minimumSize: const Size(0, 0),
-                                            tapTargetSize: MaterialTapTargetSize
-                                                .shrinkWrap,
-                                          ),
-                                          child: const Text('View Profile'),
-                                        ),
-                                      ],
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
                                     ),
-                                    10.verticalSpace,
                                   ],
                                 ),
                               ),

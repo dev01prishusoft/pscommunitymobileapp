@@ -5,7 +5,7 @@ String formatDate(DateTime date, {String locale = 'en_US'}) {
   return formatter.format(date);
 }
 
-String formatDateString(String? isoDate, {String format = 'dd/MM/yyyy', String fallback = 'N/A'}) {
+String formatDateString(String? isoDate, {String format = 'dd/MM/yyyy', String fallback = '-'}) {
   if (isoDate == null || isoDate.isEmpty) return fallback;
   try {
     final parsedDate = DateTime.parse(isoDate);

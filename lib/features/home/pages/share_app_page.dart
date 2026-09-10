@@ -133,29 +133,30 @@ class _AppLinkCard extends GetView<SamajController> {
                   ),
                 );
               }),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Obx(() {
-                    final samajName =
-                        controller.samaj.value?.name ?? LK.samajName.tr;
-                    return Text(
-                      samajName,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.headlineLarge.copyWith(
-                        color: AppColors.black,
-                        letterSpacing: 0.2,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() {
+                      final samajName =
+                          controller.samaj.value?.name ?? LK.samajName.tr;
+                      return Text(
+                        samajName,
+                        style: AppTextStyles.headlineLarge.copyWith(
+                          color: AppColors.black,
+                          letterSpacing: 0.2,
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 6),
+                    Text(
+                      LK.joinCommunity.tr,
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: Colors.grey.shade600,
                       ),
-                    );
-                  }),
-                  const SizedBox(height: 6),
-                  Text(
-                    LK.joinCommunity.tr,
-                    style: AppTextStyles.titleSmall.copyWith(
-                      color: Colors.grey.shade600,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
