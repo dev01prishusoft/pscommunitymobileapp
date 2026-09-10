@@ -2,18 +2,33 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/models/auth_tokens.dart';
+import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/auth/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._apiClient, this._tokenManager);
+  AuthRepositoryImpl(
+    this._apiClient,
+    this._tokenManager, [
+    ModulePermissionService? modulePermissionService,
+  ]) : _modulePermissionService = modulePermissionService;
+
   final ApiClient _apiClient;
   final TokenManager _tokenManager;
+  final ModulePermissionService? _modulePermissionService;
+
+  ModulePermissionService get _moduleService =>
+      _modulePermissionService ??
+      (Get.isRegistered<ModulePermissionService>()
+          ? Get.find<ModulePermissionService>()
+          : ModulePermissionService.to);
 
   @override
   Future<Result<AuthTokens>> login({
@@ -62,7 +77,13 @@ class AuthRepositoryImpl implements AuthRepository {
         deviceType = 'ios';
       }
       deviceToken = await FirebaseMessaging.instance.getToken() ?? '';
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthRepositoryImpl.memberLogin: FirebaseMessaging.getToken failed',
+      );
+    }
 
     final result = await _apiClient.postParsed<AuthTokens>(
       ApiEndpoints.memberLogin,
@@ -169,6 +190,16 @@ class AuthRepositoryImpl implements AuthRepository {
       throw ServerFailure('Response is missing authentication tokens');
     }
 
+    final rawModules = authData['modules'] ?? authData['user']?['modules'];
+    if (rawModules != null) {
+      _moduleService.updateFromRawList(rawModules);
+    }
+
+    final parsedModules = (rawModules as List?)
+        ?.where((item) => item is Map)
+        .map((item) => ModulePermissionModel.fromJson(Map<String, dynamic>.from(item as Map)))
+        .toList();
+
     return AuthTokens(
       accessToken: accessToken,
       refreshToken: refreshToken,
@@ -183,6 +214,7 @@ class AuthRepositoryImpl implements AuthRepository {
       deviceUniqueId: authData['deviceUniqueId']?.toString(),
       primaryColor: authData['primaryColor']?.toString(),
       secondaryColor: authData['secondaryColor']?.toString(),
+      modules: parsedModules,
     );
   }
 }

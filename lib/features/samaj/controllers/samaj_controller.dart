@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/models/samaj.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/features/samaj/repositories/samaj_repository.dart';
 
 class SamajController extends GetxController with WidgetsBindingObserver{
@@ -23,7 +24,13 @@ class SamajController extends GetxController with WidgetsBindingObserver{
       ever(localizationService.currentLocale, (_) {
         fetchSamajDetail(updateLanguage: false);
       });
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SamajController.onInit: LocalizationService listener setup failed',
+      );
+    }
   }
 
   @override
@@ -77,7 +84,13 @@ class SamajController extends GetxController with WidgetsBindingObserver{
                 }
               }
             }
-          } catch (_) {}
+          } catch (e, stack) {
+            CrashReporter.recordError(
+              e,
+              stack,
+              reason: 'SamajController.fetchSamajDetail: auto-update language failed for ${detail.languageCode}',
+            );
+          }
         }
       }
     } catch (e) {

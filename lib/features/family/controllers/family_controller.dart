@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/family/repositories/family_reposit
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/member_address.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FamilyController extends GetxController {
@@ -377,7 +378,13 @@ class FamilyController extends GetxController {
           await launchUrl(url, mode: LaunchMode.externalApplication);
         }
       }
-    } catch (e) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FamilyController.launchSafeUrl failed for $urlString',
+      );
+    }
   }
 
   String getFormattedDateOfBirth(Member member) {

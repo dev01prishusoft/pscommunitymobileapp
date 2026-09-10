@@ -1,29 +1,39 @@
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
   SecureStorageService()
     : _storage = FlutterSecureStorage(
-        aOptions: AndroidOptions(
-          resetOnError: true,
-          
-        ),
+        aOptions: AndroidOptions(resetOnError: true),
         iOptions: IOSOptions(
           accessibility: KeychainAccessibility.first_unlock_this_device,
           synchronizable: false,
         ),
       );
+
   final FlutterSecureStorage _storage;
+
+  void _reportError(Object error, StackTrace stack, {required String reason}) {
+    CrashReporter.recordError(error, stack, reason: reason);
+  }
 
   Future<void> write(String key, String? value) async {
     try {
       await _storage.write(key: 'ps_community_$key', value: value);
-    } catch (_) {}
+    } catch (e, stack) {
+      _reportError(
+        e,
+        stack,
+        reason: 'SecureStorage.write failed for key: $key',
+      );
+    }
   }
 
   Future<String?> read(String key) async {
     try {
       return await _storage.read(key: 'ps_community_$key');
-    } catch (e) {
+    } catch (e, stack) {
+      _reportError(e, stack, reason: 'SecureStorage.read failed for key: $key');
       return null;
     }
   }
@@ -31,21 +41,46 @@ class SecureStorageService {
   Future<void> delete(String key) async {
     try {
       await _storage.delete(key: 'ps_community_$key');
-    } catch (_) {}
+    } catch (e, stack) {
+      _reportError(
+        e,
+        stack,
+        reason: 'SecureStorage.delete failed for key: $key',
+      );
+    }
   }
 
   Future<void> deleteAll() async {
     try {
       await _storage.deleteAll();
-    } catch (_) {}
+    } catch (e, stack) {
+      _reportError(e, stack, reason: 'SecureStorage.deleteAll failed');
+    }
   }
 
   Future<void> setBool(String key, bool value) async {
-    await _storage.write(key: key, value: value.toString());
+    try {
+      await _storage.write(key: key, value: value.toString());
+    } catch (e, stack) {
+      _reportError(
+        e,
+        stack,
+        reason: 'SecureStorage.setBool failed for key: $key',
+      );
+    }
   }
 
   Future<bool> getBool(String key) async {
-    final value = await _storage.read(key: key);
-    return value == 'true';
+    try {
+      final value = await _storage.read(key: key);
+      return value == 'true';
+    } catch (e, stack) {
+      _reportError(
+        e,
+        stack,
+        reason: 'SecureStorage.getBool failed for key: $key',
+      );
+      return false;
+    }
   }
 }

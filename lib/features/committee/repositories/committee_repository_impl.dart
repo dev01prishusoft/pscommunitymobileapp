@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
@@ -41,13 +41,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     if (result is Success<PaginatedResponse<CommitteeNode>>) {
       final list = result.data.data;
       final tree = _buildTree(list);
-
-      if (kDebugMode) {
-        for (var root in tree) {
-          _printNode(root, 0);
-        }
-      }
-
       return Success(tree);
     } else {
       return Error((result as Error).failure);
@@ -79,17 +72,17 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
             final activeMembers = fetchedMembers.where((m) => !isDateInPast(m.endDate)).toList();
             return Success(detail.copyWith(members: activeMembers));
           }
-        } catch (_) {}
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason: 'CommitteeRepositoryImpl.getCommitteeDetail: fetch members failed for committee $id',
+          );
+        }
       }
       return Success(detail);
     } else {
       return Error((result as Error).failure);
-    }
-  }
-
-  void _printNode(CommitteeNode node, int depth) {
-    for (var child in node.children) {
-      _printNode(child, depth + 1);
     }
   }
 
@@ -117,13 +110,6 @@ class CommitteeRepositoryImpl implements CommitteeRepository {
     }
 
     final tree = roots.map((r) => link(r)).toList();
-
-    if (kDebugMode) {
-      for (var root in tree) {
-        _printNode(root, 0);
-      }
-    }
-
     return tree;
   }
 }

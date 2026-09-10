@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 
 @pragma('vm:entry-point')
@@ -114,13 +115,25 @@ class PushNotificationService {
             try {
               final data = jsonDecode(payload) as Map<String, dynamic>;
               _initialMessageToHandle = RemoteMessage(data: data);
-            } catch (_) {}
+            } catch (e, stack) {
+              CrashReporter.recordError(
+                e,
+                stack,
+                reason: 'PushNotificationService: failed to decode launch payload',
+              );
+            }
           }
         }
       }
 
       _isInitialized = true;
-    } catch (_) {}
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PushNotificationService.init failed',
+      );
+    }
   }
 
   void _showLocalNotification(RemoteMessage message, AndroidNotificationChannel channel) {
@@ -157,7 +170,13 @@ class PushNotificationService {
         final data = jsonDecode(response.payload!) as Map<String, dynamic>;
         final message = RemoteMessage(data: data);
         _handleMessageTap(message);
-      } catch (_) {}
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'PushNotificationService: failed to decode tapped notification payload',
+        );
+      }
     }
   }
 

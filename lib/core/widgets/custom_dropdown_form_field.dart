@@ -68,17 +68,15 @@ class CustomDropdownFormField<T> extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(
-            color: AppColors.grey.withValues(alpha: 0.15),
-            width: 1.2.w,
+            color: AppColors.primary.withValues(alpha: 0.5),
+            width: 1.w,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide(
-            color: value != null
-                ? AppColors.primary.withValues(alpha: 0.4)
-                : AppColors.grey.withValues(alpha: 0.25),
-            width: 1.2.w,
+            color: AppColors.primary.withValues(alpha: 0.5),
+            width: 1.w,
           ),
         ),
         focusedBorder: OutlineInputBorder(

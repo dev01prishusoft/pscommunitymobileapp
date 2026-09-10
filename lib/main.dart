@@ -40,6 +40,11 @@ Future<void> _bootstrap() async {
       FirebaseCrashlytics.instance.recordFlutterFatalError(details);
     };
 
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+
     await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     await DI.bootstrap();
 
