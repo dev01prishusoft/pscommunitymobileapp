@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -409,7 +410,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   controller: controller.firstNameCtrl,
                   label: LK.firstName.tr,
                   isRequired: true,
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person_outline),
                   maxLength: 100,
                 ),
                 AppSpacing.vM,
@@ -424,7 +425,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller: controller.lastNameCtrl,
                     label: LK.lastName.tr,
                     isRequired: true,
-                    prefixIcon: const Icon(Icons.person),
+                    prefixIcon: const Icon(Icons.person_outline),
                     maxLength: 100,
                   ),
                 ),
@@ -457,6 +458,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
                 Obx(
                   () => AppLocationAutoComplete(
+                    prefixIcon: const Icon(Iconsax.location_copy),
                     controller: controller.bornPlaceCtrl,
                     label: LK.BornPlace.tr,
                     isRequired: true,
@@ -667,7 +669,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   isRequired: true,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: const Icon(Icons.phone),
+                  prefixIcon: const Icon(Iconsax.call_copy),
                   maxLength: 10,
                   validator: AppValidators.mobile,
                 ),
@@ -677,7 +679,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.secondaryMobileLabel.tr,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: const Icon(Icons.phone_android),
+                  prefixIcon: const Icon(Iconsax.mobile_copy),
                   maxLength: 10,
                   validator: AppValidators.optionalMobile,
                 ),
@@ -694,7 +696,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.entryPersonMobileCtrl,
                   label: LK.entryPersonMobile.tr,
-                  prefixIcon: const Icon(Icons.phone_callback),
+                  prefixIcon: const Icon(Iconsax.call_incoming_copy),
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   maxLength: 10,
@@ -704,7 +706,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.emergencyNameCtrl,
                   label: LK.emergencyContactNameLabel.tr,
-                  prefixIcon: const Icon(Icons.person_add_alt_1),
+                  prefixIcon: const Icon(Iconsax.user_add_copy),
                   maxLength: 100,
                 ),
                 AppSpacing.vM,
@@ -753,7 +755,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.facebookCtrl,
                   label: LK.facebook.tr,
-                  prefixIcon: const Icon(Icons.facebook),
+                  prefixIcon: const Icon(
+                    Iconsax.facebook,
+                    color: AppColors.blue,
+                  ),
                   maxLength: 300,
                   validator: AppValidators.url,
                 ),
@@ -761,7 +766,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.whatsappCtrl,
                   label: LK.whatsapp.tr,
-                  prefixIcon: const Icon(Icons.chat),
+                  prefixIcon: const Icon(
+                    Iconsax.whatsapp,
+                    color: AppColors.green,
+                  ),
                   maxLength: 300,
                   validator: AppValidators.url,
                 ),
@@ -769,7 +777,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.instagramCtrl,
                   label: LK.instagram.tr,
-                  prefixIcon: const Icon(Icons.camera_alt),
+                  prefixIcon: const Icon(
+                    Iconsax.instagram_copy,
+                    color: AppColors.pink,
+                  ),
                   maxLength: 300,
                   validator: AppValidators.url,
                 ),
@@ -777,7 +788,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.twitterCtrl,
                   label: LK.twitterX.tr,
-                  prefixIcon: const Icon(Icons.close),
+                  prefixIcon: const Icon(Iconsax.close_square),
                   maxLength: 300,
                   validator: AppValidators.url,
                 ),
@@ -1331,6 +1342,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
             initialValue: addr.pincode,
             label: LK.pincode.tr,
+            prefixIcon: const Icon(Icons.pin_drop_outlined),
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             maxLength: 6,
@@ -1349,6 +1361,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             initialValue: addr.line1,
             label: LK.addressLine1.tr,
             isRequired: true,
+            prefixIcon: const Icon(Icons.location_on_outlined),
             maxLength: 300,
             keyboardType: TextInputType.multiline,
             maxLines: 5,
@@ -1368,6 +1381,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             initialValue: addr.line2,
             label: LK.addressLine2.tr,
             isRequired: true,
+            prefixIcon: const Icon(Icons.location_on_outlined),
             maxLength: 300,
             keyboardType: TextInputType.multiline,
             maxLines: 5,
@@ -1386,6 +1400,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
             initialValue: addr.landmark,
             label: LK.landmarkLabel.tr,
+            prefixIcon: const Icon(Icons.location_city_outlined),
             maxLength: 200,
             onChanged: (v) {
               addr.landmark = v;
@@ -1689,6 +1704,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             AppFormTextField(
               initialValue: edu.institute,
               label: LK.instituteNameLabel.tr,
+              prefixIcon: const Icon(Icons.school_outlined),
               maxLength: 300,
               onChanged: (v) {
                 edu.institute = v;
@@ -1703,6 +1719,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   child: AppFormTextField(
                     initialValue: edu.passingYear,
                     label: LK.passingYearLabel.tr,
+                    prefixIcon: const Icon(Iconsax.calendar_copy),
                     hint: 'YYYY',
                     keyboardType: TextInputType.phone,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -1742,7 +1759,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                             CrashReporter.recordError(
                               e,
                               stack,
-                              reason: 'AddFamilyMemberPage passing year date parse failed',
+                              reason:
+                                  'AddFamilyMemberPage passing year date parse failed',
                             );
                           }
                         }
@@ -1755,21 +1773,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     },
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 5.w),
                 Expanded(
                   child: AppFormTextField(
                     initialValue: edu.percentage,
                     label: LK.percentageLabel.tr,
+                    prefixIcon: const Icon(Iconsax.percentage_circle_copy),
                     hint: '00',
-                    suffixIcon: Padding(
-                      padding: EdgeInsets.only(top: 14.h, right: 16.w),
-                      child: Text(
-                        '%',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -1798,11 +1808,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     },
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 5.w),
                 Expanded(
                   child: AppFormTextField(
                     initialValue: edu.grade,
                     label: 'Grade',
+                    prefixIcon: const Icon(Iconsax.medal_copy),
                     maxLength: 10,
                     onChanged: (v) {
                       edu.grade = v;
@@ -2099,6 +2110,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppFormTextField(
                   controller: controller.otherOccupationCtrl,
                   label: LK.otherOccupationLabel.tr,
+                  prefixIcon: const Icon(Iconsax.personalcard_copy),
                   maxLength: 200,
                   onChanged: (v) =>
                       controller.workInfo.otherOccupation.value = v,
@@ -2108,14 +2120,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   AppFormTextField(
                     controller: controller.companyNameCtrl,
                     label: LK.companyNameLabel.tr,
-                    prefixIcon: const Icon(Icons.business),
+                    prefixIcon: const Icon(Iconsax.buildings_copy),
                     maxLength: 200,
                     onChanged: (v) => controller.companyName.value = v,
                   ),
                   AppFormTextField(
                     controller: controller.businessNameCtrl,
                     label: LK.businessName.tr,
-                    prefixIcon: const Icon(Icons.business_center),
+                    prefixIcon: const Icon(Iconsax.briefcase_copy),
                     maxLength: 200,
                     onChanged: (v) => controller.businessName.value = v,
                   ),

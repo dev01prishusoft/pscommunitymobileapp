@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -305,7 +306,7 @@ class _SocialMediaSection extends StatelessWidget {
       child: Column(
         children: [
           _buildSocialItem(
-            Icons.facebook,
+            Iconsax.facebook,
             LK.facebook.tr,
             member.facebookUrl ?? LK.na,
             AppColors.blue,
@@ -315,7 +316,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.camera_alt_outlined,
+            Iconsax.instagram_copy,
             LK.instagram.tr,
             member.instagramUrl ?? LK.na,
             Colors.pink,
@@ -325,7 +326,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.chat_bubble_outline,
+            Iconsax.whatsapp,
             LK.whatsapp.tr,
             member.whatsappUrl ?? LK.na,
             AppColors.green,
@@ -335,7 +336,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.alternate_email,
+            Iconsax.close_square,
             LK.twitterX.tr,
             member.twitterUrl ?? LK.na,
             AppColors.black,

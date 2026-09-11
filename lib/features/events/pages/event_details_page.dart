@@ -718,7 +718,8 @@ class EventDetailsPage extends StatelessWidget {
                     CrashReporter.recordError(
                       e,
                       stack,
-                      reason: 'EventDetailsPage: failed to decode pdfName for media ${media.url}',
+                      reason:
+                          'EventDetailsPage: failed to decode pdfName for media ${media.url}',
                     );
                   }
 
@@ -803,7 +804,8 @@ class EventDetailsPage extends StatelessWidget {
   }
 
   Widget _buildBottomStaticBar(EventDetailsData event) {
-    if (event.isMemberRegistered == true) return SizedBox.shrink();
+    if (event.isMemberRegistered == true || event.isRegistrationClosed == true)
+      return SizedBox.shrink();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       decoration: BoxDecoration(

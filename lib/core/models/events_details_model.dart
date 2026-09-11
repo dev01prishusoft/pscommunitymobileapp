@@ -4,13 +4,20 @@ class EventDetailsResponse {
   String? message;
   EventDetailsData? data;
 
-  EventDetailsResponse({this.statusCode, this.succeeded, this.message, this.data});
+  EventDetailsResponse({
+    this.statusCode,
+    this.succeeded,
+    this.message,
+    this.data,
+  });
 
   EventDetailsResponse.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     succeeded = json['succeeded'];
     message = json['message'];
-    data = json['data'] != null ? new EventDetailsData.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? new EventDetailsData.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -44,6 +51,7 @@ class EventDetailsData {
   bool? isRegistrationRequired;
   num? totalRegistrations;
   bool? isMemberRegistered;
+  bool? isRegistrationClosed;
   String? venueName;
   String? googleMapUrl;
   String? addressLine1;
@@ -57,37 +65,39 @@ class EventDetailsData {
   List<Medias>? medias;
   List<Organizers>? organizers;
 
-  EventDetailsData(
-      {this.eventId,
-      this.eventType,
-      this.eventMode,
-      this.eventName,
-      this.translatedEventName,
-      this.startDateTime,
-      this.endDateTime,
-      this.shortDescription,
-      this.translatedShortDescription,
-      this.description,
-      this.translatedDescription,
-      this.termsAndConditions,
-      this.translatedTermsAndConditions,
-      this.maximumGuestsPerMember,
-      this.registrationFee,
-      this.isRegistrationRequired,
-      this.totalRegistrations,
-      this.isMemberRegistered,
-      this.venueName,
-      this.googleMapUrl,
-      this.addressLine1,
-      this.addressLine2,
-      this.landmark,
-      this.pincode,
-      this.committeeName,
-      this.organizerName,
-      this.organizerMobileNo,
-      this.schedules,
-      this.medias,
-      this.organizers});
+  EventDetailsData({
+    this.eventId,
+    this.eventType,
+    this.eventMode,
+    this.eventName,
+    this.translatedEventName,
+    this.startDateTime,
+    this.endDateTime,
+    this.shortDescription,
+    this.translatedShortDescription,
+    this.description,
+    this.translatedDescription,
+    this.termsAndConditions,
+    this.translatedTermsAndConditions,
+    this.maximumGuestsPerMember,
+    this.registrationFee,
+    this.isRegistrationRequired,
+    this.totalRegistrations,
+    this.isMemberRegistered,
+    this.isRegistrationClosed,
+    this.venueName,
+    this.googleMapUrl,
+    this.addressLine1,
+    this.addressLine2,
+    this.landmark,
+    this.pincode,
+    this.committeeName,
+    this.organizerName,
+    this.organizerMobileNo,
+    this.schedules,
+    this.medias,
+    this.organizers,
+  });
 
   EventDetailsData.fromJson(Map<String, dynamic> json) {
     eventId = json['eventId'];
@@ -108,6 +118,7 @@ class EventDetailsData {
     isRegistrationRequired = json['isRegistrationRequired'];
     totalRegistrations = json['totalRegistrations'];
     isMemberRegistered = json['isMemberRegistered'];
+    isRegistrationClosed = json['isRegistrationClosed'];
     venueName = json['venueName'];
     googleMapUrl = json['googleMapUrl'];
     addressLine1 = json['addressLine1'];
@@ -157,6 +168,7 @@ class EventDetailsData {
     data['isRegistrationRequired'] = this.isRegistrationRequired;
     data['totalRegistrations'] = this.totalRegistrations;
     data['isMemberRegistered'] = this.isMemberRegistered;
+    data['isRegistrationClosed '] = this.isRegistrationClosed;
     data['venueName'] = this.venueName;
     data['googleMapUrl'] = this.googleMapUrl;
     data['addressLine1'] = this.addressLine1;
@@ -194,20 +206,21 @@ class Schedules {
   String? scheduleLandmark;
   String? onlineMeetingLink;
 
-  Schedules(
-      {this.sessionName,
-      this.speakerName,
-      this.scheduleStartDateTime,
-      this.scheduleEndDateTime,
-      this.sessionDescription,
-      this.eventVenueId,
-      this.scheduleVenueName,
-      this.scheduleGoogleMapUrl,
-      this.scheduleAddressLine1,
-      this.scheduleAddressLine2,
-      this.schedulePincode,
-      this.scheduleLandmark,
-      this.onlineMeetingLink});
+  Schedules({
+    this.sessionName,
+    this.speakerName,
+    this.scheduleStartDateTime,
+    this.scheduleEndDateTime,
+    this.sessionDescription,
+    this.eventVenueId,
+    this.scheduleVenueName,
+    this.scheduleGoogleMapUrl,
+    this.scheduleAddressLine1,
+    this.scheduleAddressLine2,
+    this.schedulePincode,
+    this.scheduleLandmark,
+    this.onlineMeetingLink,
+  });
 
   Schedules.fromJson(Map<String, dynamic> json) {
     sessionName = json['sessionName'];
@@ -222,7 +235,8 @@ class Schedules {
     scheduleAddressLine2 = json['scheduleAddressLine2'];
     schedulePincode = json['schedulePincode'];
     scheduleLandmark = json['scheduleLandmark'];
-    onlineMeetingLink = json['onlineMeetingLink'] ??
+    onlineMeetingLink =
+        json['onlineMeetingLink'] ??
         json['onlineMeetingUrl'] ??
         json['meetingLink'] ??
         json['meetingUrl'];
@@ -257,15 +271,16 @@ class Medias {
   bool? isCoverImage;
   bool? isGalleryVisible;
 
-  Medias(
-      {this.type,
-      this.format,
-      this.url,
-      this.thumbnailUrl,
-      this.caption,
-      this.alternativeText,
-      this.isCoverImage,
-      this.isGalleryVisible});
+  Medias({
+    this.type,
+    this.format,
+    this.url,
+    this.thumbnailUrl,
+    this.caption,
+    this.alternativeText,
+    this.isCoverImage,
+    this.isGalleryVisible,
+  });
 
   Medias.fromJson(Map<String, dynamic> json) {
     type = json['type'];
@@ -302,15 +317,16 @@ class Organizers {
   String? email;
   List<CommitteeMembers>? committeeMembers;
 
-  Organizers(
-      {this.eventOrganizerId,
-      this.memberId,
-      this.committeeId,
-      this.committeeName,
-      this.memberName,
-      this.mobileNo,
-      this.email,
-      this.committeeMembers});
+  Organizers({
+    this.eventOrganizerId,
+    this.memberId,
+    this.committeeId,
+    this.committeeName,
+    this.memberName,
+    this.mobileNo,
+    this.email,
+    this.committeeMembers,
+  });
 
   Organizers.fromJson(Map<String, dynamic> json) {
     eventOrganizerId = json['eventOrganizerId'];
@@ -338,8 +354,9 @@ class Organizers {
     data['mobileNo'] = this.mobileNo;
     data['email'] = this.email;
     if (this.committeeMembers != null) {
-      data['committeeMembers'] =
-          this.committeeMembers!.map((v) => v.toJson()).toList();
+      data['committeeMembers'] = this.committeeMembers!
+          .map((v) => v.toJson())
+          .toList();
     }
     return data;
   }
@@ -352,12 +369,13 @@ class CommitteeMembers {
   String? mobileNo;
   String? email;
 
-  CommitteeMembers(
-      {this.committeeMemberId,
-      this.memberId,
-      this.memberName,
-      this.mobileNo,
-      this.email});
+  CommitteeMembers({
+    this.committeeMemberId,
+    this.memberId,
+    this.memberName,
+    this.mobileNo,
+    this.email,
+  });
 
   CommitteeMembers.fromJson(Map<String, dynamic> json) {
     committeeMemberId = json['committeeMemberId'];

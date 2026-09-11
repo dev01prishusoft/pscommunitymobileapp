@@ -546,7 +546,7 @@ class _AddressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SectionContainer(
-      title: LK.memberAddresses.tr,
+      title: LK.memberAddresses.tr.capitalize,
       icon: Icons.location_on_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -796,7 +796,7 @@ class _SocialMediaSection extends StatelessWidget {
       child: Column(
         children: [
           _buildSocialItem(
-            Icons.facebook,
+            Iconsax.facebook,
             LK.facebook.tr,
             member.facebookUrl ?? LK.na,
             AppColors.blue,
@@ -806,7 +806,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.camera_alt_outlined,
+            Iconsax.instagram_copy,
             LK.instagram.tr,
             member.instagramUrl ?? LK.na,
             Colors.pink,
@@ -816,7 +816,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.chat_bubble_outline,
+            Iconsax.whatsapp,
             LK.whatsapp.tr,
             member.whatsappUrl ?? LK.na,
             AppColors.green,
@@ -826,7 +826,7 @@ class _SocialMediaSection extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _buildSocialItem(
-            Icons.alternate_email,
+            Iconsax.close_square,
             LK.twitterX.tr,
             member.twitterUrl ?? LK.na,
             AppColors.black,

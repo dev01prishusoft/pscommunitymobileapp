@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -69,7 +70,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'EditProfilePage._loadMemberProfile failed for member $memberId',
+        reason:
+            'EditProfilePage._loadMemberProfile failed for member $memberId',
       );
     } finally {
       if (mounted) {
@@ -225,10 +227,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: Obx(() {
                   final hasChanges = controller.hasChanges;
                   final isFormLoading = controller.isFormLoading;
-      
+
                   final isLastStep = _currentStep == 6;
                   final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
-      
+
                   return AppPrimaryButton(
                     text: text,
                     height: 50.h,
@@ -430,7 +432,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: LK.firstName.tr,
                     isRequired: true,
                     originalValue: controller.currentMember?.firstName ?? '',
-                    prefixIcon: const Icon(Icons.person),
+                    prefixIcon: const Icon(Icons.person_outline),
                     maxLength: 100,
                     updateStatus: controller.getUpdateStatus('FirstName'),
                   ),
@@ -452,7 +454,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       label: LK.lastName.tr,
                       isRequired: true,
                       originalValue: controller.currentMember?.lastName ?? '',
-                      prefixIcon: const Icon(Icons.person),
+                      prefixIcon: const Icon(Icons.person_outline),
                       maxLength: 100,
                       updateStatus: controller.getUpdateStatus('LastName'),
                     ),
@@ -513,6 +515,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 Obx(
                   () => AppLocationAutoComplete(
+                    prefixIcon: Icon(Iconsax.location_copy),
                     controller: controller.bornPlaceCtrl,
                     label: LK.BornPlace.tr,
                     isRequired: true,
@@ -751,7 +754,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     readOnly: true,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    prefixIcon: const Icon(Icons.phone),
+                    prefixIcon: const Icon(Iconsax.call_copy),
                     maxLength: 10,
                     updateStatus: controller.getUpdateStatus('MobileNo'),
                   ),
@@ -763,7 +766,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: LK.secondaryMobileLabel.tr,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    prefixIcon: const Icon(Icons.phone_android),
+                    prefixIcon: const Icon(Iconsax.mobile_copy),
                     maxLength: 10,
                     validator: (v) {
                       if (v == controller.currentMember?.secondaryMobile)
@@ -794,7 +797,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.entryPersonMobileCtrl,
                     label: LK.entryPersonMobile.tr,
-                    prefixIcon: const Icon(Icons.phone_callback),
+                    prefixIcon: const Icon(Iconsax.call_incoming_copy),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     maxLength: 10,
@@ -812,7 +815,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.emergencyNameCtrl,
                     label: LK.emergencyContactNameLabel.tr,
-                    prefixIcon: const Icon(Icons.person_add_alt_1),
+                    prefixIcon: const Icon(Iconsax.user_add_copy),
                     maxLength: 100,
                     updateStatus: controller.getUpdateStatus(
                       'EmergencyContactName',
@@ -875,7 +878,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.facebookCtrl,
                     label: LK.facebook.tr,
-                    prefixIcon: const Icon(Icons.facebook),
+                    prefixIcon: const Icon(
+                      Iconsax.facebook,
+                      color: AppColors.blue,
+                    ),
                     maxLength: 300,
                     validator: (v) {
                       if (v == controller.currentMember?.facebookUrl)
@@ -890,7 +896,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.whatsappCtrl,
                     label: LK.whatsapp.tr,
-                    prefixIcon: const Icon(Icons.chat),
+                    prefixIcon: const Icon(
+                      Iconsax.whatsapp,
+                      color: AppColors.green,
+                    ),
                     maxLength: 300,
                     validator: (v) {
                       if (v == controller.currentMember?.whatsappUrl)
@@ -907,7 +916,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.instagramCtrl,
                     label: LK.instagram.tr,
-                    prefixIcon: const Icon(Icons.camera_alt),
+                    prefixIcon: const Icon(
+                      Iconsax.instagram_copy,
+                      color: AppColors.pink,
+                    ),
                     maxLength: 300,
                     validator: (v) {
                       if (v == controller.currentMember?.instagramUrl)
@@ -922,7 +934,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   () => AppFormTextField(
                     controller: controller.twitterCtrl,
                     label: LK.twitterX.tr,
-                    prefixIcon: const Icon(Icons.close),
+                    prefixIcon: const Icon(Iconsax.close_square),
                     maxLength: 300,
                     validator: (v) {
                       if (v == controller.currentMember?.twitterUrl)
@@ -1556,6 +1568,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 AppSpacing.vM,
                 Obx(
                   () => AppFormTextField(
+                    prefixIcon: const Icon(Iconsax.personalcard_copy),
                     controller: controller.otherOccupationCtrl,
                     label: LK.otherOccupationLabel.tr,
                     maxLength: 200,
@@ -1570,7 +1583,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     () => AppFormTextField(
                       controller: controller.companyNameCtrl,
                       label: LK.companyNameLabel.tr,
-                      prefixIcon: const Icon(Icons.business),
+                      prefixIcon: const Icon(Iconsax.buildings_copy),
                       maxLength: 200,
                       onChanged: (v) => controller.companyName.value = v,
                       updateStatus: controller.getUpdateStatus('CompanyName'),
@@ -1580,7 +1593,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     () => AppFormTextField(
                       controller: controller.businessNameCtrl,
                       label: LK.businessName.tr,
-                      prefixIcon: const Icon(Icons.business_center),
+                      prefixIcon: const Icon(Iconsax.briefcase_copy),
                       maxLength: 200,
                       onChanged: (v) => controller.businessName.value = v,
                       updateStatus: controller.getUpdateStatus('BusinessName'),
@@ -2434,6 +2447,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 initialValue: addr.pincode,
                 label: LK.pincode.tr,
+                prefixIcon: const Icon(Icons.pin_drop_outlined),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 6,
@@ -2455,6 +2469,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: addr.line1,
                 label: LK.addressLine1.tr,
                 isRequired: true,
+                prefixIcon: const Icon(Icons.location_on_outlined),
                 maxLength: 300,
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
@@ -2477,6 +2492,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 initialValue: addr.line2,
                 label: LK.addressLine2.tr,
                 isRequired: true,
+                prefixIcon: const Icon(Icons.location_on_outlined),
                 maxLength: 300,
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
@@ -2498,6 +2514,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 initialValue: addr.landmark,
                 label: LK.landmarkLabel.tr,
+                prefixIcon: const Icon(Icons.location_city_outlined),
                 maxLength: 200,
                 updateStatus: addr.isPrimary
                     ? controller.getUpdateStatus('Landmark')
@@ -2698,6 +2715,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppSpacing.vM,
             AppFormTextField(
               initialValue: edu.institute,
+              prefixIcon: Icon(Icons.school_outlined),
               label: LK.instituteNameLabel.tr,
               updateStatus: (isHighest && !isNew)
                   ? controller.getUpdateStatus('InstitutionName')
@@ -2718,6 +2736,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Expanded(
                   child: AppFormTextField(
                     initialValue: edu.passingYear,
+                    prefixIcon: const Icon(Iconsax.calendar_copy),
                     label: LK.passingYearLabel.tr,
                     updateStatus: (isHighest && !isNew)
                         ? controller.getUpdateStatus('YearOfPassing')
@@ -2761,7 +2780,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             CrashReporter.recordError(
                               e,
                               stack,
-                              reason: 'EditProfilePage passing year date parse failed',
+                              reason:
+                                  'EditProfilePage passing year date parse failed',
                             );
                           }
                         }
@@ -2777,24 +2797,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         : null,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 5.w),
                 Expanded(
                   child: AppFormTextField(
                     initialValue: edu.percentage,
+                    prefixIcon: const Icon(Iconsax.percentage_circle_copy),
                     label: LK.percentageLabel.tr,
                     updateStatus: (isHighest && !isNew)
                         ? controller.getUpdateStatus('Percentage')
                         : null,
                     hint: '00',
-                    suffixIcon: Padding(
-                      padding: EdgeInsets.only(top: 14.h, right: 16.w),
-                      child: Text(
-                        '%',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -2826,11 +2838,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         : null,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 5.w),
                 Expanded(
                   child: AppFormTextField(
                     initialValue: edu.grade,
                     label: 'Grade',
+                    prefixIcon: const Icon(Iconsax.medal_copy),
                     updateStatus: (isHighest && !isNew)
                         ? controller.getUpdateStatus('Grade')
                         : null,

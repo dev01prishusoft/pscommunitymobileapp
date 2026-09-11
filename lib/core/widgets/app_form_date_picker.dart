@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -102,7 +103,7 @@ class AppFormDatePicker extends StatelessWidget {
             hintText:
                 hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
             prefixIcon: Icon(
-              Icons.calendar_today,
+              Iconsax.calendar_1_copy,
               size: 20,
               color: AppColors.black,
             ),
