@@ -52,10 +52,16 @@ android {
      
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists())
-                signingConfigs.getByName("release")
-            else
-                signingConfigs.getByName("debug")
+            val isReleaseBuild = gradle.startParameter.taskNames.any {
+                it.contains("release", ignoreCase = true) || it.contains("bundle", ignoreCase = true)
+            }
+            if (!keystorePropertiesFile.exists()) {
+                if (isReleaseBuild) {
+                    throw GradleException("key.properties required for release builds")
+                }
+            } else {
+                signingConfig = signingConfigs.getByName("release")
+            }
             
             isMinifyEnabled    = false
             isShrinkResources = false
@@ -68,6 +74,17 @@ android {
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (!keystorePropertiesFile.exists()) {
+        val hasReleaseTask = allTasks.any {
+            it.name.contains("Release", ignoreCase = true) || it.name.contains("bundle", ignoreCase = true)
+        }
+        if (hasReleaseTask) {
+            throw GradleException("key.properties required for release builds")
         }
     }
 }
