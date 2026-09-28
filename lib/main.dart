@@ -97,9 +97,13 @@ class PsCommunityApp extends StatelessWidget {
                 navigatorObservers: [AppRouter.routeObserver],
                 getPages: AppRouter.pages,
                 builder: (context, child) {
-                  return Localizations.override(
-                    context: context,
-                    locale: const Locale('en', 'US'),
+                  final mq = MediaQuery.of(context);
+                  final clamped = mq.textScaler.clamp(
+                    minScaleFactor: 0.85,
+                    maxScaleFactor: 1.3,
+                  );
+                  return MediaQuery(
+                    data: mq.copyWith(textScaler: clamped),
                     child: child ?? const SizedBox.shrink(),
                   );
                 },

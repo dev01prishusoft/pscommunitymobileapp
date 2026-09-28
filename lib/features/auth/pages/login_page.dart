@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -31,11 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _controller = Get.put(LoginController(Get.find()));
-    final localizationService = Get.find<LocalizationService>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      localizationService.currentLocale.value = const Locale('en', 'US');
-      Get.updateLocale(const Locale('en', 'US'));
-    });
   }
 
   @override
