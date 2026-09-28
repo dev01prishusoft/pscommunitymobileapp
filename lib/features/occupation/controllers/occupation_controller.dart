@@ -174,7 +174,6 @@ class OccupationController extends GetxController {
       if (results.isEmpty) {
         hasMoreMembers.value = false;
       } else {
-        printInfo(info: json.encode(results));
         occupationMembers.addAll(results);
         _membersPage++;
         if (results.length < _membersPageSize) {

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -125,9 +123,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
         'isRecurring': isRecurring,
       };
 
-      log('[Payment] createOrder → POST ${ApiEndpoints.createOrder}');
-      log('[Payment] createOrder payload: $payload');
-
       final response = await _apiClient.postParsed<RazorpayOrder>(
         ApiEndpoints.createOrder,
         data: payload,
@@ -136,14 +131,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
             
       if (response.isFailure) {
-        log('[Payment] createOrder ERROR: ${response.failureOrNull}');
         throw response.failureOrNull!;
       }
 
-      log('[Payment] createOrder SUCCESS: ${response.dataOrNull?.data}');
       return response.dataOrNull!.data!;
     } catch (e) {
-      log('[Payment] createOrder EXCEPTION: $e');
       rethrow;
     }
   }
@@ -183,9 +175,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
         };
       }
 
-      log('[Payment] verifyPayment → POST $endpoint (isRecurring=$isRecurring)');
-      log('[Payment] verifyPayment payload: $payload');
-
       final response = await _apiClient.postParsed<Map<String, dynamic>>(
         endpoint,
         data: payload,
@@ -193,14 +182,11 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       
       if (response.isFailure) {
-        log('[Payment] verifyPayment ERROR: ${response.failureOrNull}');
         throw response.failureOrNull!;
       }
 
-      log('[Payment] verifyPayment SUCCESS: ${response.dataOrNull?.data}');
       return response.dataOrNull?.data ?? {};
     } catch (e) {
-      log('[Payment] verifyPayment EXCEPTION: $e');
       rethrow;
     }
   }
@@ -240,19 +226,15 @@ class PaymentRepositoryImpl implements PaymentRepository {
   @override
   Future<Map<String, dynamic>> getReceipt(int receiptId) async {
     try {
-      log('[Payment] getReceipt → GET ${ApiEndpoints.paymentReceipt}/$receiptId');
       final response = await _apiClient.getParsed<Map<String, dynamic>>(
         '${ApiEndpoints.paymentReceipt}/$receiptId',
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
       if (response.isFailure) {
-        log('[Payment] getReceipt ERROR: ${response.failureOrNull}');
         throw response.failureOrNull!;
       }
-      log('[Payment] getReceipt SUCCESS: ${response.dataOrNull?.data}');
       return response.dataOrNull?.data ?? {};
     } catch (e) {
-      log('[Payment] getReceipt EXCEPTION: $e');
       rethrow;
     }
   }

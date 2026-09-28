@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -10,6 +11,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_inline_error.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/features/auth/controllers/login_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,6 +44,45 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () => Get.to<void>(
+                () => AppWebViewPage(
+                  title: LK.privacyPolicy.tr,
+                  url: AppEnvironment.I.privacyPolicyUrl,
+                ),
+              ),
+              child: Text(
+                LK.privacyPolicy.tr,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            AppSpacing.hXxxl,
+            GestureDetector(
+              onTap: () => Get.to<void>(
+                () => AppWebViewPage(
+                  title: LK.termsAndConditions.tr,
+                  url: AppEnvironment.I.termsAndConditionsUrl,
+                ),
+              ),
+              child: Text(
+                LK.termsAndConditions.tr,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -148,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ).paddingSymmetric(
                           horizontal: AppSpacing.xxxl,
-                          vertical: 40.h,
+                          vertical: 30.h,
                         ),
                   ),
                 ),
