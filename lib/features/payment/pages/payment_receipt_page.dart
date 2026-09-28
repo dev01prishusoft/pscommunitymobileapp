@@ -231,6 +231,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
                                 child: logoUrl != null && logoUrl.isNotEmpty
                                     ? CachedImg(
                                         url: logoUrl,
+                                        width: 80.w,
+                                        height: 80.h,
                                         fit: BoxFit.cover,
                                         placeholder: (_, __) => Center(
                                           child: CircularProgressIndicator(

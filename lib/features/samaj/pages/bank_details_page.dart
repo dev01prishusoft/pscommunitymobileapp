@@ -350,6 +350,8 @@ class _ExpandableSamajCardState extends State<_ExpandableSamajCard> {
                   borderRadius: BorderRadius.circular(100),
                   child: CachedImg(
                     url: widget.samaj.logoUrl,
+                    width: 56.w,
+                    height: 56.h,
                     fit: BoxFit.cover,
                     placeholder: (_, __) => const Center(
                       child: CircularProgressIndicator(strokeWidth: 2),

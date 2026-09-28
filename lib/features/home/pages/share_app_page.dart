@@ -122,6 +122,8 @@ class _AppLinkCard extends GetView<SamajController> {
                     child: logoUrl != null && logoUrl.isNotEmpty
                         ? CachedImg(
                             url: logoUrl,
+                            width: 76.w,
+                            height: 76.h,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),

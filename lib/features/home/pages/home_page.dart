@@ -131,6 +131,8 @@ class _HomeHeader extends GetView<SamajController> {
                 child: samaj?.logoUrl != null && samaj!.logoUrl.isNotEmpty
                     ? CachedImg(
                         url: samaj.logoUrl,
+                        width: 64.w,
+                        height: 64.h,
                         fit: BoxFit.cover,
                         placeholder: (_, __) => Center(
                           child: CircularProgressIndicator(strokeWidth: 2),

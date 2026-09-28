@@ -10,11 +10,15 @@ class MemberAvatar extends StatelessWidget {
     this.gender,
     this.radius = 30.0,
     this.fallbackName,
+    this.memCacheWidth,
+    this.memCacheHeight,
   });
   final String? imageUrl;
   final String? gender;
   final double radius;
   final String? fallbackName;
+  final int? memCacheWidth;
+  final int? memCacheHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +29,21 @@ class MemberAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: radius,
         backgroundColor: AppColors.primary.withValues(alpha: 0.05),
-        child: _buildContent(fallbackNameStr),
+        child: _buildContent(context, fallbackNameStr),
       ),
     );
   }
 
-  Widget _buildContent(String name) {
+  Widget _buildContent(BuildContext context, String name) {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
+      final dpr = MediaQuery.maybeOf(context)?.devicePixelRatio ?? 2.0;
+      final defaultCacheSize = (radius * 2 * dpr).round();
       return CachedImg(
         url: imageUrl!,
         width: radius * 2,
         height: radius * 2,
+        memCacheWidth: memCacheWidth ?? defaultCacheSize,
+        memCacheHeight: memCacheHeight ?? defaultCacheSize,
         fit: BoxFit.cover,
         placeholder: (context, url) => const CircularProgressIndicator(),
         errorWidget: (context, url, error) => _buildInitialsOrIcon(name),

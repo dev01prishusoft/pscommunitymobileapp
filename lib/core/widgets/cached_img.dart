@@ -30,13 +30,23 @@ class CachedImg extends StatelessWidget {
           Icon(Icons.broken_image, color: AppColors.grey);
     }
 
+    final dpr = MediaQuery.maybeOf(context)?.devicePixelRatio ?? 1.0;
+    final targetCacheWidth = memCacheWidth ??
+        (width != null && width! > 0 && width!.isFinite
+            ? (width! * dpr).round()
+            : null);
+    final targetCacheHeight = memCacheHeight ??
+        (height != null && height! > 0 && height!.isFinite
+            ? (height! * dpr).round()
+            : null);
+
     return Image.network(
       url,
       fit: fit,
       width: width,
       height: height,
-      cacheHeight: memCacheHeight,
-      cacheWidth: memCacheWidth,
+      cacheHeight: targetCacheHeight,
+      cacheWidth: targetCacheWidth,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
         return placeholder?.call(context, url) ??

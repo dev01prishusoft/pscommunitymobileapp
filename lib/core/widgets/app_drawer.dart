@@ -128,6 +128,8 @@ class AppDrawer extends StatelessWidget {
                       child: logoUrl != null && logoUrl.isNotEmpty
                           ? CachedImg(
                               url: logoUrl,
+                              width: 64.w,
+                              height: 64.h,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Center(
                                 child: CircularProgressIndicator(

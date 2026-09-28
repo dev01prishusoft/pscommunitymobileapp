@@ -289,6 +289,7 @@ class BankAccountDetailsPage extends StatelessWidget {
                     child: bank.qrCodeImagePath != null
                         ? CachedImg(
                             url: bank.qrCodeImagePath!,
+                            width: 180.w,
                             height: 180.h,
                             fit: BoxFit.cover,
                             errorWidget: (val,val2,val3) => Icon(

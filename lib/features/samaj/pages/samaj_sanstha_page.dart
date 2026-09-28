@@ -95,6 +95,8 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
                       borderRadius: BorderRadius.circular(100),
                       child: CachedImg(
                         url: logoUrl,
+                        width: 52.w,
+                        height: 52.h,
                         fit: BoxFit.cover,
                         placeholder: (_, __) => const Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
