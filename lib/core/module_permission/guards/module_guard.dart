@@ -34,8 +34,8 @@ class ModuleGuard extends GetMiddleware {
     final service = ModulePermissionService.to;
     if (!service.isAccessible(requiredModule)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final title = customTitle ?? LK.accessRestricted.tr;
-        final subtitle = customSubtitle ??
+        final title = customTitle?.tr ?? LK.accessRestricted.tr;
+        final subtitle = customSubtitle?.tr ??
             LK.moduleAccessRestrictedSubtitle.trParams({
               'module': requiredModule.localizedName,
             });

@@ -129,6 +129,58 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
 
   @override
   Widget build(BuildContext context) {
+    if (_googleApiKey.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: widget.label,
+              style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
+              children: [
+                if (widget.isRequired)
+                  TextSpan(
+                    text: ' *',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.red,
+                    ),
+                  ),
+              ],
+            ),
+          ).paddingOnly(left: 5.w, bottom: 6.h),
+          TextFormField(
+            controller: widget.controller,
+            maxLength: 250,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
+            decoration: InputDecoration(
+              hintText:
+                  '${LK.enter.tr} ${widget.label.replaceAll('*', '').trim()}',
+              prefixIcon: widget.prefixIcon != null
+                  ? IconTheme(
+                      data: const IconThemeData(size: 20),
+                      child: widget.prefixIcon!,
+                    )
+                  : null,
+              helperText: 'Location autocomplete disabled (API key missing)',
+              helperStyle: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.grey,
+              ),
+            ),
+            validator: (value) {
+              if (widget.isRequired &&
+                  (value == null || value.trim().isEmpty)) {
+                return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
+              return null;
+            },
+          ),
+          if (widget.updateStatus != null)
+            ProfileUpdateStatusBadge(status: widget.updateStatus!),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
