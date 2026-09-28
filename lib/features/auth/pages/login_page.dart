@@ -49,7 +49,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/images/banner_logo.png', height: 160.h),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 160.h),
+                  child: Image.asset(
+                    'assets/images/banner_logo.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
                 AppSpacing.vXxl,
                 Card(
                   color: AppColors.white,

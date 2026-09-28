@@ -372,7 +372,11 @@ class _MakePaymentPageState extends State<MakePaymentPage> {
                                 }
                               },
                         child: Container(
-                          height: 50.h,
+                          constraints: BoxConstraints(minHeight: 50.h),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
                           width: double.infinity,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(

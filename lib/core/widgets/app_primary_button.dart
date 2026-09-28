@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
@@ -26,7 +27,9 @@ class AppPrimaryButton extends StatelessWidget {
 
     return Container(
       width: width ?? double.infinity,
-      height: height,
+      constraints: BoxConstraints(
+        minHeight: height,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -46,6 +49,7 @@ class AppPrimaryButton extends StatelessWidget {
           disabledBackgroundColor: buttonColor.withValues(alpha: 0.4),
           disabledForegroundColor: AppColors.white,
           elevation: 0,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

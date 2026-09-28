@@ -404,13 +404,19 @@ class MyEventDetailsPage extends StatelessWidget {
                 SizedBox(height: 22.h),
 
                 // Outlined Button: "Cancel My Registration" (red border and red text)
-                SizedBox(
-                  width: double.infinity,
-                  height: 50.h,
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: double.infinity,
+                    minHeight: 50.h,
+                  ),
                   child: OutlinedButton(
                     onPressed: () =>
                         _showCancelConfirmation(context, controller),
                     style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
                       side: BorderSide(color: AppColors.error, width: 1.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14.r),
