@@ -3,7 +3,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AppValidators {
   static final RegExp _mobileRegex = RegExp(r'^[0-9]{10}$');
-  static final RegExp _emailRegex = RegExp(r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+');
+  static final RegExp _emailRegex = RegExp(
+    r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
+  );
 
   static String? required(String? value, {String? customMessage}) {
     if (value == null || value.trim().isEmpty) {
@@ -91,14 +93,23 @@ class AppValidators {
     return null;
   }
 
-  static final RegExp _urlRegex = RegExp(
-    r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*(\?[\/\w\.~%&=#+?\-]*)?(\#[\/\w\.~%&=#+?\-]*)?\/?$',
-    caseSensitive: false,
+  static final RegExp _hostRegex = RegExp(
+    r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$',
   );
 
   static String? url(String? value) {
     if (value == null || value.trim().isEmpty) return null;
-    if (!_urlRegex.hasMatch(value.trim())) {
+    final trimmed = value.trim();
+    final uri = Uri.tryParse(
+      trimmed.contains('://') ? trimmed : 'https://$trimmed',
+    );
+    if (uri == null || uri.host.isEmpty) {
+      return LK.pleaseEnterValidURL.tr;
+    }
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return LK.pleaseEnterValidURL.tr;
+    }
+    if (!_hostRegex.hasMatch(uri.host)) {
       return LK.pleaseEnterValidURL.tr;
     }
     return null;
