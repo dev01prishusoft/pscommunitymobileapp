@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -37,7 +36,7 @@ class AppLocationAutoComplete extends StatefulWidget {
 
 class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   Timer? _debounce;
-  final String _googleApiKey = dotenv.env['GOOGLEMAP_KEY']!;
+  static const String _googleApiKey = String.fromEnvironment('GOOGLEMAP_KEY');
   final Dio _dio = Dio();
 
   bool _isLoading = false;
@@ -50,7 +49,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   }
 
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
-    if (query.trim().length < 3) return [];
+    if (_googleApiKey.isEmpty || query.trim().length < 3) return [];
     final String url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     try {
@@ -91,6 +90,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   }
 
   Future<void> _getPlaceDetails(String placeId, String description) async {
+    if (_googleApiKey.isEmpty) return;
     final String url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$_googleApiKey';
 

@@ -9,14 +9,20 @@ A production-ready Flutter application for the PrishuSoft Community, featuring s
 - `Mapper` patterns are strictly enforced to handle enum and state resolution securely.
 
 ## Environment Setup
-This application requires an external Razorpay API key to function properly.
-Do **not** use a hardcoded `.env` file for production binaries to prevent secret leakage.
+This application requires external API keys (`RAZORPAY_KEY` and `GOOGLEMAP_KEY`) to function properly.
+Do **not** include `.env` as a Flutter asset in `pubspec.yaml` to prevent secret leakage in release binaries.
 
 ### Running Locally
-To run the app on an emulator or physical device, inject the `RAZORPAY_KEY` using `--dart-define`:
+To run the app on an emulator or physical device, inject the secrets via `--dart-define`:
 
 ```bash
-flutter run --dart-define=RAZORPAY_KEY=your_key_here
+flutter run --dart-define=RAZORPAY_KEY=your_key_here --dart-define=GOOGLEMAP_KEY=your_key_here
+```
+
+Alternatively, you can keep a local uncommitted `.env` file (which is gitignored) and inject it at compile time without packaging it as a release asset:
+
+```bash
+flutter run --dart-define-from-file=.env
 ```
 
 ### Running Tests

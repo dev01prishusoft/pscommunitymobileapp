@@ -59,7 +59,6 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^5.0.0
   permission_handler: ^12.0.3
-  flutter_dotenv: ^6.0.1
   carousel_slider: ^5.1.2
   video_player: ^2.14.0
   chewie: ^1.13.1
@@ -89,7 +88,8 @@ flutter:
   assets:
     - assets/images/
     - assets/locales/
-    - .env
+  # Secrets: pass via --dart-define=RAZORPAY_KEY=... --dart-define=GOOGLEMAP_KEY=...
+  # Do NOT ship .env inside the binary.
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
