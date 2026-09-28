@@ -382,8 +382,13 @@ class MarriageController extends GetxController {
       }
 
       state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
-    } catch (e) {
+    } catch (e, stack) {
       if (requestId != _currentLoadRequestId) return;
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'MarriageController.loadProfiles failed',
+      );
       if (isRefresh) {
         state.value = AppState.error;
       }
@@ -444,10 +449,7 @@ class MarriageController extends GetxController {
       ].where((e) => e.isNotEmpty).first;
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
-        builder: (context) => ToastCard(
-          title: errorMsg,
-          isErrorMessage: true,
-        ),
+        builder: (context) => ToastCard(title: errorMsg, isErrorMessage: true),
       ).show();
       return;
     }
@@ -614,7 +616,12 @@ class MarriageController extends GetxController {
         }
       }
       targetList.assignAll([firstItem, ...fallbacks]);
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'MarriageController._loadFilterOptions failed',
+      );
       targetList.assignAll([firstItem, ...fallbacks]);
     }
   }

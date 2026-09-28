@@ -5,7 +5,7 @@ import 'package:pscommunitymobileapp/core/models/samaj.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/features/samaj/repositories/samaj_repository.dart';
 
-class SamajController extends GetxController with WidgetsBindingObserver{
+class SamajController extends GetxController with WidgetsBindingObserver {
   SamajController(this._repository);
   final SamajRepository _repository;
 
@@ -28,7 +28,8 @@ class SamajController extends GetxController with WidgetsBindingObserver{
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'SamajController.onInit: LocalizationService listener setup failed',
+        reason:
+            'SamajController.onInit: LocalizationService listener setup failed',
       );
     }
   }
@@ -60,11 +61,13 @@ class SamajController extends GetxController with WidgetsBindingObserver{
 
     try {
       final detail = await _repository.getSamajDetail();
-      _isFetchingSamaj = false; 
+      _isFetchingSamaj = false;
       if (detail != null) {
         samaj.value = detail;
 
-        if (updateLanguage && detail.languageCode != null && detail.languageCode!.isNotEmpty) {
+        if (updateLanguage &&
+            detail.languageCode != null &&
+            detail.languageCode!.isNotEmpty) {
           try {
             final localizationService = Get.find<LocalizationService>();
             if (localizationService.languages.isEmpty) {
@@ -72,9 +75,12 @@ class SamajController extends GetxController with WidgetsBindingObserver{
             }
             final hasSaved = await localizationService.hasSavedLocale();
             if (!hasSaved) {
-              final matchedLang = localizationService.languages.firstWhereOrNull(
-                (l) => l.code.toUpperCase() == detail.languageCode!.toUpperCase()
-              );
+              final matchedLang = localizationService.languages
+                  .firstWhereOrNull(
+                    (l) =>
+                        l.code.toUpperCase() ==
+                        detail.languageCode!.toUpperCase(),
+                  );
               if (matchedLang != null) {
                 final code = matchedLang.code.toUpperCase();
                 if (code == 'EN') {
@@ -88,12 +94,18 @@ class SamajController extends GetxController with WidgetsBindingObserver{
             CrashReporter.recordError(
               e,
               stack,
-              reason: 'SamajController.fetchSamajDetail: auto-update language failed for ${detail.languageCode}',
+              reason:
+                  'SamajController.fetchSamajDetail: auto-update language failed for ${detail.languageCode}',
             );
           }
         }
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SamajController.fetchSamajDetail failed',
+      );
       samajError.value = e.toString();
     } finally {
       isSamajLoading.value = false;

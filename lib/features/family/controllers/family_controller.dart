@@ -55,7 +55,13 @@ class FamilyController extends GetxController {
       memberEducations.assignAll(results[2] as List<EducationModel>);
 
       memberDetailState.value = AppState.data;
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason:
+            'FamilyController.loadMemberDetails failed for memberId: $memberId',
+      );
       memberDetailState.value = AppState.error;
     }
   }
@@ -65,7 +71,12 @@ class FamilyController extends GetxController {
     try {
       final results = await _repository.getStates();
       states.assignAll(results);
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FamilyController.loadStates failed',
+      );
     } finally {
       isStatesLoading.value = false;
     }
@@ -253,8 +264,13 @@ class FamilyController extends GetxController {
       }
 
       state.value = AppState.data;
-    } catch (e) {
+    } catch (e, stack) {
       if (requestId != _currentLoadRequestId) return;
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FamilyController.loadAreas failed',
+      );
       if (isRefresh) {
         state.value = AppState.error;
       }
@@ -313,7 +329,12 @@ class FamilyController extends GetxController {
       familyListState.value = filteredFamilies.isEmpty
           ? AppState.empty
           : AppState.data;
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FamilyController.loadFamilies failed for areaId: $areaId',
+      );
       if (isRefresh) {
         familyListState.value = AppState.error;
       }

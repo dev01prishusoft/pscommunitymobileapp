@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/pagination_mixin.dart';
 import 'package:pscommunitymobileapp/features/member/repositories/member_repository.dart';
 import 'package:pscommunitymobileapp/features/family/repositories/family_repository.dart';
@@ -37,7 +38,12 @@ class FindMemberController extends PaginationMixin<Member> {
     try {
       final results = await _familyRepository.getStates();
       states.assignAll(results);
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FindMemberController.loadStates failed',
+      );
     } finally {
       isStatesLoading.value = false;
     }
@@ -69,12 +75,15 @@ class FindMemberController extends PaginationMixin<Member> {
     selectedTaluka.value = null;
     districts.clear();
     talukas.clear();
-    
+
     refreshData(showInitialLoading: true);
   }
 
   @override
-  Future<Result<List<Member>>> fetchPage(int page, CancelToken? cancelToken) async {
+  Future<Result<List<Member>>> fetchPage(
+    int page,
+    CancelToken? cancelToken,
+  ) async {
     final result = await _repository.searchMembers(
       query: searchQuery.value,
       stateId: selectedState.value?.id,
@@ -84,7 +93,7 @@ class FindMemberController extends PaginationMixin<Member> {
       pageSize: pageSize,
       cancelToken: cancelToken,
     );
-    
+
     if (result is Success<PaginatedResponse<Member>>) {
       return Success(result.data.data);
     } else {

@@ -164,7 +164,8 @@ class EventRegistrationController extends GetxController {
           CrashReporter.recordError(
             e,
             stack,
-            reason: 'EventRegistrationController._loadCurrentUser failed for member $memberId',
+            reason:
+                'EventRegistrationController._loadCurrentUser failed for member $memberId',
           );
         }
       }
@@ -178,10 +179,10 @@ class EventRegistrationController extends GetxController {
     final s = status.trim().toLowerCase();
 
     // Check for explicit rejection or pending status in English and Gujarati
-    final isRejected = s == 'rejected' ||
-        s == 'અસ્વીકૃત' ||
-        s == 'Rejected'.tr.toLowerCase();
-    final isRequested = s == 'requested' ||
+    final isRejected =
+        s == 'rejected' || s == 'અસ્વીકૃત' || s == 'Rejected'.tr.toLowerCase();
+    final isRequested =
+        s == 'requested' ||
         s == 'pending' ||
         s == 'વિનંતી કરેલ' ||
         s == 'પેન્ડિંગ' ||
@@ -244,7 +245,13 @@ class EventRegistrationController extends GetxController {
           familyMembers.value = approvedMembers;
         }
       }
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason:
+            'EventRegistrationController.loadFamilyMembersAndCheckEvent failed',
+      );
     } finally {
       isLoadingMembers.value = false;
     }
@@ -270,7 +277,8 @@ class EventRegistrationController extends GetxController {
           CrashReporter.recordError(
             e,
             stack,
-            reason: 'EventRegistrationController: membersTileController.collapse failed',
+            reason:
+                'EventRegistrationController: membersTileController.collapse failed',
           );
         }
         try {
@@ -281,16 +289,13 @@ class EventRegistrationController extends GetxController {
           CrashReporter.recordError(
             e,
             stack,
-            reason: 'EventRegistrationController: guestsTileController.expand failed',
+            reason:
+                'EventRegistrationController: guestsTileController.expand failed',
           );
         }
       });
     } else {
-      _showToast(
-        LK.error.tr,
-        LK.event_pay_guest_limit_err.tr,
-        isError: true,
-      );
+      _showToast(LK.error.tr, LK.event_pay_guest_limit_err.tr, isError: true);
     }
   }
 
@@ -346,7 +351,8 @@ class EventRegistrationController extends GetxController {
         } else {
           appliedCoupon.value = null;
           hasError.value = true;
-          errorMessage.value = result.data.message ?? LK.event_pay_coupon_fail_err.tr;
+          errorMessage.value =
+              result.data.message ?? LK.event_pay_coupon_fail_err.tr;
         }
       } else if (result is Error<ApiResponse<CouponApplyData>>) {
         appliedCoupon.value = null;
@@ -355,7 +361,12 @@ class EventRegistrationController extends GetxController {
             ? result.failure.message
             : LK.event_pay_coupon_fail_err.tr;
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController.applyCoupon failed',
+      );
       appliedCoupon.value = null;
       hasError.value = true;
       errorMessage.value = LK.event_pay_generic_err.tr;
@@ -368,11 +379,7 @@ class EventRegistrationController extends GetxController {
     if (!formKey.currentState!.validate()) return;
 
     if (selectedMemberIds.isEmpty && customGuests.isEmpty) {
-      _showToast(
-        LK.error.tr,
-        LK.event_pay_select_member_err.tr,
-        isError: true,
-      );
+      _showToast(LK.error.tr, LK.event_pay_select_member_err.tr, isError: true);
       return;
     }
 
@@ -463,7 +470,12 @@ class EventRegistrationController extends GetxController {
           isError: true,
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController.validateEvent failed',
+      );
       _showToast(
         LK.error.tr,
         LK.event_pay_validate_generic_err.tr,
@@ -513,13 +525,14 @@ class EventRegistrationController extends GetxController {
           isError: true,
         );
       }
-    } catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back();
-      _showToast(
-        LK.error.tr,
-        LK.event_pay_order_generic_err.tr,
-        isError: true,
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController.createOrder failed',
       );
+      if (Get.isDialogOpen ?? false) Get.back();
+      _showToast(LK.error.tr, LK.event_pay_order_generic_err.tr, isError: true);
     }
   }
 
@@ -582,7 +595,12 @@ class EventRegistrationController extends GetxController {
       _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
       _razorpay.open(options);
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController._openRazorpayCheckout failed',
+      );
       final errorMessage = e.toString();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
@@ -690,7 +708,13 @@ class EventRegistrationController extends GetxController {
           isError: true,
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason:
+            'EventRegistrationController._handlePaymentSuccess verifyPayment failed',
+      );
       if (Get.isDialogOpen ?? false) Get.back();
       _showToast(LK.error.tr, LK.verificationFailed.tr, isError: true);
     }
@@ -1137,7 +1161,8 @@ class EventRegistrationController extends GetxController {
                     event.registrationFee ??
                     0;
                 final num finalAmount = coupon?.finalAmount ?? origAmount;
-                final String buttonText = '${LK.event_pay_now_btn.tr} · ₹$finalAmount';
+                final String buttonText =
+                    '${LK.event_pay_now_btn.tr} · ₹$finalAmount';
 
                 return AppPrimaryButton(
                   onPressed: () {
@@ -1257,13 +1282,14 @@ class EventRegistrationController extends GetxController {
           isError: true,
         );
       }
-    } catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back();
-      _showToast(
-        LK.error.tr,
-        LK.event_pay_reg_generic_err.tr,
-        isError: true,
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventRegistrationController._registerFreeEvent failed',
       );
+      if (Get.isDialogOpen ?? false) Get.back();
+      _showToast(LK.error.tr, LK.event_pay_reg_generic_err.tr, isError: true);
     }
   }
 

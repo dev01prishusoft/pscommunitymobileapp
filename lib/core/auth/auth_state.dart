@@ -61,8 +61,7 @@ class AuthState {
             await apiClient
                 .post(
                   '/api/v1/auth/member-revoke-token$queryParams',
-                  data:
-                      '"$token"',
+                  data: '"$token"',
                 )
                 .timeout(const Duration(seconds: 5));
           } catch (e, stack) {
@@ -128,7 +127,13 @@ class AuthState {
         final apiClient = Get.find<pscommunitymobileapp_api_client.ApiClient>();
         try {
           await apiClient.post('/api/v1/member/active-inactive/$memberId');
-        } catch (_) {
+        } catch (e, stack) {
+          CrashReporter.recordError(
+            e,
+            stack,
+            reason:
+                'AuthState.deleteAccountAndRedirect: active-inactive API failed for memberId: $memberId',
+          );
         }
       }
     }

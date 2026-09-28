@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models/support_model.dart';
@@ -33,7 +34,12 @@ class SupportController extends GetxController {
         json['data'] as Map<String, dynamic>,
       );
       update();
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SupportController.fetchCustomerSupportDetail failed',
+      );
       supportError.value = e.toString();
     } finally {
       isLoading.value = false;

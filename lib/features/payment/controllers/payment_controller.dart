@@ -118,7 +118,12 @@ class PaymentController extends GetxController {
       } else {
         dashboardState.value = AppState.data;
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController.loadDashboard failed',
+      );
       dashboardState.value = AppState.error;
     }
   }
@@ -185,7 +190,8 @@ class PaymentController extends GetxController {
         CrashReporter.recordError(
           e,
           stack,
-          reason: 'PaymentController.onTypeChanged: getCategories failed for type ${type.id}',
+          reason:
+              'PaymentController.onTypeChanged: getCategories failed for type ${type.id}',
         );
       }
     }
@@ -201,6 +207,7 @@ class PaymentController extends GetxController {
       enteredAmount.value = cat.defaultAmount;
     }
   }
+
   Future<void> initiateDirectPayment(double amount) async {
     if (paymentTypes.isEmpty) await loadPaymentTypes();
     if (paymentModes.isEmpty) await loadPaymentModes();
@@ -303,7 +310,8 @@ class PaymentController extends GetxController {
         selectedMode.value = _findDefaultOnlineMode(paymentModes);
       }
 
-      final int paymentModeId = selectedMode.value?.id ??
+      final int paymentModeId =
+          selectedMode.value?.id ??
           _findDefaultOnlineMode(paymentModes)?.id ??
           0;
 
@@ -392,7 +400,12 @@ class PaymentController extends GetxController {
       }
 
       _razorpay.open(options);
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController._openRazorpayCheckout failed',
+      );
       final errorMessage = e.toString();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
@@ -460,7 +473,12 @@ class PaymentController extends GetxController {
           ),
         ).show();
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController._handlePaymentSuccess verifyPayment failed',
+      );
       if (Get.isDialogOpen ?? false) Get.back<void>();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
@@ -540,7 +558,8 @@ class PaymentController extends GetxController {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'PaymentController.fetchHistoryCategories failed for type $typeId',
+        reason:
+            'PaymentController.fetchHistoryCategories failed for type $typeId',
       );
     }
   }

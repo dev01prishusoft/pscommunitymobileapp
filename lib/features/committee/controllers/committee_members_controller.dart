@@ -92,7 +92,12 @@ class CommitteeMembersController extends GetxController {
       } else {
         membersState.value = AppState.error;
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'CommitteeMembersController._applyFilters failed',
+      );
       membersState.value = AppState.error;
     }
   }
@@ -120,7 +125,10 @@ class CommitteeMembersController extends GetxController {
         .map((m) => m.roleName)
         .where((r) => r.isNotEmpty)
         .toSet();
-    return [DropdownItem(id: -1, text: 'All'), ...roles.map((r) => DropdownItem(id: 0, text: r))];
+    return [
+      DropdownItem(id: -1, text: 'All'),
+      ...roles.map((r) => DropdownItem(id: 0, text: r)),
+    ];
   }
 
   Map<String, List<CommitteeMember>> getGroupedMembers(

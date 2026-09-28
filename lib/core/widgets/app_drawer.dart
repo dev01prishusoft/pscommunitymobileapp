@@ -17,6 +17,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 
 class DrawerUserController extends GetxController with WidgetsBindingObserver {
@@ -57,7 +58,12 @@ class DrawerUserController extends GetxController with WidgetsBindingObserver {
         );
         member.value = response.dataOrNull?.data;
       }
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'DrawerUserController.fetchUser failed',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -225,10 +231,7 @@ class AppDrawer extends StatelessWidget {
                     onTap: () => Get.toNamed<void>(AppRouter.addedMembers),
                   ),
                   ListTile(
-                    leading: Icon(
-                      Icons.event,
-                      color: AppColors.black,
-                    ),
+                    leading: Icon(Icons.event, color: AppColors.black),
                     title: Text(LK.events_title.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.events),
                   ),

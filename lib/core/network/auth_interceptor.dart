@@ -24,20 +24,25 @@ class AuthInterceptor extends Interceptor {
   Completer<String?>? _refreshCompleter;
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final path = options.path;
-    if (!path.contains('/login') && 
-        !path.contains('/member-login') && 
+    if (!path.contains('/login') &&
+        !path.contains('/member-login') &&
         !path.contains('/refresh-token') &&
         !path.contains('/language')) {
-      if (_tokenManager.hasRefreshToken && _tokenManager.isAccessTokenNearExpiry) {
+      if (_tokenManager.hasRefreshToken &&
+          _tokenManager.isAccessTokenNearExpiry) {
         try {
           await _refreshSingleFlight(_tokenManager.refreshToken!);
         } catch (e, stack) {
           CrashReporter.recordError(
             e,
             stack,
-            reason: 'AuthInterceptor.onRequest: proactive refresh single flight failed',
+            reason:
+                'AuthInterceptor.onRequest: proactive refresh single flight failed',
           );
         }
       }
@@ -62,8 +67,8 @@ class AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
     final path = err.requestOptions.path;
-    if (path.contains('/login') || 
-        path.contains('/member-login') || 
+    if (path.contains('/login') ||
+        path.contains('/member-login') ||
         path.contains('/language')) {
       return handler.next(err);
     }
@@ -96,7 +101,12 @@ class AuthInterceptor extends Interceptor {
       } else {
         _onAuthFailure();
       }
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthInterceptor: token refresh / retry failed',
+      );
       _onAuthFailure();
     }
 
@@ -112,8 +122,10 @@ class AuthInterceptor extends Interceptor {
 
     try {
       final isMember = _tokenManager.memberId != null;
-      final refreshEndpoint = isMember ? ApiEndpoints.memberRefreshToken : ApiEndpoints.refreshToken;
-      
+      final refreshEndpoint = isMember
+          ? ApiEndpoints.memberRefreshToken
+          : ApiEndpoints.refreshToken;
+
       final response = await _refreshDio.post<Map<String, dynamic>>(
         refreshEndpoint,
         data: {
@@ -121,9 +133,7 @@ class AuthInterceptor extends Interceptor {
           'refreshToken': refreshToken,
           'mobileNo': _tokenManager.userPhone,
         },
-        options: Options(
-          extra: {'retryable': true},
-        ),
+        options: Options(extra: {'retryable': true}),
       );
 
       final data = response.data ?? {};
@@ -133,7 +143,7 @@ class AuthInterceptor extends Interceptor {
 
       if (access != null && refresh != null) {
         await _tokenManager.saveTokens(
-          access, 
+          access,
           refresh,
           isDefaultPassword: _tokenManager.isDefaultPassword,
         );

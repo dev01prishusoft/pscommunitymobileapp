@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 
 class AddedMembersController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
@@ -106,7 +107,12 @@ class AddedMembersController extends GetxController {
           }
         }
       }
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AddedMembersController.fetchMembers failed',
+      );
     } finally {
       isLoading.value = false;
       if (filteredMembers.isEmpty && hasMore.value) {

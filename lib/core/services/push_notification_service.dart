@@ -22,11 +22,12 @@ class PushNotificationService {
 
   final ApiClient _apiClient;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
   RemoteMessage? _initialMessageToHandle;
-  
+
   bool get hasInitialMessage => _initialMessageToHandle != null;
 
   void handleInitialMessage() {
@@ -40,7 +41,9 @@ class PushNotificationService {
     if (_isInitialized) return;
 
     try {
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
 
       await _firebaseMessaging.requestPermission(
         alert: true,
@@ -52,7 +55,9 @@ class PushNotificationService {
         sound: true,
       );
 
-      const androidInitSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidInitSettings = AndroidInitializationSettings(
+        '@mipmap/ic_launcher',
+      );
       const iosInitSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -69,14 +74,16 @@ class PushNotificationService {
       );
 
       const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'high_importance_channel', 
-        'High Importance Notifications', 
-        description: 'This channel is used for important notifications.', 
+        'high_importance_channel',
+        'High Importance Notifications',
+        description: 'This channel is used for important notifications.',
         importance: Importance.high,
       );
 
       await _localNotifications
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.createNotificationChannel(channel);
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
         alert: true,
@@ -108,7 +115,8 @@ class PushNotificationService {
         // notifications via flutter_local_notifications. When the user taps such
         // a local notification, the app cold-starts but getInitialMessage() is null.
         // We must check getNotificationAppLaunchDetails() instead.
-        final launchDetails = await _localNotifications.getNotificationAppLaunchDetails();
+        final launchDetails = await _localNotifications
+            .getNotificationAppLaunchDetails();
         if (launchDetails?.didNotificationLaunchApp ?? false) {
           final payload = launchDetails?.notificationResponse?.payload;
           if (payload != null) {
@@ -119,7 +127,8 @@ class PushNotificationService {
               CrashReporter.recordError(
                 e,
                 stack,
-                reason: 'PushNotificationService: failed to decode launch payload',
+                reason:
+                    'PushNotificationService: failed to decode launch payload',
               );
             }
           }
@@ -136,7 +145,10 @@ class PushNotificationService {
     }
   }
 
-  void _showLocalNotification(RemoteMessage message, AndroidNotificationChannel channel) {
+  void _showLocalNotification(
+    RemoteMessage message,
+    AndroidNotificationChannel channel,
+  ) {
     final notification = message.notification;
 
     if (notification != null) {
@@ -174,16 +186,21 @@ class PushNotificationService {
         CrashReporter.recordError(
           e,
           stack,
-          reason: 'PushNotificationService: failed to decode tapped notification payload',
+          reason:
+              'PushNotificationService: failed to decode tapped notification payload',
         );
       }
     }
   }
 
   void _handleMessageTap(RemoteMessage message) async {
-    final pageText = (message.data['pageText'] ?? '').toString().trim().toLowerCase();
-    final String memberNotificationId = message.data['memberNotificationId']?.toString() ?? '';
-    
+    final pageText = (message.data['pageText'] ?? '')
+        .toString()
+        .trim()
+        .toLowerCase();
+    final String memberNotificationId =
+        message.data['memberNotificationId']?.toString() ?? '';
+
     if (memberNotificationId.isNotEmpty && memberNotificationId != 'null') {
       final id = int.tryParse(memberNotificationId);
       if (id != null) {
@@ -194,8 +211,13 @@ class PushNotificationService {
               ApiEndpoints.markNotificationRead(id),
               cancelToken: CancelToken(),
             );
-          } catch (_) {
-            // Ignore errors silently
+          } catch (e, stack) {
+            CrashReporter.recordError(
+              e,
+              stack,
+              reason:
+                  'PushNotificationService: failed to mark notification read ($id)',
+            );
           }
         });
       }

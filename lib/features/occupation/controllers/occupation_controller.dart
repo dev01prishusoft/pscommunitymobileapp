@@ -78,7 +78,12 @@ class OccupationController extends GetxController {
     try {
       final results = await _familyRepository.getStates();
       states.assignAll(results);
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'OccupationController.loadStates failed',
+      );
     } finally {
       isStatesLoading.value = false;
     }
@@ -112,7 +117,7 @@ class OccupationController extends GetxController {
     selectedTaluka.value = null;
     districts.clear();
     talukas.clear();
-    
+
     if (activeOccupationId.value != null) {
       loadOccupationMembers(activeOccupationId.value!, refresh: true);
     }

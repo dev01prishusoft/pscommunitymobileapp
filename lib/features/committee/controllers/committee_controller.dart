@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/pagination_mixin.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
@@ -67,8 +68,13 @@ class CommitteeController extends PaginationMixin<CommitteeNode> {
       } else {
         detailState.value = AppState.error;
       }
-    } catch (e) {
+    } catch (e, stack) {
       if (e is DioException && e.type == DioExceptionType.cancel) return;
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'CommitteeController.loadCommitteeDetail failed for id: $id',
+      );
       detailState.value = AppState.error;
     }
   }

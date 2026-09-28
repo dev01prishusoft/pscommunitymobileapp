@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/models/samaj_sanstha.dart';
 import 'package:pscommunitymobileapp/features/samaj/repositories/samaj_repository.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:dio/dio.dart';
 
 class SamajRepositoryImpl implements SamajRepository {
@@ -20,12 +21,17 @@ class SamajRepositoryImpl implements SamajRepository {
         fromJsonT: (json) => Samaj.fromJson(json as Map<String, dynamic>),
       );
       return response.dataOrNull?.data;
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SamajRepositoryImpl.getSamajDetail failed',
+      );
       return null;
     }
   }
 
-@override
+  @override
   Future<List<SamajBankDetais>> getBankAccountDetails() async {
     try {
       final response = await _apiClient.get(ApiEndpoints.bankDetailsBySamaj);
@@ -34,7 +40,12 @@ class SamajRepositoryImpl implements SamajRepository {
       return data
           .map((e) => SamajBankDetais.fromJson(e as Map<String, dynamic>))
           .toList();
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SamajRepositoryImpl.getBankAccountDetails failed',
+      );
       return [];
     }
   }
@@ -48,12 +59,10 @@ class SamajRepositoryImpl implements SamajRepository {
     try {
       final response = await _apiClient.getPaginated<SamajSanstha>(
         ApiEndpoints.samajSansthaList,
-        queryParameters: {
-          'Page': pageNumber,
-          'PageSize': pageSize,
-        },
+        queryParameters: {'Page': pageNumber, 'PageSize': pageSize},
         listKey: 'data',
-        fromJsonT: (json) => SamajSanstha.fromJson(json as Map<String, dynamic>),
+        fromJsonT: (json) =>
+            SamajSanstha.fromJson(json as Map<String, dynamic>),
         cancelToken: cancelToken,
       );
 
@@ -62,7 +71,12 @@ class SamajRepositoryImpl implements SamajRepository {
       } else {
         return Error((response as Error).failure);
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'SamajRepositoryImpl.getSamajSansthas failed',
+      );
       return Error(ServerFailure(e.toString()));
     }
   }

@@ -134,7 +134,9 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   Future<void> fetchUnreadNotificationCount() async {
     try {
       if (Get.isRegistered<ModulePermissionService>()) {
-        if (!ModulePermissionService.to.isAccessible(AppModule.dailyNotification)) {
+        if (!ModulePermissionService.to.isAccessible(
+          AppModule.dailyNotification,
+        )) {
           unreadNotificationCount.value = 0;
           return;
         }
@@ -223,8 +225,12 @@ class HomeController extends GetxController with WidgetsBindingObserver {
           );
         }
       }
-    } catch (_) {
-      // Gracefully prevent unhandled exceptions from breaking app lifecycle or startup
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'HomeController.checkAppUpdate failed',
+      );
     }
   }
 }

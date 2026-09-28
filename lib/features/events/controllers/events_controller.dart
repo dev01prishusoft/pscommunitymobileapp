@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 import 'package:dio/dio.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/debouncer.dart';
 
 class EventsController extends GetxController
@@ -233,7 +234,12 @@ class EventsController extends GetxController
           if (type == 3) pastPage--;
         }
       }
-    } catch (e) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'EventsController.loadEvents failed for type: $type',
+      );
       if (!isRefresh) {
         if (type == 1) upcomingPage--;
         if (type == 2) ongoingPage--;

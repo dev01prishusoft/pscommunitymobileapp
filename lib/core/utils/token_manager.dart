@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 
 class TokenPair {
@@ -56,8 +57,12 @@ class TokenManager {
         primaryColor: results[5],
         secondaryColor: results[6],
       );
-      userPhoneRx.value = results[3] ?? '';
-    } catch (_) {
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'TokenManager.initFromStorage failed to read tokens',
+      );
       authState.value = TokenPair();
     }
   }
@@ -93,7 +98,7 @@ class TokenManager {
       await Future.wait(futures);
 
       authState.value = TokenPair(
-        accessToken: access, 
+        accessToken: access,
         refreshToken: refresh,
         isDefaultPassword: isDefaultPassword,
         deviceUniqueId: deviceUniqueId ?? authState.value.deviceUniqueId,
@@ -110,7 +115,7 @@ class TokenManager {
       await _storage.deleteAll();
       authState.value = TokenPair();
       userPhoneRx.value = '';
-      
+
       AppColors.updateColors(null, null);
       Get.changeTheme(AppTheme.light);
     } catch (_) {
@@ -171,15 +176,16 @@ class TokenManager {
     if (token == null || token.isEmpty) return null;
     final payload = _decodeJwtPayload(token);
     if (payload == null) return null;
-    
-    final id = payload['memberId'] ?? 
-               payload['MemberId'] ?? 
-               payload['nameid'] ?? 
-               payload['id'] ??
-               payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
-               payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid'] ??
-               payload['MemberID'];
-               
+
+    final id =
+        payload['memberId'] ??
+        payload['MemberId'] ??
+        payload['nameid'] ??
+        payload['id'] ??
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid'] ??
+        payload['MemberID'];
+
     if (id == null) {}
 
     if (id is int) return id;
@@ -192,11 +198,9 @@ class TokenManager {
     if (token == null || token.isEmpty) return null;
     final payload = _decodeJwtPayload(token);
     if (payload == null) return null;
-    
-    final id = payload['samajId'] ?? 
-               payload['SamajId'] ?? 
-               payload['samajid'];
-               
+
+    final id = payload['samajId'] ?? payload['SamajId'] ?? payload['samajid'];
+
     if (id is int) return id;
     if (id is String) return int.tryParse(id);
     return null;
@@ -208,9 +212,10 @@ class TokenManager {
     if (token == null || token.isEmpty) return null;
     final payload = _decodeJwtPayload(token);
     if (payload == null) return null;
-    return payload['mobile']?.toString() ?? 
-           payload['phone']?.toString() ?? 
-           payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone']?.toString();
+    return payload['mobile']?.toString() ??
+        payload['phone']?.toString() ??
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone']
+            ?.toString();
   }
 
   String? get userEmail {
@@ -218,8 +223,9 @@ class TokenManager {
     if (token == null || token.isEmpty) return null;
     final payload = _decodeJwtPayload(token);
     if (payload == null) return null;
-    return payload['email']?.toString() ?? 
-           payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']?.toString();
+    return payload['email']?.toString() ??
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+            ?.toString();
   }
 
   static Map<String, dynamic>? _decodeJwtPayload(String token) {
@@ -245,7 +251,10 @@ class TokenManager {
   static String? _cachedAccessToken;
   static DateTime? _cachedAccessExpiry;
 
-  static bool _isJwtExpired(String token, {Duration threshold = const Duration(seconds: 30)}) {
+  static bool _isJwtExpired(
+    String token, {
+    Duration threshold = const Duration(seconds: 30),
+  }) {
     if (token == _cachedAccessToken && _cachedAccessExpiry != null) {
       return DateTime.now().toUtc().isAfter(
         _cachedAccessExpiry!.subtract(threshold),
@@ -268,9 +277,7 @@ class TokenManager {
     _cachedAccessToken = token;
     _cachedAccessExpiry = expiry;
 
-    return DateTime.now().toUtc().isAfter(
-      expiry.subtract(threshold),
-    );
+    return DateTime.now().toUtc().isAfter(expiry.subtract(threshold));
   }
 
   static int? _expirySeconds(Object exp) {
