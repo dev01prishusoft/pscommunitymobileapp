@@ -26,6 +26,7 @@ class SecureStorageService {
         stack,
         reason: 'SecureStorage.write failed for key: $key',
       );
+      rethrow;
     }
   }
 
@@ -67,6 +68,7 @@ class SecureStorageService {
         stack,
         reason: 'SecureStorage.setBool failed for key: $key',
       );
+      rethrow;
     }
   }
 

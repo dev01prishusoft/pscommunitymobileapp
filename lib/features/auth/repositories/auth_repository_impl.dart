@@ -46,16 +46,20 @@ class AuthRepositoryImpl implements AuthRepository {
       if (tokens == null) {
         return Error(ServerFailure('Missing tokens in response'));
       }
-      await _tokenManager.saveTokens(
-        tokens.accessToken, 
-        tokens.refreshToken,
-        isDefaultPassword: tokens.isDefaultPassword,
-        mobile: mobile,
-        deviceUniqueId: tokens.deviceUniqueId,
-        primaryColor: tokens.primaryColor,
-        secondaryColor: tokens.secondaryColor,
-      );
-      return Success(tokens);
+      try {
+        await _tokenManager.saveTokens(
+          tokens.accessToken, 
+          tokens.refreshToken,
+          isDefaultPassword: tokens.isDefaultPassword,
+          mobile: mobile,
+          deviceUniqueId: tokens.deviceUniqueId,
+          primaryColor: tokens.primaryColor,
+          secondaryColor: tokens.secondaryColor,
+        );
+        return Success(tokens);
+      } catch (e) {
+        return Error(ServerFailure('Failed to securely save login session.'));
+      }
     } else {
       return Error((result as Error).failure);
     }
@@ -102,16 +106,20 @@ class AuthRepositoryImpl implements AuthRepository {
       if (tokens == null) {
         return Error(ServerFailure('Missing tokens in response'));
       }
-      await _tokenManager.saveTokens(
-        tokens.accessToken, 
-        tokens.refreshToken,
-        isDefaultPassword: tokens.isDefaultPassword,
-        mobile: mobile,
-        deviceUniqueId: tokens.deviceUniqueId,
-        primaryColor: tokens.primaryColor,
-        secondaryColor: tokens.secondaryColor,
-      );
-      return Success(tokens);
+      try {
+        await _tokenManager.saveTokens(
+          tokens.accessToken, 
+          tokens.refreshToken,
+          isDefaultPassword: tokens.isDefaultPassword,
+          mobile: mobile,
+          deviceUniqueId: tokens.deviceUniqueId,
+          primaryColor: tokens.primaryColor,
+          secondaryColor: tokens.secondaryColor,
+        );
+        return Success(tokens);
+      } catch (e) {
+        return Error(ServerFailure('Failed to securely save login session.'));
+      }
     } else {
       return Error((result as Error).failure);
     }
