@@ -4,7 +4,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 class AppValidators {
   static final RegExp _mobileRegex = RegExp(r'^[0-9]{10}$');
   static final RegExp _emailRegex = RegExp(
-    r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
+    r'^[a-zA-Z0-9.!#$%&'
+    "'"
+    r'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$',
   );
 
   static String? required(String? value, {String? customMessage}) {
