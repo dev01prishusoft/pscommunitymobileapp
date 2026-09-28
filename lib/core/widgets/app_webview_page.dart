@@ -155,7 +155,7 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
                     Icon(Icons.error_outline, size: 60, color: AppColors.red),
                     SizedBox(height: 16.h),
                     Text(
-                      'Failed to load page',
+                      LK.failedToLoadPage.tr,
                       style: AppTextStyles.headlineSmall,
                     ),
                     SizedBox(height: 8.h),

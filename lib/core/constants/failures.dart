@@ -69,3 +69,8 @@ class NotFoundFailure extends Failure {
   NotFoundFailure([String message = 'Resource not found', String? code])
     : super(message, translationKey: LK.noResultsFound, code: code);
 }
+
+class CancelFailure extends Failure {
+  CancelFailure([String message = 'Request cancelled', String? code])
+    : super(message, translationKey: LK.error, code: code);
+}

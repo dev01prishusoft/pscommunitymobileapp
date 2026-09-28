@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/models/member_notification.dart';
@@ -50,7 +51,7 @@ class NotificationController extends GetxController {
     );
 
     if (result.isFailure) {
-      if (result.failureOrNull?.message != 'canceled') {
+      if (result.failureOrNull is! CancelFailure) {
         errorMessage.value =
             result.failureOrNull?.message ?? LK.unknownError.tr;
         notifications.clear();
@@ -78,7 +79,7 @@ class NotificationController extends GetxController {
       cancelToken: _cancelToken,
     );
     if (result.isFailure) {
-      if (result.failureOrNull?.message != 'canceled') {
+      if (result.failureOrNull is! CancelFailure) {
         _currentPage--;
         PSDelightToastBar(
           snackbarDuration: const Duration(seconds: 3),
@@ -203,7 +204,7 @@ class NotificationController extends GetxController {
         if (index != -1 && oldNotification != null) {
           notifications[index] = oldNotification;
         }
-        if (result.failureOrNull?.message != 'canceled') {
+        if (result.failureOrNull is! CancelFailure) {
           PSDelightToastBar(
             snackbarDuration: const Duration(seconds: 3),
             builder: (context) => ToastCard(

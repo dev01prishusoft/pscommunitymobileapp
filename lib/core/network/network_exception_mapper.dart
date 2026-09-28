@@ -39,7 +39,7 @@ class NetworkExceptionMapper {
           return ServerFailure('Invalid response from server');
 
         case DioExceptionType.cancel:
-          return ServerFailure('Request cancelled');
+          return CancelFailure();
 
         case DioExceptionType.connectionError:
           return NetworkFailure();

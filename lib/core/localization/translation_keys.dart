@@ -686,4 +686,9 @@ class LK {
   static const String event_session_online_meeting_link =
       "event_session_online_meeting_link";
   static const String event_session_description = "event_session_description";
+
+  static const String showPassword = 'Show Password';
+  static const String hidePassword = 'Hide Password';
+  static const String failedToLoadPage = 'Failed to load page';
+  static const String byContinuingYouAgree = 'By continuing, you agree to our';
 }

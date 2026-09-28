@@ -371,6 +371,16 @@ class PaymentController extends GetxController {
           ? Get.find<SamajController>().samaj.value?.logoUrl
           : null;
 
+      final prefill = <String, String>{};
+      final phone = tokenManager.userPhone?.trim();
+      final email = tokenManager.userEmail?.trim();
+      if (phone != null && phone.isNotEmpty) {
+        prefill['contact'] = phone;
+      }
+      if (email != null && email.isNotEmpty) {
+        prefill['email'] = email;
+      }
+
       final options = <String, dynamic>{
         'key': key,
         'amount': order.amountInPaise,
@@ -379,14 +389,7 @@ class PaymentController extends GetxController {
         'timeout': 300,
         if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
           'image': samajLogoUrl,
-        'prefill': {
-          'contact': (tokenManager.userPhone?.isNotEmpty ?? false)
-              ? tokenManager.userPhone
-              : '+919999999999',
-          'email': (tokenManager.userEmail?.isNotEmpty ?? false)
-              ? tokenManager.userEmail
-              : 'test@example.com',
-        },
+        if (prefill.isNotEmpty) 'prefill': prefill,
         'theme': {'color': '#1E3A8A'},
         'currency': 'INR',
       };

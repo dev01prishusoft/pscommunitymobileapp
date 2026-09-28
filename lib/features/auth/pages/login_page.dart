@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'By continuing, you agree to our',
+                LK.byContinuingYouAgree.tr,
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
                 textAlign: TextAlign.center,
               ),
@@ -169,8 +169,8 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed:
                                       _controller.togglePasswordVisibility,
                                   tooltip: _controller.obscurePassword.value
-                                      ? 'Show Password'
-                                      : 'Hide Password',
+                                      ? LK.showPassword.tr
+                                      : LK.hidePassword.tr,
                                   icon: Icon(
                                     _controller.obscurePassword.value
                                         ? Iconsax.eye_copy

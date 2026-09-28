@@ -501,5 +501,9 @@
     "Access Restricted": "Access Restricted",
     "This Samaj has not purchased the @module module.": "This Samaj has not purchased the @module module.",
     "Events": "Events",
-    "events_title": "Events"
+    "events_title": "Events",
+    "Show Password": "Show Password",
+    "Hide Password": "Hide Password",
+    "Failed to load page": "Failed to load page",
+    "By continuing, you agree to our": "By continuing, you agree to our"
 }

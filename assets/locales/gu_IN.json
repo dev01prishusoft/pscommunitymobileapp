@@ -502,5 +502,9 @@
     "Access Restricted": "પ્રવેશ પ્રતિબંધિત",
     "This Samaj has not purchased the @module module.": "આ સમાજે @module મોડ્યુલ ખરીદેલ નથી.",
     "Events": "કાર્યક્રમો",
-    "events_title": "કાર્યક્રમો"
+    "events_title": "કાર્યક્રમો",
+    "Show Password": "પાસવર્ડ બતાવો",
+    "Hide Password": "પાસવર્ડ છુપાવો",
+    "Failed to load page": "પેજ લોડ કરવામાં નિષ્ફળ",
+    "By continuing, you agree to our": "આગળ વધીને, તમે અમારા નિયમો સાથે સંમત થાઓ છો"
 }
