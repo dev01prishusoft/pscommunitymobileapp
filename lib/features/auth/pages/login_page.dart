@@ -44,43 +44,61 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () => Get.to<void>(
-                () => AppWebViewPage(
-                  title: LK.privacyPolicy.tr,
-                  url: AppEnvironment.I.privacyPolicyUrl,
-                ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'By continuing, you agree to our',
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.grey),
+                textAlign: TextAlign.center,
               ),
-              child: Text(
-                LK.privacyPolicy.tr,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+              SizedBox(height: 4.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.to<void>(
+                      () => AppWebViewPage(
+                        title: LK.privacyPolicy.tr,
+                        url: AppEnvironment.I.privacyPolicyUrl,
+                      ),
+                    ),
+                    child: Text(
+                      LK.privacyPolicy.tr,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '  •  ',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Get.to<void>(
+                      () => AppWebViewPage(
+                        title: LK.termsAndConditions.tr,
+                        url: AppEnvironment.I.termsAndConditionsUrl,
+                      ),
+                    ),
+                    child: Text(
+                      LK.termsAndConditions.tr,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            AppSpacing.hXxxl,
-            GestureDetector(
-              onTap: () => Get.to<void>(
-                () => AppWebViewPage(
-                  title: LK.termsAndConditions.tr,
-                  url: AppEnvironment.I.termsAndConditionsUrl,
-                ),
-              ),
-              child: Text(
-                LK.termsAndConditions.tr,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       body: SafeArea(
