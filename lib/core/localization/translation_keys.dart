@@ -297,7 +297,7 @@ class LK {
   static const String categoryHeader = 'CATEGORY';
   static const String selectCategory = 'Select Category';
   static const String amountHeader = 'Amount Header';
-  static const String payNow = 'PAY NOW';
+  static const String payNow = 'Pay Now';
   static const String searchOccupation = 'Search occupation...';
   static const String occupationColon = 'Occupation:';
   static const String any = 'Any';

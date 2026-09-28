@@ -265,12 +265,5 @@ class AppRouter {
       },
       middlewares: [AuthGuard()],
     ),
-    /*GetPage<void>(
-      name: eventScanner,
-      page: () => EventScannerPage(
-        customToken: Get.arguments is String ? Get.arguments as String : null,
-      ),
-      middlewares: [AuthGuard()],
-    ),*/
   ];
 }

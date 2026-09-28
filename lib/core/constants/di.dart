@@ -158,7 +158,7 @@ class DI {
           fenix: true,
         );
         Get.lazyPut(
-          () => EventAttendanceController(eventAttendanceRepository),
+          () => EventAttendanceController(),
           fenix: true,
         );
 
