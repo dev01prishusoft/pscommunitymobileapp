@@ -525,7 +525,7 @@ class EventDetailsPage extends StatelessWidget {
         style: AppTextStyles.titleSmall.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.bold,
-          fontSize: 13.sp,
+          fontSize: 13,
           decoration: TextDecoration.underline,
           decorationColor: AppColors.primary,
           decorationThickness: 1,
@@ -746,7 +746,7 @@ class EventDetailsPage extends StatelessWidget {
                                 style: AppTextStyles.labelSmall.copyWith(
                                   color: const Color(0xFF2E7D32),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 10.sp,
+                                  fontSize: 10,
                                 ),
                               ),
                             ),
@@ -1599,7 +1599,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 10.sp,
+                                      fontSize: 10,
                                     ),
                                   ),
                                 ],
@@ -1690,7 +1690,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.grey.shade600,
                     fontWeight: FontWeight.w600,
-                    fontSize: 10.sp,
+                    fontSize: 10,
                   ),
                 ),
               ),
@@ -1705,7 +1705,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                 value,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primary,
-                  fontSize: 12.sp,
+                  fontSize: 12,
                 ),
               ),
             )
@@ -1715,7 +1715,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
               style: AppTextStyles.bodySmall.copyWith(
                 color: isEmpty ? AppColors.grey.shade400 : AppColors.black,
                 fontStyle: isEmpty ? FontStyle.italic : FontStyle.normal,
-                fontSize: 12.sp,
+                fontSize: 12,
                 height: 1.3,
               ),
             ),

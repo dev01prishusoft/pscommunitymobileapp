@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,8 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
+import 'package:pscommunitymobileapp/core/utils/share_origin.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/payment/controllers/payment_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
@@ -33,6 +36,33 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   bool _isRecurringArg = false;
   String _planNameArg = '';
   Map<String, dynamic>? _latestData;
+  bool _isExporting = false;
+
+  /// Guards PDF export: one at a time (no double-tap duplicates), and any
+  /// failure is reported to the user instead of being silently dropped.
+  Future<void> _runExport(Future<void> Function() action) async {
+    if (_isExporting) return;
+    setState(() => _isExporting = true);
+    try {
+      await action();
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentReceiptPage: PDF export failed',
+      );
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: LK.error.tr,
+          subtitle: LK.couldNotGenerateReceipt.tr,
+          isErrorMessage: true,
+        ),
+      ).show();
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
 
   @override
   void initState() {
@@ -64,7 +94,18 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         ),
         title: Text(LK.paymentReceipt.tr),
         actions: [
-          IconButton(onPressed: () => _shareReceipt(), icon: Icon(Icons.share)),
+          // Builder: the button's own rect anchors the iPad share popover.
+          Builder(
+            builder: (buttonContext) => IconButton(
+              tooltip: LK.share.tr,
+              onPressed: _isExporting
+                  ? null
+                  : () => _runExport(
+                      () => _shareReceipt(shareOriginOf(buttonContext)),
+                    ),
+              icon: const Icon(Icons.share),
+            ),
+          ),
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -74,7 +115,9 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text('${LK.error.tr}: ${snapshot.error}'),
+            );
           }
           if (!snapshot.hasData) {
             return Center(child: Text(LK.noDataFound.tr));
@@ -343,8 +386,19 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ),
           SizedBox(height: 24.h),
           ElevatedButton.icon(
-            onPressed: () => _generateAndPrintPdf(rawData),
-            icon: Icon(Icons.file_download_rounded, color: AppColors.white),
+            onPressed: _isExporting
+                ? null
+                : () => _runExport(() => _generateAndPrintPdf(rawData)),
+            icon: _isExporting
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.white,
+                    ),
+                  )
+                : Icon(Icons.file_download_rounded, color: AppColors.white),
             label: Text(
               LK.downloadPdf.tr,
               style: AppTextStyles.titleLarge.copyWith(
@@ -410,7 +464,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
-  Future<void> _shareReceipt() async {
+  Future<void> _shareReceipt(Rect? origin) async {
     if (_latestData == null) return;
     final parsed = _getParsedData(_latestData!);
     final pdf = await _generatePdfDocument(parsed);
@@ -419,6 +473,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     await Printing.sharePdf(
       bytes: bytes,
       filename: 'receipt_${parsed['receiptNo']}.pdf',
+      bounds: origin,
     );
   }
 
@@ -431,15 +486,21 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
+  /// Optional logo for the PDF; the receipt is still generated without it.
   Future<Uint8List?> _loadNetworkImage(String? url) async {
+    if (url == null || url.isEmpty) return null;
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 8);
     try {
-      if (url == null || url.isEmpty) return null;
-
-      final request = await HttpClient().getUrl(Uri.parse(url));
-      final response = await request.close();
+      final request = await client.getUrl(Uri.parse(url));
+      final response = await request.close().timeout(
+        const Duration(seconds: 8),
+      );
 
       if (response.statusCode == 200) {
-        return await consolidateHttpClientResponseBytes(response);
+        return await consolidateHttpClientResponseBytes(
+          response,
+        ).timeout(const Duration(seconds: 15));
       }
     } catch (e, stack) {
       CrashReporter.recordError(
@@ -447,14 +508,21 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         stack,
         reason: 'PaymentReceiptPage._loadNetworkImage failed for $url',
       );
+    } finally {
+      client.close();
     }
 
     return null;
   }
 
+  // Bundled (assets/fonts, OFL) rather than PdfGoogleFonts, which downloads
+  // at runtime and made receipts impossible to generate offline.
+  static Future<pw.Font> _loadFont(String assetPath) async =>
+      pw.Font.ttf(await rootBundle.load(assetPath));
+
   Future<pw.Document> _generatePdfDocument(Map<String, String> data) async {
-    final font = await PdfGoogleFonts.hindVadodaraRegular();
-    final boldFont = await PdfGoogleFonts.hindVadodaraBold();
+    final font = await _loadFont('assets/fonts/HindVadodara-Regular.ttf');
+    final boldFont = await _loadFont('assets/fonts/HindVadodara-Bold.ttf');
 
     final logoBytes = await _loadNetworkImage(
       samajController.samaj.value?.logoUrl,

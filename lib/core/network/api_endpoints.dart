@@ -7,6 +7,9 @@ class ApiEndpoints {
   static String memberUpdatePassword = '/api/v1/auth/member-update-password';
   static String memberRefreshToken = '/api/v1/auth/member-refresh-token';
   static String memberRevokeToken = '/api/v1/auth/member-revoke-token';
+  // Upserts the FCM token for the logged-in member + device.
+  // TODO(backend): endpoint must be implemented server-side; path is a proposal.
+  static String memberDeviceToken = '/api/v1/member/device-token';
   static String myModules = '/api/v1/samaj-module/my-modules';
   static String members = '/api/v1/member/list';
   static String memberSearch = '/api/v1/member/MemberSearch';

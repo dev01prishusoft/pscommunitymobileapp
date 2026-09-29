@@ -44,121 +44,122 @@ import 'package:pscommunitymobileapp/features/splash/controllers/splash_controll
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
 
 class DI {
+  /// Builds the dependency graph before the first frame.
+  ///
+  /// Nothing in here may wait on the user (permission dialogs etc.): there is
+  /// no UI yet. Notification permission is requested from HomeController.
   static Future<void> bootstrap() async {
-    try {
-      await Future(() async {
-        AppEnvironment.init();
-        final secureStorage = SecureStorageService();
-        Get.put(secureStorage, permanent: true);
-        final tokenManager = TokenManager(secureStorage);
-        await tokenManager.bootstrap();
+    AppEnvironment.init();
+    final secureStorage = SecureStorageService();
+    Get.put(secureStorage, permanent: true);
+    final tokenManager = TokenManager(secureStorage);
+    // A hung Keychain/Keystore read must not block startup; fall back to
+    // the logged-out state instead.
+    await tokenManager.bootstrap().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {},
+    );
 
-        AppColors.updateColors(
-          tokenManager.authState.value.primaryColor,
-          tokenManager.authState.value.secondaryColor,
-        );
+    AppColors.updateColors(
+      tokenManager.authState.value.primaryColor,
+      tokenManager.authState.value.secondaryColor,
+    );
 
-        Get.put(tokenManager, permanent: true);
+    Get.put(tokenManager, permanent: true);
 
-        final modulePermissionStorage = ModulePermissionStorage(secureStorage);
-        Get.put(modulePermissionStorage, permanent: true);
-        final modulePermissionService = ModulePermissionService(
-          storage: modulePermissionStorage,
-        );
-        await modulePermissionService.bootstrap();
-        Get.put(modulePermissionService, permanent: true);
+    final modulePermissionStorage = ModulePermissionStorage(secureStorage);
+    Get.put(modulePermissionStorage, permanent: true);
+    final modulePermissionService = ModulePermissionService(
+      storage: modulePermissionStorage,
+    );
+    await modulePermissionService.bootstrap();
+    Get.put(modulePermissionService, permanent: true);
 
-        final connectivityPlugin = Connectivity();
-        final connectivity = ConnectivityService(
-          connectivity: connectivityPlugin,
-        );
-        Get.put(connectivity, permanent: true);
+    final connectivityPlugin = Connectivity();
+    final connectivity = ConnectivityService(connectivity: connectivityPlugin);
+    Get.put(connectivity, permanent: true);
 
-        final authState = AuthState(tokenManager);
-        Get.put(authState, permanent: true);
-        
-        final apiClient = ApiClient(
-          tokenManager: tokenManager,
-          connectivity: connectivity,
-          onAuthFailure: authState.logoutAndRedirect,
-        );
-        Get.put(apiClient, permanent: true);
+    final authState = AuthState(tokenManager);
+    Get.put(authState, permanent: true);
 
-        modulePermissionService.attachApiClient(apiClient);
+    final apiClient = ApiClient(
+      tokenManager: tokenManager,
+      connectivity: connectivity,
+      onAuthFailure: authState.logoutAndRedirect,
+    );
+    Get.put(apiClient, permanent: true);
 
-        final localization = LocalizationService(secureStorage);
-        await localization.bootstrap();
-        Get.put(localization, permanent: true);
-        final authRepository = AuthRepositoryImpl(
-          apiClient,
-          tokenManager,
-          modulePermissionService,
-        );
-        final loginUseCase = LoginUseCase(authRepository);
-        Get.put(loginUseCase, permanent: true);
-        Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
-        Get.lazyPut(() => SplashController(), fenix: true);
-        final memberRepository = MemberRepositoryImpl(apiClient);
-        final familyRepository = FamilyRepositoryImpl(apiClient);
-        Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
-        Get.lazyPut(
-          () => FindMemberController(memberRepository, familyRepository),
-          fenix: true,
-        );
-        final marriageRepository = MarriageRepositoryImpl(apiClient);
-        Get.lazyPut(
-          () => MarriageController(
-            marriageRepository,
-            memberRepository,
-            familyRepository,
-          ),
-          fenix: true,
-        );
-        final committeeRepository = CommitteeRepositoryImpl(apiClient);
-        Get.lazyPut(
-          () => CommitteeController(committeeRepository),
-          fenix: true,
-        );
-        final occupationRepository = OccupationRepositoryImpl(apiClient);
-        Get.lazyPut(
-          () => OccupationController(occupationRepository, familyRepository),
-          fenix: true,
-        );
-        final PaymentRepository paymentRepository = PaymentRepositoryImpl(
-          apiClient,
-        );
-        Get.lazyPut(() => PaymentController(paymentRepository), fenix: true);
-        final businessRepository = BusinessRepositoryImpl(apiClient);
-        Get.lazyPut(() => BusinessController(businessRepository), fenix: true);
-        final samajRepository = SamajRepositoryImpl(apiClient);
-        final samajController = Get.put(
-          SamajController(samajRepository),
-          permanent: true,
-        );
+    modulePermissionService.attachApiClient(apiClient);
 
-        Get.lazyPut(() => BankAccountController(samajRepository), fenix: true);
-        Get.lazyPut(() => SupportController(apiClient), fenix: true);
-        Get.lazyPut(() => HomeController(), fenix: true);
-        Get.lazyPut(() => ShareController(apiClient), fenix: true);
-        final eventsRepository = EventsRepositoryImpl(apiClient);
-        Get.lazyPut<EventsRepositories>(() => eventsRepository, fenix: true);
-        Get.lazyPut(() => EventsController(eventsRepository), fenix: true);
-        Get.lazyPut(
-          () => EventRegistrationController(repository: eventsRepository),
-          fenix: true,
-        );
-        Get.lazyPut(() => MyEventsController(eventsRepository), fenix: true);
+    final localization = LocalizationService(secureStorage);
+    await localization.bootstrap();
+    Get.put(localization, permanent: true);
+    final authRepository = AuthRepositoryImpl(
+      apiClient,
+      tokenManager,
+      modulePermissionService,
+    );
+    final loginUseCase = LoginUseCase(authRepository);
+    Get.put(loginUseCase, permanent: true);
+    Get.lazyPut(() => ResetPasswordController(authRepository), fenix: true);
+    Get.lazyPut(() => SplashController(), fenix: true);
+    final memberRepository = MemberRepositoryImpl(apiClient);
+    final familyRepository = FamilyRepositoryImpl(apiClient);
+    Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
+    Get.lazyPut(
+      () => FindMemberController(memberRepository, familyRepository),
+      fenix: true,
+    );
+    final marriageRepository = MarriageRepositoryImpl(apiClient);
+    Get.lazyPut(
+      () => MarriageController(
+        marriageRepository,
+        memberRepository,
+        familyRepository,
+      ),
+      fenix: true,
+    );
+    final committeeRepository = CommitteeRepositoryImpl(apiClient);
+    Get.lazyPut(() => CommitteeController(committeeRepository), fenix: true);
+    final occupationRepository = OccupationRepositoryImpl(apiClient);
+    Get.lazyPut(
+      () => OccupationController(occupationRepository, familyRepository),
+      fenix: true,
+    );
+    final PaymentRepository paymentRepository = PaymentRepositoryImpl(
+      apiClient,
+    );
+    // Registered on its own so pending payments can be reconciled at startup
+    // without instantiating PaymentController (which loads 5 endpoints).
+    Get.put<PaymentRepository>(paymentRepository, permanent: true);
+    Get.lazyPut(() => PaymentController(paymentRepository), fenix: true);
+    final businessRepository = BusinessRepositoryImpl(apiClient);
+    Get.lazyPut(() => BusinessController(businessRepository), fenix: true);
+    final samajRepository = SamajRepositoryImpl(apiClient);
+    final samajController = Get.put(
+      SamajController(samajRepository),
+      permanent: true,
+    );
 
-        final pushNotificationService = PushNotificationService(apiClient);
-        await pushNotificationService.init();
-        Get.put(pushNotificationService, permanent: true);
+    Get.lazyPut(() => BankAccountController(samajRepository), fenix: true);
+    Get.lazyPut(() => SupportController(apiClient), fenix: true);
+    Get.lazyPut(() => HomeController(), fenix: true);
+    Get.lazyPut(() => ShareController(apiClient), fenix: true);
+    final eventsRepository = EventsRepositoryImpl(apiClient);
+    Get.lazyPut<EventsRepositories>(() => eventsRepository, fenix: true);
+    Get.lazyPut(() => EventsController(eventsRepository), fenix: true);
+    Get.lazyPut(
+      () => EventRegistrationController(repository: eventsRepository),
+      fenix: true,
+    );
+    Get.lazyPut(() => MyEventsController(eventsRepository), fenix: true);
 
-        if (authState.isAuthenticated.value) {
-          unawaited(samajController.fetchAll());
-        }
-      }).timeout(const Duration(seconds: 15));
-    } catch (e) {
-      rethrow;
+    final pushNotificationService = PushNotificationService(apiClient);
+    await pushNotificationService.init();
+    Get.put(pushNotificationService, permanent: true);
+
+    if (authState.isAuthenticated.value) {
+      unawaited(samajController.fetchAll());
     }
   }
 }

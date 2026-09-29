@@ -10,12 +10,14 @@ import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/event_validate_model.dart';
 import 'package:pscommunitymobileapp/core/models/gender_model.dart';
+import 'package:pscommunitymobileapp/core/models/pending_payment.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
+import 'package:pscommunitymobileapp/core/utils/retry.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
@@ -25,6 +27,7 @@ import 'package:pscommunitymobileapp/features/events/repositories/events_reposit
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_details_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/services/payment_reconciler.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CustomGuestForm {
@@ -681,36 +684,37 @@ class EventRegistrationController extends GetxController {
           )
           .toList();
 
-      final result = await _repository.eventVerifyPayment(
+      // Razorpay has already captured the money. Persist first so an
+      // interrupted verification is retried on the next launch. The verify
+      // call no longer shares _cancelToken, which coupon lookup and
+      // validation cancel and replace.
+      final pending = PendingEventPayment(
         razorpayOrderId: orderIdToUse,
         razorpayPaymentId: response.paymentId ?? '',
         razorpaySignature: response.signature ?? '',
         eventId: eventId,
         memberId: memberId,
         eventCouponId: eventCouponId,
-        notes: "",
         guests: verifyGuests,
-        cancelToken: _cancelToken,
       );
-
-      if (Get.isDialogOpen ?? false) Get.back();
-
-      if (result is Success<ApiResponse<Map<String, dynamic>>>) {
-        if (Get.isBottomSheetOpen ?? false) Get.back();
-        _showToast(
-          LK.success.tr,
-          result.data.message ?? LK.paymentSuccessful.tr,
-        );
-        navigateBackAfterRegister();
-      } else if (result is Error<ApiResponse<Map<String, dynamic>>>) {
-        _showToast(
-          LK.error.tr,
-          result.failure.message.isNotEmpty
-              ? result.failure.message
-              : LK.verificationFailed.tr,
-          isError: true,
+      final reconciler = PaymentReconciler.fromGet();
+      try {
+        await reconciler.store.saveEventPayment(pending);
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason:
+              'EventRegistrationController: could not persist pending payment',
         );
       }
+
+      final verified = await reconciler.verifyEventPayment(pending);
+
+      if (Get.isDialogOpen ?? false) Get.back();
+      if (Get.isBottomSheetOpen ?? false) Get.back();
+      _showToast(LK.success.tr, verified.message ?? LK.paymentSuccessful.tr);
+      navigateBackAfterRegister();
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
@@ -719,7 +723,18 @@ class EventRegistrationController extends GetxController {
             'EventRegistrationController._handlePaymentSuccess verifyPayment failed',
       );
       if (Get.isDialogOpen ?? false) Get.back();
-      _showToast(LK.error.tr, LK.verificationFailed.tr, isError: true);
+      if (isTransientFailure(e)) {
+        // Money captured, confirmation still pending: never say "failed".
+        _showToast(LK.info.tr, LK.paymentConfirmationPending.tr);
+      } else {
+        _showToast(
+          LK.error.tr,
+          e is Failure && e.message.isNotEmpty
+              ? e.message
+              : LK.verificationFailed.tr,
+          isError: true,
+        );
+      }
     }
   }
 
@@ -886,7 +901,7 @@ class EventRegistrationController extends GetxController {
                                     LK.event_pay_base_amount_desc.tr,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.grey.shade500,
-                                      fontSize: 11.sp,
+                                      fontSize: 11,
                                     ),
                                   ),
                                 ],
@@ -955,7 +970,7 @@ class EventRegistrationController extends GetxController {
                                           : LK.event_pay_discount_applied.tr,
                                       style: AppTextStyles.bodySmall.copyWith(
                                         color: AppColors.green,
-                                        fontSize: 11.sp,
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -1001,7 +1016,7 @@ class EventRegistrationController extends GetxController {
                                 LK.event_pay_final_amount_desc.tr,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.grey.shade500,
-                                  fontSize: 11.sp,
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
@@ -1105,7 +1120,7 @@ class EventRegistrationController extends GetxController {
                                 errorMessage.value,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.red,
-                                  fontSize: 12.sp,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),

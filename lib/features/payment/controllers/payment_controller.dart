@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
+import 'package:pscommunitymobileapp/core/utils/retry.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -15,7 +16,9 @@ import 'package:pscommunitymobileapp/core/models/payment_item.dart';
 import 'package:pscommunitymobileapp/core/models/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/core/models/payment_mode.dart';
 import 'package:pscommunitymobileapp/core/models/payment_type.dart';
+import 'package:pscommunitymobileapp/core/models/pending_payment.dart';
 import 'package:pscommunitymobileapp/features/payment/repositories/payment_repository.dart';
+import 'package:pscommunitymobileapp/features/payment/services/payment_reconciler.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -70,6 +73,12 @@ class PaymentController extends GetxController {
   late Razorpay _razorpay;
   int? _pendingAdminRequestId;
   bool _isCurrentPaymentRecurring = false;
+  // Snapshot of what was actually sent to createOrder. Verification must use
+  // these, not the live form state, which the user can change or reset.
+  double _pendingAmount = 0;
+  int _pendingTypeId = 0;
+  int _pendingCategoryId = 0;
+  late final PaymentReconciler _reconciler = PaymentReconciler.fromGet();
 
   @override
   void onInit() {
@@ -284,6 +293,9 @@ class PaymentController extends GetxController {
     }
     _pendingAdminRequestId = adminPaymentRequestId;
     _isCurrentPaymentRecurring = isRecurring;
+    _pendingAmount = amount;
+    _pendingTypeId = typeId ?? 0;
+    _pendingCategoryId = categoryId ?? 0;
 
     try {
       final tokenManager = Get.find<TokenManager>();
@@ -427,38 +439,51 @@ class PaymentController extends GetxController {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    // Razorpay has already captured the money at this point. Persist first so
+    // an interrupted verification is retried on the next launch.
+    final pending = PendingPayment(
+      razorpayOrderId:
+          response.orderId ??
+          response.data?['razorpay_subscription_id']?.toString() ??
+          '',
+      razorpayPaymentId: response.paymentId ?? '',
+      razorpaySignature: response.signature ?? '',
+      amount: _pendingAmount,
+      paymentTypeId: _pendingTypeId,
+      paymentCategoryId: _pendingCategoryId,
+      adminPaymentRequestId: _pendingAdminRequestId,
+      isRecurring: _isCurrentPaymentRecurring,
+    );
+
+    try {
+      await _reconciler.store.savePayment(pending);
+    } catch (e, stack) {
+      // Still try to verify; the backend webhook covers a lost record.
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentController: could not persist pending payment',
+      );
+    }
+
     try {
       unawaited(
         Get.dialog<void>(
-          Center(child: CircularProgressIndicator()),
+          const Center(child: CircularProgressIndicator()),
           barrierDismissible: false,
         ),
       );
 
-      final orderIdToUse =
-          response.orderId ??
-          response.data?['razorpay_subscription_id']?.toString() ??
-          '';
+      final result = await _reconciler.verifyPayment(pending);
 
-      final result = await _repository.verifyPayment(
-        razorpayOrderId: orderIdToUse,
-        razorpayPaymentId: response.paymentId ?? '',
-        razorpaySignature: response.signature ?? '',
-        amount: enteredAmount.value,
-        paymentTypeId: selectedType.value?.id ?? 0,
-        paymentCategoryId: selectedCategory.value?.id ?? 0,
-        adminPaymentRequestId: _pendingAdminRequestId,
-        isRecurring: _isCurrentPaymentRecurring,
-      );
-
-      Get.back<void>();
+      if (Get.isDialogOpen ?? false) Get.back<void>();
 
       final receiptId = result['receiptId'] as int?;
 
       await loadDashboard();
+      resetPaymentForm();
 
       if (receiptId != null) {
-        resetPaymentForm();
         unawaited(
           Get.toNamed<void>(
             AppRouter.paymentReceipt,
@@ -466,8 +491,6 @@ class PaymentController extends GetxController {
           ),
         );
       } else {
-        Get.back<void>();
-        resetPaymentForm();
         PSDelightToastBar(
           snackbarDuration: const Duration(seconds: 3),
           builder: (context) => ToastCard(
@@ -483,14 +506,25 @@ class PaymentController extends GetxController {
         reason: 'PaymentController._handlePaymentSuccess verifyPayment failed',
       );
       if (Get.isDialogOpen ?? false) Get.back<void>();
-      PSDelightToastBar(
-        snackbarDuration: const Duration(seconds: 3),
-        builder: (context) => ToastCard(
-          title: LK.error.tr,
-          subtitle: LK.verificationFailed.tr,
-          isErrorMessage: true,
-        ),
-      ).show();
+      if (isTransientFailure(e)) {
+        // Money captured, confirmation still pending: never say "failed".
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 6),
+          builder: (context) => ToastCard(
+            title: LK.info.tr,
+            subtitle: LK.paymentConfirmationPending.tr,
+          ),
+        ).show();
+      } else {
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: LK.verificationFailed.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
+      }
     } finally {
       isProcessingPayment.value = false;
       isProcessingRecurring.value = false;

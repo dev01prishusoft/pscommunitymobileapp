@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/core/utils/share_origin.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/share_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
@@ -38,19 +39,29 @@ class ShareAppPage extends StatelessWidget {
                   spacing: 14,
                   children: [
                     Expanded(
-                      child: _ShareButton(
-                        icon: Icons.chat_bubble_rounded,
-                        label: LK.shareAppViaWhatsApp.tr,
-                        color: AppColors.green,
-                        onTap: controller.shareViaWhatsApp,
+                      // Builder gives each button its own context, whose rect
+                      // anchors the iPad share popover.
+                      child: Builder(
+                        builder: (buttonContext) => _ShareButton(
+                          icon: Icons.chat_bubble_rounded,
+                          label: LK.shareAppViaWhatsApp.tr,
+                          color: AppColors.green,
+                          onTap: () => controller.shareViaWhatsApp(
+                            origin: shareOriginOf(buttonContext),
+                          ),
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: _ShareButton(
-                        icon: Icons.share_rounded,
-                        label: LK.shareAppViaOther.tr,
-                        color: AppColors.primary,
-                        onTap: controller.shareGeneral,
+                      child: Builder(
+                        builder: (buttonContext) => _ShareButton(
+                          icon: Icons.share_rounded,
+                          label: LK.shareAppViaOther.tr,
+                          color: AppColors.primary,
+                          onTap: () => controller.shareGeneral(
+                            origin: shareOriginOf(buttonContext),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -327,7 +338,10 @@ class _QrCard extends StatelessWidget {
 
             InkWell(
               onTap: () {
-                ctrl.shareSelectedLink(selected);
+                ctrl.shareSelectedLink(
+                  selected,
+                  origin: shareOriginOf(context),
+                );
               },
               borderRadius: BorderRadius.circular(12),
               child: Container(

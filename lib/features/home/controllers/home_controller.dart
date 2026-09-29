@@ -16,6 +16,8 @@ import 'package:pscommunitymobileapp/core/models/app_link_model.dart';
 import 'package:pscommunitymobileapp/core/models/member_notification.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/check_updated_version.dart';
+import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
+import 'package:pscommunitymobileapp/features/payment/services/payment_reconciler.dart';
 
 class MenuItem {
   MenuItem({
@@ -108,6 +110,36 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       Get.find<ModulePermissionService>().fetchMyModules();
     }
     fetchUnreadNotificationCount();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _setUpPushNotifications();
+    _reconcilePendingPayments();
+  }
+
+  /// The permission prompt used to run during bootstrap, before any UI, inside
+  /// a startup timeout. It now runs once Home is visible.
+  Future<void> _setUpPushNotifications() async {
+    if (!Get.isRegistered<PushNotificationService>()) return;
+    final push = Get.find<PushNotificationService>();
+    await push.requestPermissionIfNeeded(Get.find<SecureStorageService>());
+    await push.syncDeviceToken();
+  }
+
+  /// Finishes Razorpay verifications interrupted by a network error or by the
+  /// OS killing the app during checkout.
+  Future<void> _reconcilePendingPayments() async {
+    try {
+      await PaymentReconciler.fromGet().reconcilePending();
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'HomeController._reconcilePendingPayments failed',
+      );
+    }
   }
 
   @override

@@ -315,7 +315,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
             Text(
               count,
               style: TextStyle(
-                fontSize: 13.sp,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.white : defaultColor,
               ),
@@ -324,7 +324,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 10.sp,
+                fontSize: 10,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 color: isSelected
                     ? AppColors.white.withValues(alpha: 0.9)

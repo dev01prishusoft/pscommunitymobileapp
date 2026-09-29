@@ -144,7 +144,7 @@ class CommitteeCard extends StatelessWidget {
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
-                            fontSize: 10.sp,
+                            fontSize: 10,
                           ),
                         ),
                       ],

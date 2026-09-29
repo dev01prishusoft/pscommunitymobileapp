@@ -105,7 +105,7 @@ class AppTheme {
       titleTextStyle: TextStyle(
         color: AppColors.black,
         fontWeight: FontWeight.bold,
-        fontSize: 17.sp,
+        fontSize: 17,
       ),
     ),
 

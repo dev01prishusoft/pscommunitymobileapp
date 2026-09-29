@@ -87,6 +87,10 @@ flutter:
   assets:
     - assets/images/
     - assets/locales/
+    # Hind Vadodara (SIL OFL 1.1, see assets/fonts/OFL.txt): used by the
+    # payment receipt PDF so it renders Gujarati offline.
+    - assets/fonts/HindVadodara-Regular.ttf
+    - assets/fonts/HindVadodara-Bold.ttf
   # Secrets: pass via --dart-define=RAZORPAY_KEY=... --dart-define=GOOGLEMAP_KEY=...
   # Do NOT ship .env inside the binary.
 

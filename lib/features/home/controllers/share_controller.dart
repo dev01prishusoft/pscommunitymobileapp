@@ -1,3 +1,5 @@
+import 'dart:ui' show Rect;
+
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
@@ -71,7 +73,8 @@ class ShareController extends GetxController {
     ).show();
   }
 
-  Future<void> shareViaWhatsApp() async {
+  /// [origin] anchors the share sheet on iPad (see shareOriginOf).
+  Future<void> shareViaWhatsApp({Rect? origin}) async {
     final encoded = Uri.encodeComponent(_shareBody);
 
     final uri = Uri.parse('https://wa.me/?text=$encoded');
@@ -79,15 +82,17 @@ class ShareController extends GetxController {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      await shareGeneral();
+      await shareGeneral(origin: origin);
     }
   }
 
-  Future<void> shareGeneral() async {
-    await SharePlus.instance.share(ShareParams(text: _shareBody));
+  Future<void> shareGeneral({Rect? origin}) async {
+    await SharePlus.instance.share(
+      ShareParams(text: _shareBody, sharePositionOrigin: origin),
+    );
   }
 
-  void shareSelectedLink(AppLinkModel link) {
+  void shareSelectedLink(AppLinkModel link, {Rect? origin}) {
     final samajName =
         Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr;
 
@@ -99,7 +104,9 @@ class ShareController extends GetxController {
     ${link.appLink}
     ''';
 
-    SharePlus.instance.share(ShareParams(text: text));
+    SharePlus.instance.share(
+      ShareParams(text: text, sharePositionOrigin: origin),
+    );
   }
 
   AppLinkModel? get selectedLink {

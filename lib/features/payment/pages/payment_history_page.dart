@@ -667,7 +667,7 @@ class _PaymentCard extends StatelessWidget {
                             style: AppTextStyles.bodySmall.copyWith(
                               color: Colors.grey.shade700,
                               fontWeight: FontWeight.w600,
-                              fontSize: 10.sp,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -703,7 +703,7 @@ class _PaymentCard extends StatelessWidget {
                               ? AppColors.red
                               : AppColors.orange,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10.sp,
+                          fontSize: 10,
                         ),
                       ),
                     ),
@@ -735,7 +735,7 @@ class _PaymentCard extends StatelessWidget {
                             style: AppTextStyles.bodySmall.copyWith(
                               color: Colors.grey.shade700,
                               fontWeight: FontWeight.w600,
-                              fontSize: 10.sp,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -767,7 +767,7 @@ class _PaymentCard extends StatelessWidget {
                               style: AppTextStyles.labelSmall.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 10.sp,
+                                fontSize: 10,
                               ),
                             ),
                           ],

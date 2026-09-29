@@ -700,4 +700,12 @@ class LK {
   static const String computerGeneratedReceipt =
       'This is a computer-generated receipt, signature is not required.';
   static const String locationFetchedSuccessfully = 'Location fetched successfully';
+  static const String locationAutocompleteDisabled =
+      'Location autocomplete disabled (API key missing)';
+  static const String profilePicture = 'Profile picture';
+  static const String cropProfilePhoto = 'Crop Profile Photo';
+  static const String paymentConfirmationPending =
+      'Payment received. We are confirming it, and your receipt will appear in Payment History shortly.';
+  static const String couldNotGenerateReceipt =
+      'Could not generate the receipt. Please try again.';
 }

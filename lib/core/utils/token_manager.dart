@@ -57,6 +57,12 @@ class TokenManager {
         primaryColor: results[5],
         secondaryColor: results[6],
       );
+      // The refresh-token request sends `mobileNo` from userPhone. Without
+      // this it falls back to JWT claims, which may not contain the number.
+      final storedMobile = results[3];
+      if (storedMobile != null && storedMobile.isNotEmpty) {
+        userPhoneRx.value = storedMobile;
+      }
     } catch (e, stack) {
       CrashReporter.recordError(
         e,

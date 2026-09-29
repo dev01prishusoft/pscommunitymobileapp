@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,9 +8,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
+import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 
 @pragma('vm:entry-point')
@@ -25,8 +29,12 @@ class PushNotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  static const _notificationPromptedKey = 'ps_community_notification_prompted';
+  static const _syncedTokenKey = 'fcm_token_synced';
+
   bool _isInitialized = false;
   RemoteMessage? _initialMessageToHandle;
+  StreamSubscription<String>? _tokenRefreshSub;
 
   bool get hasInitialMessage => _initialMessageToHandle != null;
 
@@ -37,6 +45,8 @@ class PushNotificationService {
     }
   }
 
+  /// Runs during DI bootstrap, before the first frame. Must not show any
+  /// system dialog: the permission prompt lives in [requestPermissionIfNeeded].
   Future<void> init() async {
     if (_isInitialized) return;
 
@@ -45,23 +55,14 @@ class PushNotificationService {
         _firebaseMessagingBackgroundHandler,
       );
 
-      await _firebaseMessaging.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
-      );
-
       const androidInitSettings = AndroidInitializationSettings(
         '@mipmap/ic_launcher',
       );
+      // Permissions are requested explicitly after login, not on plugin init.
       const iosInitSettings = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
       );
       const initSettings = InitializationSettings(
         android: androidInitSettings,
@@ -90,8 +91,17 @@ class PushNotificationService {
         badge: true,
         sound: true,
       );
+      _tokenRefreshSub = _firebaseMessaging.onTokenRefresh.listen(
+        syncDeviceToken,
+      );
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        _showLocalNotification(message, channel);
+        // iOS already presents foreground notifications itself (see
+        // setForegroundNotificationPresentationOptions above); showing a local
+        // one as well would produce two banners. Android does not show FCM
+        // notifications while the app is in the foreground.
+        if (Platform.isAndroid) {
+          _showLocalNotification(message, channel);
+        }
         if (Get.isRegistered<HomeController>()) {
           Get.find<HomeController>().fetchUnreadNotificationCount();
         }
@@ -143,6 +153,68 @@ class PushNotificationService {
         reason: 'PushNotificationService.init failed',
       );
     }
+  }
+
+  /// Asks for notification permission once, from a visible screen after login.
+  /// The flag lives in secure storage, which logout clears, so a new login may
+  /// be asked once more (the OS itself stops re-prompting after a denial).
+  Future<void> requestPermissionIfNeeded(SecureStorageService storage) async {
+    try {
+      if (await storage.getBool(_notificationPromptedKey)) return;
+      await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      await storage.setBool(_notificationPromptedKey, true);
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PushNotificationService.requestPermissionIfNeeded failed',
+      );
+    }
+  }
+
+  /// Uploads the current FCM token for the logged-in member. Called on every
+  /// token rotation and once per Home visit; skips the request when the token
+  /// has not changed since the last successful upload.
+  Future<void> syncDeviceToken([String? refreshedToken]) async {
+    try {
+      if (!Get.isRegistered<TokenManager>() ||
+          !Get.find<TokenManager>().hasToken) {
+        return;
+      }
+      if (Platform.isIOS && await _firebaseMessaging.getAPNSToken() == null) {
+        return; // onTokenRefresh fires once APNs registration completes.
+      }
+      final token = refreshedToken ?? await _firebaseMessaging.getToken();
+      if (token == null || token.isEmpty) return;
+
+      final storage = Get.find<SecureStorageService>();
+      if (await storage.read(_syncedTokenKey) == token) return;
+
+      await _apiClient.post(
+        ApiEndpoints.memberDeviceToken,
+        data: {
+          'deviceToken': token,
+          'deviceType': Platform.isIOS ? 'ios' : 'android',
+        },
+      );
+      await storage.write(_syncedTokenKey, token);
+    } on NotFoundFailure {
+      // Endpoint not deployed yet on this backend; retried on the next call.
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PushNotificationService.syncDeviceToken failed',
+      );
+    }
+  }
+
+  void dispose() {
+    _tokenRefreshSub?.cancel();
   }
 
   void _showLocalNotification(

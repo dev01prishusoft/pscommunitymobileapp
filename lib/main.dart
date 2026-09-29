@@ -23,6 +23,8 @@ import 'firebase_options.dart';
 
 void main() {
   runZonedGuarded(_bootstrap, (error, stack) {
+    // Firebase may be the thing that failed to start.
+    if (Firebase.apps.isEmpty) return;
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
   });
 }
@@ -30,9 +32,11 @@ void main() {
 Future<void> _bootstrap() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
 
     FlutterError.onError = (FlutterErrorDetails details) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(details);
@@ -52,10 +56,28 @@ Future<void> _bootstrap() async {
       await LocalizationValidator.validate();
     }
 
-    runApp(PsCommunityApp());
+    runApp(const PsCommunityApp());
   } catch (e, stack) {
-    runApp(FatalErrorScreen(error: e, stackTrace: stack));
+    if (Firebase.apps.isNotEmpty) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Bootstrap failed',
+        fatal: true,
+      );
+    }
+    runApp(
+      FatalErrorScreen(error: e, stackTrace: stack, onRetry: _retryBootstrap),
+    );
   }
+}
+
+/// Clears the partially built dependency graph and starts over. GetX keeps an
+/// existing registration on a second `put`/`lazyPut`, so without this the
+/// retry would reuse half-initialised services.
+Future<void> _retryBootstrap() async {
+  Get.deleteAll(force: true);
+  await _bootstrap();
 }
 
 class PsCommunityApp extends StatelessWidget {
@@ -98,9 +120,11 @@ class PsCommunityApp extends StatelessWidget {
                 getPages: AppRouter.pages,
                 builder: (context, child) {
                   final mq = MediaQuery.of(context);
+                  // WCAG 1.4.4: honour the user's text size up to 200 %, and
+                  // never shrink text below what they chose.
                   final clamped = mq.textScaler.clamp(
-                    minScaleFactor: 0.85,
-                    maxScaleFactor: 1.3,
+                    minScaleFactor: 1.0,
+                    maxScaleFactor: 2.0,
                   );
                   return MediaQuery(
                     data: mq.copyWith(textScaler: clamped),

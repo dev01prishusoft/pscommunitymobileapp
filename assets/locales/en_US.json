@@ -511,5 +511,10 @@
     "Could not load PDF": "Could not load PDF",
     "Cannot exceed 100": "Cannot exceed 100",
     "This is a computer-generated receipt, signature is not required.": "This is a computer-generated receipt, signature is not required.",
-    "Location fetched successfully": "Location fetched successfully"
+    "Location fetched successfully": "Location fetched successfully",
+    "Location autocomplete disabled (API key missing)": "Location autocomplete disabled (API key missing)",
+    "Profile picture": "Profile picture",
+    "Crop Profile Photo": "Crop Profile Photo",
+    "Payment received. We are confirming it, and your receipt will appear in Payment History shortly.": "Payment received. We are confirming it, and your receipt will appear in Payment History shortly.",
+    "Could not generate the receipt. Please try again.": "Could not generate the receipt. Please try again."
 }

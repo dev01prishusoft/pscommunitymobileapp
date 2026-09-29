@@ -95,14 +95,14 @@ class AppTextField extends StatelessWidget {
           },
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppColors.black,
-            fontSize: 14.0.sp,
+            fontSize: 14.0,
           ),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.grey,
-              fontSize: 14.0.sp,
+              fontSize: 14.0,
             ),
             prefixIcon: Icon(icon, color: iconColor ?? AppColors.grey),
             suffixIcon: suffixIcon,

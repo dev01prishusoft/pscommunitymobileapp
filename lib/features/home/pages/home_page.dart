@@ -388,7 +388,7 @@ class _NotificationMenu extends GetView<HomeController> {
                   label: Text(
                     count > 99 ? '99+' : count.toString(),
                     style: AppTextStyles.labelSmall.copyWith(
-                      fontSize: 8.sp,
+                      fontSize: 8,
                       color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),

@@ -2368,7 +2368,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                                 LK.removePhoto.tr,
                                 style: AppTextStyles.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18.sp,
+                                  fontSize: 18,
                                   color: AppColors.black,
                                 ),
                                 textAlign: TextAlign.center,
@@ -2441,7 +2441,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: Text(
                     LK.removePhoto.tr,
                     style: AppTextStyles.labelSmall.copyWith(
-                      fontSize: 10.sp,
+                      fontSize: 10,
                       color: AppColors.red,
                     ),
                   ),
