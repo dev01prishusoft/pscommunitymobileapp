@@ -691,4 +691,12 @@ class LK {
   static const String hidePassword = 'Hide Password';
   static const String failedToLoadPage = 'Failed to load page';
   static const String byContinuingYouAgree = 'By continuing, you agree to our';
+
+  // FLT-028: previously hardcoded English literals
+  static const String noDataFound = 'No data found';
+  static const String invalidReceiptId = 'Invalid Receipt ID';
+  static const String couldNotLoadPdf = 'Could not load PDF';
+  static const String cannotExceed100 = 'Cannot exceed 100';
+  static const String computerGeneratedReceipt =
+      'This is a computer-generated receipt, signature is not required.';
 }

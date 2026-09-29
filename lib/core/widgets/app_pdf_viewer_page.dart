@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:printing/printing.dart';
 import 'package:http/http.dart' as http;
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AppPdfViewerPage extends StatefulWidget {
   final String title;
@@ -57,7 +59,7 @@ class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
                     Icon(Icons.error_outline, size: 48, color: AppColors.red),
                     const SizedBox(height: 16),
                     Text(
-                      'Could not load PDF',
+                      LK.couldNotLoadPdf.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

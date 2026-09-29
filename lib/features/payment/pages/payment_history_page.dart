@@ -98,7 +98,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           }),
           IconButton(
             icon: const Icon(Iconsax.filter_search_copy),
-            tooltip: 'Filters',
+            tooltip: LK.paymentFilters.tr,
             onPressed: () async {
               await Get.dialog<void>(
                 _PaymentFilterDialog(onApply: _refreshHistory),

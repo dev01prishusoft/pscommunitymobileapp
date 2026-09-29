@@ -2824,7 +2824,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       if (v != null && v.isNotEmpty) {
                         final numVal = double.tryParse(v);
                         if (numVal != null && numVal > 100) {
-                          return 'Cannot exceed 100';
+                          return LK.cannotExceed100.tr;
                         }
                       }
                       return null;

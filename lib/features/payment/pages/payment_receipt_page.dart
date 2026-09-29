@@ -52,7 +52,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     if (_receiptId == null) {
       return Scaffold(
         appBar: AppBar(title: Text(LK.paymentReceipt.tr)),
-        body: Center(child: Text('Invalid Receipt ID')),
+        body: Center(child: Text(LK.invalidReceiptId.tr)),
       );
     }
 
@@ -77,7 +77,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
-            return Center(child: Text('No data found'));
+            return Center(child: Text(LK.noDataFound.tr));
           }
 
           final data = snapshot.data!;
@@ -719,7 +719,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
               pw.SizedBox(height: 4),
               pw.Center(
                 child: pw.Text(
-                  'This is a computer-generated receipt, signature is not required.',
+                  LK.computerGeneratedReceipt.tr,
                   style: const pw.TextStyle(
                     fontSize: 9,
                     color: PdfColors.grey600,

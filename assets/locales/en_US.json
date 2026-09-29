@@ -199,7 +199,6 @@
     "No Internet Connection": "No Internet Connection",
     "No bank accounts found": "No bank accounts found",
     "No file chosen": "No file chosen",
-    "No items found": "No items found",
     "No matches found": "No matches found",
     "No members found": "No members found",
     "No members found for this committee": "No members found for this committee",
@@ -494,7 +493,6 @@
     "Representative": "Representative",
     "WhatsApp Support": "WhatsApp Support",
     "Email Support": "Email Support",
-    "Payment Filters": "Payment Filters",
     "Community Portal": "Community Portal",
     "Initiated Payments": "Initiated Payments",
     "Completed Payments": "Completed Payments",
@@ -505,5 +503,12 @@
     "Show Password": "Show Password",
     "Hide Password": "Hide Password",
     "Failed to load page": "Failed to load page",
-    "By continuing, you agree to our": "By continuing, you agree to our"
+    "By continuing, you agree to our": "By continuing, you agree to our",
+    "No items found": "No items found",
+    "Payment Filters": "Payment Filters",
+    "No data found": "No data found",
+    "Invalid Receipt ID": "Invalid Receipt ID",
+    "Could not load PDF": "Could not load PDF",
+    "Cannot exceed 100": "Cannot exceed 100",
+    "This is a computer-generated receipt, signature is not required.": "This is a computer-generated receipt, signature is not required."
 }

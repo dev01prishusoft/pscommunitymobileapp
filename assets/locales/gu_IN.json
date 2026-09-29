@@ -199,7 +199,6 @@
     "No Internet Connection": "કોઈ ઇન્ટરનેટ કનેક્શન નથી",
     "No bank accounts found": "કોઈ બેંક ખાતા મળ્યા નથી",
     "No file chosen": "કોઈ ફાઇલ પસંદ નથી",
-    "No items found": "કોઈ વસ્તુઓ મળી નથી",
     "No matches found": "કોઈ મેળ મળ્યા નથી",
     "No members found": "કોઈ સભ્યો મળ્યા નથી",
     "No members found for this committee": "આ સમિતિ માટે કોઈ સભ્યો મળ્યા નથી",
@@ -506,5 +505,11 @@
     "Show Password": "પાસવર્ડ બતાવો",
     "Hide Password": "પાસવર્ડ છુપાવો",
     "Failed to load page": "પેજ લોડ કરવામાં નિષ્ફળ",
-    "By continuing, you agree to our": "આગળ વધીને, તમે અમારા નિયમો સાથે સંમત થાઓ છો"
+    "By continuing, you agree to our": "આગળ વધીને, તમે અમારા નિયમો સાથે સંમત થાઓ છો",
+    "No items found": "કોઈ આઇટમ મળી નથી",
+    "No data found": "કોઈ ડેટા મળ્યો નથી",
+    "Invalid Receipt ID": "અમાન્ય રસીદ ID",
+    "Could not load PDF": "PDF લોડ કરી શકાઈ નથી",
+    "Cannot exceed 100": "100 થી વધુ ન હોઈ શકે",
+    "This is a computer-generated receipt, signature is not required.": "આ કમ્પ્યૂટર-જનિત રસીદ છે, સહી જરૂરી નથી."
 }

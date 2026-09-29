@@ -33,7 +33,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
       body: PaginatedListView<SamajSanstha, SamajSansthaController>(
         headerWidget: _buildHeader(_controller),
         padding: AppSpacing.pagePadding,
-        emptyMessage: 'No items found',
+        emptyMessage: LK.noItemsFound.tr,
         itemBuilder: (context, index, sanstha) =>
             _SansthaCard(sanstha: sanstha),
       ),
