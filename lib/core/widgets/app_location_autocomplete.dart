@@ -154,8 +154,6 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
             decoration: InputDecoration(
-              hintText:
-                  '${LK.enter.tr} ${widget.label.replaceAll('*', '').trim()}',
               prefixIcon: widget.prefixIcon != null
                   ? IconTheme(
                       data: const IconThemeData(size: 20),
@@ -256,8 +254,6 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                     color: AppColors.black,
                   ),
                   decoration: InputDecoration(
-                    hintText:
-                        '${LK.enter.tr} ${widget.label.replaceAll('*', '').trim()}',
                     prefixIcon: widget.prefixIcon != null
                         ? IconTheme(
                             data: const IconThemeData(size: 20),

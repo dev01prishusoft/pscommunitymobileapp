@@ -60,7 +60,6 @@ class AppFormDropdown<T> extends StatelessWidget {
             value: value,
             items: items,
             onChanged: onChanged,
-            hint: hint ?? '${LK.enter.tr} ${label.replaceAll('*', '').trim()}',
             menuMaxHeight: 350,
             selectedItemBuilder: (BuildContext context) {
               return items.map<Widget>((DropdownMenuItem<T> item) {

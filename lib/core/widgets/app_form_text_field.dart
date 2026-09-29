@@ -96,11 +96,6 @@ class AppFormTextField extends StatelessWidget {
             color: readOnly ? AppColors.grey : AppColors.black,
           ),
           decoration: InputDecoration(
-            hintText:
-                hint ??
-                (label != null && label!.isNotEmpty
-                    ? '${LK.enter.tr} ${label!.replaceAll('*', '').trim()}'
-                    : null),
             prefixIcon: prefixIcon != null
                 ? IconTheme(
                     data: const IconThemeData(size: 20),
