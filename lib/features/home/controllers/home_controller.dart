@@ -49,7 +49,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     ),
     MenuItem(
       icon: Icons.account_balance_wallet,
-      labelKey: LK.payment,
+      labelKey: LK.payments,
       route: AppRouter.payments,
       module: AppModule.payment,
     ),

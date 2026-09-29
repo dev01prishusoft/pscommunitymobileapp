@@ -45,8 +45,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to take profile pictures.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app requires access to your location to auto-populate your address details.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app requires access to your location to auto-populate your address details.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
