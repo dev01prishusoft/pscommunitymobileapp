@@ -3,6 +3,8 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "build/**"
+    - android/**
+    - ios/**
   errors:
     empty_catches: error
 
