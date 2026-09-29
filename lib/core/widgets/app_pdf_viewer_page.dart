@@ -28,10 +28,10 @@ class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
-        throw Exception('Failed to load PDF');
+        throw Exception(LK.couldNotLoadPdf.tr);
       }
     } catch (e) {
-      throw Exception('Error downloading PDF: $e');
+      throw Exception('${LK.couldNotLoadPdf.tr}: $e');
     }
   }
 

@@ -510,5 +510,6 @@
     "Invalid Receipt ID": "Invalid Receipt ID",
     "Could not load PDF": "Could not load PDF",
     "Cannot exceed 100": "Cannot exceed 100",
-    "This is a computer-generated receipt, signature is not required.": "This is a computer-generated receipt, signature is not required."
+    "This is a computer-generated receipt, signature is not required.": "This is a computer-generated receipt, signature is not required.",
+    "Location fetched successfully": "Location fetched successfully"
 }

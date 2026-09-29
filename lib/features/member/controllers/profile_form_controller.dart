@@ -2511,7 +2511,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           snackbarDuration: const Duration(seconds: 2),
           builder: (context) => ToastCard(
             title: LK.success.tr,
-            subtitle: 'Location fetched successfully.',
+            subtitle: LK.locationFetchedSuccessfully.tr,
             isErrorMessage: false,
           ),
         ).show();

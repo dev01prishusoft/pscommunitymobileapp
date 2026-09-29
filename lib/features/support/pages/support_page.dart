@@ -27,7 +27,7 @@ class SupportPage extends StatelessWidget {
           body: controller.isLoading.value
               ? const Center(child: CircularProgressIndicator())
               : support == null
-              ? const Center(child: Text('No Data Found'))
+              ? Center(child: Text(LK.noDataFound.tr))
               : SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   padding: AppSpacing.pagePadding,
