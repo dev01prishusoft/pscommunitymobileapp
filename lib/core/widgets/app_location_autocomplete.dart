@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -37,7 +37,7 @@ class AppLocationAutoComplete extends StatefulWidget {
 
 class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   Timer? _debounce;
-  final String _googleApiKey = dotenv.env['GOOGLEMAP_KEY']!;
+  final String _googleApiKey = Env.googleMapKey;
   final Dio _dio = Dio();
 
   bool _isLoading = false;
@@ -130,6 +130,55 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
 
   @override
   Widget build(BuildContext context) {
+    if (_googleApiKey.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: TextSpan(
+              text: widget.label,
+              style: AppTextStyles.labelSmall.copyWith(color: AppColors.grey),
+              children: [
+                if (widget.isRequired)
+                  TextSpan(
+                    text: ' *',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.red,
+                    ),
+                  ),
+              ],
+            ),
+          ).paddingOnly(left: 5.w, bottom: 6.h),
+          TextFormField(
+            controller: widget.controller,
+            maxLength: 250,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
+            decoration: InputDecoration(
+              prefixIcon: widget.prefixIcon != null
+                  ? IconTheme(
+                      data: const IconThemeData(size: 20),
+                      child: widget.prefixIcon!,
+                    )
+                  : null,
+              helperText: 'Location autocomplete disabled (API key missing)',
+              helperStyle: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.grey,
+              ),
+            ),
+            validator: (value) {
+              if (widget.isRequired &&
+                  (value == null || value.trim().isEmpty)) {
+                return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+              }
+              return null;
+            },
+          ),
+          if (widget.updateStatus != null)
+            ProfileUpdateStatusBadge(status: widget.updateStatus!),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

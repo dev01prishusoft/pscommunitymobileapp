@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/models/coupon_apply_model.dart';
 import 'package:pscommunitymobileapp/core/models/event_create_order_model.dart';
@@ -543,7 +544,7 @@ class EventRegistrationController extends GetxController {
     isProcessingPayment.value = true;
     try {
       final tokenManager = Get.find<TokenManager>();
-      const envKey = String.fromEnvironment('RAZORPAY_KEY');
+      final envKey = Env.razorpayKey;
       final key = envKey.isNotEmpty ? envKey : (order.keyId ?? '');
       if (key.isEmpty) {
         PSDelightToastBar(

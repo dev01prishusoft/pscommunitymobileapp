@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -343,7 +344,7 @@ class PaymentController extends GetxController {
         isRecurring: isRecurring,
       );
 
-      const envKey = String.fromEnvironment('RAZORPAY_KEY');
+      final envKey = Env.razorpayKey;
       final key = envKey.isNotEmpty ? envKey : order.keyId;
       if (key.isEmpty) {
         PSDelightToastBar(
