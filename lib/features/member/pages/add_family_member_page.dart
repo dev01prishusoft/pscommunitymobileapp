@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -42,6 +43,15 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   late final PageController _pageController;
   int _currentStep = 0;
   late String controllerTag;
+
+  String get _nativeLangSuffix {
+    if (!Get.isRegistered<LocalizationService>()) return '';
+    final langs = Get.find<LocalizationService>().languages;
+    if (langs.length <= 1) return '';
+    final hasNonEn = langs.any((l) => !l.code.toLowerCase().startsWith('en'));
+    if (!hasNonEn) return '';
+    return ' (${LK.nativeLangName.tr})';
+  }
 
   @override
   void initState() {
@@ -406,27 +416,33 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ],
                 ),
                 const Divider(height: 24),
-                AppFormTextField(
-                  controller: controller.firstNameCtrl,
-                  label: LK.firstName.tr,
-                  isRequired: true,
-                  prefixIcon: const Icon(Icons.person_outline),
-                  maxLength: 100,
-                ),
-                AppSpacing.vM,
-                _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.middleNameCtrl,
-                    label: LK.middleName.tr,
-                    prefixIcon: const Icon(Icons.person_outline),
-                    maxLength: 100,
-                  ),
-                  AppFormTextField(
-                    controller: controller.lastNameCtrl,
-                    label: LK.lastName.tr,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.firstNameCtrl,
+                    label: '${LK.firstName.tr}$_nativeLangSuffix',
                     isRequired: true,
                     prefixIcon: const Icon(Icons.person_outline),
                     maxLength: 100,
+                  ),
+                ),
+                AppSpacing.vM,
+                _buildFieldPair(
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.middleNameCtrl,
+                      label: '${LK.middleName.tr}$_nativeLangSuffix',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      maxLength: 100,
+                    ),
+                  ),
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.lastNameCtrl,
+                      label: '${LK.lastName.tr}$_nativeLangSuffix',
+                      isRequired: true,
+                      prefixIcon: const Icon(Icons.person_outline),
+                      maxLength: 100,
+                    ),
                   ),
                 ),
                 _buildFieldPair(

@@ -512,5 +512,6 @@
     "Could not load PDF": "PDF લોડ કરી શકાઈ નથી",
     "Cannot exceed 100": "100 થી વધુ ન હોઈ શકે",
     "This is a computer-generated receipt, signature is not required.": "આ કમ્પ્યૂટર-જનિત રસીદ છે, સહી જરૂરી નથી.",
-    "Location fetched successfully": "સ્થાન સફળતાપૂર્વક મેળવાયું"
+    "Location fetched successfully": "સ્થાન સફળતાપૂર્વક મેળવાયું",
+    "native_lang_name": "ગુજરાતી"
 }
