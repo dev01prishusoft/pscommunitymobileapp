@@ -33,6 +33,7 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   bool _isRecurringArg = false;
   String _planNameArg = '';
   Map<String, dynamic>? _latestData;
+  bool _isExportingPdf = false;
 
   @override
   void initState() {
@@ -64,7 +65,22 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
         ),
         title: Text(LK.paymentReceipt.tr),
         actions: [
-          IconButton(onPressed: () => _shareReceipt(), icon: Icon(Icons.share)),
+          Builder(
+            builder: (btnContext) => IconButton(
+              onPressed:
+                  _isExportingPdf ? null : () => _shareReceipt(btnContext),
+              icon: _isExportingPdf
+                  ? SizedBox(
+                      width: 18.w,
+                      height: 18.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : Icon(Icons.share),
+            ),
+          ),
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -343,8 +359,18 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
           ),
           SizedBox(height: 24.h),
           ElevatedButton.icon(
-            onPressed: () => _generateAndPrintPdf(rawData),
-            icon: Icon(Icons.file_download_rounded, color: AppColors.white),
+            onPressed:
+                _isExportingPdf ? null : () => _generateAndPrintPdf(rawData),
+            icon: _isExportingPdf
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.w,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.white,
+                    ),
+                  )
+                : Icon(Icons.file_download_rounded, color: AppColors.white),
             label: Text(
               LK.downloadPdf.tr,
               style: AppTextStyles.titleLarge.copyWith(
@@ -355,6 +381,8 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
             style: ElevatedButton.styleFrom(
               minimumSize: Size(double.infinity, 56.h),
               backgroundColor: AppColors.primary,
+              disabledBackgroundColor:
+                  AppColors.primary.withValues(alpha: 0.6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -410,25 +438,67 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
     );
   }
 
-  Future<void> _shareReceipt() async {
-    if (_latestData == null) return;
-    final parsed = _getParsedData(_latestData!);
-    final pdf = await _generatePdfDocument(parsed);
-    final bytes = await pdf.save();
+  Future<void> _shareReceipt(BuildContext context) async {
+    if (_isExportingPdf || _latestData == null) return;
+    setState(() => _isExportingPdf = true);
+    try {
+      final parsed = _getParsedData(_latestData!);
+      final pdf = await _generatePdfDocument(parsed);
+      final bytes = await pdf.save();
 
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: 'receipt_${parsed['receiptNo']}.pdf',
-    );
+      final box = context.findRenderObject() as RenderBox?;
+      final bounds = (box != null && box.hasSize)
+          ? (box.localToGlobal(Offset.zero) & box.size)
+          : (Get.context != null
+              ? Rect.fromCenter(
+                  center: Offset(
+                    MediaQuery.sizeOf(Get.context!).width / 2,
+                    MediaQuery.sizeOf(Get.context!).height / 2,
+                  ),
+                  width: 1,
+                  height: 1,
+                )
+              : const Rect.fromLTWH(0, 0, 100, 100));
+
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: 'receipt_${parsed['receiptNo']}.pdf',
+        bounds: bounds,
+      );
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentReceiptPage._shareReceipt failed',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isExportingPdf = false);
+      }
+    }
   }
 
   Future<void> _generateAndPrintPdf(Map<String, dynamic> data) async {
-    final parsed = _getParsedData(data);
-    final pdf = await _generatePdfDocument(parsed);
+    if (_isExportingPdf) return;
+    setState(() => _isExportingPdf = true);
+    try {
+      final parsed = _getParsedData(data);
+      final pdf = await _generatePdfDocument(parsed);
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save(),
+      );
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PaymentReceiptPage._generateAndPrintPdf failed',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isExportingPdf = false);
+      }
+    }
   }
 
   Future<Uint8List?> _loadNetworkImage(String? url) async {

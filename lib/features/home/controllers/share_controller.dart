@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
@@ -71,7 +72,19 @@ class ShareController extends GetxController {
     ).show();
   }
 
-  Future<void> shareViaWhatsApp() async {
+  Rect _fallbackOrigin() {
+    if (Get.context != null) {
+      final size = MediaQuery.sizeOf(Get.context!);
+      return Rect.fromCenter(
+        center: Offset(size.width / 2, size.height / 2),
+        width: 1,
+        height: 1,
+      );
+    }
+    return const Rect.fromLTWH(0, 0, 100, 100);
+  }
+
+  Future<void> shareViaWhatsApp({Rect? sharePositionOrigin}) async {
     final encoded = Uri.encodeComponent(_shareBody);
 
     final uri = Uri.parse('https://wa.me/?text=$encoded');
@@ -79,15 +92,20 @@ class ShareController extends GetxController {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      await shareGeneral();
+      await shareGeneral(sharePositionOrigin: sharePositionOrigin);
     }
   }
 
-  Future<void> shareGeneral() async {
-    await SharePlus.instance.share(ShareParams(text: _shareBody));
+  Future<void> shareGeneral({Rect? sharePositionOrigin}) async {
+    await SharePlus.instance.share(
+      ShareParams(
+        text: _shareBody,
+        sharePositionOrigin: sharePositionOrigin ?? _fallbackOrigin(),
+      ),
+    );
   }
 
-  void shareSelectedLink(AppLinkModel link) {
+  void shareSelectedLink(AppLinkModel link, {Rect? sharePositionOrigin}) {
     final samajName =
         Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr;
 
@@ -99,7 +117,12 @@ class ShareController extends GetxController {
     ${link.appLink}
     ''';
 
-    SharePlus.instance.share(ShareParams(text: text));
+    SharePlus.instance.share(
+      ShareParams(
+        text: text,
+        sharePositionOrigin: sharePositionOrigin ?? _fallbackOrigin(),
+      ),
+    );
   }
 
   AppLinkModel? get selectedLink {
