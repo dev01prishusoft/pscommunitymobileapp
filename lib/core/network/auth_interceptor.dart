@@ -100,17 +100,27 @@ class AuthInterceptor extends Interceptor {
         return handler.resolve(response);
       } else {
         _onAuthFailure();
+        return handler.next(err);
       }
-    } catch (e, stack) {
+    } on DioException catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
         reason: 'AuthInterceptor: token refresh / retry failed',
       );
-      _onAuthFailure();
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 403) {
+        _onAuthFailure();
+      }
+      return handler.next(err);
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthInterceptor: unexpected error during token refresh',
+      );
+      return handler.next(err);
     }
-
-    handler.next(err);
   }
 
   Future<String?> _refreshSingleFlight(String refreshToken) async {
