@@ -516,6 +516,8 @@
     "Server Under Maintenance": "Server Under Maintenance",
     "Our servers are temporarily unavailable or experiencing high traffic. Please try again in a moment.": "Our servers are temporarily unavailable or experiencing high traffic. Please try again in a moment.",
     "Please check your Wi-Fi or mobile data connection and try again.": "Please check your Wi-Fi or mobile data connection and try again.",
+    "serverDownDesc": "Our servers are temporarily unavailable or experiencing high traffic. Please try again in a moment.",
+    "noInternetDesc": "Please check your Wi-Fi or mobile data connection and try again.",
     "Connection Timed Out": "Connection Timed Out",
     "The server took too long to respond. Please check your signal and try again.": "The server took too long to respond. Please check your signal and try again.",
     "Try Again": "Try Again",

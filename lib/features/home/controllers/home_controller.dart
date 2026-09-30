@@ -15,6 +15,7 @@ import 'package:pscommunitymobileapp/features/home/controllers/share_controller.
 import 'package:pscommunitymobileapp/core/models/app_link_model.dart';
 import 'package:pscommunitymobileapp/core/models/member_notification.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
+import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/core/services/check_updated_version.dart';
 
 class MenuItem {
@@ -108,6 +109,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       Get.find<ModulePermissionService>().fetchMyModules();
     }
     fetchUnreadNotificationCount();
+
+    if (Get.isRegistered<PushNotificationService>()) {
+      Get.find<PushNotificationService>().requestNotificationPermissions();
+    }
   }
 
   @override

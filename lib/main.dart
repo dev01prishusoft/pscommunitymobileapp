@@ -83,7 +83,15 @@ Future<void> _bootstrap() async {
         ),
       );
     } else {
-      runApp(FatalErrorScreen(error: e, stackTrace: stack));
+      runApp(
+        FatalErrorScreen(
+          error: e,
+          stackTrace: stack,
+          onRetry: () async {
+            await _bootstrap();
+          },
+        ),
+      );
     }
   }
 }

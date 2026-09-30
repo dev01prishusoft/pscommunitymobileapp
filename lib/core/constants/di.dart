@@ -160,7 +160,7 @@ class DI {
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
         }
-      }).timeout(const Duration(seconds: 15));
+      });
     } catch (e) {
       rethrow;
     }
