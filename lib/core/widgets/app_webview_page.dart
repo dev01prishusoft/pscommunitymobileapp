@@ -67,10 +67,11 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e, stack) {
+      final scheme = Uri.tryParse(urlString)?.scheme ?? 'unknown';
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'AppWebViewPage._launchExternalUrl failed for $urlString',
+        reason: 'AppWebViewPage._launchExternal failed (scheme: $scheme)',
       );
     }
   }

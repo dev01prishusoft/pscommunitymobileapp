@@ -400,10 +400,11 @@ class FamilyController extends GetxController {
         }
       }
     } catch (e, stack) {
+      final scheme = Uri.tryParse(urlString)?.scheme ?? 'unknown';
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'FamilyController.launchSafeUrl failed for $urlString',
+        reason: 'FamilyController.launchSafeUrl failed (scheme: $scheme)',
       );
     }
   }
