@@ -22,6 +22,14 @@ class AppPdfViewerPage extends StatefulWidget {
 }
 
 class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
+  late Future<Uint8List> _pdfFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _pdfFuture = _fetchPdf();
+  }
+
   Future<Uint8List> _fetchPdf() async {
     try {
       final response = await http.get(Uri.parse(widget.pdfUrl));
@@ -31,7 +39,7 @@ class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
         throw Exception(LK.couldNotLoadPdf.tr);
       }
     } catch (e) {
-      throw Exception('${LK.couldNotLoadPdf.tr}: $e');
+      throw Exception(LK.couldNotLoadPdf.tr);
     }
   }
 
@@ -42,7 +50,7 @@ class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
         title: Text(widget.title),
       ),
       body: FutureBuilder<Uint8List>(
-        future: _fetchPdf(),
+        future: _pdfFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -66,18 +74,12 @@ class _AppPdfViewerPageState extends State<AppPdfViewerPage> {
                         color: AppColors.black,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      snapshot.error.toString(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.grey),
-                    ),
                   ],
                 ),
               ),
             );
           }
-          
+
           if (snapshot.hasData) {
             return PdfPreview(
               build: (format) => snapshot.data!,

@@ -49,6 +49,13 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
     _lastSelectedLocation = widget.controller.text;
   }
 
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _dio.close(force: true);
+    super.dispose();
+  }
+
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (_googleApiKey.isEmpty || query.trim().length < 3) return [];
     final String url =
@@ -120,12 +127,6 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
         reason: 'AppLocationAutoComplete._getPlaceDetails failed',
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
   }
 
   @override

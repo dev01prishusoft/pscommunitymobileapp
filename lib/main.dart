@@ -71,9 +71,13 @@ Future<void> _bootstrap() async {
         errStr.contains('failed host lookup');
 
     if (isNetworkOrServer) {
-      final isServerDown = errStr.contains('server') ||
-          errStr.contains('50') ||
-          errStr.contains('connection refused');
+      final isServerDown = (() {
+        if (e is DioException) {
+          final status = e.response?.statusCode;
+          if (status != null && status >= 500 && status <= 599) return true;
+        }
+        return errStr.contains('server') || errStr.contains('connection refused');
+      })();
       runApp(
         PrebootNetworkErrorScreen(
           isServerDown: isServerDown,

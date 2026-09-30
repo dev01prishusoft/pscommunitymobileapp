@@ -208,23 +208,6 @@ class PaymentController extends GetxController {
     }
   }
 
-  Future<void> initiateDirectPayment(double amount) async {
-    if (paymentTypes.isEmpty) await loadPaymentTypes();
-    if (paymentModes.isEmpty) await loadPaymentModes();
-
-    if (paymentTypes.isNotEmpty) {
-      await onTypeChanged(paymentTypes.first);
-    }
-    if (paymentModes.isNotEmpty) {
-      selectedMode.value = paymentModes.first;
-    }
-    if (categories.isNotEmpty) {
-      selectedCategory.value = categories.first;
-    }
-
-    await initiatePayment(customAmount: amount);
-  }
-
   Future<void> initiatePayment({
     int? adminPaymentRequestId,
     double? customAmount,
@@ -481,6 +464,9 @@ class PaymentController extends GetxController {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
+    isProcessingPayment.value = false;
+    isProcessingRecurring.value = false;
+    _pendingAdminRequestId = null;
     PSDelightToastBar(
       snackbarDuration: const Duration(seconds: 3),
       builder: (context) =>

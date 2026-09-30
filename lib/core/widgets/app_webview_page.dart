@@ -74,27 +74,35 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
             if (progress == 0 ||
                 progress == 100 ||
                 (progress % 10 == 0 && progress != _loadingPercentage)) {
-              setState(() {
-                _loadingPercentage = progress;
-              });
+              if (mounted) {
+                setState(() {
+                  _loadingPercentage = progress;
+                });
+              }
             }
           },
           onPageStarted: (String url) {
-            setState(() {
-              _loadingPercentage = 0;
-              _hasError = false;
-            });
+            if (mounted) {
+              setState(() {
+                _loadingPercentage = 0;
+                _hasError = false;
+              });
+            }
           },
           onPageFinished: (String url) {
-            setState(() {
-              _loadingPercentage = 100;
-            });
+            if (mounted) {
+              setState(() {
+                _loadingPercentage = 100;
+              });
+            }
           },
           onWebResourceError: (WebResourceError error) {
-            setState(() {
-              _hasError = true;
-              _errorMessage = error.description;
-            });
+            if (mounted) {
+              setState(() {
+                _hasError = true;
+                _errorMessage = error.description;
+              });
+            }
           },
           onNavigationRequest: (NavigationRequest request) async {
             final url = request.url;

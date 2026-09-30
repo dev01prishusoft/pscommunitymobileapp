@@ -158,7 +158,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
     final Map<String, dynamic> payload;
     if (isRecurring) {
       payload = {
-        'paymentId': adminPaymentRequestId ?? 0,
         'razorpayPaymentId': razorpayPaymentId,
         'razorpaySubscriptionId': razorpayOrderId,
         'razorpaySignature': razorpaySignature,
