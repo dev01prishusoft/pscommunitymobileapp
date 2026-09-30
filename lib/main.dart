@@ -138,7 +138,7 @@ class PsCommunityApp extends StatelessWidget {
                   final mq = MediaQuery.of(context);
                   final clamped = mq.textScaler.clamp(
                     minScaleFactor: 0.85,
-                    maxScaleFactor: 1.3,
+                    maxScaleFactor: 2.0,
                   );
                   return MediaQuery(
                     data: mq.copyWith(textScaler: clamped),

@@ -887,7 +887,7 @@ class EventRegistrationController extends GetxController {
                                     LK.event_pay_base_amount_desc.tr,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.grey.shade500,
-                                      fontSize: 11.sp,
+                                      fontSize: 11,
                                     ),
                                   ),
                                 ],
@@ -956,7 +956,7 @@ class EventRegistrationController extends GetxController {
                                           : LK.event_pay_discount_applied.tr,
                                       style: AppTextStyles.bodySmall.copyWith(
                                         color: AppColors.green,
-                                        fontSize: 11.sp,
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -1002,7 +1002,7 @@ class EventRegistrationController extends GetxController {
                                 LK.event_pay_final_amount_desc.tr,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.grey.shade500,
-                                  fontSize: 11.sp,
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
@@ -1106,7 +1106,7 @@ class EventRegistrationController extends GetxController {
                                 errorMessage.value,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.red,
-                                  fontSize: 12.sp,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),

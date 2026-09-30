@@ -316,7 +316,7 @@ class MarriagePage extends GetView<MarriageController> {
                           color: isSelected
                               ? AppColors.white
                               : AppColors.primary,
-                          fontSize: 10.sp,
+                          fontSize: 10,
                         ),
                       ),
                       selected: isSelected,

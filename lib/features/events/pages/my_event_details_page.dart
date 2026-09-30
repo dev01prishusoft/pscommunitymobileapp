@@ -196,7 +196,7 @@ class MyEventDetailsPage extends StatelessWidget {
                             eventName,
                             style: AppTextStyles.titleMedium.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                              fontSize: 18,
                               color: const Color(0xFF1F2937),
                             ),
                             textAlign: TextAlign.center,
@@ -206,7 +206,7 @@ class MyEventDetailsPage extends StatelessWidget {
                             Text(
                               dateTimeStr,
                               style: TextStyle(
-                                fontSize: 13.sp,
+                                fontSize: 13,
                                 color: const Color(0xFF6B7280),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -227,7 +227,7 @@ class MyEventDetailsPage extends StatelessWidget {
                               statusName.toUpperCase(),
                               style: TextStyle(
                                 color: badgeTextColor,
-                                fontSize: 10.sp,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -266,7 +266,7 @@ class MyEventDetailsPage extends StatelessWidget {
                           Text(
                             LK.my_event_details_reg_number.tr,
                             style: TextStyle(
-                              fontSize: 11.sp,
+                              fontSize: 11,
                               color: const Color(0xFF6B7280),
                               fontWeight: FontWeight.w500,
                             ),
@@ -275,7 +275,7 @@ class MyEventDetailsPage extends StatelessWidget {
                           SelectableText(
                             registrationNumber,
                             style: TextStyle(
-                              fontSize: 16.sp,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFF1F2937),
                               letterSpacing: 1.2,
@@ -305,7 +305,7 @@ class MyEventDetailsPage extends StatelessWidget {
                               ? '$memberName · $memberNo'
                               : memberName,
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF1F2937),
                           ),
@@ -330,7 +330,7 @@ class MyEventDetailsPage extends StatelessWidget {
                           child: Text(
                             guestsText,
                             style: TextStyle(
-                              fontSize: 13.5.sp,
+                              fontSize: 13.5,
                               color: const Color(0xFF374151),
                               fontWeight: FontWeight.w500,
                             ),
@@ -358,7 +358,7 @@ class MyEventDetailsPage extends StatelessWidget {
                               child: Text(
                                 fullAddress,
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 13,
                                   color: const Color(0xFF4B5563),
                                   height: 1.4,
                                 ),
@@ -551,7 +551,7 @@ class MyEventDetailsPage extends StatelessWidget {
                     LK.cancel_registration.tr,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 17.sp,
+                      fontSize: 17,
                       color: AppColors.black,
                     ),
                   ),
@@ -562,7 +562,7 @@ class MyEventDetailsPage extends StatelessWidget {
               LK.my_event_details_dialog_msg.tr,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.grey.shade700,
-                fontSize: 14.sp,
+                fontSize: 14,
                 height: 1.4,
               ),
             ),
@@ -587,7 +587,7 @@ class MyEventDetailsPage extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.grey.shade700,
                           fontWeight: FontWeight.w600,
-                          fontSize: 14.sp,
+                          fontSize: 14,
                         ),
                       ),
                     ),
@@ -758,7 +758,7 @@ class MyEventDetailsPage extends StatelessWidget {
         Text(
           LK.my_event_details_qr_na.tr,
           style: TextStyle(
-            fontSize: 12.5.sp,
+            fontSize: 12.5,
             fontWeight: FontWeight.w600,
             color: AppColors.grey.shade600,
           ),

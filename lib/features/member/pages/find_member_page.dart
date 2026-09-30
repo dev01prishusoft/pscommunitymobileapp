@@ -120,7 +120,7 @@ class _FindMemberCard extends StatelessWidget {
         style: AppTextStyles.labelSmall.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.bold,
-          fontSize: 10.sp,
+          fontSize: 10,
         ),
       ),
     );
@@ -147,7 +147,7 @@ class _FindMemberCard extends StatelessWidget {
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.pink,
               fontWeight: FontWeight.bold,
-              fontSize: 10.sp,
+              fontSize: 10,
             ),
           ),
         ],
@@ -183,7 +183,7 @@ class _FindMemberCard extends StatelessWidget {
         style: AppTextStyles.labelSmall.copyWith(
           color: AppColors.grey.shade800,
           fontWeight: FontWeight.w600,
-          fontSize: 10.sp,
+          fontSize: 10,
         ),
       ),
     );
@@ -202,7 +202,7 @@ class _FindMemberCard extends StatelessWidget {
         style: AppTextStyles.labelSmall.copyWith(
           color: AppColors.blue.shade900,
           fontWeight: FontWeight.w600,
-          fontSize: 10.sp,
+          fontSize: 10,
         ),
       ),
     );
@@ -252,7 +252,7 @@ class _FindMemberCard extends StatelessWidget {
                     member.name,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 15.sp,
+                      fontSize: 15,
                     ),
                   ),
                   SizedBox(height: 6.h),

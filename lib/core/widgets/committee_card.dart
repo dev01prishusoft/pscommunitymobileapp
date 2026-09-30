@@ -113,7 +113,7 @@ class CommitteeCard extends StatelessWidget {
                       fontWeight: currentDepth == 0
                           ? FontWeight.w700
                           : FontWeight.w600,
-                      fontSize: currentDepth == 0 ? 14.sp : 13.sp,
+                      fontSize: currentDepth == 0 ? 14 : 13,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -144,7 +144,7 @@ class CommitteeCard extends StatelessWidget {
                           style: AppTextStyles.labelSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
-                            fontSize: 10.sp,
+                            fontSize: 10,
                           ),
                         ),
                       ],

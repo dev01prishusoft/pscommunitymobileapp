@@ -60,7 +60,7 @@ class NotificationsPage extends GetView<NotificationController> {
                             LK.deleteAllNotification.tr,
                             style: AppTextStyles.titleMedium.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                              fontSize: 18,
                               color: AppColors.black,
                             ),
                             textAlign: TextAlign.center,

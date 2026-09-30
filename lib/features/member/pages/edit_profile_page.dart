@@ -2008,7 +2008,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 LK.removePhoto.tr,
                                 style: AppTextStyles.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18.sp,
+                                  fontSize: 18,
                                   color: AppColors.black,
                                 ),
                                 textAlign: TextAlign.center,
@@ -2081,7 +2081,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   label: Text(
                     LK.removePhoto.tr,
                     style: AppTextStyles.labelSmall.copyWith(
-                      fontSize: 10.sp,
+                      fontSize: 10,
                       color: AppColors.red,
                     ),
                   ),

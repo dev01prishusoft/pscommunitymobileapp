@@ -147,7 +147,7 @@ class _NotificationCardState extends State<NotificationCard> {
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
-              fontSize: 8.sp,
+              fontSize: 8,
             ),
           ),
         ],

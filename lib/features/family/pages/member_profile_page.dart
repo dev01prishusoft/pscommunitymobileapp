@@ -267,7 +267,7 @@ class _ProfileHeader extends StatelessWidget {
             style: AppTextStyles.labelSmall.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
-              fontSize: 10.sp,
+              fontSize: 10,
             ),
           ),
           if (isRejected) ...[
