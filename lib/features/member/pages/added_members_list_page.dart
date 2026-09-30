@@ -161,7 +161,19 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                         );
                       }
                       final member = _controller.filteredMembers[index];
-                      return AddedMemberCard(member: member);
+                      return AddedMemberCard(
+                        member: member,
+                        onEdit: () {
+                          Get.toNamed<dynamic>(
+                            AppRouter.addFamilyMember,
+                            arguments: {'memberId': member.memberId},
+                          )?.then((updated) {
+                            if (updated == true) {
+                              _controller.refreshMembers();
+                            }
+                          });
+                        },
+                      );
                     },
                   ),
                 );

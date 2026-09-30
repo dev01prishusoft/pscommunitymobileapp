@@ -10,8 +10,9 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AddedMemberCard extends StatelessWidget {
-  const AddedMemberCard({super.key, required this.member});
+  const AddedMemberCard({super.key, required this.member, this.onEdit});
   final Member member;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,10 @@ class AddedMemberCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onEdit != null) ...[
+                  SizedBox(width: 8.w),
+                  _buildEditButton(),
+                ],
               ],
             ),
           ),
@@ -82,6 +87,31 @@ class AddedMemberCard extends StatelessWidget {
       gender: member.genderName,
       fallbackName: member.fullName,
       radius: 28.r,
+    );
+  }
+
+  Widget _buildEditButton() {
+    return Material(
+      color: AppColors.primary.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(10.r),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10.r),
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          onEdit!();
+        },
+        child: Tooltip(
+          message: LK.edit.tr,
+          child: Padding(
+            padding: EdgeInsets.all(8.w),
+            child: Icon(
+              Icons.edit_outlined,
+              size: 18.sp,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

@@ -197,6 +197,8 @@ class LK {
   static const String recurring = 'Recurring';
   static const String somethingWrong = 'Something went wrong';
   static const String memberAddedSuccessfully = 'Member Added Successfully';
+  static const String memberUpdatedSuccessfully =
+      'Member Updated Successfully';
   static const String noResultsFound = 'No results found';
   static const String noMembersFound = 'No members found';
   static const String noMatchesFound = 'No matches found';
@@ -441,6 +443,8 @@ class LK {
   static const String ageYears = 'yrs';
   static const String editProfile = 'Edit Profile';
   static const String addFamilyMember = 'Add Family Member';
+  static const String editFamilyMember = 'Edit Family Member';
+  static const String edit = 'Edit';
   static const String personal = 'Personal';
   static const String contactVerify = 'Contact & Verify';
   static const String familyParents = 'Family & Parents';

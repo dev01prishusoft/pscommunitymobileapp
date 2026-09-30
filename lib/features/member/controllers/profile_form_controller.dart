@@ -238,6 +238,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
       workInfo.getAddressAreas(talukaName);
 
   Member? get currentMember => _currentMember;
+  String get initialEducationJson => _initialEducationJson;
 
   Map<String, dynamic> get changedFormData {
     final formDataMap = <String, dynamic>{};

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
+import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
@@ -19,8 +20,9 @@ import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_location_autocomplete.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
-import 'package:pscommunitymobileapp/features/member/controllers/profile_form_controller.dart';
+import 'package:pscommunitymobileapp/features/member/controllers/add_family_member_controller.dart';
 
 class AddFamilyMemberPage extends StatefulWidget {
   const AddFamilyMemberPage({super.key});
@@ -30,7 +32,7 @@ class AddFamilyMemberPage extends StatefulWidget {
 }
 
 class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
-  late final ProfileFormController controller;
+  late final AddFamilyMemberController controller;
   final ScrollController _scrollController = ScrollController();
   final ScrollController _addressScrollController = ScrollController();
   final ScrollController _educationScrollController = ScrollController();
@@ -43,6 +45,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   late final PageController _pageController;
   int _currentStep = 0;
   late String controllerTag;
+  bool _isEditMode = false;
+  bool _isLoadingMember = false;
 
   String get _nativeLangSuffix {
     if (!Get.isRegistered<LocalizationService>()) return '';
@@ -57,9 +61,38 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   void initState() {
     super.initState();
     controllerTag = UniqueKey().toString();
-    controller = Get.put(ProfileFormController(), tag: controllerTag);
-    controller.markAsAddMode();
+    controller = Get.put(AddFamilyMemberController(), tag: controllerTag);
+    final args = Get.arguments;
+    final editMemberId =
+        args is Map<String, dynamic> ? args['memberId'] as int? : null;
+    if (editMemberId != null) {
+      _isEditMode = true;
+      _isLoadingMember = true;
+      _loadMemberForEdit(editMemberId);
+    } else {
+      controller.markAsAddMode();
+    }
     _pageController = PageController(initialPage: _currentStep);
+  }
+
+  Future<void> _loadMemberForEdit(int memberId) async {
+    final loaded = await controller.loadMemberForEdit(memberId);
+    if (!mounted) return;
+    if (!loaded) {
+      PSDelightToastBar(
+        snackbarDuration: const Duration(seconds: 3),
+        builder: (context) => ToastCard(
+          title: LK.error.tr,
+          subtitle: LK.unexpectedError.tr,
+          isErrorMessage: true,
+        ),
+      ).show();
+      Get.back<void>();
+      return;
+    }
+    setState(() {
+      _isLoadingMember = false;
+    });
   }
 
   @override
@@ -69,7 +102,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     _educationScrollController.dispose();
     _headerScrollController.dispose();
     _pageController.dispose();
-    Get.delete<ProfileFormController>(tag: controllerTag);
+    Get.delete<AddFamilyMemberController>(tag: controllerTag);
     super.dispose();
   }
 
@@ -106,8 +139,56 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
       top: false,
       bottom: true,
       child: Scaffold(
-        appBar: AppBar(title: Text(LK.addFamilyMember.tr)),
-        body: ResponsiveFormContainer(
+        appBar: AppBar(
+          title: Text(
+            _isEditMode ? LK.editFamilyMember.tr : LK.addFamilyMember.tr,
+          ),
+          actions: [
+            if (_isEditMode && !_isLoadingMember)
+              Obx(() {
+                final hasChanges = controller.hasChanges;
+                final isFormLoading = controller.isFormLoading;
+                if (!hasChanges) return const SizedBox.shrink();
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: isFormLoading
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: () => controller.updateMember(
+                            successMessage: LK.memberUpdatedSuccessfully.tr,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          child: Text(
+                            LK.saveChanges.tr,
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                );
+              }),
+          ],
+        ),
+        body: _isLoadingMember
+            ? const Center(child: CircularProgressIndicator())
+            : ResponsiveFormContainer(
           child: Form(
             key: controller.formKey,
             autovalidateMode: AutovalidateMode.disabled,
@@ -179,7 +260,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
           ),
         ),
-        bottomNavigationBar: Container(
+        bottomNavigationBar: _isLoadingMember
+            ? null
+            : Container(
           padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -214,6 +297,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               Expanded(
                 child: Obx(() {
                   final isFormLoading = controller.isFormLoading;
+                  final hasChanges = !_isEditMode || controller.hasChanges;
                   final isLastStep = _currentStep == 5;
                   final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
       
@@ -221,16 +305,24 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     text: text,
                     height: 50.h,
                     onPressed: isLastStep
-                        ? () {
-                            final isValid =
-                                _stepFormKeys[5].currentState?.validate() ??
-                                false;
-                            if (isValid) {
-                              controller.submitForm(
-                                successMessage: LK.memberAddedSuccessfully.tr,
-                              );
-                            }
-                          }
+                        ? !hasChanges
+                              ? null
+                              : () {
+                                  final isValid =
+                                      _stepFormKeys[5].currentState?.validate() ??
+                                      false;
+                                  if (!isValid) return;
+                                  if (_isEditMode) {
+                                    controller.updateMember(
+                                      successMessage:
+                                          LK.memberUpdatedSuccessfully.tr,
+                                    );
+                                  } else {
+                                    controller.submitForm(
+                                      successMessage: LK.memberAddedSuccessfully.tr,
+                                    );
+                                  }
+                                }
                         : () {
                             _animateToStep(_currentStep + 1);
                           },
@@ -423,6 +515,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     isRequired: true,
                     prefixIcon: const Icon(Icons.person_outline),
                     maxLength: 100,
+                    updateStatus: controller.getUpdateStatus('FirstName'),
                   ),
                 ),
                 AppSpacing.vM,
@@ -433,6 +526,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       label: '${LK.middleName.tr}$_nativeLangSuffix',
                       prefixIcon: const Icon(Icons.person_outline),
                       maxLength: 100,
+                      updateStatus: controller.getUpdateStatus('MiddleName'),
                     ),
                   ),
                   Obx(
@@ -442,6 +536,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       isRequired: true,
                       prefixIcon: const Icon(Icons.person_outline),
                       maxLength: 100,
+                      updateStatus: controller.getUpdateStatus('LastName'),
                     ),
                   ),
                 ),
@@ -452,6 +547,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     isRequired: true,
                     prefixIcon: const Icon(Icons.language),
                     maxLength: 100,
+                    updateStatus: controller.getUpdateStatus(
+                      'FirstNameEnglish',
+                    ),
                   ),
                   AppFormTextField(
                     controller: controller.lastNameEnCtrl,
@@ -459,6 +557,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     isRequired: true,
                     prefixIcon: const Icon(Icons.language),
                     maxLength: 100,
+                    updateStatus: controller.getUpdateStatus(
+                      'LastNameEnglish',
+                    ),
                   ),
                 ),
                 _buildFieldPair(
@@ -466,10 +567,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     controller: controller.dobCtrl,
                     label: LK.birthDate.tr,
                     lastDate: DateTime.now(),
+                    updateStatus: controller.getUpdateStatus('DateOfBirth'),
                   ),
                   AppFormTimePicker(
                     controller: controller.tobCtrl,
                     label: LK.birthTime.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'DateOfBirthTime',
+                    ),
                   ),
                 ),
                 Obx(
@@ -511,6 +616,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       onChanged: (v) => controller.gender.value = v!,
                       label: LK.gender.tr,
                       isRequired: true,
+                      updateStatus: controller.getUpdateStatus(
+                        'GenderId',
+                        idMap: controller.personalInfo.genderIdMap,
+                      ),
                     ),
                   ),
                   Obx(
@@ -540,6 +649,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       },
                       label: LK.maritalStatusLabel.tr,
                       isRequired: true,
+                      updateStatus: controller.getUpdateStatus(
+                        'MaritalStatusId',
+                        idMap: controller.personalInfo.maritalStatusIdMap,
+                      ),
                     ),
                   ),
                 ),
@@ -569,6 +682,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               .toList(),
                       onChanged: (v) => controller.bloodGroup.value = v!,
                       label: LK.bloodGroup.tr,
+                      updateStatus: controller.getUpdateStatus(
+                        'BloodGroupId',
+                        idMap: controller.personalInfo.bloodGroupIdMap,
+                      ),
                     ),
                   ),
                   Obx(
@@ -593,6 +710,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                               .toList(),
                       onChanged: (v) => controller.sign.value = v!,
                       label: LK.sign.tr,
+                      updateStatus: controller.getUpdateStatus(
+                        'signId',
+                        idMap: controller.personalInfo.signIdMap,
+                      ),
                     ),
                   ),
                 ),
@@ -614,6 +735,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       }
                       return null;
                     },
+                    updateStatus: controller.getUpdateStatus('Weight'),
                   ),
                   AppFormTextField(
                     controller: controller.heightCtrl,
@@ -632,6 +754,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       }
                       return null;
                     },
+                    updateStatus: controller.getUpdateStatus('Height'),
                   ),
                 ),
               ],
@@ -688,6 +811,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Iconsax.call_copy),
                   maxLength: 10,
                   validator: AppValidators.mobile,
+                  updateStatus: controller.getUpdateStatus('MobileNo'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -698,6 +822,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Iconsax.mobile_copy),
                   maxLength: 10,
                   validator: AppValidators.optionalMobile,
+                  updateStatus: controller.getUpdateStatus('SecondaryMobile'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -707,6 +832,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Icons.email_outlined),
                   maxLength: 200,
                   validator: AppValidators.optionalEmail,
+                  updateStatus: controller.getUpdateStatus('EmailAddress'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -717,6 +843,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   maxLength: 10,
                   validator: AppValidators.optionalMobile,
+                  updateStatus: controller.getUpdateStatus(
+                    'EntryPersonMobileNo',
+                  ),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -724,6 +853,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: LK.emergencyContactNameLabel.tr,
                   prefixIcon: const Icon(Iconsax.user_add_copy),
                   maxLength: 100,
+                  updateStatus: controller.getUpdateStatus(
+                    'EmergencyContactName',
+                  ),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -734,6 +866,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Icons.emergency_outlined),
                   maxLength: 10,
                   validator: AppValidators.optionalMobile,
+                  updateStatus: controller.getUpdateStatus(
+                    'EmergencyContactNo',
+                  ),
                 ),
               ],
             ),
@@ -777,6 +912,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   maxLength: 300,
                   validator: AppValidators.url,
+                  updateStatus: controller.getUpdateStatus('FacebookUrl'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -788,6 +924,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   maxLength: 300,
                   validator: AppValidators.url,
+                  updateStatus:
+                      controller.getUpdateStatus('OfficialWhatsappUrl') ??
+                      controller.getUpdateStatus('WhatsappUrl'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -799,6 +938,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   maxLength: 300,
                   validator: AppValidators.url,
+                  updateStatus: controller.getUpdateStatus('InstagramUrl'),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -807,6 +947,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Iconsax.close_square),
                   maxLength: 300,
                   validator: AppValidators.url,
+                  updateStatus: controller.getUpdateStatus('TwitterUrl'),
                 ),
               ],
             ),
@@ -865,6 +1006,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 onChanged: (v) => controller.relation.value = v!,
                 label: LK.relation.tr,
                 isRequired: true,
+                updateStatus: controller.getUpdateStatus(
+                  'RelationTypeId',
+                  idMap: controller.personalInfo.relationIdMap,
+                ),
               ),
             ),
             AppSpacing.vM,
@@ -873,6 +1018,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               label: LK.motherFatherName.tr,
               prefixIcon: const Icon(Icons.people_outline),
               maxLength: 100,
+              updateStatus: controller.getUpdateStatus('MotherFatherName'),
             ),
             AppSpacing.vM,
             _buildFieldPair(
@@ -897,6 +1043,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     if (v != null) controller.gotra.value = v;
                   },
                   label: LK.gotraLabel.tr,
+                  updateStatus: controller.getUpdateStatus(
+                    'GotraId',
+                    idMap: controller.personalInfo.gotraIdMap,
+                  ),
                 ),
               ),
               Obx(
@@ -923,6 +1073,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     if (v != null) controller.mothersGotra.value = v;
                   },
                   label: LK.mothersGotra.tr,
+                  updateStatus: controller.getUpdateStatus(
+                    'MotherGotraId',
+                    idMap: controller.personalInfo.mothersGotraIdMap,
+                  ),
                 ),
               ),
             ),
@@ -956,6 +1110,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.mothersState.tr,
+                updateStatus: controller.getUpdateStatus(
+                  'MotherStateId',
+                  idMap: controller.workInfo.globalStateIdMap,
+                ),
               );
             }),
             AppSpacing.vM,
@@ -990,6 +1148,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.mothersDistrict.tr,
+                updateStatus: controller.getUpdateStatus(
+                  'MotherDistrictId',
+                  idMap: controller.workInfo.globalDistrictIdMap,
+                ),
               );
             }),
             AppSpacing.vM,
@@ -1023,6 +1185,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.mothersTaluka.tr,
+                updateStatus: controller.getUpdateStatus(
+                  'MotherTalukaId',
+                  idMap: controller.workInfo.globalTalukaIdMap,
+                ),
               );
             }),
             AppSpacing.vM,
@@ -1053,6 +1219,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.mothersArea.tr,
+                updateStatus: controller.getUpdateStatus(
+                  'MotherAreaId',
+                  idMap: controller.workInfo.globalAreaIdMap,
+                ),
               );
             }),
             AppSpacing.vM,
@@ -1063,6 +1233,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               return _buildCheckbox(
                 LK.lookingForMarriage.tr,
                 controller.openToMarriage,
+                updateStatus:
+                    controller.getUpdateStatus('IsLookingforMarriage') ??
+                    controller.getUpdateStatus('LookingforMarriage') ??
+                    controller.getUpdateStatus('IsLookingForMarriage'),
               );
             }),
           ],
@@ -1230,6 +1404,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             label: LK.addressType.tr,
             isRequired: true,
             requiredErrorMessage: LK.addressTypeRequired.tr,
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus(
+                    'AddressTypeId',
+                    idMap: controller.contactInfo.addressTypeIdMap,
+                  )
+                : null,
           );
         }),
         AppSpacing.vM,
@@ -1261,6 +1441,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             label: LK.state.tr,
             isRequired: true,
             requiredErrorMessage: LK.stateRequired.tr,
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus(
+                    'StateId',
+                    idMap: controller.workInfo.globalStateIdMap,
+                  )
+                : null,
           );
         }),
         AppSpacing.vM,
@@ -1291,6 +1477,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             label: LK.district.tr,
             isRequired: true,
             requiredErrorMessage: LK.districtRequired.tr,
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus(
+                    'DistrictId',
+                    idMap: controller.workInfo.globalDistrictIdMap,
+                  )
+                : null,
           );
         }),
         AppSpacing.vM,
@@ -1320,6 +1512,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             label: LK.taluka.tr,
             isRequired: true,
             requiredErrorMessage: LK.talukaRequired.tr,
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus(
+                    'TalukaId',
+                    idMap: controller.workInfo.globalTalukaIdMap,
+                  )
+                : null,
           );
         }),
         AppSpacing.vM,
@@ -1348,6 +1546,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             label: LK.area.tr,
             isRequired: true,
             requiredErrorMessage: LK.areaRequired.tr,
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus(
+                    'AreaId',
+                    idMap: controller.workInfo.globalAreaIdMap,
+                  )
+                : null,
           );
         }),
         AppSpacing.vM,
@@ -1366,6 +1570,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               addr.pincode = v;
               controller.addresses.refresh();
             },
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus('Pincode')
+                : null,
           ),
         ),
         AppSpacing.vM,
@@ -1386,6 +1593,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               addr.line1 = v;
               controller.addresses.refresh();
             },
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus('AddressLine1')
+                : null,
           ),
         ),
         AppSpacing.vM,
@@ -1406,6 +1616,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               addr.line2 = v;
               controller.addresses.refresh();
             },
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus('AddressLine2')
+                : null,
           ),
         ),
         AppSpacing.vM,
@@ -1422,6 +1635,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               addr.landmark = v;
               controller.addresses.refresh();
             },
+            updateStatus: addr.isPrimary
+                ? controller.getUpdateStatus('Landmark')
+                : null,
           ),
         ),
         AppSpacing.vM,
@@ -1646,6 +1862,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   Widget _buildEducationItem(int index) {
     final edu = controller.educationList[index];
     final isHighest = edu.isHighest;
+    final isNew = edu.isNew;
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.l),
       decoration: BoxDecoration(
@@ -1714,6 +1931,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   }
                 },
                 label: LK.qualificationLabel.tr,
+                updateStatus: (isHighest && !isNew)
+                    ? controller.getUpdateStatus(
+                        'EducationalQualificationId',
+                        idMap: controller.contactInfo.educationIdMap,
+                      )
+                    : null,
               ),
             ),
             AppSpacing.vM,
@@ -1726,6 +1949,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 edu.institute = v;
                 controller.educationList.refresh();
               },
+              updateStatus: (isHighest && !isNew)
+                  ? controller.getUpdateStatus('InstitutionName')
+                  : null,
             ),
             AppSpacing.vM,
             Row(
@@ -1787,6 +2013,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       edu.passingYear = v;
                       controller.educationList.refresh();
                     },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('YearOfPassing')
+                        : null,
                   ),
                 ),
                 SizedBox(width: 5.w),
@@ -1822,6 +2051,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       edu.percentage = v;
                       controller.educationList.refresh();
                     },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Percentage')
+                        : null,
                   ),
                 ),
                 SizedBox(width: 5.w),
@@ -1835,6 +2067,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       edu.grade = v;
                       controller.educationList.refresh();
                     },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Grade')
+                        : null,
                   ),
                 ),
               ],
@@ -1851,6 +2086,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 edu.description = v;
                 controller.educationList.refresh();
               },
+              updateStatus: (isHighest && !isNew)
+                  ? controller.getUpdateStatus('Description')
+                  : null,
             ),
             AppSpacing.vM,
             Column(
@@ -1985,20 +2223,32 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   _buildCheckbox(
                     LK.ownLand.tr,
                     controller.personalInfo.ownLand,
+                    updateStatus:
+                        controller.getUpdateStatus('IsOwnLand') ??
+                        controller.getUpdateStatus('OwnLand'),
                   ),
                   _buildCheckbox(
                     LK.ownHouse.tr,
                     controller.personalInfo.ownHouse,
+                    updateStatus:
+                        controller.getUpdateStatus('IsOwnHouse') ??
+                        controller.getUpdateStatus('OwnHouse'),
                   ),
                 ),
                 _buildFieldPair(
                   _buildCheckbox(
                     LK.twoWheeler.tr,
                     controller.personalInfo.twoWheeler,
+                    updateStatus:
+                        controller.getUpdateStatus('HasTwoWheeler') ??
+                        controller.getUpdateStatus('TwoWheeler'),
                   ),
                   _buildCheckbox(
                     LK.fourWheeler.tr,
                     controller.personalInfo.fourWheeler,
+                    updateStatus:
+                        controller.getUpdateStatus('HasFourWheeler') ??
+                        controller.getUpdateStatus('FourWheeler'),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2008,6 +2258,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   prefixIcon: const Icon(Icons.currency_rupee),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   maxLength: 13,
+                  updateStatus: controller.getUpdateStatus('MonthlyIncome'),
                 ),
               ],
             ),
@@ -2068,6 +2319,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     label: LK.occupationType.tr,
                     isRequired: true,
                     requiredErrorMessage: LK.occupationTypeRequired.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationTypeId',
+                      idMap: controller.workInfo.occupationTypeIdMap,
+                    ),
                   );
                 }),
                 AppSpacing.vM,
@@ -2095,6 +2350,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     label: LK.occupation.tr,
                     isRequired: true,
                     requiredErrorMessage: LK.occupationRequired.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationId',
+                      idMap: controller.workInfo.occupationIdMap,
+                    ),
                   );
                 }),
                 AppSpacing.vM,
@@ -2120,6 +2379,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workInfo.jobPosition.value = v;
                     },
                     label: LK.jobPositionLabel.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'JobPositionId',
+                      idMap: controller.workInfo.jobPositionIdMap,
+                    ),
                   );
                 }),
                 AppSpacing.vM,
@@ -2130,6 +2393,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   maxLength: 200,
                   onChanged: (v) =>
                       controller.workInfo.otherOccupation.value = v,
+                  updateStatus: controller.getUpdateStatus('OtherOccupation'),
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
@@ -2139,6 +2403,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: const Icon(Iconsax.buildings_copy),
                     maxLength: 200,
                     onChanged: (v) => controller.companyName.value = v,
+                    updateStatus: controller.getUpdateStatus('CompanyName'),
                   ),
                   AppFormTextField(
                     controller: controller.businessNameCtrl,
@@ -2146,6 +2411,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: const Icon(Iconsax.briefcase_copy),
                     maxLength: 200,
                     onChanged: (v) => controller.businessName.value = v,
+                    updateStatus: controller.getUpdateStatus('BusinessName'),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2156,6 +2422,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   maxLines: 5,
                   minLines: 3,
                   maxLength: 500,
+                  updateStatus: controller.getUpdateStatus(
+                    'OccupationDescription',
+                  ),
                 ),
                 AppSpacing.vM,
                 Obx(
@@ -2182,6 +2451,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workState.value = v;
                     },
                     label: LK.state.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationStateId',
+                      idMap: controller.workInfo.workStateIdMap,
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2209,6 +2482,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workDistrict.value = v;
                     },
                     label: LK.district.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationDistrictId',
+                      idMap: controller.workInfo.workDistrictIdMap,
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2236,6 +2513,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workTaluka.value = v;
                     },
                     label: LK.taluka.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationTalukaId',
+                      idMap: controller.workInfo.workTalukaIdMap,
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2263,6 +2544,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workArea.value = v;
                     },
                     label: LK.area.tr,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationAreaId',
+                      idMap: controller.workInfo.workAreaIdMap,
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2275,6 +2560,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   maxLines: 5,
                   minLines: 3,
                   onChanged: (v) => controller.workAddressLine1.value = v,
+                  updateStatus: controller.getUpdateStatus(
+                    'OccupationAddressLine1',
+                  ),
                 ),
                 AppSpacing.vM,
                 AppFormTextField(
@@ -2286,6 +2574,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   maxLines: 5,
                   minLines: 3,
                   onChanged: (v) => controller.workAddressLine2.value = v,
+                  updateStatus: controller.getUpdateStatus(
+                    'OccupationAddressLine2',
+                  ),
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
@@ -2295,6 +2586,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: const Icon(Icons.location_city_outlined),
                     maxLength: 200,
                     onChanged: (v) => controller.workLandmark.value = v,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationLandmark',
+                    ),
                   ),
                   AppFormTextField(
                     controller: controller.workPincodeCtrl,
@@ -2304,6 +2598,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     maxLength: 6,
                     onChanged: (v) => controller.workPincode.value = v,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationPincode',
+                    ),
                   ),
                 ),
               ],
@@ -2345,8 +2642,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ),
               Obx(() {
                 final file = controller.profileImage.value;
+                final profileUrl =
+                    controller.currentMember?.profilePhotoFullUrl;
                 final isRemoved = controller.personalInfo.isPhotoRemoved.value;
-                final hasImage = file != null && !isRemoved;
+                final hasImage =
+                    (file != null && !isRemoved) ||
+                    (!isRemoved && profileUrl != null && profileUrl.isNotEmpty);
 
                 if (!hasImage) return const SizedBox.shrink();
 
@@ -2478,40 +2779,70 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           AppSpacing.vM,
           Center(
             child: Obx(() {
+              final profileUrl = controller.currentMember?.profilePhotoFullUrl;
+              final isRemoved = controller.personalInfo.isPhotoRemoved.value;
+              final showNetworkImage =
+                  !isRemoved && profileUrl != null && profileUrl.isNotEmpty;
+
               return AppImagePicker(
                 imageFile: controller.profileImage.value,
+                imageUrl: showNetworkImage ? profileUrl : null,
                 onPickImage: controller.pickProfilePhoto,
               );
             }),
           ),
+          Obx(() {
+            final status = controller.getUpdateStatus('ProfilePhotoPath');
+            if (status != null) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: ProfileUpdateStatusBadge(
+                  status: status,
+                  showValue: false,
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
           AppSpacing.vM,
         ],
       ),
     );
   }
 
-  Widget _buildCheckbox(String label, RxBool value) {
+  Widget _buildCheckbox(
+    String label,
+    RxBool value, {
+    ProfileUpdateStatus? updateStatus,
+  }) {
     return Obx(
-      () => InkWell(
-        onTap: () => value.value = !value.value,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: [
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: Checkbox(
-                  value: value.value,
-                  onChanged: (v) => value.value = v!,
-                  activeColor: AppColors.primary,
-                ),
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => value.value = !value.value,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: Checkbox(
+                      value: value.value,
+                      onChanged: (v) => value.value = v!,
+                      activeColor: AppColors.primary,
+                    ),
+                  ),
+                  AppSpacing.hS,
+                  Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
+                ],
               ),
-              AppSpacing.hS,
-              Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
-            ],
+            ),
           ),
-        ),
+          if (updateStatus != null)
+            ProfileUpdateStatusBadge(status: updateStatus),
+        ],
       ),
     );
   }
