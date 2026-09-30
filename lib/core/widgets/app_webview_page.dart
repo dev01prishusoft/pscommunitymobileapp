@@ -5,8 +5,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AppWebViewPage extends StatefulWidget {
@@ -14,11 +13,9 @@ class AppWebViewPage extends StatefulWidget {
     super.key,
     required this.title,
     required this.url,
-    this.allowAllUrls = false,
   });
   final String title;
   final String url;
-  final bool allowAllUrls;
 
   @override
   State<AppWebViewPage> createState() => _AppWebViewPageState();
@@ -29,7 +26,6 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
   int _loadingPercentage = 0;
 
   bool _isUrlAllowed(String urlString) {
-    if (widget.allowAllUrls) return true;
     try {
       final uri = Uri.parse(urlString);
       if (uri.scheme != 'http' && uri.scheme != 'https') {
@@ -56,25 +52,8 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
     }
   }
 
-  Future<void> _launchExternal(String urlString) async {
-    try {
-      final Uri url = Uri.parse(urlString);
-      if (urlString.startsWith('tel:')) {
-        final String number = urlString.replaceFirst('tel:', '');
-        final Uri telUri = Uri(scheme: 'tel', path: number);
-        await launchUrl(telUri);
-      } else {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      }
-    } catch (e, stack) {
-      final scheme = Uri.tryParse(urlString)?.scheme ?? 'unknown';
-      CrashReporter.recordError(
-        e,
-        stack,
-        reason: 'AppWebViewPage._launchExternal failed (scheme: $scheme)',
-      );
-    }
-  }
+  Future<void> _launchExternal(String urlString) =>
+      SafeLauncher.open(urlString);
 
   bool _hasError = false;
   String _errorMessage = '';

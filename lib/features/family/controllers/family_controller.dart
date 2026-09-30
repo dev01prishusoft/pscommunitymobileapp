@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/models/family.dart';
 import 'package:pscommunitymobileapp/core/models/family_area.dart';
@@ -9,8 +10,7 @@ import 'package:pscommunitymobileapp/features/family/repositories/family_reposit
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/member_address.dart';
-import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
 
 class FamilyController extends GetxController {
   FamilyController(this._repository);
@@ -385,29 +385,7 @@ class FamilyController extends GetxController {
       member.age > 0 ? '${member.age} ${LK.ageYears.tr}' : LK.na;
   final NumberFormat currencyFormatter = NumberFormat('#,##0.##', 'en_IN');
 
-  Future<void> launchSafeUrl(String urlString) async {
-    try {
-      final Uri url = Uri.parse(urlString);
-      if (urlString.startsWith('tel:')) {
-        final String number = urlString.replaceFirst('tel:', '');
-        final Uri telUri = Uri(scheme: 'tel', path: number);
-        if (await canLaunchUrl(telUri)) {
-          await launchUrl(telUri);
-        }
-      } else {
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-        }
-      }
-    } catch (e, stack) {
-      final scheme = Uri.tryParse(urlString)?.scheme ?? 'unknown';
-      CrashReporter.recordError(
-        e,
-        stack,
-        reason: 'FamilyController.launchSafeUrl failed (scheme: $scheme)',
-      );
-    }
-  }
+  Future<void> launchSafeUrl(String urlString) => SafeLauncher.open(urlString);
 
   String getFormattedDateOfBirth(Member member) {
     if (member.dateOfBirth == null) return LK.na;

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
+import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -1623,19 +1623,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                                   !url.startsWith('https://')) {
                                 url = 'https://$url';
                               }
-                              Get.to(
-                                () => AppWebViewPage(
-                                  title:
-                                      (schedule.sessionName != null &&
-                                          schedule.sessionName!
-                                              .trim()
-                                              .isNotEmpty)
-                                      ? schedule.sessionName!.trim()
-                                      : LK.event_session_online_meeting.tr,
-                                  url: url,
-                                  allowAllUrls: true,
-                                ),
-                              );
+                              SafeLauncher.open(url);
                             }
                           : null,
                     ),
