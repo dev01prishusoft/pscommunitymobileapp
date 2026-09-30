@@ -32,6 +32,30 @@ class LK {
   static const String errorTimeout = 'Request Timeout';
   static const String errorCertificatePinning = 'Security Error';
   static const String errorValidation = 'Validation Error';
+  static const String serverDownTitle = 'Server Under Maintenance';
+  static const String serverDownDesc = 'serverDownDesc';
+  static const String noInternetTitle = 'No Internet Connection';
+  static const String noInternetDesc = 'noInternetDesc';
+  static const String timeoutTitle = 'Connection Timed Out';
+  static const String timeoutDesc =
+      'The server took too long to respond. Please check your signal and try again.';
+  static const String tryAgain = 'Try Again';
+  static const String checkingConnection = 'Checking connection...';
+  static const String serverStillUnreachable =
+      'Server is still unreachable. Please try again shortly.';
+  static const String connectionRestored = 'Connection restored successfully!';
+  static const String goBack = 'Go Back';
+  static const String diagnosticsTitle = 'Connection Diagnostics';
+  static const String internetStatus = 'Internet Status';
+  static const String serverStatus = 'Server Status';
+  static const String connected = 'Connected';
+  static const String disconnected = 'Disconnected';
+  static const String reachable = 'Reachable';
+  static const String unreachable = 'Unreachable';
+  static const String statusOffline = 'OFFLINE';
+  static const String statusServerMaintenance = 'SERVER MAINTENANCE';
+  static const String statusTimeout = 'TIMEOUT';
+  static const String exitApp = 'Exit App';
   static const String accessRestricted = 'Access Restricted';
   static const String moduleAccessRestrictedSubtitle =
       'This Samaj has not purchased the @module module.';

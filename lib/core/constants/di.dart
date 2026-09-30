@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/services/global_network_error_service.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
@@ -73,6 +74,9 @@ class DI {
           connectivity: connectivityPlugin,
         );
         Get.put(connectivity, permanent: true);
+
+        final globalNetworkErrorService = GlobalNetworkErrorService(connectivity);
+        Get.put(globalNetworkErrorService, permanent: true);
 
         final authState = AuthState(tokenManager);
         Get.put(authState, permanent: true);

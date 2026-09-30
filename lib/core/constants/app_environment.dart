@@ -7,8 +7,8 @@ class AppEnvironment {
     required this.flavor,
     required this.apiBaseUrl,
     required this.uiBaseUrl,
-    this.connectTimeout = const Duration(seconds: 15),
-    this.receiveTimeout = const Duration(seconds: 15),
+    this.connectTimeout = const Duration(seconds: 10),
+    this.receiveTimeout = const Duration(seconds: 10),
     this.enableLogging = true,
   });
   static AppEnvironment? _instance;
@@ -45,8 +45,8 @@ class AppEnvironment {
       uiBaseUrl: flavor == Flavor.prod
           ? ApiConstants.uiBaseUrl
           : ApiConstants.devUiBaseUrl,
-      connectTimeout: Duration(seconds: 15),
-      receiveTimeout: Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
       enableLogging: flavor == Flavor.dev,
     );
   }

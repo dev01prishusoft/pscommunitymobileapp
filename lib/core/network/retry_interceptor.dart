@@ -6,8 +6,8 @@ import 'dart:math';
 class RetryInterceptor extends Interceptor {
   RetryInterceptor({
     required this.dio,
-    this.maxRetries = 3,
-    this.initialDelay = const Duration(milliseconds: 1000),
+    this.maxRetries = 1,
+    this.initialDelay = const Duration(milliseconds: 800),
   });
   final Dio dio;
   final int maxRetries;

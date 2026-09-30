@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' hide Response;
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
@@ -8,6 +9,7 @@ import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart
 import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart';
 import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
+import 'package:pscommunitymobileapp/core/services/global_network_error_service.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 
 class ApiClient {
@@ -37,7 +39,7 @@ class ApiClient {
         mainDio: _dio,
         onAuthFailure: onAuthFailure,
       ),
-      RetryInterceptor(dio: _dio),
+      RetryInterceptor(dio: _dio, maxRetries: 1),
       ErrorMappingInterceptor(),
     ]);
   }
@@ -52,7 +54,11 @@ class ApiClient {
     CancelToken? cancelToken,
     Options? options,
   }) async {
-    await _checkConnectivity();
+    final bool skipErrorScreen =
+        (options?.extra?['skipErrorScreen'] as bool?) ??
+        (options?.extra?['silent'] as bool?) ??
+        false;
+    await _checkConnectivity(skipErrorScreen: skipErrorScreen);
     try {
       return await _dio.request(
         path,
@@ -207,9 +213,14 @@ class ApiClient {
     }
   }
 
-  Future<void> _checkConnectivity() async {
+  Future<void> _checkConnectivity({bool skipErrorScreen = false}) async {
     final hasConnection = await _connectivity.hasConnection();
     if (!hasConnection) {
+      if (!skipErrorScreen && Get.isRegistered<GlobalNetworkErrorService>()) {
+        GlobalNetworkErrorService.to.handleNetworkError(
+          type: NetworkErrorType.noInternet,
+        );
+      }
       throw NetworkFailure();
     }
   }

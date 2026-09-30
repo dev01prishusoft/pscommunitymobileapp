@@ -41,6 +41,7 @@ import 'package:pscommunitymobileapp/features/notification/pages/notifications_p
 import 'package:pscommunitymobileapp/features/notification/controllers/notification_controller.dart';
 import 'package:pscommunitymobileapp/features/notification/repositories/notification_repository_impl.dart';
 import 'package:pscommunitymobileapp/core/services/notification_navigation_service.dart';
+import 'package:pscommunitymobileapp/core/widgets/network_error_page.dart';
 
 class AppRouter {
   static final RouteObserver<PageRoute> routeObserver =
@@ -79,6 +80,7 @@ class AppRouter {
   static String eventRegistration = '/event-registration';
   static String myEvents = '/my-events';
   static String eventScanner = '/event-scanner';
+  static String networkError = '/network-error';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -264,6 +266,11 @@ class AppRouter {
         return const MyEventsPage();
       },
       middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: networkError,
+      page: () => const NetworkErrorPage(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

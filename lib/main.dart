@@ -17,7 +17,11 @@ import 'package:pscommunitymobileapp/core/localization/localization_service.dart
 import 'package:pscommunitymobileapp/core/localization/localization_validator.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/widgets/fatal_error_screen.dart';
+import 'package:pscommunitymobileapp/core/widgets/preboot_network_error_screen.dart';
 
 import 'firebase_options.dart';
 
@@ -54,7 +58,33 @@ Future<void> _bootstrap() async {
 
     runApp(PsCommunityApp());
   } catch (e, stack) {
-    runApp(FatalErrorScreen(error: e, stackTrace: stack));
+    final errStr = e.toString().toLowerCase();
+    final isNetworkOrServer = e is Failure ||
+        e is DioException ||
+        e is SocketException ||
+        e is TimeoutException ||
+        errStr.contains('socketexception') ||
+        errStr.contains('timeoutexception') ||
+        errStr.contains('networkfailure') ||
+        errStr.contains('serverfailure') ||
+        errStr.contains('connection refused') ||
+        errStr.contains('failed host lookup');
+
+    if (isNetworkOrServer) {
+      final isServerDown = errStr.contains('server') ||
+          errStr.contains('50') ||
+          errStr.contains('connection refused');
+      runApp(
+        PrebootNetworkErrorScreen(
+          isServerDown: isServerDown,
+          onRetry: () async {
+            await _bootstrap();
+          },
+        ),
+      );
+    } else {
+      runApp(FatalErrorScreen(error: e, stackTrace: stack));
+    }
   }
 }
 

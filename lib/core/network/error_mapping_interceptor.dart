@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
+import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/services/global_network_error_service.dart';
 
 class ErrorMappingInterceptor extends Interceptor {
   @override
@@ -54,7 +57,58 @@ class ErrorMappingInterceptor extends Interceptor {
       default:
         failure = ServerFailure();
     }
+
+    _notifyGlobalNetworkError(err, failure);
+
     handler.next(err.copyWith(error: failure));
+  }
+
+  void _notifyGlobalNetworkError(DioException err, Failure failure) {
+    if (err.type == DioExceptionType.cancel) return;
+
+    final options = err.requestOptions;
+    final bool skipErrorScreen =
+        (options.extra['skipErrorScreen'] as bool?) ??
+        (options.extra['silent'] as bool?) ??
+        false;
+
+    if (skipErrorScreen) return;
+
+    if (!Get.isRegistered<GlobalNetworkErrorService>()) return;
+
+    final globalService = GlobalNetworkErrorService.to;
+
+    if (failure is TimeoutFailure) {
+      globalService.handleNetworkError(
+        type: NetworkErrorType.timeout,
+        message: failure.message,
+      );
+    } else if (failure is ServerFailure) {
+      final status = err.response?.statusCode;
+      if (status != null && status >= 500) {
+        globalService.handleNetworkError(
+          type: NetworkErrorType.serverDown,
+          message: failure.message,
+        );
+      }
+    } else if (failure is NetworkFailure ||
+        err.type == DioExceptionType.connectionError) {
+      if (Get.isRegistered<ConnectivityService>()) {
+        Get.find<ConnectivityService>().hasConnection().then((hasNet) {
+          globalService.handleNetworkError(
+            type: hasNet
+                ? NetworkErrorType.serverDown
+                : NetworkErrorType.noInternet,
+            message: failure.message,
+          );
+        });
+      } else {
+        globalService.handleNetworkError(
+          type: NetworkErrorType.noInternet,
+          message: failure.message,
+        );
+      }
+    }
   }
 
   String? _extractMessage(Map<String, dynamic> data) {
