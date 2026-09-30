@@ -109,27 +109,29 @@ class PaymentRepositoryImpl implements PaymentRepository {
     String? description,
     bool isRecurring = false,
   }) async {
-    try {
-      final payload = {
-        'amount': amount,
-        'currency': currency,
-        'paymentTypeId': paymentTypeId,
-        'paymentCategoryId': paymentCategoryId,
-        'adminPaymentRequestId': adminPaymentRequestId ?? 0,
-        'memberId': memberId,
-        'paymentStatusId': paymentStatusId,
-        'paymentModeId': paymentModeId,
-        'description': description ?? '',
-        'isRecurring': isRecurring,
-      };
+    final payload = <String, dynamic>{
+      'amount': amount,
+      'currency': currency,
+      'paymentTypeId': paymentTypeId,
+      'paymentCategoryId': paymentCategoryId,
+      'adminPaymentRequestId': (adminPaymentRequestId != null && adminPaymentRequestId > 0)
+          ? adminPaymentRequestId
+          : (adminPaymentRequestId ?? 0),
+      'memberId': memberId,
+      'paymentStatusId': paymentStatusId,
+      'paymentModeId': paymentModeId,
+      'description': description ?? '',
+      'isRecurring': isRecurring,
+    };
 
+    try {
       final response = await _apiClient.postParsed<RazorpayOrder>(
         ApiEndpoints.createOrder,
         data: payload,
         fromJsonT: (json) =>
             RazorpayOrder.fromJson(json as Map<String, dynamic>),
       );
-            
+
       if (response.isFailure) {
         throw response.failureOrNull!;
       }
@@ -151,36 +153,36 @@ class PaymentRepositoryImpl implements PaymentRepository {
     int? adminPaymentRequestId,
     bool isRecurring = false,
   }) async {
-    try {
-      final endpoint = isRecurring ? ApiEndpoints.verifySubscription : ApiEndpoints.verifyPayment;
-      
-      final Map<String, dynamic> payload;
-      if (isRecurring) {
-        payload = {
-          'paymentId': adminPaymentRequestId ?? 0,
-          'razorpayPaymentId': razorpayPaymentId,
-          'razorpaySubscriptionId': razorpayOrderId,
-          'razorpaySignature': razorpaySignature,
-        };
-      } else {
-        payload = {
-          'razorpayOrderId': razorpayOrderId,
-          'razorpayPaymentId': razorpayPaymentId,
-          'razorpaySignature': razorpaySignature,
-          'amount': amount,
-          'paymentTypeId': paymentTypeId,
-          'paymentCategoryId': paymentCategoryId,
-          if (adminPaymentRequestId != null)
-            'adminPaymentRequestId': adminPaymentRequestId,
-        };
-      }
+    final endpoint = isRecurring ? ApiEndpoints.verifySubscription : ApiEndpoints.verifyPayment;
 
+    final Map<String, dynamic> payload;
+    if (isRecurring) {
+      payload = {
+        'paymentId': adminPaymentRequestId ?? 0,
+        'razorpayPaymentId': razorpayPaymentId,
+        'razorpaySubscriptionId': razorpayOrderId,
+        'razorpaySignature': razorpaySignature,
+      };
+    } else {
+      payload = {
+        'razorpayOrderId': razorpayOrderId,
+        'razorpayPaymentId': razorpayPaymentId,
+        'razorpaySignature': razorpaySignature,
+        'amount': amount,
+        'paymentTypeId': paymentTypeId,
+        'paymentCategoryId': paymentCategoryId,
+        if (adminPaymentRequestId != null)
+          'adminPaymentRequestId': adminPaymentRequestId,
+      };
+    }
+
+    try {
       final response = await _apiClient.postParsed<Map<String, dynamic>>(
         endpoint,
         data: payload,
         fromJsonT: (json) => json as Map<String, dynamic>,
       );
-      
+
       if (response.isFailure) {
         throw response.failureOrNull!;
       }

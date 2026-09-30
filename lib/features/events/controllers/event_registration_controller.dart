@@ -545,7 +545,9 @@ class EventRegistrationController extends GetxController {
     try {
       final tokenManager = Get.find<TokenManager>();
       final envKey = Env.razorpayKey;
-      final key = envKey.isNotEmpty ? envKey : (order.keyId ?? '');
+      final key = (order.keyId != null && order.keyId!.trim().isNotEmpty)
+          ? order.keyId!.trim()
+          : envKey;
       if (key.isEmpty) {
         PSDelightToastBar(
           snackbarDuration: const Duration(seconds: 3),
@@ -577,9 +579,18 @@ class EventRegistrationController extends GetxController {
         prefill['email'] = email;
       }
 
+      final parsedPaise = (order.amountInPaise is num && (order.amountInPaise as num) > 0)
+          ? (order.amountInPaise as num).toInt()
+          : (int.tryParse(order.amountInPaise?.toString() ?? '') ?? 0);
+      final int amountInPaise = parsedPaise > 0
+          ? parsedPaise
+          : ((order.finalAmount is num)
+              ? ((order.finalAmount as num) * 100).round()
+              : 0);
+
       final options = <String, dynamic>{
         'key': key,
-        'amount': order.amountInPaise,
+        'amount': amountInPaise,
         'name': samajName,
         'description': event.eventName ?? LK.paymentForCommunity.tr,
         'timeout': 300,

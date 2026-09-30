@@ -345,7 +345,7 @@ class PaymentController extends GetxController {
       );
 
       final envKey = Env.razorpayKey;
-      final key = envKey.isNotEmpty ? envKey : order.keyId;
+      final key = order.keyId.trim().isNotEmpty ? order.keyId.trim() : envKey;
       if (key.isEmpty) {
         PSDelightToastBar(
           snackbarDuration: const Duration(seconds: 3),
@@ -382,9 +382,13 @@ class PaymentController extends GetxController {
         prefill['email'] = email;
       }
 
+      final int amountInPaise = order.amountInPaise > 0
+          ? order.amountInPaise
+          : (amount * 100).round();
+
       final options = <String, dynamic>{
         'key': key,
-        'amount': order.amountInPaise,
+        'amount': amountInPaise,
         'name': samajName,
         'description': LK.paymentForCommunity,
         'timeout': 300,
