@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -17,7 +16,7 @@ import 'package:pscommunitymobileapp/core/models/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/core/models/payment_mode.dart';
 import 'package:pscommunitymobileapp/core/models/payment_type.dart';
 import 'package:pscommunitymobileapp/features/payment/repositories/payment_repository.dart';
-import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/services/razorpay_checkout_service.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentController extends GetxController {
@@ -344,84 +343,40 @@ class PaymentController extends GetxController {
         isRecurring: isRecurring,
       );
 
-      final envKey = Env.razorpayKey;
-      final key = order.keyId.trim().isNotEmpty ? order.keyId.trim() : envKey;
-      if (key.isEmpty) {
-        PSDelightToastBar(
-          snackbarDuration: const Duration(seconds: 3),
-          builder: (context) => ToastCard(
-            title: LK.error.tr,
-            subtitle: LK.paymentGatewayMissing.tr,
-            isErrorMessage: true,
-          ),
-        ).show();
-        isProcessingPayment.value = false;
-        isProcessingRecurring.value = false;
-        return;
-      }
-
-      String samajName = '';
-      if (Get.isRegistered<SamajController>()) {
-        samajName = Get.find<SamajController>().samaj.value?.name ?? '';
-      }
-      if (samajName.trim().isEmpty) {
-        samajName = 'PS Community';
-      }
-
-      final String? samajLogoUrl = Get.isRegistered<SamajController>()
-          ? Get.find<SamajController>().samaj.value?.logoUrl
-          : null;
-
-      final prefill = <String, String>{};
-      final phone = tokenManager.userPhone?.trim();
-      final email = tokenManager.userEmail?.trim();
-      if (phone != null && phone.isNotEmpty) {
-        prefill['contact'] = phone;
-      }
-      if (email != null && email.isNotEmpty) {
-        prefill['email'] = email;
-      }
-
       final int amountInPaise = order.amountInPaise > 0
           ? order.amountInPaise
           : (amount * 100).round();
 
-      final options = <String, dynamic>{
-        'key': key,
-        'amount': amountInPaise,
-        'name': samajName,
-        'description': LK.paymentForCommunity,
-        'timeout': 300,
-        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
-          'image': samajLogoUrl,
-        if (prefill.isNotEmpty) 'prefill': prefill,
-        'theme': {'color': '#1E3A8A'},
-        'currency': 'INR',
-      };
-
-      if (isRecurring &&
-          order.subscriptionId != null &&
-          order.subscriptionId!.isNotEmpty) {
-        options['subscription_id'] = order.subscriptionId!;
-      } else {
-        options['order_id'] = order.orderId;
+      final opened = RazorpayCheckoutService.open(
+        _razorpay,
+        RazorpayCheckoutParams(
+          orderId: order.orderId,
+          amountInPaise: amountInPaise,
+          currency: order.currency,
+          keyId: order.keyId,
+          subscriptionId:
+              (isRecurring && (order.subscriptionId?.isNotEmpty ?? false))
+              ? order.subscriptionId
+              : null,
+          description: LK.paymentForCommunity,
+        ),
+      );
+      if (!opened) {
+        isProcessingPayment.value = false;
+        isProcessingRecurring.value = false;
+        _pendingAdminRequestId = null;
       }
-
-      _razorpay.open(options);
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'PaymentController._openRazorpayCheckout failed',
+        reason: 'PaymentController.initiatePayment failed',
       );
-      final errorMessage = e.toString();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
         builder: (context) => ToastCard(
           title: LK.error.tr,
-          subtitle: errorMessage.isNotEmpty
-              ? errorMessage
-              : LK.paymentFailed.tr,
+          subtitle: LK.paymentFailed.tr,
           isErrorMessage: true,
         ),
       ).show();
