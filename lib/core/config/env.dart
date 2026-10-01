@@ -1,6 +1,6 @@
 import 'package:envied/envied.dart';
 
-part 'env.g.dart';
+// part 'env.g.dart';
 
 /// Secrets read from `.env` at build time and compiled in obfuscated form.
 /// After editing `.env`, regenerate with:
@@ -8,8 +8,8 @@ part 'env.g.dart';
 @Envied(path: '.env', obfuscate: true)
 abstract class Env {
   @EnviedField(varName: 'GOOGLEMAP_KEY', defaultValue: '')
-  static final String googleMapKey = _Env.googleMapKey;
+  static final String googleMapKey = "";
 
   @EnviedField(varName: 'RAZORPAY_KEY', defaultValue: '')
-  static final String razorpayKey = _Env.razorpayKey;
+  static final String razorpayKey = "";
 }

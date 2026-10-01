@@ -20,6 +20,7 @@ import 'package:pscommunitymobileapp/core/models/address_model.dart';
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/models/family_member_dropdown.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/work_info_controller.dart';
@@ -124,6 +125,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxBool get isActive => personalInfo.isActive;
   RxBool get isFamilyHead => personalInfo.isFamilyHead;
   RxString get relation => personalInfo.relation;
+  RxList<Data> get familyMemberList => personalInfo.familyMemberList;
+  Rxn<int> get selectedFamilyMemberId => personalInfo.selectedFamilyMemberId;
+  Rxn<int> get selectedMemberId => personalInfo.selectedFamilyMemberId;
+  Rxn<int> get memberId => personalInfo.selectedFamilyMemberId;
+  RxBool get isLoadingFamilyMembers => personalInfo.isLoadingFamilyMembers;
   RxString get motherFatherName => personalInfo.motherFatherName;
   RxString get gotra => personalInfo.gotra;
   RxString get mothersGotra => personalInfo.mothersGotra;
@@ -421,6 +427,12 @@ class ProfileFormController extends GetxController with FormStateMixin {
       m.relatedToMemberName,
       m.relationTypeId,
     );
+
+    if (personalInfo.selectedFamilyMemberId.value != null &&
+        personalInfo.selectedFamilyMemberId.value != m.relatedToMemberId) {
+      formDataMap['RelatedToMemberId'] =
+          personalInfo.selectedFamilyMemberId.value;
+    }
 
     addIfChanged(
       'MotherFatherName',
@@ -826,6 +838,15 @@ class ProfileFormController extends GetxController with FormStateMixin {
 
     isMemberLoaded = true;
     _checkAndTakeSnapshot();
+
+    final headId = (m.isHead == true)
+        ? m.memberId
+        : ((m.relatedToMemberId != null && m.relatedToMemberId! > 0)
+              ? m.relatedToMemberId
+              : ((m.familyId != null && m.familyId! > 0)
+                    ? m.familyId
+                    : m.memberId));
+    fetchFamilyMembers(headMemberId: headId);
 
     int addressMemberId = m.memberId;
     if (m.issameAddressasMyFamilyHeadAddress == true) {
@@ -1287,6 +1308,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     isAddMode = true;
     isMemberLoaded = true;
     _checkAndTakeSnapshot();
+    fetchFamilyMembers();
   }
 
   Future<void> loadAllDropdowns() async {
@@ -1369,6 +1391,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         [],
         idMap: workInfo.workStateIdMap,
       ),
+      fetchFamilyMembers(),
     ]);
 
     await workInfo.fetchOccupations();
@@ -1379,6 +1402,74 @@ class ProfileFormController extends GetxController with FormStateMixin {
     areDropdownsLoaded = true;
     sanitizeAddresses();
     _checkAndTakeSnapshot();
+  }
+
+  int? getHeadMemberId() {
+    if (_currentMember != null) {
+      if (_currentMember!.isHead == true) {
+        return _currentMember!.memberId;
+      }
+      if (_currentMember!.relatedToMemberId != null &&
+          _currentMember!.relatedToMemberId! > 0) {
+        return _currentMember!.relatedToMemberId;
+      }
+      if (_currentMember!.familyId != null && _currentMember!.familyId! > 0) {
+        return _currentMember!.familyId;
+      }
+    }
+    if (Get.isRegistered<DrawerUserController>()) {
+      final drawerMember = Get.find<DrawerUserController>().member.value;
+      if (drawerMember != null) {
+        if (drawerMember.isHead == true) {
+          return drawerMember.memberId;
+        }
+        if (drawerMember.relatedToMemberId != null &&
+            drawerMember.relatedToMemberId! > 0) {
+          return drawerMember.relatedToMemberId;
+        }
+        if (drawerMember.familyId != null && drawerMember.familyId! > 0) {
+          return drawerMember.familyId;
+        }
+        return drawerMember.memberId;
+      }
+    }
+    if (Get.isRegistered<TokenManager>()) {
+      return Get.find<TokenManager>().memberId;
+    }
+    return null;
+  }
+
+  Future<void> fetchFamilyMembers({int? headMemberId}) async {
+    try {
+      final effectiveHeadId = headMemberId ?? getHeadMemberId();
+      if (effectiveHeadId == null || effectiveHeadId <= 0) return;
+
+      personalInfo.isLoadingFamilyMembers.value = true;
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(
+        '/api/v1/member/family-members',
+        queryParameters: {'headMemberId': effectiveHeadId},
+      );
+
+      if (response.data != null) {
+        final Map<String, dynamic> jsonMap =
+            response.data is Map<String, dynamic>
+            ? response.data as Map<String, dynamic>
+            : jsonDecode(response.data.toString()) as Map<String, dynamic>;
+        final familyData = FamilyMemberDropDown.fromJson(jsonMap);
+        if (familyData.succeeded == true && familyData.data != null) {
+          personalInfo.familyMemberList.assignAll(familyData.data!);
+        }
+      }
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'ProfileFormController.fetchFamilyMembers failed',
+      );
+    } finally {
+      personalInfo.isLoadingFamilyMembers.value = false;
+    }
   }
 
   String? _findLocByName(String name, Iterable<String> mapKeys) {
@@ -1507,11 +1598,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
   bool isMemberLoaded = false;
   bool areDropdownsLoaded = false;
 
-  void _checkAndTakeSnapshot() {
+  void checkAndTakeSnapshot() {
     if (isMemberLoaded && areDropdownsLoaded) {
       takeSnapshot();
     }
   }
+
+  void _checkAndTakeSnapshot() => checkAndTakeSnapshot();
 
   Future<void> takeSnapshot() async {
     _ensureSelectionValue(personalInfo.gender, personalInfo.genderList);
@@ -1891,7 +1984,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
   }
 
-  void submitForm({String? successMessage}) {
+  Future<bool> submitForm({
+    String? successMessage,
+    bool navigateBack = true,
+  }) async {
     final isEdit = _currentMember != null;
     bool hasListErrors = false;
 
@@ -1905,7 +2001,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
       personalInfo.firstName.value = personalInfo.firstNameCtrl.text;
       personalInfo.lastName.value = personalInfo.lastNameCtrl.text;
 
-      submitThrottled(() async {
+      bool success = false;
+      await submitThrottled(() async {
         personalInfo.uploadProgress.value = 0.1;
 
         try {
@@ -2120,7 +2217,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['ApproveStatus'] = null;
             formDataMap['ApprovedBy'] = null;
             formDataMap['ApprovedDate'] = null;
-            formDataMap['RelatedToMemberId'] = null;
+            formDataMap['RelatedToMemberId'] =
+                personalInfo.selectedFamilyMemberId.value;
             formDataMap['ProfilePhotoPath'] = null;
             formDataMap['PasswordModifiedDate'] = null;
 
@@ -2372,16 +2470,29 @@ class ProfileFormController extends GetxController with FormStateMixin {
             Get.find<DrawerUserController>().fetchUser();
           }
 
-          await Future<void>.delayed(const Duration(milliseconds: 1500));
-          await Get.offAllNamed<void>(AppRouter.home);
+          if (navigateBack) {
+            await Future<void>.delayed(const Duration(milliseconds: 1500));
+            await Get.offAllNamed<void>(AppRouter.home);
+          } else {
+            fetchProfileUpdateStatus();
+            _checkAndTakeSnapshot();
+          }
+          success = true;
         } catch (e) {
+          if (e is Failure && e.message == 'No member changes found.') {
+            if (navigateBack) {
+              await Future<void>.delayed(const Duration(milliseconds: 500));
+              await Get.offAllNamed<void>(AppRouter.home);
+            } else {
+              fetchProfileUpdateStatus();
+              _checkAndTakeSnapshot();
+            }
+            success = true;
+            return;
+          }
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
-            if (e.message == 'No member changes found.') {
-              errorMessage = e.message.tr;
-            } else {
-              errorMessage = e.message;
-            }
+            errorMessage = e.message;
           }
           PSDelightToastBar(
             snackbarDuration: const Duration(seconds: 3),
@@ -2395,6 +2506,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           personalInfo.uploadProgress.value = 0.0;
         }
       });
+      return success;
     } else {
       showListErrors.value = true;
       PSDelightToastBar(
@@ -2405,6 +2517,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
           isErrorMessage: true,
         ),
       ).show();
+      return false;
     }
   }
 

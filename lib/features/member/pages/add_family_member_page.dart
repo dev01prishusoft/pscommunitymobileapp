@@ -143,48 +143,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           title: Text(
             _isEditMode ? LK.editFamilyMember.tr : LK.addFamilyMember.tr,
           ),
-          actions: [
-            if (_isEditMode && !_isLoadingMember)
-              Obx(() {
-                final hasChanges = controller.hasChanges;
-                final isFormLoading = controller.isFormLoading;
-                if (!hasChanges) return const SizedBox.shrink();
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: isFormLoading
-                      ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
-                            ),
-                          ),
-                        )
-                      : OutlinedButton(
-                          onPressed: () => controller.updateMember(
-                            successMessage: LK.memberUpdatedSuccessfully.tr,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AppColors.primary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          child: Text(
-                            LK.saveChanges.tr,
-                            style: AppTextStyles.labelLarge.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                );
-              }),
-          ],
         ),
         body: _isLoadingMember
             ? const Center(child: CircularProgressIndicator())
@@ -299,7 +257,9 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   final isFormLoading = controller.isFormLoading;
                   final hasChanges = !_isEditMode || controller.hasChanges;
                   final isLastStep = _currentStep == 5;
-                  final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
+                        final text = isLastStep
+                            ? LK.saveChanges.tr
+                            : LK.nextAndSave.tr;
       
                   return AppPrimaryButton(
                     text: text,
@@ -316,6 +276,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                                     controller.updateMember(
                                       successMessage:
                                           LK.memberUpdatedSuccessfully.tr,
+                                            navigateBack: true,
                                     );
                                   } else {
                                     controller.submitForm(
@@ -323,10 +284,25 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                                     );
                                   }
                                 }
-                        : () {
+                              : () async {
+                                  final isValid =
+                                      _stepFormKeys[_currentStep].currentState
+                                          ?.validate() ??
+                                      true;
+                                  if (!isValid) return;
+
+                                  if (_isEditMode && controller.hasChanges) {
+                                    final success = await controller
+                                        .updateMember(
+                                          successMessage:
+                                              LK.memberUpdatedSuccessfully.tr,
+                                          navigateBack: false,
+                                        );
+                                    if (!success) return;
+                                  }
                             _animateToStep(_currentStep + 1);
                           },
-                    isLoading: isLastStep ? isFormLoading : false,
+                          isLoading: isFormLoading,
                   );
                 }),
               ),
@@ -541,39 +517,47 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.firstNameEnCtrl,
-                    label: LK.firstNameEnglish.tr,
-                    isRequired: true,
-                    prefixIcon: const Icon(Icons.language),
-                    maxLength: 100,
-                    updateStatus: controller.getUpdateStatus(
-                      'FirstNameEnglish',
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.firstNameEnCtrl,
+                      label: LK.firstNameEnglish.tr,
+                      isRequired: true,
+                      prefixIcon: const Icon(Icons.language),
+                      maxLength: 100,
+                      updateStatus: controller.getUpdateStatus(
+                        'FirstNameEnglish',
+                      ),
                     ),
                   ),
-                  AppFormTextField(
-                    controller: controller.lastNameEnCtrl,
-                    label: LK.lastNameEnglish.tr,
-                    isRequired: true,
-                    prefixIcon: const Icon(Icons.language),
-                    maxLength: 100,
-                    updateStatus: controller.getUpdateStatus(
-                      'LastNameEnglish',
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.lastNameEnCtrl,
+                      label: LK.lastNameEnglish.tr,
+                      isRequired: true,
+                      prefixIcon: const Icon(Icons.language),
+                      maxLength: 100,
+                      updateStatus: controller.getUpdateStatus(
+                        'LastNameEnglish',
+                      ),
                     ),
                   ),
                 ),
                 _buildFieldPair(
-                  AppFormDatePicker(
-                    controller: controller.dobCtrl,
-                    label: LK.birthDate.tr,
-                    lastDate: DateTime.now(),
-                    updateStatus: controller.getUpdateStatus('DateOfBirth'),
+                  Obx(
+                    () => AppFormDatePicker(
+                      controller: controller.dobCtrl,
+                      label: LK.birthDate.tr,
+                      lastDate: DateTime.now(),
+                      updateStatus: controller.getUpdateStatus('DateOfBirth'),
+                    ),
                   ),
-                  AppFormTimePicker(
-                    controller: controller.tobCtrl,
-                    label: LK.birthTime.tr,
-                    updateStatus: controller.getUpdateStatus(
-                      'DateOfBirthTime',
+                  Obx(
+                    () => AppFormTimePicker(
+                      controller: controller.tobCtrl,
+                      label: LK.birthTime.tr,
+                      updateStatus: controller.getUpdateStatus(
+                        'DateOfBirthTime',
+                      ),
                     ),
                   ),
                 ),
@@ -718,43 +702,47 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.weightCtrl,
-                    label: LK.weightKg.tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: [DecimalAutoInsertFormatter()],
-                    prefixIcon: const Icon(Icons.monitor_weight_outlined),
-                    maxLength: 6,
-                    validator: (val) {
-                      if (val != null && val.isNotEmpty) {
-                        if (val.replaceAll('.', '').length > 5) {
-                          return 'Max 5 digits allowed';
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.weightCtrl,
+                      label: LK.weightKg.tr,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [DecimalAutoInsertFormatter()],
+                      prefixIcon: const Icon(Icons.monitor_weight_outlined),
+                      maxLength: 6,
+                      validator: (val) {
+                        if (val != null && val.isNotEmpty) {
+                          if (val.replaceAll('.', '').length > 5) {
+                            return 'Max 5 digits allowed';
+                          }
                         }
-                      }
-                      return null;
-                    },
-                    updateStatus: controller.getUpdateStatus('Weight'),
+                        return null;
+                      },
+                      updateStatus: controller.getUpdateStatus('Weight'),
+                    ),
                   ),
-                  AppFormTextField(
-                    controller: controller.heightCtrl,
-                    label: LK.heightCm.tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: [DecimalAutoInsertFormatter()],
-                    prefixIcon: const Icon(Icons.height),
-                    maxLength: 6,
-                    validator: (val) {
-                      if (val != null && val.isNotEmpty) {
-                        if (val.replaceAll('.', '').length > 5) {
-                          return 'Max 5 digits allowed';
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.heightCtrl,
+                      label: LK.heightCm.tr,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [DecimalAutoInsertFormatter()],
+                      prefixIcon: const Icon(Icons.height),
+                      maxLength: 6,
+                      validator: (val) {
+                        if (val != null && val.isNotEmpty) {
+                          if (val.replaceAll('.', '').length > 5) {
+                            return 'Max 5 digits allowed';
+                          }
                         }
-                      }
-                      return null;
-                    },
-                    updateStatus: controller.getUpdateStatus('Height'),
+                        return null;
+                      },
+                      updateStatus: controller.getUpdateStatus('Height'),
+                    ),
                   ),
                 ),
               ],
@@ -802,72 +790,84 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ],
                 ),
                 const Divider(height: 24),
-                AppFormTextField(
-                  controller: controller.mobileCtrl,
-                  label: LK.mobileNo.tr,
-                  isRequired: true,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: const Icon(Iconsax.call_copy),
-                  maxLength: 10,
-                  validator: AppValidators.mobile,
-                  updateStatus: controller.getUpdateStatus('MobileNo'),
-                ),
-                AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.secondaryMobileCtrl,
-                  label: LK.secondaryMobileLabel.tr,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: const Icon(Iconsax.mobile_copy),
-                  maxLength: 10,
-                  validator: AppValidators.optionalMobile,
-                  updateStatus: controller.getUpdateStatus('SecondaryMobile'),
-                ),
-                AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emailCtrl,
-                  label: LK.email.tr,
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  maxLength: 200,
-                  validator: AppValidators.optionalEmail,
-                  updateStatus: controller.getUpdateStatus('EmailAddress'),
-                ),
-                AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.entryPersonMobileCtrl,
-                  label: LK.entryPersonMobile.tr,
-                  prefixIcon: const Icon(Iconsax.call_incoming_copy),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  maxLength: 10,
-                  validator: AppValidators.optionalMobile,
-                  updateStatus: controller.getUpdateStatus(
-                    'EntryPersonMobileNo',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.mobileCtrl,
+                    label: LK.mobileNo.tr,
+                    isRequired: true,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    prefixIcon: const Icon(Iconsax.call_copy),
+                    maxLength: 10,
+                    validator: AppValidators.mobile,
+                    updateStatus: controller.getUpdateStatus('MobileNo'),
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emergencyNameCtrl,
-                  label: LK.emergencyContactNameLabel.tr,
-                  prefixIcon: const Icon(Iconsax.user_add_copy),
-                  maxLength: 100,
-                  updateStatus: controller.getUpdateStatus(
-                    'EmergencyContactName',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.secondaryMobileCtrl,
+                    label: LK.secondaryMobileLabel.tr,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    prefixIcon: const Icon(Iconsax.mobile_copy),
+                    maxLength: 10,
+                    validator: AppValidators.optionalMobile,
+                    updateStatus: controller.getUpdateStatus('SecondaryMobile'),
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.emergencyNoCtrl,
-                  label: LK.emergencyContact.tr,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  prefixIcon: const Icon(Icons.emergency_outlined),
-                  maxLength: 10,
-                  validator: AppValidators.optionalMobile,
-                  updateStatus: controller.getUpdateStatus(
-                    'EmergencyContactNo',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.emailCtrl,
+                    label: LK.email.tr,
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    maxLength: 200,
+                    validator: AppValidators.optionalEmail,
+                    updateStatus: controller.getUpdateStatus('EmailAddress'),
+                  ),
+                ),
+                AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.entryPersonMobileCtrl,
+                    label: LK.entryPersonMobile.tr,
+                    prefixIcon: const Icon(Iconsax.call_incoming_copy),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 10,
+                    validator: AppValidators.optionalMobile,
+                    updateStatus: controller.getUpdateStatus(
+                      'EntryPersonMobileNo',
+                    ),
+                  ),
+                ),
+                AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.emergencyNameCtrl,
+                    label: LK.emergencyContactNameLabel.tr,
+                    prefixIcon: const Icon(Iconsax.user_add_copy),
+                    maxLength: 100,
+                    updateStatus: controller.getUpdateStatus(
+                      'EmergencyContactName',
+                    ),
+                  ),
+                ),
+                AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.emergencyNoCtrl,
+                    label: LK.emergencyContact.tr,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    prefixIcon: const Icon(Icons.emergency_outlined),
+                    maxLength: 10,
+                    validator: AppValidators.optionalMobile,
+                    updateStatus: controller.getUpdateStatus(
+                      'EmergencyContactNo',
+                    ),
                   ),
                 ),
               ],
@@ -915,39 +915,45 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   updateStatus: controller.getUpdateStatus('FacebookUrl'),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.whatsappCtrl,
-                  label: LK.whatsapp.tr,
-                  prefixIcon: const Icon(
-                    Iconsax.whatsapp,
-                    color: AppColors.green,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.whatsappCtrl,
+                    label: LK.whatsapp.tr,
+                    prefixIcon: const Icon(
+                      Iconsax.whatsapp,
+                      color: AppColors.green,
+                    ),
+                    maxLength: 300,
+                    validator: AppValidators.url,
+                    updateStatus:
+                        controller.getUpdateStatus('OfficialWhatsappUrl') ??
+                        controller.getUpdateStatus('WhatsappUrl'),
                   ),
-                  maxLength: 300,
-                  validator: AppValidators.url,
-                  updateStatus:
-                      controller.getUpdateStatus('OfficialWhatsappUrl') ??
-                      controller.getUpdateStatus('WhatsappUrl'),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.instagramCtrl,
-                  label: LK.instagram.tr,
-                  prefixIcon: const Icon(
-                    Iconsax.instagram_copy,
-                    color: AppColors.pink,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.instagramCtrl,
+                    label: LK.instagram.tr,
+                    prefixIcon: const Icon(
+                      Iconsax.instagram_copy,
+                      color: AppColors.pink,
+                    ),
+                    maxLength: 300,
+                    validator: AppValidators.url,
+                    updateStatus: controller.getUpdateStatus('InstagramUrl'),
                   ),
-                  maxLength: 300,
-                  validator: AppValidators.url,
-                  updateStatus: controller.getUpdateStatus('InstagramUrl'),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.twitterCtrl,
-                  label: LK.twitterX.tr,
-                  prefixIcon: const Icon(Iconsax.close_square),
-                  maxLength: 300,
-                  validator: AppValidators.url,
-                  updateStatus: controller.getUpdateStatus('TwitterUrl'),
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.twitterCtrl,
+                    label: LK.twitterX.tr,
+                    prefixIcon: const Icon(Iconsax.close_square),
+                    maxLength: 300,
+                    validator: AppValidators.url,
+                    updateStatus: controller.getUpdateStatus('TwitterUrl'),
+                  ),
                 ),
               ],
             ),
@@ -990,6 +996,31 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             ),
             const Divider(height: 24),
             Obx(
+              () => AppFormDropdown<int>(
+                value:
+                    controller.familyMemberList.any(
+                      (e) =>
+                          e.memberId == controller.selectedFamilyMemberId.value,
+                    )
+                    ? controller.selectedFamilyMemberId.value
+                    : null,
+                items: controller.familyMemberList
+                    .map(
+                      (e) => DropdownMenuItem<int>(
+                        value: e.memberId,
+                        child: Text(e.fullName ?? ''),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) {
+                  controller.selectedFamilyMemberId.value = v;
+                },
+                label: LK.familyMember.tr,
+                hint: LK.selectFamilyMember.tr,
+              ),
+            ),
+            AppSpacing.vM,
+            Obx(
               () => AppFormDropdown<String>(
                 value:
                     controller.relationList.contains(controller.relation.value)
@@ -1013,12 +1044,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ),
             ),
             AppSpacing.vM,
-            AppFormTextField(
-              controller: controller.motherFatherNameCtrl,
-              label: LK.motherFatherName.tr,
-              prefixIcon: const Icon(Icons.people_outline),
-              maxLength: 100,
-              updateStatus: controller.getUpdateStatus('MotherFatherName'),
+            Obx(
+              () => AppFormTextField(
+                controller: controller.motherFatherNameCtrl,
+                label: LK.motherFatherName.tr,
+                prefixIcon: const Icon(Icons.people_outline),
+                maxLength: 100,
+                updateStatus: controller.getUpdateStatus('MotherFatherName'),
+              ),
             ),
             AppSpacing.vM,
             _buildFieldPair(
@@ -1940,155 +1973,165 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ),
             ),
             AppSpacing.vM,
-            AppFormTextField(
-              initialValue: edu.institute,
-              label: LK.instituteNameLabel.tr,
-              prefixIcon: const Icon(Icons.school_outlined),
-              maxLength: 300,
-              onChanged: (v) {
-                edu.institute = v;
-                controller.educationList.refresh();
-              },
-              updateStatus: (isHighest && !isNew)
-                  ? controller.getUpdateStatus('InstitutionName')
-                  : null,
+            Obx(
+              () => AppFormTextField(
+                initialValue: edu.institute,
+                label: LK.instituteNameLabel.tr,
+                prefixIcon: const Icon(Icons.school_outlined),
+                maxLength: 300,
+                onChanged: (v) {
+                  edu.institute = v;
+                  controller.educationList.refresh();
+                },
+                updateStatus: (isHighest && !isNew)
+                    ? controller.getUpdateStatus('InstitutionName')
+                    : null,
+              ),
             ),
             AppSpacing.vM,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: AppFormTextField(
-                    initialValue: edu.passingYear,
-                    label: LK.passingYearLabel.tr,
-                    prefixIcon: const Icon(Iconsax.calendar_copy),
-                    hint: 'YYYY',
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 4,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return null;
-                      if (v.length != 4) {
-                        return 'Passing Year must be exactly 4 digits';
-                      }
-                      final year = int.tryParse(v);
-                      if (year != null) {
-                        final currentYear = DateTime.now().year;
-                        if (year > currentYear) {
-                          return 'Passing Year cannot be greater than the current year';
+                  child: Obx(
+                    () => AppFormTextField(
+                      initialValue: edu.passingYear,
+                      label: LK.passingYearLabel.tr,
+                      prefixIcon: const Icon(Iconsax.calendar_copy),
+                      hint: 'YYYY',
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      maxLength: 4,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return null;
+                        if (v.length != 4) {
+                          return 'Passing Year must be exactly 4 digits';
                         }
+                        final year = int.tryParse(v);
+                        if (year != null) {
+                          final currentYear = DateTime.now().year;
+                          if (year > currentYear) {
+                            return 'Passing Year cannot be greater than the current year';
+                          }
 
-                        final dobStr = controller.dobCtrl.text;
-                        if (dobStr.isNotEmpty) {
-                          try {
-                            DateTime? dobDate;
-                            if (dobStr.contains('-') &&
-                                dobStr.split('-')[0].length == 2) {
-                              final parts = dobStr.split('-');
-                              dobDate = DateTime(
-                                int.parse(parts[2]),
-                                int.parse(parts[1]),
-                                int.parse(parts[0]),
+                          final dobStr = controller.dobCtrl.text;
+                          if (dobStr.isNotEmpty) {
+                            try {
+                              DateTime? dobDate;
+                              if (dobStr.contains('-') &&
+                                  dobStr.split('-')[0].length == 2) {
+                                final parts = dobStr.split('-');
+                                dobDate = DateTime(
+                                  int.parse(parts[2]),
+                                  int.parse(parts[1]),
+                                  int.parse(parts[0]),
+                                );
+                              } else {
+                                dobDate = DateTime.tryParse(dobStr);
+                              }
+
+                              if (dobDate != null && year < dobDate.year) {
+                                return 'Passing Year cannot be before year of birth';
+                              }
+                            } catch (e, stack) {
+                              CrashReporter.recordError(
+                                e,
+                                stack,
+                                reason:
+                                    'AddFamilyMemberPage passing year date parse failed',
                               );
-                            } else {
-                              dobDate = DateTime.tryParse(dobStr);
                             }
-
-                            if (dobDate != null && year < dobDate.year) {
-                              return 'Passing Year cannot be before year of birth';
-                            }
-                          } catch (e, stack) {
-                            CrashReporter.recordError(
-                              e,
-                              stack,
-                              reason:
-                                  'AddFamilyMemberPage passing year date parse failed',
-                            );
                           }
                         }
-                      }
-                      return null;
-                    },
-                    onChanged: (v) {
-                      edu.passingYear = v;
-                      controller.educationList.refresh();
-                    },
-                    updateStatus: (isHighest && !isNew)
-                        ? controller.getUpdateStatus('YearOfPassing')
-                        : null,
-                  ),
-                ),
-                SizedBox(width: 5.w),
-                Expanded(
-                  child: AppFormTextField(
-                    initialValue: edu.percentage,
-                    label: LK.percentageLabel.tr,
-                    prefixIcon: const Icon(Iconsax.percentage_circle_copy),
-                    hint: '00',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
+                        return null;
+                      },
+                      onChanged: (v) {
+                        edu.passingYear = v;
+                        controller.educationList.refresh();
+                      },
+                      updateStatus: (isHighest && !isNew)
+                          ? controller.getUpdateStatus('YearOfPassing')
+                          : null,
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                      TextInputFormatter.withFunction((oldValue, newValue) {
-                        if (newValue.text.isEmpty) return newValue;
-                        final numVal = double.tryParse(newValue.text);
-                        if (numVal != null && numVal > 100) return oldValue;
-                        return newValue;
-                      }),
-                    ],
-                    maxLength: 6,
-                    validator: (v) {
-                      if (v != null && v.isNotEmpty) {
-                        final numVal = double.tryParse(v);
-                        if (numVal != null && numVal > 100) {
-                          return LK.cannotExceed100.tr;
-                        }
-                      }
-                      return null;
-                    },
-                    onChanged: (v) {
-                      edu.percentage = v;
-                      controller.educationList.refresh();
-                    },
-                    updateStatus: (isHighest && !isNew)
-                        ? controller.getUpdateStatus('Percentage')
-                        : null,
                   ),
                 ),
                 SizedBox(width: 5.w),
                 Expanded(
-                  child: AppFormTextField(
-                    initialValue: edu.grade,
-                    label: 'Grade',
-                    prefixIcon: const Icon(Iconsax.medal_copy),
-                    maxLength: 10,
-                    onChanged: (v) {
-                      edu.grade = v;
-                      controller.educationList.refresh();
-                    },
-                    updateStatus: (isHighest && !isNew)
-                        ? controller.getUpdateStatus('Grade')
-                        : null,
+                  child: Obx(
+                    () => AppFormTextField(
+                      initialValue: edu.percentage,
+                      label: LK.percentageLabel.tr,
+                      prefixIcon: const Icon(Iconsax.percentage_circle_copy),
+                      hint: '00',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                        TextInputFormatter.withFunction((oldValue, newValue) {
+                          if (newValue.text.isEmpty) return newValue;
+                          final numVal = double.tryParse(newValue.text);
+                          if (numVal != null && numVal > 100) return oldValue;
+                          return newValue;
+                        }),
+                      ],
+                      maxLength: 6,
+                      validator: (v) {
+                        if (v != null && v.isNotEmpty) {
+                          final numVal = double.tryParse(v);
+                          if (numVal != null && numVal > 100) {
+                            return LK.cannotExceed100.tr;
+                          }
+                        }
+                        return null;
+                      },
+                      onChanged: (v) {
+                        edu.percentage = v;
+                        controller.educationList.refresh();
+                      },
+                      updateStatus: (isHighest && !isNew)
+                          ? controller.getUpdateStatus('Percentage')
+                          : null,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 5.w),
+                Expanded(
+                  child: Obx(
+                    () => AppFormTextField(
+                      initialValue: edu.grade,
+                      label: 'Grade',
+                      prefixIcon: const Icon(Iconsax.medal_copy),
+                      maxLength: 10,
+                      onChanged: (v) {
+                        edu.grade = v;
+                        controller.educationList.refresh();
+                      },
+                      updateStatus: (isHighest && !isNew)
+                          ? controller.getUpdateStatus('Grade')
+                          : null,
+                    ),
                   ),
                 ),
               ],
             ),
             AppSpacing.vM,
-            AppFormTextField(
-              initialValue: edu.description,
-              label: 'Description',
-              keyboardType: TextInputType.multiline,
-              maxLines: 5,
-              minLines: 3,
-              maxLength: 500,
-              onChanged: (v) {
-                edu.description = v;
-                controller.educationList.refresh();
-              },
-              updateStatus: (isHighest && !isNew)
-                  ? controller.getUpdateStatus('Description')
-                  : null,
+            Obx(
+              () => AppFormTextField(
+                initialValue: edu.description,
+                label: 'Description',
+                keyboardType: TextInputType.multiline,
+                maxLines: 5,
+                minLines: 3,
+                maxLength: 500,
+                onChanged: (v) {
+                  edu.description = v;
+                  controller.educationList.refresh();
+                },
+                updateStatus: (isHighest && !isNew)
+                    ? controller.getUpdateStatus('Description')
+                    : null,
+              ),
             ),
             AppSpacing.vM,
             Column(
@@ -2219,46 +2262,52 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ],
                 ),
                 const Divider(height: 24),
-                _buildFieldPair(
-                  _buildCheckbox(
-                    LK.ownLand.tr,
-                    controller.personalInfo.ownLand,
-                    updateStatus:
-                        controller.getUpdateStatus('IsOwnLand') ??
-                        controller.getUpdateStatus('OwnLand'),
-                  ),
-                  _buildCheckbox(
-                    LK.ownHouse.tr,
-                    controller.personalInfo.ownHouse,
-                    updateStatus:
-                        controller.getUpdateStatus('IsOwnHouse') ??
-                        controller.getUpdateStatus('OwnHouse'),
+                Obx(
+                  () => _buildFieldPair(
+                    _buildCheckbox(
+                      LK.ownLand.tr,
+                      controller.personalInfo.ownLand,
+                      updateStatus:
+                          controller.getUpdateStatus('IsOwnLand') ??
+                          controller.getUpdateStatus('OwnLand'),
+                    ),
+                    _buildCheckbox(
+                      LK.ownHouse.tr,
+                      controller.personalInfo.ownHouse,
+                      updateStatus:
+                          controller.getUpdateStatus('IsOwnHouse') ??
+                          controller.getUpdateStatus('OwnHouse'),
+                    ),
                   ),
                 ),
-                _buildFieldPair(
-                  _buildCheckbox(
-                    LK.twoWheeler.tr,
-                    controller.personalInfo.twoWheeler,
-                    updateStatus:
-                        controller.getUpdateStatus('HasTwoWheeler') ??
-                        controller.getUpdateStatus('TwoWheeler'),
-                  ),
-                  _buildCheckbox(
-                    LK.fourWheeler.tr,
-                    controller.personalInfo.fourWheeler,
-                    updateStatus:
-                        controller.getUpdateStatus('HasFourWheeler') ??
-                        controller.getUpdateStatus('FourWheeler'),
+                Obx(
+                  () => _buildFieldPair(
+                    _buildCheckbox(
+                      LK.twoWheeler.tr,
+                      controller.personalInfo.twoWheeler,
+                      updateStatus:
+                          controller.getUpdateStatus('HasTwoWheeler') ??
+                          controller.getUpdateStatus('TwoWheeler'),
+                    ),
+                    _buildCheckbox(
+                      LK.fourWheeler.tr,
+                      controller.personalInfo.fourWheeler,
+                      updateStatus:
+                          controller.getUpdateStatus('HasFourWheeler') ??
+                          controller.getUpdateStatus('FourWheeler'),
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.personalInfo.monthlyIncomeCtrl,
-                  label: LK.monthlyIncomeLabel.tr,
-                  prefixIcon: const Icon(Icons.currency_rupee),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  maxLength: 13,
-                  updateStatus: controller.getUpdateStatus('MonthlyIncome'),
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.personalInfo.monthlyIncomeCtrl,
+                    label: LK.monthlyIncomeLabel.tr,
+                    prefixIcon: const Icon(Icons.currency_rupee),
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    maxLength: 13,
+                    updateStatus: controller.getUpdateStatus('MonthlyIncome'),
+                  ),
                 ),
               ],
             ),
@@ -2386,44 +2435,52 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   );
                 }),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.otherOccupationCtrl,
-                  label: LK.otherOccupationLabel.tr,
-                  prefixIcon: const Icon(Iconsax.personalcard_copy),
-                  maxLength: 200,
-                  onChanged: (v) =>
-                      controller.workInfo.otherOccupation.value = v,
-                  updateStatus: controller.getUpdateStatus('OtherOccupation'),
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.otherOccupationCtrl,
+                    label: LK.otherOccupationLabel.tr,
+                    prefixIcon: const Icon(Iconsax.personalcard_copy),
+                    maxLength: 200,
+                    onChanged: (v) =>
+                        controller.workInfo.otherOccupation.value = v,
+                    updateStatus: controller.getUpdateStatus('OtherOccupation'),
+                  ),
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.companyNameCtrl,
-                    label: LK.companyNameLabel.tr,
-                    prefixIcon: const Icon(Iconsax.buildings_copy),
-                    maxLength: 200,
-                    onChanged: (v) => controller.companyName.value = v,
-                    updateStatus: controller.getUpdateStatus('CompanyName'),
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.companyNameCtrl,
+                      label: LK.companyNameLabel.tr,
+                      prefixIcon: const Icon(Iconsax.buildings_copy),
+                      maxLength: 200,
+                      onChanged: (v) => controller.companyName.value = v,
+                      updateStatus: controller.getUpdateStatus('CompanyName'),
+                    ),
                   ),
-                  AppFormTextField(
-                    controller: controller.businessNameCtrl,
-                    label: LK.businessName.tr,
-                    prefixIcon: const Icon(Iconsax.briefcase_copy),
-                    maxLength: 200,
-                    onChanged: (v) => controller.businessName.value = v,
-                    updateStatus: controller.getUpdateStatus('BusinessName'),
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.businessNameCtrl,
+                      label: LK.businessName.tr,
+                      prefixIcon: const Icon(Iconsax.briefcase_copy),
+                      maxLength: 200,
+                      onChanged: (v) => controller.businessName.value = v,
+                      updateStatus: controller.getUpdateStatus('BusinessName'),
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.occupationDescriptionCtrl,
-                  label: LK.occupationDescriptionLabel.tr,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  minLines: 3,
-                  maxLength: 500,
-                  updateStatus: controller.getUpdateStatus(
-                    'OccupationDescription',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.occupationDescriptionCtrl,
+                    label: LK.occupationDescriptionLabel.tr,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                    minLines: 3,
+                    maxLength: 500,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationDescription',
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
@@ -2551,55 +2608,63 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.workAddressLine1Ctrl,
-                  label: LK.occupationAddressLine1Label.tr,
-                  prefixIcon: const Icon(Icons.location_on_outlined),
-                  maxLength: 300,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  minLines: 3,
-                  onChanged: (v) => controller.workAddressLine1.value = v,
-                  updateStatus: controller.getUpdateStatus(
-                    'OccupationAddressLine1',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.workAddressLine1Ctrl,
+                    label: LK.occupationAddressLine1Label.tr,
+                    prefixIcon: const Icon(Icons.location_on_outlined),
+                    maxLength: 300,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                    minLines: 3,
+                    onChanged: (v) => controller.workAddressLine1.value = v,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationAddressLine1',
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
-                AppFormTextField(
-                  controller: controller.workAddressLine2Ctrl,
-                  label: LK.occupationAddressLine2Label.tr,
-                  prefixIcon: const Icon(Icons.location_on_outlined),
-                  maxLength: 300,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  minLines: 3,
-                  onChanged: (v) => controller.workAddressLine2.value = v,
-                  updateStatus: controller.getUpdateStatus(
-                    'OccupationAddressLine2',
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.workAddressLine2Ctrl,
+                    label: LK.occupationAddressLine2Label.tr,
+                    prefixIcon: const Icon(Icons.location_on_outlined),
+                    maxLength: 300,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                    minLines: 3,
+                    onChanged: (v) => controller.workAddressLine2.value = v,
+                    updateStatus: controller.getUpdateStatus(
+                      'OccupationAddressLine2',
+                    ),
                   ),
                 ),
                 AppSpacing.vM,
                 _buildFieldPair(
-                  AppFormTextField(
-                    controller: controller.workLandmarkCtrl,
-                    label: LK.landmarkLabel.tr,
-                    prefixIcon: const Icon(Icons.location_city_outlined),
-                    maxLength: 200,
-                    onChanged: (v) => controller.workLandmark.value = v,
-                    updateStatus: controller.getUpdateStatus(
-                      'OccupationLandmark',
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.workLandmarkCtrl,
+                      label: LK.landmarkLabel.tr,
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                      maxLength: 200,
+                      onChanged: (v) => controller.workLandmark.value = v,
+                      updateStatus: controller.getUpdateStatus(
+                        'OccupationLandmark',
+                      ),
                     ),
                   ),
-                  AppFormTextField(
-                    controller: controller.workPincodeCtrl,
-                    label: LK.pincode.tr,
-                    prefixIcon: const Icon(Icons.pin_drop_outlined),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 6,
-                    onChanged: (v) => controller.workPincode.value = v,
-                    updateStatus: controller.getUpdateStatus(
-                      'OccupationPincode',
+                  Obx(
+                    () => AppFormTextField(
+                      controller: controller.workPincodeCtrl,
+                      label: LK.pincode.tr,
+                      prefixIcon: const Icon(Icons.pin_drop_outlined),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      maxLength: 6,
+                      onChanged: (v) => controller.workPincode.value = v,
+                      updateStatus: controller.getUpdateStatus(
+                        'OccupationPincode',
+                      ),
                     ),
                   ),
                 ),
@@ -2815,35 +2880,33 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     RxBool value, {
     ProfileUpdateStatus? updateStatus,
   }) {
-    return Obx(
-      () => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () => value.value = !value.value,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: Checkbox(
-                      value: value.value,
-                      onChanged: (v) => value.value = v!,
-                      activeColor: AppColors.primary,
-                    ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => value.value = !value.value,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                    value: value.value,
+                    onChanged: (v) => value.value = v!,
+                    activeColor: AppColors.primary,
                   ),
-                  AppSpacing.hS,
-                  Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
-                ],
-              ),
+                ),
+                AppSpacing.hS,
+                Expanded(child: Text(label, style: AppTextStyles.titleSmall)),
+              ],
             ),
           ),
-          if (updateStatus != null)
-            ProfileUpdateStatusBadge(status: updateStatus),
-        ],
-      ),
+        ),
+        if (updateStatus != null)
+          ProfileUpdateStatusBadge(status: updateStatus),
+      ],
     );
   }
 

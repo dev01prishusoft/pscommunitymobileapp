@@ -161,7 +161,6 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                       child: widget.prefixIcon!,
                     )
                   : null,
-              helperText: 'Location autocomplete disabled (API key missing)',
               helperStyle: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.grey,
               ),

@@ -10,6 +10,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/core/models/family_member_dropdown.dart';
 
 class PersonalInfoController extends GetxController {
   final defaultGenders = ['Male', 'Female', 'Other'];
@@ -45,6 +46,14 @@ class PersonalInfoController extends GetxController {
   final signList = <String>[].obs;
   final gotraList = <String>[].obs;
   final mothersGotraList = <String>[].obs;
+
+  final familyMemberList = <Data>[].obs;
+  final Rxn<int> selectedFamilyMemberId = Rxn<int>();
+  final RxBool isLoadingFamilyMembers = false.obs;
+
+  Rxn<int> get memberId => selectedFamilyMemberId;
+  set memberId(Rxn<int> val) => selectedFamilyMemberId.value = val.value;
+  Rxn<int> get selectedMemberId => selectedFamilyMemberId;
 
   final genderIdMap = <String, int>{}.obs;
   final maritalStatusIdMap = <String, int>{}.obs;
@@ -215,6 +224,11 @@ class PersonalInfoController extends GetxController {
         m.monthlyIncome?.toString().replaceAll(RegExp(r'\.0$'), '') ?? '';
     isFamilyHead.value = m.isHead ?? false;
     relatedToMemberName.value = m.relatedToMemberName ?? '';
+    if (m.relatedToMemberId != null && m.relatedToMemberId! > 0) {
+      selectedFamilyMemberId.value = m.relatedToMemberId;
+    } else if (m.isHead == true) {
+      selectedFamilyMemberId.value = m.memberId;
+    }
 
     memberNoCtrl.text = memberNo.value;
     tobCtrl.text = tob.value;

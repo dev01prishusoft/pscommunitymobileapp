@@ -114,48 +114,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(LK.editProfile.tr),
-          actions: [
-            if (_currentStep != 6)
-              Obx(() {
-                final hasChanges = controller.hasChanges;
-                final isFormLoading = controller.isFormLoading;
-                if (!hasChanges) return const SizedBox.shrink();
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: isFormLoading
-                      ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
-                            ),
-                          ),
-                        )
-                      : OutlinedButton(
-                          onPressed: () => controller.submitForm(
-                            successMessage: LK.editProfileRequestSent.tr,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: AppColors.primary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          child: Text(
-                            LK.saveChanges.tr,
-                            style: AppTextStyles.labelLarge.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                );
-              }),
-          ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -241,7 +199,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   final isFormLoading = controller.isFormLoading;
 
                   final isLastStep = _currentStep == 6;
-                  final text = isLastStep ? LK.saveChanges.tr : LK.next.tr;
+                  final text = isLastStep ? LK.saveChanges.tr : LK.nextAndSave.tr;
 
                   return AppPrimaryButton(
                     text: text,
@@ -250,12 +208,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ? (hasChanges
                               ? () => controller.submitForm(
                                   successMessage: LK.editProfileRequestSent.tr,
+                                  navigateBack: true,
                                 )
                               : null)
-                        : () {
+                        : () async {
+                            if (hasChanges) {
+                              final success = await controller.submitForm(
+                                successMessage: LK.editProfileRequestSent.tr,
+                                navigateBack: false,
+                              );
+                              if (!success) return;
+                            }
                             _animateToStep(_currentStep + 1);
                           },
-                    isLoading: isLastStep ? isFormLoading : false,
+                    isLoading: isFormLoading,
                   );
                 }),
               ),
@@ -996,6 +962,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
             const Divider(height: 24),
+            Obx(
+              () => controller.personalInfo.isFamilyHead.value
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: AppFormDropdown<int>(
+                        value:
+                            controller.familyMemberList.any(
+                              (e) =>
+                                  e.memberId ==
+                                  controller.selectedFamilyMemberId.value,
+                            )
+                            ? controller.selectedFamilyMemberId.value
+                            : null,
+                        items: controller.familyMemberList
+                            .map(
+                              (e) => DropdownMenuItem<int>(
+                                value: e.memberId,
+                                child: Text(e.fullName ?? ''),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) {
+                          controller.selectedFamilyMemberId.value = v;
+                        },
+                        label: LK.familyMember.tr,
+                        hint: LK.selectFamilyMember.tr,
+                      ),
+                    ),
+            ),
             IgnorePointer(
               child: Opacity(
                 opacity: 0.6,

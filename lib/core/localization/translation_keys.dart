@@ -448,6 +448,8 @@ class LK {
   static const String personal = 'Personal';
   static const String contactVerify = 'Contact & Verify';
   static const String familyParents = 'Family & Parents';
+  static const String familyMember = 'Family Member';
+  static const String selectFamilyMember = 'Select Family Member';
   static const String assetsLife = 'Assets & Life';
   static const String addressesTab = 'Addresses';
   static const String educationTab = 'Education';
@@ -559,6 +561,7 @@ class LK {
   static const String community = 'community';
   static const String samajSansthaDescription = 'samaj_sanstha_description';
   static const String next = 'Next';
+  static const String nextAndSave = 'Next & Save';
   static const String back = 'Back';
   static const String tapToExpandDetails = 'Tap to expand details';
   static const String tapToCollapse = 'Tap to collapse';

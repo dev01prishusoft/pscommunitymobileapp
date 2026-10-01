@@ -48,47 +48,136 @@ class AddFamilyMemberController extends ProfileFormController {
     return _statusFuture = _fetchMemberUpdateStatus();
   }
 
+  List<dynamic> _extractItems(dynamic data) {
+    if (data == null) return [];
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      if (data['items'] is List) return data['items'] as List<dynamic>;
+      if (data['memberUpdateRequests'] is List) {
+        return data['memberUpdateRequests'] as List<dynamic>;
+      }
+      if (data['requests'] is List) return data['requests'] as List<dynamic>;
+      if (data['updates'] is List) return data['updates'] as List<dynamic>;
+      if (data['fields'] is List) return data['fields'] as List<dynamic>;
+      if (data['data'] is List) return data['data'] as List<dynamic>;
+      if (data['data'] is Map<String, dynamic>) {
+        return _extractItems(data['data']);
+      }
+      if (data.containsKey('keyName') ||
+          data.containsKey('fieldName') ||
+          data.containsKey('fieldKey')) {
+        return [data];
+      }
+      final list = <dynamic>[];
+      for (final val in data.values) {
+        if (val is Map<String, dynamic> &&
+            (val.containsKey('keyName') ||
+                val.containsKey('fieldName') ||
+                val.containsKey('fieldKey'))) {
+          list.add(val);
+        } else if (val is List) {
+          list.addAll(val);
+        }
+      }
+      return list;
+    }
+    return [];
+  }
+
   Future<void> _fetchMemberUpdateStatus() async {
     final memberId = editingMemberId;
     if (memberId == null) return;
     try {
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.get(
-        '/api/v1/MemberUpdateRequest/member-details/$memberId',
-      );
+      final newStatuses = <String, ProfileUpdateStatus>{};
 
-      if (response.statusCode == 200 &&
-          response.data is Map<String, dynamic> &&
-          response.data['succeeded'] == true) {
-        final data = response.data['data'];
-        final items = data is Map<String, dynamic>
-            ? data['items'] as List<dynamic>? ?? []
-            : data is List<dynamic>
-            ? data
-            : <dynamic>[];
+      // 1. Try member-details/{memberId}
+      try {
+        final response = await apiClient.get(
+          '/api/v1/MemberUpdateRequest/member-details/$memberId',
+        );
 
-        final newStatuses = <String, ProfileUpdateStatus>{};
-        for (final item in items) {
-          if (item is! Map<String, dynamic>) continue;
-          final status = ProfileUpdateStatus.fromJson(item);
-          if (status.keyName.isEmpty) continue;
-          newStatuses[status.keyName] = status;
+        if (response.statusCode == 200 && response.data != null) {
+          final resData = response.data is Map<String, dynamic>
+              ? (response.data['data'] ?? response.data)
+              : response.data;
+          final items = _extractItems(resData);
+          for (final item in items) {
+            if (item is! Map<String, dynamic>) continue;
+            final status = ProfileUpdateStatus.fromJson(item);
+            if (status.keyName.isEmpty) continue;
+            newStatuses[status.keyName] = status;
+            newStatuses[status.keyName.toLowerCase()] = status;
+          }
         }
+      } catch (_) {}
 
-        fieldStatuses.value = newStatuses;
+      // 2. Fallback to members-list with query parameter if empty
+      if (newStatuses.isEmpty) {
+        try {
+          final response = await apiClient.get(
+            '/api/v1/MemberUpdateRequest/members-list',
+            queryParameters: {'memberId': memberId, 'PageSize': 100},
+          );
+
+          if (response.statusCode == 200 && response.data != null) {
+            final resData = response.data is Map<String, dynamic>
+                ? (response.data['data'] ?? response.data)
+                : response.data;
+            final items = _extractItems(resData);
+            for (final item in items) {
+              if (item is! Map<String, dynamic>) continue;
+              final status = ProfileUpdateStatus.fromJson(item);
+              if (status.keyName.isEmpty) continue;
+              newStatuses[status.keyName] = status;
+              newStatuses[status.keyName.toLowerCase()] = status;
+            }
+          }
+        } catch (_) {}
       }
+
+      // 3. Fallback to profile-status with memberId query parameter if still empty
+      if (newStatuses.isEmpty) {
+        try {
+          final response = await apiClient.get(
+            '/api/v1/MemberUpdateRequest/profile-status',
+            queryParameters: {'memberId': memberId},
+          );
+
+          if (response.statusCode == 200 && response.data != null) {
+            final resData = response.data is Map<String, dynamic>
+                ? (response.data['data'] ?? response.data)
+                : response.data;
+            final items = _extractItems(resData);
+            for (final item in items) {
+              if (item is! Map<String, dynamic>) continue;
+              final status = ProfileUpdateStatus.fromJson(item);
+              if (status.keyName.isEmpty) continue;
+              newStatuses[status.keyName] = status;
+              newStatuses[status.keyName.toLowerCase()] = status;
+            }
+          }
+        } catch (_) {}
+      }
+
+      fieldStatuses.value = newStatuses;
+      fieldStatuses.refresh();
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'AddFamilyMemberController.fetchProfileUpdateStatus failed for member $memberId',
+        reason:
+            'AddFamilyMemberController.fetchProfileUpdateStatus failed for member $memberId',
       );
     }
   }
 
-  void updateMember({String? successMessage}) {
+  Future<bool> updateMember({
+    String? successMessage,
+    bool navigateBack = true,
+  }) async {
     final memberId = editingMemberId;
-    if (memberId == null || currentMember == null) return;
+    if (memberId == null || currentMember == null) return false;
     bool hasListErrors = false;
 
     if (contactInfo.addresses.isEmpty) {
@@ -101,7 +190,8 @@ class AddFamilyMemberController extends ProfileFormController {
       personalInfo.firstName.value = personalInfo.firstNameCtrl.text;
       personalInfo.lastName.value = personalInfo.lastNameCtrl.text;
 
-      submitThrottled(() async {
+      bool success = false;
+      await submitThrottled(() async {
         personalInfo.uploadProgress.value = 0.1;
 
         try {
@@ -133,7 +223,7 @@ class AddFamilyMemberController extends ProfileFormController {
               '/api/v1/MemberUpdateRequest/create',
               data: formData,
             );
-
+            
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
               final msg = response.data['message'] as String?;
@@ -147,8 +237,9 @@ class AddFamilyMemberController extends ProfileFormController {
             educationList.map((e) => e.toJson()).toList(),
           );
           if (currentEduJson != initialEducationJson) {
-            final newEducations =
-                contactInfo.educationList.where((e) => e.isNew).toList();
+            final newEducations = contactInfo.educationList
+                .where((e) => e.isNew)
+                .toList();
             if (newEducations.isNotEmpty) {
               hasEducationUpdates = true;
               try {
@@ -160,8 +251,8 @@ class AddFamilyMemberController extends ProfileFormController {
                       "memberId": memberId,
                       "educationalQualificationId":
                           contactInfo.educationIdMap[edu.qualification] ??
-                              edu.qualificationId ??
-                              0,
+                          edu.qualificationId ??
+                          0,
                       "description": edu.description,
                       "institutionName": edu.institute,
                       "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
@@ -188,14 +279,14 @@ class AddFamilyMemberController extends ProfileFormController {
           }
 
           if (!hasProfileUpdates && !hasEducationUpdates) {
-            PSDelightToastBar(
-              snackbarDuration: const Duration(seconds: 3),
-              builder: (context) => ToastCard(
-                title: LK.error.tr,
-                subtitle: 'No member changes found.'.tr,
-                isErrorMessage: true,
-              ),
-            ).show();
+            if (navigateBack) {
+              await Future<void>.delayed(const Duration(milliseconds: 500));
+              Get.back<dynamic>(result: true);
+            } else {
+              fetchProfileUpdateStatus();
+              checkAndTakeSnapshot();
+            }
+            success = true;
             return;
           }
 
@@ -213,16 +304,29 @@ class AddFamilyMemberController extends ProfileFormController {
                 ToastCard(title: LK.success.tr, subtitle: snackbarMsg),
           ).show();
 
-          await Future<void>.delayed(const Duration(milliseconds: 1500));
-          Get.back<dynamic>(result: true);
+          if (navigateBack) {
+            await Future<void>.delayed(const Duration(milliseconds: 1500));
+            Get.back<dynamic>(result: true);
+          } else {
+            fetchProfileUpdateStatus();
+            checkAndTakeSnapshot();
+          }
+          success = true;
         } catch (e) {
+          if (e is Failure && e.message == 'No member changes found.') {
+            if (navigateBack) {
+              await Future<void>.delayed(const Duration(milliseconds: 500));
+              Get.back<dynamic>(result: true);
+            } else {
+              fetchProfileUpdateStatus();
+              checkAndTakeSnapshot();
+            }
+            success = true;
+            return;
+          }
           String errorMessage = LK.unexpectedError.tr;
           if (e is Failure) {
-            if (e.message == 'No member changes found.') {
-              errorMessage = e.message.tr;
-            } else {
-              errorMessage = e.message;
-            }
+            errorMessage = e.message;
           }
           PSDelightToastBar(
             snackbarDuration: const Duration(seconds: 3),
@@ -236,6 +340,7 @@ class AddFamilyMemberController extends ProfileFormController {
           personalInfo.uploadProgress.value = 0.0;
         }
       });
+      return success;
     } else {
       showListErrors.value = true;
       PSDelightToastBar(
@@ -246,6 +351,7 @@ class AddFamilyMemberController extends ProfileFormController {
           isErrorMessage: true,
         ),
       ).show();
+      return false;
     }
   }
 }

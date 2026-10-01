@@ -9,12 +9,41 @@ class ProfileUpdateStatus {
   });
 
   factory ProfileUpdateStatus.fromJson(Map<String, dynamic> json) {
+    final key = (json['keyName'] ??
+            json['fieldName'] ??
+            json['fieldKey'] ??
+            json['columnName'] ??
+            json['propertyName'] ??
+            '')
+        .toString();
+
+    final reqId = json['approvalRequestId'] as int? ??
+        json['memberUpdateRequestId'] as int? ??
+        json['id'] as int? ??
+        (int.tryParse(json['approvalRequestId']?.toString() ?? '') ?? 0);
+
+    final statusStr = (json['status'] ??
+            json['approvalStatus'] ??
+            json['requestStatus'] ??
+            '')
+        .toString();
+
+    final oldVal = (json['oldValue'] ??
+            json['previousValue'] ??
+            json['currentValue'])
+        ?.toString();
+
+    final newVal = (json['newValue'] ??
+            json['updatedValue'] ??
+            json['requestedValue'])
+        ?.toString();
+
     return ProfileUpdateStatus(
-      approvalRequestId: json['approvalRequestId'] as int? ?? 0,
-      keyName: json['keyName'] as String? ?? '',
-      oldValue: json['oldValue']?.toString(),
-      newValue: json['newValue']?.toString(),
-      status: json['status'] as String? ?? '',
+      approvalRequestId: reqId,
+      keyName: key,
+      oldValue: oldVal,
+      newValue: newVal,
+      status: statusStr,
       rawJson: json.toString(),
     );
   }
