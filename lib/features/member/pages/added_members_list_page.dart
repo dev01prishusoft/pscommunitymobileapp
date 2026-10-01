@@ -51,14 +51,14 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
         appBar: AppBar(
           title: _isSearchVisible
               ? CupertinoSearchbar(
-                onTapSuffix: () {
-                      _searchController.clear();
-                      _controller.onSearchChanged('');
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      setState(() {
-                        _isSearchVisible = false;
-                      });
-                    },
+                  onTapSuffix: () {
+                    _searchController.clear();
+                    _controller.onSearchChanged('');
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  },
                   hintText: LK.searchByNameAndMnoAndMID.tr,
                   controller: _searchController,
                   onChanged: (value) {
@@ -129,6 +129,9 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                   );
                 }
 
+                // Read here so Obx tracks it; itemBuilder runs lazily.
+                final showApproveStatus = _controller.showApprovalUi;
+
                 return RefreshIndicator(
                   onRefresh: () async => _controller.refreshMembers(),
                   color: AppColors.primary,
@@ -161,7 +164,10 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
                         );
                       }
                       final member = _controller.filteredMembers[index];
-                      return AddedMemberCard(member: member);
+                      return AddedMemberCard(
+                        member: member,
+                        showApproveStatus: showApproveStatus,
+                      );
                     },
                   ),
                 );
@@ -196,7 +202,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
 
   Widget _buildStatsPanel() {
     return Obx(() {
-      if (_controller.members.isEmpty) {
+      if (_controller.members.isEmpty || !_controller.showApprovalUi) {
         return const SizedBox.shrink();
       }
 

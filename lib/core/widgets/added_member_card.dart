@@ -10,8 +10,13 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AddedMemberCard extends StatelessWidget {
-  const AddedMemberCard({super.key, required this.member});
+  const AddedMemberCard({
+    super.key,
+    required this.member,
+    this.showApproveStatus = true,
+  });
   final Member member;
+  final bool showApproveStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +28,7 @@ class AddedMemberCard extends StatelessWidget {
           arguments: {
             'memberId': member.memberId,
             'fromMyMemberList': true,
+            'showApproveStatus': showApproveStatus,
           },
         );
       },
@@ -54,7 +60,8 @@ class AddedMemberCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (member.approveStatus != null &&
+                          if (showApproveStatus &&
+                              member.approveStatus != null &&
                               member.approveStatus!.isNotEmpty) ...[
                             SizedBox(width: 8.w),
                             _buildStatusBadge(member.approveStatus!),
