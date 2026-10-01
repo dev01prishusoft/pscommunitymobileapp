@@ -8,21 +8,12 @@ A production-ready Flutter application for the PrishuSoft Community, featuring s
 - Features rigorous separation between API data (Raw) and UI Localization (`.tr`).
 - `Mapper` patterns are strictly enforced to handle enum and state resolution securely.
 
-## Environment Setup
-This application requires an external API key (`GOOGLEMAP_KEY`) to function properly.
-Do **not** include `.env` as a Flutter asset in `pubspec.yaml` to prevent secret leakage in release binaries.
+## Configuration
+The Google Places API key is not bundled with the app. It is fetched at runtime from `GET /api/v1/AppSetting` (`AppSettingService`). If the key is unavailable, location fields fall back to plain text input.
 
 ### Running Locally
-To run the app on an emulator or physical device, inject the secret via `--dart-define`:
-
 ```bash
-flutter run --dart-define=GOOGLEMAP_KEY=your_key_here
-```
-
-Alternatively, you can keep a local uncommitted `.env` file (which is gitignored) and inject it at compile time without packaging it as a release asset:
-
-```bash
-flutter run --dart-define-from-file=.env
+flutter run
 ```
 
 ### Running Tests
