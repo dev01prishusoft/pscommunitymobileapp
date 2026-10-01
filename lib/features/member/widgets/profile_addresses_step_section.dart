@@ -25,7 +25,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
 
   final ProfileFormController controller;
   final ProfileUpdateStatus? Function(String key, {Map<String, int>? idMap})?
-      getUpdateStatus;
+  getUpdateStatus;
   final ScrollController? scrollController;
   final VoidCallback? onAddAddress;
   final void Function(int index)? onDeleteAddress;
@@ -137,38 +137,6 @@ class ProfileAddressesStepSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (addr.isPrimary || !_isEditMode)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Obx(() {
-                    final isFetching = controller.isFetchingLocation.value;
-                    return TextButton.icon(
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                      ),
-                      onPressed: isFetching
-                          ? null
-                          : () => controller.fetchCurrentLocation(addr),
-                      icon: isFetching
-                          ? SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.primary,
-                              ),
-                            )
-                          : const Icon(Icons.my_location, size: 18),
-                      label: Text(
-                        isFetching
-                            ? 'Fetching Address...'
-                            : 'Use Current Location',
-                      ),
-                    );
-                  }),
-                ],
-              ),
             AppSpacing.vS,
             Obx(() {
               final typeList = controller.contactInfo.addressTypeList;
@@ -348,90 +316,74 @@ class ProfileAddressesStepSection extends StatelessWidget {
               );
             }),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                key: ValueKey(
-                  'pincode_${index}_${controller.locationFetchTrigger.value}',
-                ),
-                initialValue: addr.pincode,
-                label: LK.pincode.tr,
-                prefixIcon: const Icon(Icons.pin_drop_outlined),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 6,
-                updateStatus: (addr.isPrimary && _isEditMode)
-                    ? getUpdateStatus!('Pincode')
-                    : null,
-                onChanged: (v) {
-                  addr.pincode = v;
-                  controller.addresses.refresh();
-                },
-              ),
+            AppFormTextField(
+              key: ValueKey('pincode_$index'),
+              initialValue: addr.pincode,
+              label: LK.pincode.tr,
+              prefixIcon: const Icon(Icons.pin_drop_outlined),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 6,
+              updateStatus: (addr.isPrimary && _isEditMode)
+                  ? getUpdateStatus!('Pincode')
+                  : null,
+              onChanged: (v) {
+                addr.pincode = v;
+                controller.addresses.refresh();
+              },
             ),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                key: ValueKey(
-                  'line1_${index}_${controller.locationFetchTrigger.value}',
-                ),
-                initialValue: addr.line1,
-                label: LK.addressLine1.tr,
-                isRequired: true,
-                prefixIcon: const Icon(Icons.location_on_outlined),
-                maxLength: 300,
-                keyboardType: TextInputType.multiline,
-                maxLines: 5,
-                minLines: 3,
-                updateStatus: (addr.isPrimary && _isEditMode)
-                    ? getUpdateStatus!('AddressLine1')
-                    : null,
-                onChanged: (v) {
-                  addr.line1 = v;
-                  controller.addresses.refresh();
-                },
-              ),
+            AppFormTextField(
+              key: ValueKey('line1_$index'),
+              initialValue: addr.line1,
+              label: LK.addressLine1.tr,
+              isRequired: true,
+              prefixIcon: const Icon(Icons.location_on_outlined),
+              maxLength: 300,
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
+              minLines: 3,
+              updateStatus: (addr.isPrimary && _isEditMode)
+                  ? getUpdateStatus!('AddressLine1')
+                  : null,
+              onChanged: (v) {
+                addr.line1 = v;
+                controller.addresses.refresh();
+              },
             ),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                key: ValueKey(
-                  'line2_${index}_${controller.locationFetchTrigger.value}',
-                ),
-                initialValue: addr.line2,
-                label: LK.addressLine2.tr,
-                isRequired: true,
-                prefixIcon: const Icon(Icons.location_on_outlined),
-                maxLength: 300,
-                keyboardType: TextInputType.multiline,
-                maxLines: 5,
-                minLines: 3,
-                updateStatus: (addr.isPrimary && _isEditMode)
-                    ? getUpdateStatus!('AddressLine2')
-                    : null,
-                onChanged: (v) {
-                  addr.line2 = v;
-                  controller.addresses.refresh();
-                },
-              ),
+            AppFormTextField(
+              key: ValueKey('line2_$index'),
+              initialValue: addr.line2,
+              label: LK.addressLine2.tr,
+              isRequired: true,
+              prefixIcon: const Icon(Icons.location_on_outlined),
+              maxLength: 300,
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
+              minLines: 3,
+              updateStatus: (addr.isPrimary && _isEditMode)
+                  ? getUpdateStatus!('AddressLine2')
+                  : null,
+              onChanged: (v) {
+                addr.line2 = v;
+                controller.addresses.refresh();
+              },
             ),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                key: ValueKey(
-                  'landmark_${index}_${controller.locationFetchTrigger.value}',
-                ),
-                initialValue: addr.landmark,
-                label: LK.landmarkLabel.tr,
-                prefixIcon: const Icon(Icons.location_city_outlined),
-                maxLength: 200,
-                updateStatus: (addr.isPrimary && _isEditMode)
-                    ? getUpdateStatus!('Landmark')
-                    : null,
-                onChanged: (v) {
-                  addr.landmark = v;
-                  controller.addresses.refresh();
-                },
-              ),
+            AppFormTextField(
+              key: ValueKey('landmark_$index'),
+              initialValue: addr.landmark,
+              label: LK.landmarkLabel.tr,
+              prefixIcon: const Icon(Icons.location_city_outlined),
+              maxLength: 200,
+              updateStatus: (addr.isPrimary && _isEditMode)
+                  ? getUpdateStatus!('Landmark')
+                  : null,
+              onChanged: (v) {
+                addr.landmark = v;
+                controller.addresses.refresh();
+              },
             ),
             AppSpacing.vM,
             _buildPrimaryCheckbox(addr),
@@ -462,8 +414,9 @@ class ProfileAddressesStepSection extends StatelessWidget {
                 ],
         ),
         child: Theme(
-          data: Theme.of(Get.context!)
-              .copyWith(dividerColor: Colors.transparent),
+          data: Theme.of(
+            Get.context!,
+          ).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
             controlAffinity: ListTileControlAffinity.leading,
             iconColor: AppColors.primary,
@@ -519,10 +472,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
@@ -561,9 +511,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
           RichText(
             text: TextSpan(
               text: LK.primary.tr,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.grey,
-              ),
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
             ),
           ),
           const SizedBox(height: 8),
@@ -572,9 +520,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.grey.withValues(alpha: 0.5),
-              ),
+              border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
             ),
             child: Row(
               children: [
@@ -615,9 +561,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: LK.isPrimary.tr,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.grey,
-            ),
+            style: AppTextStyles.labelMedium.copyWith(color: AppColors.grey),
           ),
         ),
         const SizedBox(height: 8),
@@ -635,9 +579,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.grey.withValues(alpha: 0.5),
-              ),
+              border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
             ),
             child: Row(
               children: [

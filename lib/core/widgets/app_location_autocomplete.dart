@@ -265,101 +265,105 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
               description,
             );
           },
-          fieldViewBuilder: (
-            BuildContext context,
-            TextEditingController fieldTextEditingController,
-            FocusNode fieldFocusNode,
-            VoidCallback onFieldSubmitted,
-          ) {
-            if (widget.controller.text.isNotEmpty &&
-                fieldTextEditingController.text.isEmpty) {
-              fieldTextEditingController.text = widget.controller.text;
-            }
-
-            fieldTextEditingController.addListener(() {
-              if (widget.controller.text != fieldTextEditingController.text) {
-                widget.controller.text = fieldTextEditingController.text;
-              }
-            });
-
-            return TextFormField(
-              maxLength: 250,
-              controller: fieldTextEditingController,
-              focusNode: fieldFocusNode,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.black,
-              ),
-              decoration: InputDecoration(
-                prefixIcon: widget.prefixIcon != null
-                    ? IconTheme(
-                        data: const IconThemeData(size: 20),
-                        child: widget.prefixIcon!,
-                      )
-                    : null,
-                suffixIcon: _isLoading
-                    ? const Padding(
-                        padding: EdgeInsets.all(12.0),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : null,
-              ),
-              validator: (value) {
-                if (widget.isRequired &&
-                    (value == null || value.trim().isEmpty)) {
-                  return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+          fieldViewBuilder:
+              (
+                BuildContext context,
+                TextEditingController fieldTextEditingController,
+                FocusNode fieldFocusNode,
+                VoidCallback onFieldSubmitted,
+              ) {
+                if (widget.controller.text.isNotEmpty &&
+                    fieldTextEditingController.text.isEmpty) {
+                  fieldTextEditingController.text = widget.controller.text;
                 }
-                if (value != null &&
-                    value.trim().isNotEmpty &&
-                    value != _lastSelectedLocation) {
-                  return LK.selectValidLocation.tr;
-                }
-                return null;
-              },
-            );
-          },
-          optionsViewBuilder: (
-            BuildContext context,
-            AutocompleteOnSelected<Map<String, dynamic>> onSelected,
-            Iterable<Map<String, dynamic>> options,
-          ) {
-            return Align(
-              alignment: Alignment.topLeft,
-              child: Material(
-                elevation: 4.0,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  constraints: BoxConstraints(maxHeight: 250.h),
-                  width: MediaQuery.of(context).size.width -
-                      32.w, // Match padding roughly
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: options.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Map<String, dynamic> option = options.elementAt(
-                        index,
-                      );
-                      return ListTile(
-                        leading: const Icon(Icons.location_on_outlined),
-                        title: Text(
-                          option['description']?.toString() ?? '',
-                          style: AppTextStyles.bodyMedium,
-                        ),
-                        onTap: () {
-                          onSelected(option);
-                        },
-                      );
-                    },
+
+                fieldTextEditingController.addListener(() {
+                  if (widget.controller.text !=
+                      fieldTextEditingController.text) {
+                    widget.controller.text = fieldTextEditingController.text;
+                  }
+                });
+
+                return TextFormField(
+                  maxLength: 250,
+                  controller: fieldTextEditingController,
+                  focusNode: fieldFocusNode,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.black,
                   ),
-                ),
-              ),
-            );
-          },
+                  decoration: InputDecoration(
+                    prefixIcon: widget.prefixIcon != null
+                        ? IconTheme(
+                            data: const IconThemeData(size: 20),
+                            child: widget.prefixIcon!,
+                          )
+                        : null,
+                    suffixIcon: _isLoading
+                        ? const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : null,
+                  ),
+                  validator: (value) {
+                    if (widget.isRequired &&
+                        (value == null || value.trim().isEmpty)) {
+                      return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
+                    }
+                    if (value != null &&
+                        value.trim().isNotEmpty &&
+                        value != _lastSelectedLocation) {
+                      return LK.selectValidLocation.tr;
+                    }
+                    return null;
+                  },
+                );
+              },
+          optionsViewBuilder:
+              (
+                BuildContext context,
+                AutocompleteOnSelected<Map<String, dynamic>> onSelected,
+                Iterable<Map<String, dynamic>> options,
+              ) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4.0,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      constraints: BoxConstraints(maxHeight: 250.h),
+                      width:
+                          MediaQuery.of(context).size.width -
+                          32.w, // Match padding roughly
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final Map<String, dynamic> option = options.elementAt(
+                            index,
+                          );
+                          return ListTile(
+                            leading: const Icon(Icons.location_on_outlined),
+                            title: Text(
+                              option['description']?.toString() ?? '',
+                              style: AppTextStyles.bodyMedium,
+                            ),
+                            onTap: () {
+                              onSelected(option);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
         ),
         if (widget.updateStatus != null)
           ProfileUpdateStatusBadge(status: widget.updateStatus!),
