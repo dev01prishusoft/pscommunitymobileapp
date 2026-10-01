@@ -44,11 +44,11 @@ class MarriagePage extends GetView<MarriageController> {
           if (controller.isSearchVisible.value) {
             return CupertinoSearchbar(
               onTapSuffix: () {
-                  controller.searchTextController.clear();
-                  controller.searchQuery.value = '';
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  controller.isSearchVisible.value = false;
-                },
+                controller.searchTextController.clear();
+                controller.searchQuery.value = '';
+                FocusManager.instance.primaryFocus?.unfocus();
+                controller.isSearchVisible.value = false;
+              },
               hintText: LK.searchByNameHint.tr,
               controller: controller.searchTextController,
               onChanged: (val) {
@@ -78,7 +78,6 @@ class MarriagePage extends GetView<MarriageController> {
               },
             );
           }),
-
           IconButton(
             icon: Icon(Iconsax.filter_search_copy),
             tooltip: LK.advancedFilters.tr,
@@ -118,8 +117,7 @@ class MarriagePage extends GetView<MarriageController> {
                         member: controller.filteredMembers[index],
                       );
                     },
-                    childCount:
-                        controller.filteredMembers.length +
+                    childCount: controller.filteredMembers.length +
                         (controller.hasMore.value ? 1 : 0),
                   ),
                 );
@@ -273,18 +271,13 @@ class MarriagePage extends GetView<MarriageController> {
             iconColor: AppColors.primary,
             label: LK.lookingForMarriage.tr,
             widget: Obx(
-              () => SizedBox(
-                height: 25.h,
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: Switch(
-                    value: controller.lookingForMarriage.value,
-                    onChanged: (val) {
-                      controller.lookingForMarriage.value = val;
-                    },
-                    activeThumbColor: AppColors.primary,
-                  ),
-                ),
+              () => _buildChoiceChips<bool?>(
+                options: const [null, true, false],
+                selected: controller.lookingForMarriage.value,
+                labelOf: (value) =>
+                    value == null ? LK.all.tr : (value ? LK.yes.tr : LK.no.tr),
+                onSelected: (value) =>
+                    controller.lookingForMarriage.value = value,
               ),
             ),
           ),
@@ -294,62 +287,68 @@ class MarriagePage extends GetView<MarriageController> {
             icon: Iconsax.user_copy,
             iconColor: AppColors.primary,
             widget: Obx(
-              () => Wrap(
-                runSpacing: 5.h,
-                children: ['All', 'Male', 'Female'].map((gender) {
-                  final isSelected = controller.selectedGender.value == gender;
-                  final displayLabel = gender == 'All'
-                      ? LK.all.tr
-                      : (gender == 'Male' ? LK.male.tr : LK.female.tr);
-                  return Container(
-                    margin: EdgeInsets.only(right: 6.w),
-                    child: ChoiceChip(
-                      showCheckmark: false,
-                      visualDensity: VisualDensity(
-                        horizontal: VisualDensity.minimumDensity,
-                        vertical: VisualDensity.minimumDensity,
-                      ),
-                      padding: EdgeInsets.zero,
-                      label: Text(
-                        displayLabel,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: isSelected
-                              ? AppColors.white
-                              : AppColors.primary,
-                          fontSize: 10,
-                        ),
-                      ),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          controller.selectedGender.value = gender;
-                        }
-                      },
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.grey.withValues(alpha: 0.1),
-                      labelStyle: AppTextStyles.bodySmall.copyWith(
-                        color: isSelected ? AppColors.white : AppColors.primary,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                        side: BorderSide(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.transparent,
-                        ),
-                      ),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  );
-                }).toList(),
+              () => _buildChoiceChips<String>(
+                options: const ['All', 'Male', 'Female'],
+                selected: controller.selectedGender.value,
+                labelOf: (gender) => gender == 'All'
+                    ? LK.all.tr
+                    : (gender == 'Male' ? LK.male.tr : LK.female.tr),
+                onSelected: (gender) =>
+                    controller.selectedGender.value = gender,
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildChoiceChips<T>({
+    required List<T> options,
+    required T selected,
+    required String Function(T) labelOf,
+    required ValueChanged<T> onSelected,
+  }) {
+    return Wrap(
+      runSpacing: 5.h,
+      children: options.map((option) {
+        final isSelected = selected == option;
+        return Container(
+          margin: EdgeInsets.only(right: 6.w),
+          child: ChoiceChip(
+            showCheckmark: false,
+            visualDensity: VisualDensity(
+              horizontal: VisualDensity.minimumDensity,
+              vertical: VisualDensity.minimumDensity,
+            ),
+            padding: EdgeInsets.zero,
+            label: Text(
+              labelOf(option),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isSelected ? AppColors.white : AppColors.primary,
+                fontSize: 10,
+              ),
+            ),
+            selected: isSelected,
+            onSelected: (value) {
+              if (value) onSelected(option);
+            },
+            selectedColor: AppColors.primary,
+            backgroundColor: AppColors.grey.withValues(alpha: 0.1),
+            labelStyle: AppTextStyles.bodySmall.copyWith(
+              color: isSelected ? AppColors.white : AppColors.primary,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.r),
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.transparent,
+              ),
+            ),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -653,9 +652,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                                   child: Checkbox(
                                     value: controller.excludeSameGotra.value,
                                     activeColor: AppColors.primary,
-                                    onChanged: (val) =>
-                                        controller.excludeSameGotra.value =
-                                            val!,
+                                    onChanged: (val) => controller
+                                        .excludeSameGotra.value = val!,
                                   ),
                                 ),
                               ),

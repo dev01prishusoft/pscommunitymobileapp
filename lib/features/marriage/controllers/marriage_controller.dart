@@ -33,7 +33,7 @@ class MarriageController extends GetxController {
 
   final Rx<AppState> state = AppState.loading.obs;
   final RxList<UnmarriedCount> unmarriedCounts = <UnmarriedCount>[].obs;
-  final RxBool lookingForMarriage = true.obs;
+  final Rxn<bool> lookingForMarriage = Rxn<bool>();
   final RxString selectedGender = 'All'.obs;
   final RxBool isAdvancedFiltersOpen = false.obs;
   final RxBool excludeSameGotra = false.obs;
@@ -256,9 +256,8 @@ class MarriageController extends GetxController {
       return;
     }
 
-    final districtId = districts
-        .firstWhereOrNull((d) => d.text == districtName)
-        ?.id;
+    final districtId =
+        districts.firstWhereOrNull((d) => d.text == districtName)?.id;
     if (districtId != null) {
       final t = await _familyRepository.getTalukas(districtId);
       talukas.assignAll(t);
@@ -357,15 +356,13 @@ class MarriageController extends GetxController {
         selectedDistrict: selectedDistrict.value,
         selectedTaluka: selectedTaluka.value,
         selectedArea: selectedArea.value,
-        selectedStateId: states
-            .firstWhereOrNull((s) => s.text == selectedState.value)
-            ?.id,
+        selectedStateId:
+            states.firstWhereOrNull((s) => s.text == selectedState.value)?.id,
         selectedDistrictId: districts
             .firstWhereOrNull((d) => d.text == selectedDistrict.value)
             ?.id,
-        selectedTalukaId: talukas
-            .firstWhereOrNull((t) => t.text == selectedTaluka.value)
-            ?.id,
+        selectedTalukaId:
+            talukas.firstWhereOrNull((t) => t.text == selectedTaluka.value)?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
         selectedIncomeFrom: selectedIncomeFrom.value,
@@ -560,7 +557,7 @@ class MarriageController extends GetxController {
           } else if (rawData is Map<String, dynamic>) {
             list =
                 (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ??
-                [];
+                    [];
           }
           if (idMap != null && clearMap) idMap.clear();
           final items = list
