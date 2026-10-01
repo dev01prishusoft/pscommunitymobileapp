@@ -200,20 +200,6 @@ class _MemberDetailsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(Widget item1, Widget item2, {bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 16.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: item1),
-          SizedBox(width: 12.w),
-          Expanded(child: item2),
-        ],
-      ),
-    );
-  }
-
   Widget _buildGridItem(
     IconData icon,
     String label,
