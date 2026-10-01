@@ -562,6 +562,7 @@ class LK {
   static const String samajSansthaDescription = 'samaj_sanstha_description';
   static const String next = 'Next';
   static const String nextAndSave = 'Next & Save';
+  static const String submit = 'Submit';
   static const String back = 'Back';
   static const String tapToExpandDetails = 'Tap to expand details';
   static const String tapToCollapse = 'Tap to collapse';

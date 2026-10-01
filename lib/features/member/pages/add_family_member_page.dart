@@ -19,6 +19,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_location_autocomplete.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/add_family_member_controller.dart';
@@ -36,9 +37,11 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   final ScrollController _addressScrollController = ScrollController();
   final ScrollController _educationScrollController = ScrollController();
   final ScrollController _headerScrollController = ScrollController();
-  final List<GlobalKey> _stepKeys = List.generate(6, (index) => GlobalKey());
+  static const int _workStep = 5;
+  static const int _commentStep = 6;
+  final List<GlobalKey> _stepKeys = List.generate(7, (index) => GlobalKey());
   final List<GlobalKey<FormState>> _stepFormKeys = List.generate(
-    6,
+    7,
     (index) => GlobalKey<FormState>(),
   );
   late final PageController _pageController;
@@ -46,6 +49,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
   late String controllerTag;
   bool _isEditMode = false;
   bool _isLoadingMember = false;
+  bool _isFinishing = false;
 
   String get _nativeLangSuffix {
     if (!Get.isRegistered<LocalizationService>()) return '';
@@ -132,6 +136,69 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     _pageController.jumpToPage(index);
   }
 
+  Future<void> _onNextPressed(bool hasChanges) async {
+    if (_isFinishing) return;
+    final isLastStep = _currentStep == _workStep;
+    final isValid =
+        _stepFormKeys[_currentStep].currentState?.validate() ?? !isLastStep;
+    if (!isValid) return;
+
+    if (!_isEditMode) {
+      if (isLastStep) {
+        controller.submitForm(successMessage: LK.memberAddedSuccessfully.tr);
+      } else {
+        _animateToStep(_currentStep + 1);
+      }
+      return;
+    }
+
+    if (hasChanges) {
+      final success = await controller.updateMember(
+        successMessage: LK.memberUpdatedSuccessfully.tr,
+        navigateBack: false,
+      );
+      if (!success || !mounted) return;
+    }
+
+    if (!isLastStep) {
+      _animateToStep(_currentStep + 1);
+      return;
+    }
+
+    // Comment step is only needed when changes were sent for approval.
+    if (controller.isPendingApproval.value) {
+      _animateToStep(_commentStep);
+      return;
+    }
+
+    await _finish(delay: hasChanges);
+  }
+
+  Future<void> _submitComment() async {
+    if (_isFinishing) return;
+    final success = await controller.submitEditRequestComment(
+      controller.editingMemberId,
+    );
+    if (!success || !mounted) return;
+
+    PSDelightToastBar(
+      snackbarDuration: const Duration(seconds: 3),
+      builder: (context) => ToastCard(
+        title: LK.success.tr,
+        subtitle: LK.memberUpdatedSuccessfully.tr,
+      ),
+    ).show();
+    await _finish(delay: true);
+  }
+
+  Future<void> _finish({required bool delay}) async {
+    _isFinishing = true;
+    if (delay) {
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+    }
+    if (mounted) Get.back<dynamic>(result: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -210,6 +277,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                           child: _buildStepWork(),
                         ),
                       ),
+                      if (_isEditMode)
+                        KeepAliveStepWrapper(
+                          child: Form(
+                            key: _stepFormKeys[_commentStep],
+                            child: _buildStepEditRequestComment(),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -254,54 +328,21 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               Expanded(
                 child: Obx(() {
                   final isFormLoading = controller.isFormLoading;
-                  final hasChanges = !_isEditMode || controller.hasChanges;
-                  final isLastStep = _currentStep == 5;
-                        final text = isLastStep
-                            ? LK.saveChanges.tr
-                            : LK.nextAndSave.tr;
-      
+                  final hasChanges = _isEditMode && controller.hasChanges;
+                  final isCommentStep = _currentStep == _commentStep;
+                  final text = isCommentStep
+                      ? LK.submit.tr
+                      : _currentStep == _workStep
+                      ? LK.saveChanges.tr
+                      : LK.nextAndSave.tr;
+
                   return AppPrimaryButton(
                     text: text,
                     height: 50.h,
-                    onPressed: isLastStep
-                        ? !hasChanges
-                              ? null
-                              : () {
-                                  final isValid =
-                                      _stepFormKeys[5].currentState?.validate() ??
-                                      false;
-                                  if (!isValid) return;
-                                  if (_isEditMode) {
-                                    controller.updateMember(
-                                      successMessage:
-                                          LK.memberUpdatedSuccessfully.tr,
-                                            navigateBack: true,
-                                    );
-                                  } else {
-                                    controller.submitForm(
-                                      successMessage: LK.memberAddedSuccessfully.tr,
-                                    );
-                                  }
-                                }
-                              : () async {
-                                  final isValid =
-                                      _stepFormKeys[_currentStep].currentState
-                                          ?.validate() ??
-                                      true;
-                                  if (!isValid) return;
-
-                                  if (_isEditMode && controller.hasChanges) {
-                                    final success = await controller
-                                        .updateMember(
-                                          successMessage:
-                                              LK.memberUpdatedSuccessfully.tr,
-                                          navigateBack: false,
-                                        );
-                                    if (!success) return;
-                                  }
-                            _animateToStep(_currentStep + 1);
-                          },
-                          isLoading: isFormLoading,
+                    onPressed: isCommentStep
+                        ? _submitComment
+                        : () => _onNextPressed(hasChanges),
+                    isLoading: isFormLoading,
                   );
                 }),
               ),
@@ -327,6 +368,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           'icon': Icons.school_outlined,
         },
         {'title': LK.workHistory.tr, 'icon': Icons.work_outline},
+        if (_isEditMode && controller.isPendingApproval.value)
+          {'title': LK.editRequestComment.tr, 'icon': Icons.comment_outlined},
       ];
 
       return Container(
@@ -1383,34 +1426,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     final fieldsWidget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Obx(() {
-              final isFetching = controller.isFetchingLocation.value;
-              return TextButton.icon(
-                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-                onPressed: isFetching
-                    ? null
-                    : () => controller.fetchCurrentLocation(addr),
-                icon: isFetching
-                    ? SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primary,
-                        ),
-                      )
-                    : const Icon(Icons.my_location, size: 18),
-                label: Text(
-                  isFetching ? 'Fetching Address...' : 'Use Current Location',
-                ),
-              );
-            }),
-          ],
-        ),
-        AppSpacing.vS,
         Obx(() {
           final typeList = controller.addressTypeList;
           return AppFormDropdown<String>(
@@ -1587,90 +1602,74 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           );
         }),
         AppSpacing.vM,
-        Obx(
-          () => AppFormTextField(
-            key: ValueKey(
-              'pincode_${index}_${controller.locationFetchTrigger.value}',
-            ),
-            initialValue: addr.pincode,
-            label: LK.pincode.tr,
-            prefixIcon: const Icon(Icons.pin_drop_outlined),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            maxLength: 6,
-            onChanged: (v) {
-              addr.pincode = v;
-              controller.addresses.refresh();
-            },
-            updateStatus: addr.isPrimary
-                ? controller.getUpdateStatus('Pincode')
-                : null,
-          ),
+        AppFormTextField(
+          key: ValueKey('pincode_$index'),
+          initialValue: addr.pincode,
+          label: LK.pincode.tr,
+          prefixIcon: const Icon(Icons.pin_drop_outlined),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLength: 6,
+          onChanged: (v) {
+            addr.pincode = v;
+            controller.addresses.refresh();
+          },
+          updateStatus: addr.isPrimary
+              ? controller.getUpdateStatus('Pincode')
+              : null,
         ),
         AppSpacing.vM,
-        Obx(
-          () => AppFormTextField(
-            key: ValueKey(
-              'line1_${index}_${controller.locationFetchTrigger.value}',
-            ),
-            initialValue: addr.line1,
-            label: LK.addressLine1.tr,
-            isRequired: true,
-            prefixIcon: const Icon(Icons.location_on_outlined),
-            maxLength: 300,
-            keyboardType: TextInputType.multiline,
-            maxLines: 5,
-            minLines: 3,
-            onChanged: (v) {
-              addr.line1 = v;
-              controller.addresses.refresh();
-            },
-            updateStatus: addr.isPrimary
-                ? controller.getUpdateStatus('AddressLine1')
-                : null,
-          ),
+        AppFormTextField(
+          key: ValueKey('line1_$index'),
+          initialValue: addr.line1,
+          label: LK.addressLine1.tr,
+          isRequired: true,
+          prefixIcon: const Icon(Icons.location_on_outlined),
+          maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: 5,
+          minLines: 3,
+          onChanged: (v) {
+            addr.line1 = v;
+            controller.addresses.refresh();
+          },
+          updateStatus: addr.isPrimary
+              ? controller.getUpdateStatus('AddressLine1')
+              : null,
         ),
         AppSpacing.vM,
-        Obx(
-          () => AppFormTextField(
-            key: ValueKey(
-              'line2_${index}_${controller.locationFetchTrigger.value}',
-            ),
-            initialValue: addr.line2,
-            label: LK.addressLine2.tr,
-            isRequired: true,
-            prefixIcon: const Icon(Icons.location_on_outlined),
-            maxLength: 300,
-            keyboardType: TextInputType.multiline,
-            maxLines: 5,
-            minLines: 3,
-            onChanged: (v) {
-              addr.line2 = v;
-              controller.addresses.refresh();
-            },
-            updateStatus: addr.isPrimary
-                ? controller.getUpdateStatus('AddressLine2')
-                : null,
-          ),
+        AppFormTextField(
+          key: ValueKey('line2_$index'),
+          initialValue: addr.line2,
+          label: LK.addressLine2.tr,
+          isRequired: true,
+          prefixIcon: const Icon(Icons.location_on_outlined),
+          maxLength: 300,
+          keyboardType: TextInputType.multiline,
+          maxLines: 5,
+          minLines: 3,
+          onChanged: (v) {
+            addr.line2 = v;
+            controller.addresses.refresh();
+          },
+          updateStatus: addr.isPrimary
+              ? controller.getUpdateStatus('AddressLine2')
+              : null,
         ),
         AppSpacing.vM,
-        Obx(
-          () => AppFormTextField(
-            key: ValueKey(
-              'landmark_${index}_${controller.locationFetchTrigger.value}',
-            ),
-            initialValue: addr.landmark,
-            label: LK.landmarkLabel.tr,
-            prefixIcon: const Icon(Icons.location_city_outlined),
-            maxLength: 200,
-            onChanged: (v) {
-              addr.landmark = v;
-              controller.addresses.refresh();
-            },
-            updateStatus: addr.isPrimary
-                ? controller.getUpdateStatus('Landmark')
-                : null,
-          ),
+        AppFormTextField(
+          key: ValueKey('landmark_$index'),
+          initialValue: addr.landmark,
+          label: LK.landmarkLabel.tr,
+          prefixIcon: const Icon(Icons.location_city_outlined),
+          maxLength: 200,
+          onChanged: (v) {
+            addr.landmark = v;
+            controller.addresses.refresh();
+          },
+          updateStatus: addr.isPrimary
+              ? controller.getUpdateStatus('Landmark')
+              : null,
         ),
         AppSpacing.vM,
         InkWell(
@@ -2220,6 +2219,49 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepEditRequestComment() {
+    return SingleChildScrollView(
+      padding: AppSpacing.pM,
+      child: Container(
+        padding: AppSpacing.pL,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.comment_outlined, color: AppColors.primary, size: 20),
+                AppSpacing.hM,
+                Text(
+                  LK.editRequestComment.tr,
+                  style: AppTextStyles.headlineSmall,
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            AppFormTextField(
+              controller: controller.editRequestCommentCtrl,
+              label: LK.editRequestComment.tr,
+              maxLines: 4,
+              maxLength: 500,
             ),
           ],
         ),

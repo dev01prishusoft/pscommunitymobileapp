@@ -32,6 +32,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
   final TextEditingController editRequestCommentCtrl = TextEditingController();
   final RxString editRequestComment = ''.obs;
 
+  /// True once a save response says changes were sent for approval; only
+  /// then is the edit request comment step shown.
+  final RxBool isPendingApproval = false.obs;
+
   late final PersonalInfoController personalInfo;
   late final ContactController contactInfo;
   late final WorkInfoController workInfo;
@@ -1981,6 +1985,62 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
   }
 
+  /// Messages from `MemberUpdateRequest/create` meaning some changes are
+  /// pending approval.
+  static const Set<String> _pendingApprovalMessages = {
+    'some fields were updated. remaining fields were sent for approval',
+    'request saved successfully',
+  };
+
+  /// Marks [isPendingApproval] when [message] is a pending-approval message.
+  void trackApprovalMessage(String? message) {
+    if (message == null) return;
+    var normalized = message.trim().toLowerCase();
+    if (normalized.endsWith('.')) {
+      normalized = normalized.substring(0, normalized.length - 1);
+    }
+    if (_pendingApprovalMessages.contains(normalized)) {
+      isPendingApproval.value = true;
+    }
+  }
+
+  /// Posts the edit request comment for [memberId]. An empty comment is
+  /// skipped. Returns false (after showing an error) if the request fails.
+  Future<bool> submitEditRequestComment(int? memberId) async {
+    final comment = editRequestCommentCtrl.text.trim();
+    if (comment.isEmpty || memberId == null) return true;
+
+    bool success = false;
+    await submitThrottled(() async {
+      try {
+        await Get.find<ApiClient>().post(
+          '/api/v1/MemberUpdateRequest/authorized-comment',
+          data: {
+            'memberId': memberId,
+            'profileUpdateComment': comment,
+            'rejectedReasonCommentByAdmin': null,
+          },
+        );
+        success = true;
+      } catch (e, stack) {
+        CrashReporter.recordError(
+          e,
+          stack,
+          reason: 'ProfileFormController.submitEditRequestComment failed',
+        );
+        PSDelightToastBar(
+          snackbarDuration: const Duration(seconds: 3),
+          builder: (context) => ToastCard(
+            title: LK.error.tr,
+            subtitle: e is Failure ? e.message : LK.unexpectedError.tr,
+            isErrorMessage: true,
+          ),
+        ).show();
+      }
+    });
+    return success;
+  }
+
   Future<bool> submitForm({
     String? successMessage,
     bool navigateBack = true,
@@ -2247,6 +2307,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
               final msg = response.data['message'] as String?;
+              if (isEdit) trackApprovalMessage(msg);
               if (msg != null && msg.isNotEmpty) {
                 successMessage = msg.tr;
               }
@@ -2358,45 +2419,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   );
                 }
               }
-            }
-
-            if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
-              try {
-                await apiClient.post(
-                  '/api/v1/MemberUpdateRequest/authorized-comment',
-                  data: {
-                    'memberId': _currentMember!.memberId,
-                    'profileUpdateComment': editRequestCommentCtrl.text.trim(),
-                    'rejectedReasonCommentByAdmin': null,
-                  },
-                );
-              } catch (e, stack) {
-                CrashReporter.recordError(
-                  e,
-                  stack,
-                  reason:
-                      'ProfileFormController._saveMember authorized-comment failed',
-                );
-              }
-            }
-          } else if (isEdit && editRequestCommentCtrl.text.trim().isNotEmpty) {
-            final apiClient = Get.find<ApiClient>();
-            try {
-              await apiClient.post(
-                '/api/v1/MemberUpdateRequest/authorized-comment',
-                data: {
-                  'memberId': _currentMember!.memberId,
-                  'profileUpdateComment': editRequestCommentCtrl.text.trim(),
-                  'rejectedReasonCommentByAdmin': null,
-                },
-              );
-            } catch (e, stack) {
-              CrashReporter.recordError(
-                e,
-                stack,
-                reason:
-                    'ProfileFormController._saveMember authorized-comment (no-updates) failed',
-              );
             }
           }
 

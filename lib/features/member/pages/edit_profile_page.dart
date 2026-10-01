@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -16,6 +17,7 @@ import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_time_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_image_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_location_autocomplete.dart';
@@ -106,6 +108,59 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void _animateToStep(int index) {
     _pageController.jumpToPage(index);
+  }
+
+  static const int _workStep = 5;
+  static const int _commentStep = 6;
+  bool _isFinishing = false;
+
+  Future<void> _saveAndContinue(bool hasChanges) async {
+    if (_isFinishing) return;
+    if (hasChanges) {
+      final success = await controller.submitForm(
+        successMessage: LK.editProfileRequestSent.tr,
+        navigateBack: false,
+      );
+      if (!success || !mounted) return;
+    }
+
+    if (_currentStep < _workStep) {
+      _animateToStep(_currentStep + 1);
+      return;
+    }
+
+    // Comment step is only needed when changes were sent for approval.
+    if (controller.isPendingApproval.value) {
+      _animateToStep(_commentStep);
+      return;
+    }
+
+    await _finish(delay: hasChanges);
+  }
+
+  Future<void> _submitComment() async {
+    if (_isFinishing) return;
+    final success = await controller.submitEditRequestComment(
+      controller.currentMember?.memberId,
+    );
+    if (!success || !mounted) return;
+
+    PSDelightToastBar(
+      snackbarDuration: const Duration(seconds: 3),
+      builder: (context) => ToastCard(
+        title: LK.success.tr,
+        subtitle: LK.editProfileRequestSent.tr,
+      ),
+    ).show();
+    await _finish(delay: true);
+  }
+
+  Future<void> _finish({required bool delay}) async {
+    _isFinishing = true;
+    if (delay) {
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+    }
+    await Get.offAllNamed<void>(AppRouter.home);
   }
 
   @override
@@ -200,29 +255,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   final hasChanges = controller.hasChanges;
                   final isFormLoading = controller.isFormLoading;
 
-                  final isLastStep = _currentStep == 6;
-                  final text = isLastStep ? LK.saveChanges.tr : LK.nextAndSave.tr;
+                  final isCommentStep = _currentStep == _commentStep;
 
                   return AppPrimaryButton(
-                    text: text,
+                    text: isCommentStep ? LK.submit.tr : LK.nextAndSave.tr,
                     height: 50.h,
-                    onPressed: isLastStep
-                        ? (hasChanges
-                              ? () => controller.submitForm(
-                                  successMessage: LK.editProfileRequestSent.tr,
-                                  navigateBack: true,
-                                )
-                              : null)
-                        : () async {
-                            if (hasChanges) {
-                              final success = await controller.submitForm(
-                                successMessage: LK.editProfileRequestSent.tr,
-                                navigateBack: false,
-                              );
-                              if (!success) return;
-                            }
-                            _animateToStep(_currentStep + 1);
-                          },
+                    onPressed: isCommentStep
+                        ? _submitComment
+                        : () => _saveAndContinue(hasChanges),
                     isLoading: isFormLoading,
                   );
                 }),
@@ -249,7 +289,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           'icon': Icons.school_outlined,
         },
         {'title': LK.workHistory.tr, 'icon': Icons.work_outline},
-        {'title': LK.editRequestComment.tr, 'icon': Icons.comment_outlined},
+        if (controller.isPendingApproval.value)
+          {'title': LK.editRequestComment.tr, 'icon': Icons.comment_outlined},
       ];
 
       return Container(

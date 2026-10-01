@@ -227,6 +227,7 @@ class AddFamilyMemberController extends ProfileFormController {
             if (response.data != null &&
                 response.data is Map<String, dynamic>) {
               final msg = response.data['message'] as String?;
+              trackApprovalMessage(msg);
               if (msg != null && msg.isNotEmpty) {
                 successMessage = msg.tr;
               }

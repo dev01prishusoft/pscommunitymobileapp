@@ -10,15 +10,14 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 
 class AddedMemberCard extends StatelessWidget {
-  const AddedMemberCard({super.key, required this.member, this.onEdit});
-  final Member member;
-  final VoidCallback? onEdit;
   const AddedMemberCard({
     super.key,
     required this.member,
+    this.onEdit,
     this.showApproveStatus = true,
   });
   final Member member;
+  final VoidCallback? onEdit;
   final bool showApproveStatus;
 
   @override

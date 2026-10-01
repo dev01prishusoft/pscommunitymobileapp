@@ -113,29 +113,30 @@ class ProfileWorkStepSection extends StatelessWidget {
           LK.assetsLife.tr,
         ),
         const Divider(height: 24),
-        Obx(
-          () => _buildFieldPair(
-            _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand),
-            _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse),
-          ),
+        // Each checkbox has its own Obx; an outer Obx here would observe
+        // nothing and throw "improper use of GetX".
+        _buildFieldPair(
+          _buildCheckbox(LK.ownLand.tr, controller.personalInfo.ownLand),
+          _buildCheckbox(LK.ownHouse.tr, controller.personalInfo.ownHouse),
         ),
-        Obx(
-          () => _buildFieldPair(
-            _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler),
-            _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler),
-          ),
+        _buildFieldPair(
+          _buildCheckbox(LK.twoWheeler.tr, controller.personalInfo.twoWheeler),
+          _buildCheckbox(LK.fourWheeler.tr, controller.personalInfo.fourWheeler),
         ),
         AppSpacing.vM,
-        Obx(
-          () => AppFormTextField(
+        Obx(() {
+          // Touch fieldStatuses so Obx always has an observable, even when
+          // no getUpdateStatus callback is supplied.
+          controller.fieldStatuses.length;
+          return AppFormTextField(
             controller: controller.personalInfo.monthlyIncomeCtrl,
             label: LK.monthlyIncomeLabel.tr,
             prefixIcon: const Icon(Icons.currency_rupee),
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             maxLength: 13,
             updateStatus: _status('MonthlyIncome'),
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
