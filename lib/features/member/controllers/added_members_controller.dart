@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/core/models/member_registration_model.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 
 class AddedMembersController extends GetxController {
@@ -17,6 +19,15 @@ class AddedMembersController extends GetxController {
   final requestedCount = 0.obs;
 
   final selectedTab = 'all'.obs;
+
+  /// Whether member additions go through approval. Defaults to true (the
+  /// existing UI) if the setting cannot be fetched.
+  final requireApproval = true.obs;
+  final isSettingLoaded = false.obs;
+
+  /// Approval tabs and status badges are shown only once the setting is
+  /// known and approval is required, so they never flash and disappear.
+  bool get showApprovalUi => isSettingLoaded.value && requireApproval.value;
 
   List<Member> get filteredMembers {
     if (selectedTab.value == 'all') {
@@ -51,7 +62,32 @@ class AddedMembersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    fetchRegistrationSetting();
     fetchMembers();
+  }
+
+  Future<void> fetchRegistrationSetting() async {
+    try {
+      final response = await _apiClient.get(
+        ApiEndpoints.memberRegistrationSetting,
+      );
+      final body = response.data;
+      if (body is Map<String, dynamic>) {
+        final setting = MemberRegistrationModel.fromJson(body);
+        if (setting.succeeded == true) {
+          requireApproval.value = setting.data?.requireApproval ?? true;
+        }
+      }
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AddedMembersController.fetchRegistrationSetting failed',
+      );
+    } finally {
+      if (!requireApproval.value) selectedTab.value = 'all';
+      isSettingLoaded.value = true;
+    }
   }
 
   void onSearchChanged(String query) {

@@ -38,19 +38,27 @@ class ShareAppPage extends StatelessWidget {
                   spacing: 14,
                   children: [
                     Expanded(
-                      child: _ShareButton(
-                        icon: Icons.chat_bubble_rounded,
-                        label: LK.shareAppViaWhatsApp.tr,
-                        color: AppColors.green,
-                        onTap: controller.shareViaWhatsApp,
+                      child: Builder(
+                        builder: (btnContext) => _ShareButton(
+                          icon: Icons.chat_bubble_rounded,
+                          label: LK.shareAppViaWhatsApp.tr,
+                          color: AppColors.green,
+                          onTap: () => controller.shareViaWhatsApp(
+                            sharePositionOrigin: _getShareOrigin(btnContext),
+                          ),
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: _ShareButton(
-                        icon: Icons.share_rounded,
-                        label: LK.shareAppViaOther.tr,
-                        color: AppColors.primary,
-                        onTap: controller.shareGeneral,
+                      child: Builder(
+                        builder: (btnContext) => _ShareButton(
+                          icon: Icons.share_rounded,
+                          label: LK.shareAppViaOther.tr,
+                          color: AppColors.primary,
+                          onTap: () => controller.shareGeneral(
+                            sharePositionOrigin: _getShareOrigin(btnContext),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -325,11 +333,15 @@ class _QrCard extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            InkWell(
-              onTap: () {
-                ctrl.shareSelectedLink(selected);
-              },
-              borderRadius: BorderRadius.circular(12),
+            Builder(
+              builder: (btnContext) => InkWell(
+                onTap: () {
+                  ctrl.shareSelectedLink(
+                    selected,
+                    sharePositionOrigin: _getShareOrigin(btnContext),
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -359,7 +371,8 @@ class _QrCard extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+          ),
+        ],
         ),
       );
     });
@@ -421,4 +434,12 @@ class _ShareButton extends StatelessWidget {
       ),
     );
   }
+}
+
+Rect? _getShareOrigin(BuildContext context) {
+  final box = context.findRenderObject() as RenderBox?;
+  if (box != null && box.hasSize) {
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+  return null;
 }

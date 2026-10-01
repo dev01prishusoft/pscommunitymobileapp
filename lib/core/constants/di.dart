@@ -7,6 +7,7 @@ import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
+import 'package:pscommunitymobileapp/core/services/app_setting_service.dart';
 import 'package:pscommunitymobileapp/core/services/global_network_error_service.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/core/services/push_notification_service.dart';
@@ -90,6 +91,9 @@ class DI {
 
         modulePermissionService.attachApiClient(apiClient);
 
+        final appSettingService = AppSettingService(apiClient);
+        Get.put(appSettingService, permanent: true);
+
         final localization = LocalizationService(secureStorage);
         await localization.bootstrap();
         Get.put(localization, permanent: true);
@@ -159,8 +163,9 @@ class DI {
 
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
+          unawaited(appSettingService.getGoogleApiKey());
         }
-      }).timeout(const Duration(seconds: 15));
+      });
     } catch (e) {
       rethrow;
     }

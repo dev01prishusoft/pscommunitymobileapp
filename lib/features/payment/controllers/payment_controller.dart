@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -17,7 +16,7 @@ import 'package:pscommunitymobileapp/core/models/paid_payment_request.dart';
 import 'package:pscommunitymobileapp/core/models/payment_mode.dart';
 import 'package:pscommunitymobileapp/core/models/payment_type.dart';
 import 'package:pscommunitymobileapp/features/payment/repositories/payment_repository.dart';
-import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/services/razorpay_checkout_service.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentController extends GetxController {
@@ -209,23 +208,6 @@ class PaymentController extends GetxController {
     }
   }
 
-  Future<void> initiateDirectPayment(double amount) async {
-    if (paymentTypes.isEmpty) await loadPaymentTypes();
-    if (paymentModes.isEmpty) await loadPaymentModes();
-
-    if (paymentTypes.isNotEmpty) {
-      await onTypeChanged(paymentTypes.first);
-    }
-    if (paymentModes.isNotEmpty) {
-      selectedMode.value = paymentModes.first;
-    }
-    if (categories.isNotEmpty) {
-      selectedCategory.value = categories.first;
-    }
-
-    await initiatePayment(customAmount: amount);
-  }
-
   Future<void> initiatePayment({
     int? adminPaymentRequestId,
     double? customAmount,
@@ -344,80 +326,40 @@ class PaymentController extends GetxController {
         isRecurring: isRecurring,
       );
 
-      final envKey = Env.razorpayKey;
-      final key = envKey.isNotEmpty ? envKey : order.keyId;
-      if (key.isEmpty) {
-        PSDelightToastBar(
-          snackbarDuration: const Duration(seconds: 3),
-          builder: (context) => ToastCard(
-            title: LK.error.tr,
-            subtitle: LK.paymentGatewayMissing.tr,
-            isErrorMessage: true,
-          ),
-        ).show();
+      final int amountInPaise = order.amountInPaise > 0
+          ? order.amountInPaise
+          : (amount * 100).round();
+
+      final opened = RazorpayCheckoutService.open(
+        _razorpay,
+        RazorpayCheckoutParams(
+          orderId: order.orderId,
+          amountInPaise: amountInPaise,
+          currency: order.currency,
+          keyId: order.keyId,
+          subscriptionId:
+              (isRecurring && (order.subscriptionId?.isNotEmpty ?? false))
+              ? order.subscriptionId
+              : null,
+          description: LK.paymentForCommunity,
+        ),
+      );
+      if (!opened) {
         isProcessingPayment.value = false;
         isProcessingRecurring.value = false;
-        return;
+        _pendingAdminRequestId = null;
       }
-
-      String samajName = '';
-      if (Get.isRegistered<SamajController>()) {
-        samajName = Get.find<SamajController>().samaj.value?.name ?? '';
-      }
-      if (samajName.trim().isEmpty) {
-        samajName = 'PS Community';
-      }
-
-      final String? samajLogoUrl = Get.isRegistered<SamajController>()
-          ? Get.find<SamajController>().samaj.value?.logoUrl
-          : null;
-
-      final prefill = <String, String>{};
-      final phone = tokenManager.userPhone?.trim();
-      final email = tokenManager.userEmail?.trim();
-      if (phone != null && phone.isNotEmpty) {
-        prefill['contact'] = phone;
-      }
-      if (email != null && email.isNotEmpty) {
-        prefill['email'] = email;
-      }
-
-      final options = <String, dynamic>{
-        'key': key,
-        'amount': order.amountInPaise,
-        'name': samajName,
-        'description': LK.paymentForCommunity,
-        'timeout': 300,
-        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
-          'image': samajLogoUrl,
-        if (prefill.isNotEmpty) 'prefill': prefill,
-        'theme': {'color': '#1E3A8A'},
-        'currency': 'INR',
-      };
-
-      if (isRecurring &&
-          order.subscriptionId != null &&
-          order.subscriptionId!.isNotEmpty) {
-        options['subscription_id'] = order.subscriptionId!;
-      } else {
-        options['order_id'] = order.orderId;
-      }
-
-      _razorpay.open(options);
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'PaymentController._openRazorpayCheckout failed',
+        reason: 'PaymentController.initiatePayment failed',
       );
-      final errorMessage = e.toString();
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),
         builder: (context) => ToastCard(
           title: LK.error.tr,
-          subtitle: errorMessage.isNotEmpty
-              ? errorMessage
-              : LK.paymentFailed.tr,
+          subtitle: LK.paymentFailed.tr,
           isErrorMessage: true,
         ),
       ).show();
@@ -522,6 +464,9 @@ class PaymentController extends GetxController {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
+    isProcessingPayment.value = false;
+    isProcessingRecurring.value = false;
+    _pendingAdminRequestId = null;
     PSDelightToastBar(
       snackbarDuration: const Duration(seconds: 3),
       builder: (context) =>

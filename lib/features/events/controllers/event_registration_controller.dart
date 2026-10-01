@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/models/coupon_apply_model.dart';
 import 'package:pscommunitymobileapp/core/models/event_create_order_model.dart';
@@ -23,7 +22,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_text_field.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
-import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/payment/services/razorpay_checkout_service.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/event_details_controller.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -541,82 +540,36 @@ class EventRegistrationController extends GetxController {
     CreateOrderData order, {
     required EventDetailsData event,
   }) {
-    isProcessingPayment.value = true;
-    try {
-      final tokenManager = Get.find<TokenManager>();
-      final envKey = Env.razorpayKey;
-      final key = envKey.isNotEmpty ? envKey : (order.keyId ?? '');
-      if (key.isEmpty) {
-        PSDelightToastBar(
-          snackbarDuration: const Duration(seconds: 3),
-          builder: (context) => ToastCard(
-            title: LK.error.tr,
-            subtitle: LK.paymentGatewayMissing.tr,
-            isErrorMessage: true,
-          ),
-        ).show();
-        isProcessingPayment.value = false;
-        return;
-      }
+    // Normalise amountInPaise from the dynamic field on CreateOrderData.
+    final rawPaise = order.amountInPaise;
+    final parsedPaise = rawPaise is num
+        ? rawPaise.toInt()
+        : (int.tryParse(rawPaise?.toString() ?? '') ?? 0);
+    final int amountInPaise = parsedPaise > 0
+        ? parsedPaise
+        : ((order.finalAmount is num)
+              ? ((order.finalAmount as num) * 100).round()
+              : 0);
 
-      final String samajName = Get.isRegistered<SamajController>()
-          ? (Get.find<SamajController>().samaj.value?.name ?? LK.samajName.tr)
-          : LK.samajName.tr;
+    _currentEventId = event.eventId ?? 0;
+    _registeredEvent = event;
+    _razorpay.clear();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
-      final String? samajLogoUrl = Get.isRegistered<SamajController>()
-          ? Get.find<SamajController>().samaj.value?.logoUrl
-          : null;
-
-      final prefill = <String, String>{};
-      final phone = tokenManager.userPhone?.trim();
-      final email = tokenManager.userEmail?.trim();
-      if (phone != null && phone.isNotEmpty) {
-        prefill['contact'] = phone;
-      }
-      if (email != null && email.isNotEmpty) {
-        prefill['email'] = email;
-      }
-
-      final options = <String, dynamic>{
-        'key': key,
-        'amount': order.amountInPaise,
-        'name': samajName,
-        'description': event.eventName ?? LK.paymentForCommunity.tr,
-        'timeout': 300,
-        if (samajLogoUrl != null && samajLogoUrl.isNotEmpty)
-          'image': samajLogoUrl,
-        if (prefill.isNotEmpty) 'prefill': prefill,
-        'theme': {'color': '#1E3A8A'},
-        'currency': order.currency ?? 'INR',
-        'order_id': order.orderId,
-      };
-
-      _currentEventId = event.eventId ?? 0;
-      _registeredEvent = event;
-      _razorpay.clear();
-      _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-      _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-      _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-
-      _razorpay.open(options);
-    } catch (e, stack) {
-      CrashReporter.recordError(
-        e,
-        stack,
-        reason: 'EventRegistrationController._openRazorpayCheckout failed',
-      );
-      final errorMessage = e.toString();
-      PSDelightToastBar(
-        snackbarDuration: const Duration(seconds: 3),
-        builder: (context) => ToastCard(
-          title: LK.error.tr,
-          subtitle: errorMessage.isNotEmpty
-              ? errorMessage
-              : LK.paymentFailed.tr,
-          isErrorMessage: true,
-        ),
-      ).show();
-      isProcessingPayment.value = false;
+    final opened = RazorpayCheckoutService.open(
+      _razorpay,
+      RazorpayCheckoutParams(
+        orderId: order.orderId ?? '',
+        amountInPaise: amountInPaise,
+        currency: order.currency ?? 'INR',
+        keyId: order.keyId ?? '',
+        description: event.eventName ?? LK.paymentForCommunity.tr,
+      ),
+    );
+    if (opened) {
+      isProcessingPayment.value = true;
     }
   }
 
@@ -887,7 +840,7 @@ class EventRegistrationController extends GetxController {
                                     LK.event_pay_base_amount_desc.tr,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.grey.shade500,
-                                      fontSize: 11.sp,
+                                      fontSize: 11,
                                     ),
                                   ),
                                 ],
@@ -956,7 +909,7 @@ class EventRegistrationController extends GetxController {
                                           : LK.event_pay_discount_applied.tr,
                                       style: AppTextStyles.bodySmall.copyWith(
                                         color: AppColors.green,
-                                        fontSize: 11.sp,
+                                        fontSize: 11,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -1002,7 +955,7 @@ class EventRegistrationController extends GetxController {
                                 LK.event_pay_final_amount_desc.tr,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.grey.shade500,
-                                  fontSize: 11.sp,
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
@@ -1106,7 +1059,7 @@ class EventRegistrationController extends GetxController {
                                 errorMessage.value,
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.red,
-                                  fontSize: 12.sp,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),

@@ -267,7 +267,7 @@ class EventsPage extends GetView<EventsController> {
             Text(
               count,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.white : defaultColor,
               ),
@@ -276,7 +276,7 @@ class EventsPage extends GetView<EventsController> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 color: isSelected
                     ? AppColors.white.withValues(alpha: 0.9)

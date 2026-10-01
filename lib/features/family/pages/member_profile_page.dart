@@ -99,6 +99,8 @@ class _ProfileHeader extends StatelessWidget {
     final args = Get.arguments as Map<String, dynamic>?;
     final fromMyMemberList =
         args != null && (args['fromMyMemberList'] as bool? ?? false);
+    final showApproveStatus =
+        args == null || (args['showApproveStatus'] as bool? ?? true);
     final fromMatrimonial =
         args != null && (args['fromMatrimonial'] as bool? ?? false);
 
@@ -225,6 +227,7 @@ class _ProfileHeader extends StatelessWidget {
             ],
           ).paddingSymmetric(vertical: 25.h, horizontal: 20.w),
           if (fromMyMemberList &&
+              showApproveStatus &&
               member.approveStatus != null &&
               member.approveStatus!.trim().isNotEmpty)
             _buildStatusBadge(
@@ -267,7 +270,7 @@ class _ProfileHeader extends StatelessWidget {
             style: AppTextStyles.labelSmall.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
-              fontSize: 10.sp,
+              fontSize: 10,
             ),
           ),
           if (isRejected) ...[

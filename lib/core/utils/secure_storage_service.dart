@@ -61,7 +61,7 @@ class SecureStorageService {
 
   Future<void> setBool(String key, bool value) async {
     try {
-      await _storage.write(key: key, value: value.toString());
+      await _storage.write(key: 'ps_community_$key', value: value.toString());
     } catch (e, stack) {
       _reportError(
         e,
@@ -74,7 +74,7 @@ class SecureStorageService {
 
   Future<bool> getBool(String key) async {
     try {
-      final value = await _storage.read(key: key);
+      final value = await _storage.read(key: 'ps_community_$key');
       return value == 'true';
     } catch (e, stack) {
       _reportError(

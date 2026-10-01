@@ -89,28 +89,43 @@ class AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
 
+    final String? newToken;
     try {
-      final newToken = await _refreshSingleFlight(refreshToken);
-      if (newToken != null) {
-        final options = err.requestOptions;
-        options.headers['Authorization'] = 'Bearer $newToken';
-        options.extra['isAuthRetry'] = true;
-
-        final response = await _mainDio.fetch<dynamic>(options);
-        return handler.resolve(response);
-      } else {
-        _onAuthFailure();
-      }
+      newToken = await _refreshSingleFlight(refreshToken);
+    } on DioException catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'AuthInterceptor: token refresh failed',
+      );
+      // Only a definitive rejection from the refresh endpoint logs the user out.
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 403) _onAuthFailure();
+      return handler.next(err);
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'AuthInterceptor: token refresh / retry failed',
+        reason: 'AuthInterceptor: unexpected error during token refresh',
       );
-      _onAuthFailure();
+      return handler.next(err);
     }
 
-    handler.next(err);
+    if (newToken == null) {
+      _onAuthFailure();
+      return handler.next(err);
+    }
+
+    final options = err.requestOptions;
+    options.headers['Authorization'] = 'Bearer $newToken';
+    options.extra['isAuthRetry'] = true;
+
+    try {
+      final response = await _mainDio.fetch<dynamic>(options);
+      return handler.resolve(response);
+    } on DioException catch (e) {
+      return handler.next(e);
+    }
   }
 
   Future<String?> _refreshSingleFlight(String refreshToken) async {

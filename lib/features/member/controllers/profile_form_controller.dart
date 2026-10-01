@@ -10,11 +10,8 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
-import 'package:pscommunitymobileapp/core/services/location_service.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/models/address_model.dart';
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
@@ -24,9 +21,6 @@ import 'package:pscommunitymobileapp/core/models/family_member_dropdown.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/contact_controller.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/personal_info_controller.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/work_info_controller.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
-import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 
 class ProfileFormController extends GetxController with FormStateMixin {
   final formKey = GlobalKey<FormState>();
@@ -37,8 +31,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
       <String, ProfileUpdateStatus>{}.obs;
   final TextEditingController editRequestCommentCtrl = TextEditingController();
   final RxString editRequestComment = ''.obs;
-  final RxInt locationFetchTrigger = 0.obs;
-  final RxBool isFetchingLocation = false.obs;
 
   late final PersonalInfoController personalInfo;
   late final ContactController contactInfo;
@@ -888,7 +880,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'ProfileFormController.fetchProfileUpdateStatus failed for member ${_currentMember?.memberId}',
+        reason:
+            'ProfileFormController.fetchProfileUpdateStatus failed for member ${_currentMember?.memberId}',
       );
     }
   }
@@ -989,7 +982,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         CrashReporter.recordError(
           e,
           stack,
-          reason: 'ProfileFormController._formatStatusValue: DateOfBirth parse failed for ${status.newValue}',
+          reason:
+              'ProfileFormController._formatStatusValue: DateOfBirth parse failed for ${status.newValue}',
         );
       }
     }
@@ -1020,7 +1014,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
         CrashReporter.recordError(
           e,
           stack,
-          reason: 'ProfileFormController._formatStatusValue: DateOfBirthTime parse failed for ${status.newValue}',
+          reason:
+              'ProfileFormController._formatStatusValue: DateOfBirthTime parse failed for ${status.newValue}',
         );
       }
     }
@@ -1112,7 +1107,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'ProfileFormController.loadEducation failed for member $memberId',
+        reason:
+            'ProfileFormController.loadEducation failed for member $memberId',
       );
     }
   }
@@ -1299,7 +1295,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
       CrashReporter.recordError(
         e,
         stack,
-        reason: 'ProfileFormController.loadAddresses failed for member $memberId',
+        reason:
+            'ProfileFormController.loadAddresses failed for member $memberId',
       );
     }
   }
@@ -2322,7 +2319,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   CrashReporter.recordError(
                     e,
                     stack,
-                    reason: 'ProfileFormController._saveMember member-address/mobile/upsert failed',
+                    reason:
+                        'ProfileFormController._saveMember member-address/mobile/upsert failed',
                   );
                 }
 
@@ -2355,7 +2353,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   CrashReporter.recordError(
                     e,
                     stack,
-                    reason: 'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
+                    reason:
+                        'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
                   );
                 }
               }
@@ -2375,7 +2374,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 CrashReporter.recordError(
                   e,
                   stack,
-                  reason: 'ProfileFormController._saveMember authorized-comment failed',
+                  reason:
+                      'ProfileFormController._saveMember authorized-comment failed',
                 );
               }
             }
@@ -2394,7 +2394,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
               CrashReporter.recordError(
                 e,
                 stack,
-                reason: 'ProfileFormController._saveMember authorized-comment (no-updates) failed',
+                reason:
+                    'ProfileFormController._saveMember authorized-comment (no-updates) failed',
               );
             }
           }
@@ -2442,7 +2443,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   CrashReporter.recordError(
                     e,
                     stack,
-                    reason: 'ProfileFormController._saveMember edit MemberEducation/mobile/upsert failed',
+                    reason:
+                        'ProfileFormController._saveMember edit MemberEducation/mobile/upsert failed',
                   );
                 }
               }
@@ -2518,207 +2520,6 @@ class ProfileFormController extends GetxController with FormStateMixin {
         ),
       ).show();
       return false;
-    }
-  }
-
-  String _findBestMatch(Iterable<String> list, String? target) {
-    if (target == null || target.trim().isEmpty) return '';
-    final tNorm = target.trim().toLowerCase();
-
-    // Exact match first
-    for (final s in list) {
-      if (s.trim().toLowerCase() == tNorm) return s;
-    }
-    // Contains match
-    for (final s in list) {
-      final sNorm = s.trim().toLowerCase();
-      if (sNorm.contains(tNorm) || tNorm.contains(sNorm)) return s;
-    }
-    return '';
-  }
-
-  Future<void> fetchCurrentLocation(AddressModel addr) async {
-    try {
-      isFetchingLocation.value = true;
-      final placemark = await LocationService.getCurrentPlacemark();
-      if (placemark != null) {
-        // Attempt to match state
-        final stateName = placemark.administrativeArea;
-        final matchedState = _findBestMatch(workStateList, stateName);
-
-        if (matchedState.isNotEmpty) {
-          addr.state = matchedState;
-          addr.district = '';
-          addr.taluka = '';
-          addr.area = '';
-
-          // Fetch districts for this state
-          final districts = await workInfo.getAddressDistrictsAsync(
-            matchedState,
-          );
-          final districtName =
-              (placemark.subAdministrativeArea?.isNotEmpty == true)
-              ? placemark.subAdministrativeArea
-              : placemark.locality;
-          final matchedDistrict = _findBestMatch(districts, districtName);
-
-          if (matchedDistrict.isNotEmpty) {
-            addr.district = matchedDistrict;
-
-            // Fetch talukas for this district
-            final talukas = await workInfo.getAddressTalukasAsync(
-              matchedDistrict,
-            );
-            final talukaName = (placemark.subLocality?.isNotEmpty == true)
-                ? placemark.subLocality
-                : placemark.locality;
-            final matchedTaluka = _findBestMatch(talukas, talukaName);
-
-            if (matchedTaluka.isNotEmpty) {
-              addr.taluka = matchedTaluka;
-
-              // Fetch areas for this taluka
-              final areas = await workInfo.getAddressAreasAsync(matchedTaluka);
-              final areaName = (placemark.subLocality?.isNotEmpty == true)
-                  ? placemark.subLocality
-                  : placemark.thoroughfare;
-              final matchedArea = _findBestMatch(areas, areaName);
-
-              if (matchedArea.isNotEmpty) {
-                addr.area = matchedArea;
-              }
-            }
-          }
-        }
-
-        addr.pincode = placemark.postalCode ?? '';
-
-        final street = placemark.street ?? '';
-        final name = placemark.name ?? '';
-
-        addr.line1 = street.isNotEmpty ? street : name;
-
-        if (name.isNotEmpty && name != street && !street.contains(name)) {
-          addr.landmark = name;
-        } else if (placemark.thoroughfare?.isNotEmpty == true &&
-            placemark.thoroughfare != street) {
-          addr.landmark = placemark.thoroughfare!;
-        } else {
-          addr.landmark = '';
-        }
-
-        final subLocality = placemark.subLocality ?? '';
-        final locality = placemark.locality ?? '';
-        if (subLocality.isNotEmpty &&
-            locality.isNotEmpty &&
-            subLocality != locality) {
-          addr.line2 = '$subLocality, $locality';
-        } else if (locality.isNotEmpty) {
-          addr.line2 = locality;
-        } else if (subLocality.isNotEmpty) {
-          addr.line2 = subLocality;
-        }
-
-        locationFetchTrigger.value++;
-        contactInfo.addresses.refresh();
-        PSDelightToastBar(
-          snackbarDuration: const Duration(seconds: 2),
-          builder: (context) => ToastCard(
-            title: LK.success.tr,
-            subtitle: LK.locationFetchedSuccessfully.tr,
-            isErrorMessage: false,
-          ),
-        ).show();
-      }
-    } catch (e) {
-      if (e.toString().contains('permanently denied')) {
-        Get.dialog<void>(
-          Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(24.w),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.red.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.location_off_rounded,
-                      color: AppColors.red,
-                      size: 40.w,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'Permission Denied',
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    'Location permission is permanently denied. Please go to app settings to enable it so we can fetch your address.',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.grey.shade700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 24.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Get.back<void>(),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.grey.shade800,
-                            side: BorderSide(color: Colors.grey.shade300),
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                          ),
-                          child: Text(
-                            'Cancel',
-                            style: AppTextStyles.titleMedium,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: AppPrimaryButton(
-                          onPressed: () async {
-                            Get.back<void>();
-                            await Geolocator.openAppSettings();
-                          },
-                          text: "Settings",
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      } else {
-        PSDelightToastBar(
-          snackbarDuration: const Duration(seconds: 3),
-          builder: (context) => ToastCard(
-            title: LK.error.tr,
-            subtitle: e.toString(),
-            isErrorMessage: true,
-          ),
-        ).show();
-      }
-    } finally {
-      isFetchingLocation.value = false;
     }
   }
 }

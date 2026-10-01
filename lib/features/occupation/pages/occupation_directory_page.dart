@@ -255,7 +255,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             style: AppTextStyles.labelLarge.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
-              fontSize: 16.sp,
+              fontSize: 16,
             ),
           ),
           Text(
@@ -263,7 +263,7 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
             textAlign: TextAlign.center,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.primary,
-              fontSize: 12.sp,
+              fontSize: 12,
             ),
           ),
         ],

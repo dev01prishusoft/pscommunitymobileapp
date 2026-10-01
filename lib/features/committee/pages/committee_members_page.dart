@@ -124,7 +124,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             LK.role.tr,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.grey,
-                              fontSize: 9.sp,
+                              fontSize: 9,
                             ),
                           ),
                           Text(
@@ -132,7 +132,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                             style: AppTextStyles.labelMedium.copyWith(
                               color: AppColors.black,
                               fontWeight: FontWeight.bold,
-                              fontSize: 11.sp,
+                              fontSize: 11,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -494,7 +494,7 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
                 title,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.grey,
-                  fontSize: 10.sp,
+                  fontSize: 10,
                 ),
               ),
               SizedBox(height: 2.h),

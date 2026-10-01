@@ -11,7 +11,6 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/utils/app_validators.dart';
-import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_date_picker.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_dropdown.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_form_text_field.dart';
@@ -2750,7 +2749,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                                 LK.removePhoto.tr,
                                 style: AppTextStyles.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18.sp,
+                                  fontSize: 18,
                                   color: AppColors.black,
                                 ),
                                 textAlign: TextAlign.center,
@@ -2823,7 +2822,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   label: Text(
                     LK.removePhoto.tr,
                     style: AppTextStyles.labelSmall.copyWith(
-                      fontSize: 10.sp,
+                      fontSize: 10,
                       color: AppColors.red,
                     ),
                   ),

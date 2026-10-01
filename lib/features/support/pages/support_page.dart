@@ -75,7 +75,7 @@ class SupportPage extends StatelessWidget {
                                     LK.needHelp.tr,
                                     style: AppTextStyles.displaySmall.copyWith(
                                       color: Colors.white,
-                                      fontSize: 22.sp,
+                                      fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

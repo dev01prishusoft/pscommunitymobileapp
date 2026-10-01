@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/profile_update_status.dart';
+import 'package:pscommunitymobileapp/core/services/app_setting_service.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
@@ -37,7 +37,8 @@ class AppLocationAutoComplete extends StatefulWidget {
 
 class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   Timer? _debounce;
-  final String _googleApiKey = Env.googleMapKey;
+  String _googleApiKey = AppSettingService.maybe?.cachedGoogleApiKey ?? '';
+  bool _isKeyLoading = false;
   final Dio _dio = Dio();
 
   bool _isLoading = false;
@@ -47,6 +48,26 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   void initState() {
     super.initState();
     _lastSelectedLocation = widget.controller.text;
+    if (_googleApiKey.isEmpty) _loadGoogleApiKey();
+  }
+
+  Future<void> _loadGoogleApiKey() async {
+    final service = AppSettingService.maybe;
+    if (service == null) return;
+    setState(() => _isKeyLoading = true);
+    final key = await service.getGoogleApiKey();
+    if (!mounted) return;
+    setState(() {
+      _googleApiKey = key;
+      _isKeyLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _dio.close(force: true);
+    super.dispose();
   }
 
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
@@ -91,12 +112,19 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
   }
 
   Future<void> _getPlaceDetails(String placeId, String description) async {
-    if (_googleApiKey.isEmpty) return;
-    final String url =
-        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$_googleApiKey';
+    if (_googleApiKey.isEmpty || placeId.isEmpty) return;
+    const String url =
+        'https://maps.googleapis.com/maps/api/place/details/json';
 
     try {
-      final response = await _dio.get(url);
+      final response = await _dio.get(
+        url,
+        queryParameters: {
+          'place_id': placeId,
+          'fields': 'geometry',
+          'key': _googleApiKey,
+        },
+      );
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['status'] == 'OK') {
@@ -120,12 +148,6 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
         reason: 'AppLocationAutoComplete._getPlaceDetails failed',
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
   }
 
   @override
@@ -161,6 +183,19 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                       child: widget.prefixIcon!,
                     )
                   : null,
+              suffixIcon: _isKeyLoading
+                  ? const Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : null,
+              helperText: _isKeyLoading
+                  ? null
+                  : 'Location autocomplete disabled (API key missing)',
               helperStyle: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.grey,
               ),
@@ -208,6 +243,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
             Completer<Iterable<Map<String, dynamic>>> completer = Completer();
 
             _debounce = Timer(const Duration(milliseconds: 500), () async {
+              if (!mounted) return completer.complete(const []);
               setState(() => _isLoading = true);
               final results = await _getSuggestions(textEditingValue.text);
               if (mounted) {
@@ -219,11 +255,15 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
             return completer.future;
           },
           displayStringForOption: (Map<String, dynamic> option) =>
-              option['description'],
+              option['description']?.toString() ?? '',
           onSelected: (Map<String, dynamic> selection) {
-            widget.controller.text = selection['description'];
-            _lastSelectedLocation = selection['description'];
-            _getPlaceDetails(selection['place_id'], selection['description']);
+            final description = selection['description']?.toString() ?? '';
+            widget.controller.text = description;
+            _lastSelectedLocation = description;
+            _getPlaceDetails(
+              selection['place_id']?.toString() ?? '',
+              description,
+            );
           },
           fieldViewBuilder:
               (
@@ -311,7 +351,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                           return ListTile(
                             leading: const Icon(Icons.location_on_outlined),
                             title: Text(
-                              option['description'],
+                              option['description']?.toString() ?? '',
                               style: AppTextStyles.bodyMedium,
                             ),
                             onTap: () {

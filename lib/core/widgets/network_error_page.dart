@@ -153,7 +153,7 @@ class _NetworkErrorPageState extends State<NetworkErrorPage>
                                     style: AppTextStyles.bodyMedium.copyWith(
                                       color: const Color(0xFF64748B),
                                       height: 1.5,
-                                      fontSize: 14.sp,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
@@ -246,7 +246,7 @@ class _NetworkErrorPageState extends State<NetworkErrorPage>
                                                       .copyWith(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.w700,
-                                                    fontSize: 16.sp,
+                                                    fontSize: 16,
                                                   ),
                                                 ),
                                               ],
@@ -277,7 +277,7 @@ class _NetworkErrorPageState extends State<NetworkErrorPage>
                                     LK.goBack.tr,
                                     style: AppTextStyles.labelMedium.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 15.sp,
+                                      fontSize: 15,
                                       color: const Color(0xFF64748B),
                                     ),
                                   ),
@@ -350,7 +350,7 @@ class _NetworkErrorPageState extends State<NetworkErrorPage>
               color: dot,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
-              fontSize: 11.sp,
+              fontSize: 11,
             ),
           ),
         ],

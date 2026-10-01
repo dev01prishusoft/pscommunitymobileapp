@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
 
 import '../../../core/models/support_model.dart';
 
@@ -47,19 +47,11 @@ class SupportController extends GetxController {
     }
   }
 
-  Future<void> openWhatsApp(String number) async {
-    final uri = Uri.parse('https://wa.me/${number.replaceAll('+', '')}');
+  Future<bool> openWhatsApp(String number) =>
+      SafeLauncher.open('https://wa.me/${number.replaceAll('+', '')}');
 
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
+  Future<bool> openEmail(String email) =>
+      SafeLauncher.open('mailto:$email');
 
-  Future<void> openEmail(String email) async {
-    final uri = Uri(scheme: 'mailto', path: email);
-
-    await launchUrl(uri);
-  }
-
-  void launchSafeUrl(String s) async {
-    await launchUrl(Uri.parse(s));
-  }
+  Future<bool> launchSafeUrl(String s) => SafeLauncher.open(s);
 }

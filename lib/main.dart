@@ -71,9 +71,13 @@ Future<void> _bootstrap() async {
         errStr.contains('failed host lookup');
 
     if (isNetworkOrServer) {
-      final isServerDown = errStr.contains('server') ||
-          errStr.contains('50') ||
-          errStr.contains('connection refused');
+      final isServerDown = (() {
+        if (e is DioException) {
+          final status = e.response?.statusCode;
+          if (status != null && status >= 500 && status <= 599) return true;
+        }
+        return errStr.contains('server') || errStr.contains('connection refused');
+      })();
       runApp(
         PrebootNetworkErrorScreen(
           isServerDown: isServerDown,
@@ -83,7 +87,15 @@ Future<void> _bootstrap() async {
         ),
       );
     } else {
-      runApp(FatalErrorScreen(error: e, stackTrace: stack));
+      runApp(
+        FatalErrorScreen(
+          error: e,
+          stackTrace: stack,
+          onRetry: () async {
+            await _bootstrap();
+          },
+        ),
+      );
     }
   }
 }
@@ -130,7 +142,7 @@ class PsCommunityApp extends StatelessWidget {
                   final mq = MediaQuery.of(context);
                   final clamped = mq.textScaler.clamp(
                     minScaleFactor: 0.85,
-                    maxScaleFactor: 1.3,
+                    maxScaleFactor: 2.0,
                   );
                   return MediaQuery(
                     data: mq.copyWith(textScaler: clamped),

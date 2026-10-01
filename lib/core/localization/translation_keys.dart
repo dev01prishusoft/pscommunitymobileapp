@@ -731,5 +731,4 @@ class LK {
   static const String cannotExceed100 = 'Cannot exceed 100';
   static const String computerGeneratedReceipt =
       'This is a computer-generated receipt, signature is not required.';
-  static const String locationFetchedSuccessfully = 'Location fetched successfully';
 }

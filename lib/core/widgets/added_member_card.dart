@@ -13,6 +13,13 @@ class AddedMemberCard extends StatelessWidget {
   const AddedMemberCard({super.key, required this.member, this.onEdit});
   final Member member;
   final VoidCallback? onEdit;
+  const AddedMemberCard({
+    super.key,
+    required this.member,
+    this.showApproveStatus = true,
+  });
+  final Member member;
+  final bool showApproveStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +31,7 @@ class AddedMemberCard extends StatelessWidget {
           arguments: {
             'memberId': member.memberId,
             'fromMyMemberList': true,
+            'showApproveStatus': showApproveStatus,
           },
         );
       },
@@ -55,7 +63,8 @@ class AddedMemberCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (member.approveStatus != null &&
+                          if (showApproveStatus &&
+                              member.approveStatus != null &&
                               member.approveStatus!.isNotEmpty) ...[
                             SizedBox(width: 8.w),
                             _buildStatusBadge(member.approveStatus!),
@@ -151,7 +160,7 @@ class AddedMemberCard extends StatelessWidget {
             style: AppTextStyles.labelSmall.copyWith(
               color: color,
               fontWeight: FontWeight.bold,
-              fontSize: 10.sp,
+              fontSize: 10,
             ),
           ),
         ],

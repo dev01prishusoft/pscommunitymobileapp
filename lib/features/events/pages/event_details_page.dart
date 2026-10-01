@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
+import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -525,7 +525,7 @@ class EventDetailsPage extends StatelessWidget {
         style: AppTextStyles.titleSmall.copyWith(
           color: AppColors.primary,
           fontWeight: FontWeight.bold,
-          fontSize: 13.sp,
+          fontSize: 13,
           decoration: TextDecoration.underline,
           decorationColor: AppColors.primary,
           decorationThickness: 1,
@@ -746,7 +746,7 @@ class EventDetailsPage extends StatelessWidget {
                                 style: AppTextStyles.labelSmall.copyWith(
                                   color: const Color(0xFF2E7D32),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 10.sp,
+                                  fontSize: 10,
                                 ),
                               ),
                             ),
@@ -1599,7 +1599,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 10.sp,
+                                      fontSize: 10,
                                     ),
                                   ),
                                 ],
@@ -1623,19 +1623,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                                   !url.startsWith('https://')) {
                                 url = 'https://$url';
                               }
-                              Get.to(
-                                () => AppWebViewPage(
-                                  title:
-                                      (schedule.sessionName != null &&
-                                          schedule.sessionName!
-                                              .trim()
-                                              .isNotEmpty)
-                                      ? schedule.sessionName!.trim()
-                                      : LK.event_session_online_meeting.tr,
-                                  url: url,
-                                  allowAllUrls: true,
-                                ),
-                              );
+                              SafeLauncher.open(url);
                             }
                           : null,
                     ),
@@ -1690,7 +1678,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.grey.shade600,
                     fontWeight: FontWeight.w600,
-                    fontSize: 10.sp,
+                    fontSize: 10,
                   ),
                 ),
               ),
@@ -1705,7 +1693,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
                 value,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primary,
-                  fontSize: 12.sp,
+                  fontSize: 12,
                 ),
               ),
             )
@@ -1715,7 +1703,7 @@ class _SessionDetailsTooltipDialog extends StatelessWidget {
               style: AppTextStyles.bodySmall.copyWith(
                 color: isEmpty ? AppColors.grey.shade400 : AppColors.black,
                 fontStyle: isEmpty ? FontStyle.italic : FontStyle.normal,
-                fontSize: 12.sp,
+                fontSize: 12,
                 height: 1.3,
               ),
             ),

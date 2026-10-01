@@ -46,7 +46,7 @@ class CreateOrderData {
 
   CreateOrderData.fromJson(Map<String, dynamic> json) {
     orderId = json['orderId'];
-    amountInPaise = json['amountInPaise'];
+    amountInPaise = json['amountInPaise'] ?? json['amount'];
     finalAmount = json['finalAmount'];
     originalAmount = json['originalAmount'];
     discountAmount = json['discountAmount'];

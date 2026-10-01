@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,23 +46,13 @@ class PushNotificationService {
         _firebaseMessagingBackgroundHandler,
       );
 
-      await _firebaseMessaging.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
-      );
-
       const androidInitSettings = AndroidInitializationSettings(
         '@mipmap/ic_launcher',
       );
       const iosInitSettings = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
       );
       const initSettings = InitializationSettings(
         android: androidInitSettings,
@@ -91,7 +82,11 @@ class PushNotificationService {
         sound: true,
       );
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        _showLocalNotification(message, channel);
+        // Show local foreground notification on Android only.
+        // On iOS, setForegroundNotificationPresentationOptions already presents the banner natively.
+        if (Platform.isAndroid) {
+          _showLocalNotification(message, channel);
+        }
         if (Get.isRegistered<HomeController>()) {
           Get.find<HomeController>().fetchUnreadNotificationCount();
         }
@@ -273,6 +268,26 @@ class PushNotificationService {
       if (Get.currentRoute != AppRouter.home) {
         Get.offAllNamed<void>(AppRouter.home);
       }
+    }
+  }
+
+  Future<void> requestNotificationPermissions() async {
+    try {
+      await _firebaseMessaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PushNotificationService.requestNotificationPermissions failed',
+      );
     }
   }
 }

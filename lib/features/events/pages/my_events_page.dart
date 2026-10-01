@@ -185,7 +185,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                             controller.targetEventName.value ??
                                 LK.my_events_selected_event.tr,
                             style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
@@ -199,7 +199,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                                 Text(
                                   '${LK.event_details_status.tr}: ',
                                   style: TextStyle(
-                                    fontSize: 11.sp,
+                                    fontSize: 11,
                                     color: AppColors.grey.shade600,
                                   ),
                                 ),
@@ -230,7 +230,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                       child: Text(
                         LK.my_events_show_all.tr,
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
@@ -275,7 +275,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                                             )),
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.grey.shade500,
-                                  fontSize: 15.sp,
+                                  fontSize: 15,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -447,7 +447,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
             Text(
               count,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? AppColors.white : defaultColor,
               ),
@@ -456,7 +456,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 color: isSelected
                     ? AppColors.white.withValues(alpha: 0.9)
@@ -546,7 +546,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                       item.eventName ?? '',
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16.sp,
+                        fontSize: 16,
                         color: AppColors.black,
                       ),
                     ),
@@ -565,7 +565,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                       statusBadge.toUpperCase(),
                       style: TextStyle(
                         color: badgeTextColor,
-                        fontSize: 10.sp,
+                        fontSize: 10,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -578,7 +578,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                   dateTimeStr,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade700,
-                    fontSize: 13.sp,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -588,7 +588,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                   venue,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade700,
-                    fontSize: 13.sp,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -599,7 +599,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                   item.registrationNumber ?? item.eventCode ?? '',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.grey.shade600,
-                    fontSize: 13.sp,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -609,7 +609,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
                   statusNote,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.grey.shade500,
-                    fontSize: 12.sp,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -640,7 +640,7 @@ class _MyEventsPageState extends State<MyEventsPage> {
       status,
       style: TextStyle(
         color: textColor,
-        fontSize: 11.sp,
+        fontSize: 11,
         fontWeight: FontWeight.w600,
       ),
     );
