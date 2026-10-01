@@ -1,4 +1,3 @@
-import 'package:pscommunitymobileapp/core/config/env.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
@@ -32,8 +31,7 @@ class RazorpayCheckoutService {
     Razorpay razorpay,
     RazorpayCheckoutParams params,
   ) {
-    final key =
-        params.keyId.trim().isNotEmpty ? params.keyId.trim() : Env.razorpayKey;
+    final key = params.keyId.trim();
     if (key.isEmpty) {
       PSDelightToastBar(
         snackbarDuration: const Duration(seconds: 3),

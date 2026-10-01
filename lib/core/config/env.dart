@@ -9,7 +9,4 @@ part 'env.g.dart';
 abstract class Env {
   @EnviedField(varName: 'GOOGLEMAP_KEY', defaultValue: '')
   static final String googleMapKey = _Env.googleMapKey;
-
-  @EnviedField(varName: 'RAZORPAY_KEY', defaultValue: '')
-  static final String razorpayKey = _Env.razorpayKey;
 }

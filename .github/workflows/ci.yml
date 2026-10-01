@@ -37,7 +37,6 @@ jobs:
       - name: Generate secrets from GitHub Secrets
         run: |
           echo "GOOGLEMAP_KEY=${{ secrets.GOOGLEMAP_KEY }}" > .env
-          echo "RAZORPAY_KEY=${{ secrets.RAZORPAY_KEY }}" >> .env
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Analyze code
