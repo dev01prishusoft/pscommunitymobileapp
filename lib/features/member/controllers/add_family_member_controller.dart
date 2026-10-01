@@ -48,120 +48,31 @@ class AddFamilyMemberController extends ProfileFormController {
     return _statusFuture = _fetchMemberUpdateStatus();
   }
 
-  List<dynamic> _extractItems(dynamic data) {
-    if (data == null) return [];
-    if (data is List) return data;
-    if (data is Map<String, dynamic>) {
-      if (data['items'] is List) return data['items'] as List<dynamic>;
-      if (data['memberUpdateRequests'] is List) {
-        return data['memberUpdateRequests'] as List<dynamic>;
-      }
-      if (data['requests'] is List) return data['requests'] as List<dynamic>;
-      if (data['updates'] is List) return data['updates'] as List<dynamic>;
-      if (data['fields'] is List) return data['fields'] as List<dynamic>;
-      if (data['data'] is List) return data['data'] as List<dynamic>;
-      if (data['data'] is Map<String, dynamic>) {
-        return _extractItems(data['data']);
-      }
-      if (data.containsKey('keyName') ||
-          data.containsKey('fieldName') ||
-          data.containsKey('fieldKey')) {
-        return [data];
-      }
-      final list = <dynamic>[];
-      for (final val in data.values) {
-        if (val is Map<String, dynamic> &&
-            (val.containsKey('keyName') ||
-                val.containsKey('fieldName') ||
-                val.containsKey('fieldKey'))) {
-          list.add(val);
-        } else if (val is List) {
-          list.addAll(val);
-        }
-      }
-      return list;
-    }
-    return [];
-  }
-
   Future<void> _fetchMemberUpdateStatus() async {
     final memberId = editingMemberId;
     if (memberId == null) return;
     try {
       final apiClient = Get.find<ApiClient>();
-      final newStatuses = <String, ProfileUpdateStatus>{};
+      final response = await apiClient.get(
+        '/api/v1/MemberUpdateRequest/profile-status/$memberId',
+      );
 
-      // 1. Try member-details/{memberId}
-      try {
-        final response = await apiClient.get(
-          '/api/v1/MemberUpdateRequest/member-details/$memberId',
-        );
+      if (response.statusCode == 200 &&
+          response.data != null &&
+          response.data['succeeded'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        final items = data['items'] as List<dynamic>? ?? [];
 
-        if (response.statusCode == 200 && response.data != null) {
-          final resData = response.data is Map<String, dynamic>
-              ? (response.data['data'] ?? response.data)
-              : response.data;
-          final items = _extractItems(resData);
-          for (final item in items) {
-            if (item is! Map<String, dynamic>) continue;
-            final status = ProfileUpdateStatus.fromJson(item);
-            if (status.keyName.isEmpty) continue;
-            newStatuses[status.keyName] = status;
-            newStatuses[status.keyName.toLowerCase()] = status;
-          }
+        final newStatuses = <String, ProfileUpdateStatus>{};
+        for (var item in items) {
+          final status = ProfileUpdateStatus.fromJson(
+            item as Map<String, dynamic>,
+          );
+          newStatuses[status.keyName] = status;
         }
-      } catch (_) {}
 
-      // 2. Fallback to members-list with query parameter if empty
-      if (newStatuses.isEmpty) {
-        try {
-          final response = await apiClient.get(
-            '/api/v1/MemberUpdateRequest/members-list',
-            queryParameters: {'memberId': memberId, 'PageSize': 100},
-          );
-
-          if (response.statusCode == 200 && response.data != null) {
-            final resData = response.data is Map<String, dynamic>
-                ? (response.data['data'] ?? response.data)
-                : response.data;
-            final items = _extractItems(resData);
-            for (final item in items) {
-              if (item is! Map<String, dynamic>) continue;
-              final status = ProfileUpdateStatus.fromJson(item);
-              if (status.keyName.isEmpty) continue;
-              newStatuses[status.keyName] = status;
-              newStatuses[status.keyName.toLowerCase()] = status;
-            }
-          }
-        } catch (_) {}
+        fieldStatuses.value = newStatuses;
       }
-
-      // 3. Fallback to profile-status with memberId query parameter if still empty
-      if (newStatuses.isEmpty) {
-        try {
-          final response = await apiClient.get(
-            '/api/v1/MemberUpdateRequest/profile-status',
-            queryParameters: {'memberId': memberId},
-          );
-
-          if (response.statusCode == 200 && response.data != null) {
-            final resData = response.data is Map<String, dynamic>
-                ? (response.data['data'] ?? response.data)
-                : response.data;
-            final items = _extractItems(resData);
-            for (final item in items) {
-              if (item is! Map<String, dynamic>) continue;
-              final status = ProfileUpdateStatus.fromJson(item);
-              if (status.keyName.isEmpty) continue;
-              newStatuses[status.keyName] = status;
-              newStatuses[status.keyName.toLowerCase()] = status;
-            }
-          }
-        } catch (_) {}
-      }
-
-      fieldStatuses.value = newStatuses;
-      fieldStatuses.refresh();
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
