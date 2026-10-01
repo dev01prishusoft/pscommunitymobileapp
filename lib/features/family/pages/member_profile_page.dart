@@ -375,12 +375,23 @@ class _MemberDetailsSection extends StatelessWidget {
                   : null,
             ),
             _buildGridItem(
-              Icons.mail_outline,
-              LK.email.tr,
-              controller.formatEmail(member),
-              isExpandable: true,
+              Icons.contact_phone_outlined,
+              LK.emergencyContact.tr,
+              controller.formatEmergencyContact(member),
+              onTap: member.emergencyContactNo != null
+                  ? () => controller.launchSafeUrl(
+                      'tel:${member.emergencyContactNo}',
+                    )
+                  : null,
             ),
           ),
+          //email
+          _buildGridItem(
+            Icons.mail_outline,
+            LK.email.tr,
+            controller.formatEmail(member),
+          ),
+          14.verticalSpace,
           //birth date and birth time
           _buildDetailRow(
             _buildGridItem(
@@ -440,25 +451,12 @@ class _MemberDetailsSection extends StatelessWidget {
               controller.formatWeight(member),
             ),
           ),
-          // mother father name and occupation
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.person_outline,
-              LK.motherFatherName.tr,
-              controller.formatMotherFather(member),
-              isExpandable: true,
-            ),
-            _buildGridItem(
-              Icons.contact_phone_outlined,
-              LK.emergencyContact.tr,
-              controller.formatEmergencyContact(member),
-              onTap: member.emergencyContactNo != null
-                  ? () => controller.launchSafeUrl(
-                      'tel:${member.emergencyContactNo}',
-                    )
-                  : null,
-            ),
-            isLast: true,
+          // mother father name
+          _buildGridItem(
+            Icons.person_outline,
+            LK.motherFatherName.tr,
+            controller.formatMotherFather(member),
+            isExpandable: true,
           ),
         ],
       ),

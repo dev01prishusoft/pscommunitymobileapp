@@ -180,22 +180,20 @@ class _MemberDetailsSection extends StatelessWidget {
     return _SectionContainer(
       child: Column(
         children: [
-          _buildDetailRow(
-            _buildGridItem(
-              Icons.phone_outlined,
-              LK.mobileNoLabel.tr,
-              controller.formatMobileNo(member),
-              onTap: member.mobileNo != null
-                  ? () => controller.launchSafeUrl('tel:${member.mobileNo}')
-                  : null,
-            ),
-            _buildGridItem(
-              Icons.mail_outline,
-              LK.email.tr,
-              controller.formatEmail(member),
-              isExpandable: true,
-            ),
-            isLast: true,
+          _buildGridItem(
+            Icons.phone_outlined,
+            LK.mobileNoLabel.tr,
+            controller.formatMobileNo(member),
+            onTap: member.mobileNo != null
+                ? () => controller.launchSafeUrl('tel:${member.mobileNo}')
+                : null,
+          ),
+          14.verticalSpace,
+          _buildGridItem(
+            Icons.mail_outline,
+            LK.email.tr,
+            controller.formatEmail(member),
+            isExpandable: true,
           ),
         ],
       ),
