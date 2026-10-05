@@ -541,5 +541,7 @@
     "OFFLINE": "OFFLINE",
     "SERVER MAINTENANCE": "SERVER MAINTENANCE",
     "TIMEOUT": "TIMEOUT",
-    "Exit App": "Exit App"
+    "Exit App": "Exit App",
+    "Add": "+Add",
+    "Search": "Search"
 }

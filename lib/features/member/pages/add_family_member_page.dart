@@ -622,6 +622,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
+                      enableSearch: false,
                       value:
                           controller.genderList.contains(
                             controller.gender.value,
@@ -650,6 +651,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   Obx(
                     () => AppFormDropdown<String>(
+                      enableSearch: false,
                       value:
                           controller.maritalStatusList.contains(
                             controller.maritalStatus.value,
@@ -1235,6 +1237,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 controller.personalInfo.motherDistrict.value,
               );
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value:
                     talukaList.contains(
                       controller.personalInfo.motherTaluka.value,
@@ -1272,6 +1275,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 controller.personalInfo.motherTaluka.value,
               );
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value:
                     areaList.contains(controller.personalInfo.motherArea.value)
                     ? controller.personalInfo.motherArea.value
@@ -1536,6 +1540,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         Obx(() {
           final talukaList = controller.getAddressTalukas(addr.district);
           return AppFormDropdown<String>(
+            enableAdd: true,
             value: talukaList.contains(addr.taluka) ? addr.taluka : null,
             items: talukaList
                 .map(
@@ -1571,6 +1576,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         Obx(() {
           final areaList = controller.getAddressAreas(addr.taluka);
           return AppFormDropdown<String>(
+            enableAdd: true,
             value: areaList.contains(addr.area) ? addr.area : null,
             items: areaList
                 .map(
@@ -1642,7 +1648,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
           key: ValueKey('line2_$index'),
           initialValue: addr.line2,
           label: LK.addressLine2.tr,
-          isRequired: true,
           prefixIcon: const Icon(Icons.location_on_outlined),
           maxLength: 300,
           keyboardType: TextInputType.multiline,
@@ -2407,7 +2412,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                         controller.workInfo.occupationType.value = v;
                     },
                     label: LK.occupationType.tr,
-                    isRequired: true,
                     requiredErrorMessage: LK.occupationTypeRequired.tr,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationTypeId',
@@ -2438,7 +2442,6 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       if (v != null) controller.workInfo.occupation.value = v;
                     },
                     label: LK.occupation.tr,
-                    isRequired: true,
                     requiredErrorMessage: LK.occupationRequired.tr,
                     updateStatus: controller.getUpdateStatus(
                       'OccupationId',
@@ -2589,6 +2592,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppSpacing.vM,
                 Obx(
                   () => AppFormDropdown<String>(
+                    enableAdd: true,
                     value:
                         controller.workTalukaList.contains(
                           controller.workTaluka.value,
@@ -2620,6 +2624,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 AppSpacing.vM,
                 Obx(
                   () => AppFormDropdown<String>(
+                    enableAdd: true,
                     value:
                         controller.workAreaList.contains(
                           controller.workArea.value,

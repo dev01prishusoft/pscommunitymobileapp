@@ -674,6 +674,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                       label: LK.maritalStatusLabel.tr,
                       icon: Iconsax.info_circle_copy,
                       child: _FilterDropdownField(
+                        enableSearch: false,
+                        enableAdd: false,
                         rxValue: controller.selectedMaritalStatus,
                         staticItems: controller.dynamicMaritalStatuses,
                         mapper: (val) {
@@ -718,6 +720,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                           SizedBox(height: 12.h),
                           Obx(
                             () => _FilterDropdownField(
+                              enableAdd: true,
                               hint: LK.selectTaluka.tr,
                               rxValue: controller.selectedTaluka,
                               rxItems: controller.talukas,
@@ -734,6 +737,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                           SizedBox(height: 12.h),
                           Obx(
                             () => _FilterDropdownField(
+                              enableAdd: true,
                               hint: 'Select Area',
                               rxValue: controller.selectedArea,
                               rxItems: controller.areas,
@@ -1013,6 +1017,8 @@ class _FilterDropdownField extends StatelessWidget {
     this.mapper,
     this.hint,
     this.isEnabled = true,
+    this.enableSearch = true,
+    this.enableAdd = false,
   });
 
   final RxString rxValue;
@@ -1024,6 +1030,8 @@ class _FilterDropdownField extends StatelessWidget {
   final String Function(String)? mapper;
   final String? hint;
   final bool isEnabled;
+  final bool enableSearch;
+  final bool enableAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -1053,6 +1061,8 @@ class _FilterDropdownField extends StatelessWidget {
         height: 48.h,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         isEnabled: isEnabledVal,
+        enableAdd: enableAdd,
+        enableSearch: enableSearch,
         items: items.toSet().toList().map((e) {
           return DropdownMenuItem<String>(
             value: e,

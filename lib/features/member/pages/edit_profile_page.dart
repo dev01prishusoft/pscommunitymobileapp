@@ -553,6 +553,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 _buildFieldPair(
                   Obx(
                     () => AppFormDropdown<String>(
+                      enableSearch: false,
                       value:
                           controller.genderList.contains(
                             controller.gender.value,
@@ -582,6 +583,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                   Obx(
                     () => AppFormDropdown<String>(
+                      enableSearch: false,
                       value:
                           controller.maritalStatusList.contains(
                             controller.maritalStatus.value,
@@ -1237,6 +1239,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller.personalInfo.motherDistrict.value,
               );
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value:
                     talukaList.contains(
                       controller.personalInfo.motherTaluka.value,
@@ -1277,6 +1280,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 controller.personalInfo.motherTaluka.value,
               );
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value:
                     areaList.contains(controller.personalInfo.motherArea.value)
                     ? controller.personalInfo.motherArea.value

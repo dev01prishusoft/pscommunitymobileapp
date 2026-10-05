@@ -197,8 +197,7 @@ class LK {
   static const String recurring = 'Recurring';
   static const String somethingWrong = 'Something went wrong';
   static const String memberAddedSuccessfully = 'Member Added Successfully';
-  static const String memberUpdatedSuccessfully =
-      'Member Updated Successfully';
+  static const String memberUpdatedSuccessfully = 'Member Updated Successfully';
   static const String noResultsFound = 'No results found';
   static const String noMembersFound = 'No members found';
   static const String noMatchesFound = 'No matches found';
@@ -732,4 +731,7 @@ class LK {
   static const String cannotExceed100 = 'Cannot exceed 100';
   static const String computerGeneratedReceipt =
       'This is a computer-generated receipt, signature is not required.';
+
+  static const String Add = "Add";
+  static const String Search = "Search";
 }

@@ -557,6 +557,7 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
               ),
               SizedBox(height: 16.h),
               CustomDropdown<DropdownItem>(
+                enableAdd: true,
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
                 items: _localTalukas

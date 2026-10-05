@@ -162,7 +162,6 @@ class ProfileWorkStepSection extends StatelessWidget {
               if (v != null) controller.workInfo.occupationType.value = v;
             },
             label: LK.occupationType.tr,
-            isRequired: true,
             originalValue: controller.currentMember?.occupationTypeName ?? '',
             updateStatus: _status(
               'OccupationTypeId',
@@ -187,7 +186,6 @@ class ProfileWorkStepSection extends StatelessWidget {
               if (v != null) controller.workInfo.occupation.value = v;
             },
             label: LK.occupation.tr,
-            isRequired: true,
             originalValue: controller.currentMember?.occupationName ?? '',
             validator: getUpdateStatus != null
                 ? (v) {
@@ -325,11 +323,10 @@ class ProfileWorkStepSection extends StatelessWidget {
         AppSpacing.vM,
         Obx(
           () => AppFormDropdown<String>(
+            enableAdd: true,
             value: controller.workTalukaList.contains(controller.workTaluka.value)
                 ? controller.workTaluka.value
                 : null,
-            isRequired: controller.hasWorkAddressChanged &&
-                controller.workDistrict.value.isNotEmpty,
             items: controller.workTalukaList
                 .map((e) => DropdownMenuItem(
                       value: e,
@@ -349,11 +346,10 @@ class ProfileWorkStepSection extends StatelessWidget {
         AppSpacing.vM,
         Obx(
           () => AppFormDropdown<String>(
+            enableAdd: true,
             value: controller.workAreaList.contains(controller.workArea.value)
                 ? controller.workArea.value
                 : null,
-            isRequired: controller.hasWorkAddressChanged &&
-                controller.workTaluka.value.isNotEmpty,
             items: controller.workAreaList
                 .map((e) => DropdownMenuItem(
                       value: e,

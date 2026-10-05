@@ -248,6 +248,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
             Obx(() {
               final talukaList = controller.getAddressTalukas(addr.district);
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value: talukaList.contains(addr.taluka) ? addr.taluka : null,
                 isRequired:
                     controller.hasContactAddressChanged &&
@@ -284,6 +285,7 @@ class ProfileAddressesStepSection extends StatelessWidget {
             Obx(() {
               final areaList = controller.getAddressAreas(addr.taluka);
               return AppFormDropdown<String>(
+                enableAdd: true,
                 value: areaList.contains(addr.area) ? addr.area : null,
                 isRequired:
                     controller.hasContactAddressChanged &&
@@ -356,7 +358,6 @@ class ProfileAddressesStepSection extends StatelessWidget {
               key: ValueKey('line2_$index'),
               initialValue: addr.line2,
               label: LK.addressLine2.tr,
-              isRequired: true,
               prefixIcon: const Icon(Icons.location_on_outlined),
               maxLength: 300,
               keyboardType: TextInputType.multiline,

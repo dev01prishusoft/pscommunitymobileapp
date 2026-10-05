@@ -479,6 +479,7 @@ class _OccupationFilterDialogState extends State<_OccupationFilterDialog> {
               ),
               SizedBox(height: 16.h),
               CustomDropdown<DropdownItem>(
+                enableAdd: true,
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
                 items: _localTalukas
