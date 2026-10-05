@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
@@ -23,6 +24,7 @@ class CustomDropdown<T> extends StatelessWidget {
     this.enableSearch = true,
     this.enableAdd = false,
     this.onAdd,
+    this.onAddQuery,
     this.searchHint,
     this.label,
   });
@@ -42,8 +44,124 @@ class CustomDropdown<T> extends StatelessWidget {
   final bool enableSearch;
   final bool enableAdd;
   final VoidCallback? onAdd;
+  final void Function(String)? onAddQuery;
   final String? searchHint;
   final String? label;
+
+  Widget _buildAddOptionCard({
+    required String query,
+    required String displayField,
+    required BuildContext dialogContext,
+  }) {
+    final cleanQuery = query.trim();
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (cleanQuery.isEmpty) return;
+          Navigator.of(dialogContext).pop();
+          onAddQuery?.call(cleanQuery);
+          onAdd?.call();
+          if (cleanQuery is T) {
+            onChanged?.call(cleanQuery as T);
+          } else if (T == DropdownItem || <DropdownItem>[] is List<T>) {
+            onChanged?.call(DropdownItem(id: 0, text: cleanQuery) as T);
+          }
+        },
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F5FF),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: const Color(0xFFC7DBFE), width: 1.2.w),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: [
+                          const TextSpan(text: 'Add '),
+                          if (cleanQuery.isNotEmpty) ...[
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 1.5.h,
+                                ),
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(6.r),
+                                  border: Border.all(
+                                    color: AppColors.grey.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    width: 1.w,
+                                  ),
+                                ),
+                                child: Text(
+                                  '"$cleanQuery"',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const TextSpan(text: ' '),
+                          ],
+                          TextSpan(
+                            text: cleanQuery.isNotEmpty
+                                ? 'as new $displayField'
+                                : 'new $displayField',
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Click to add and select',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: const Color(0xFF2563EB),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   String _extractText(Widget widget) {
     if (widget is Text) {
@@ -84,6 +202,8 @@ class CustomDropdown<T> extends StatelessWidget {
 
   void _showSearchDialog(BuildContext context) {
     final cleanLabel = (label ?? hint).replaceAll('*', '').trim();
+    final canAdd = enableAdd || onAdd != null || onAddQuery != null;
+    final displayField = cleanLabel.isNotEmpty ? cleanLabel : 'Item';
 
     showDialog(
       context: context,
@@ -94,7 +214,24 @@ class CustomDropdown<T> extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final q = query.trim().toLowerCase();
-            final filteredItems = items.where((item) {
+            final allItems =
+                (value != null && !items.any((o) => o.value == value))
+                ? [
+                    DropdownMenuItem<T>(
+                      value: value,
+                      child: Text(
+                        value is DropdownItem
+                            ? (value as DropdownItem).text
+                            : value.toString(),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ),
+                    ...items,
+                  ]
+                : items;
+            final filteredItems = allItems.where((item) {
               if (q.isEmpty) return true;
               final text = _extractText(item.child).toLowerCase();
               final val = (item.value?.toString() ?? '').toLowerCase();
@@ -120,113 +257,87 @@ class CustomDropdown<T> extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (enableSearch || enableAdd) ...[
+                    if (enableSearch) ...[
                       Padding(
                         padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 10.h),
                         child: Row(
                           children: [
-                            if (enableSearch)
-                              Expanded(
-                                child: TextField(
-                                  controller: searchController,
-                                  autofocus: true,
-                                  onChanged: (val) {
-                                    setDialogState(() {
-                                      query = val;
-                                    });
-                                  },
-                                  style: AppTextStyles.bodyMedium.copyWith(
-                                    color: AppColors.black,
-                                  ),
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    hintText:
-                                        searchHint ??
-                                        '${LK.Search.tr} $cleanLabel...',
-                                    hintStyle: AppTextStyles.bodySmall.copyWith(
-                                      color: AppColors.grey.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.search_rounded,
-                                      size: 20.sp,
-                                      color: AppColors.primary,
-                                    ),
-                                    suffixIcon: query.isNotEmpty
-                                        ? IconButton(
-                                            icon: Icon(
-                                              Icons.cancel_rounded,
-                                              size: 18.sp,
-                                              color: AppColors.grey,
-                                            ),
-                                            onPressed: () {
-                                              searchController.clear();
-                                              setDialogState(() {
-                                                query = '';
-                                              });
-                                            },
-                                          )
-                                        : null,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14.w,
-                                      vertical: 10.h,
-                                    ),
-                                    filled: true,
-                                    fillColor: AppColors.sfBackground,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      borderSide: BorderSide(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.15,
-                                        ),
-                                        width: 1.w,
-                                      ),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      borderSide: BorderSide(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.15,
-                                        ),
-                                        width: 1.w,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      borderSide: BorderSide(
-                                        color: AppColors.primary,
-                                        width: 1.2.w,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            else
-                              const Spacer(),
-                            if (enableSearch && enableAdd)
-                              SizedBox(width: 10.w),
-                            if (enableAdd)
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(dialogContext).pop();
-                                  onAdd?.call();
+                            Expanded(
+                              child: TextField(
+                                controller: searchController,
+                                autofocus: true,
+                                onChanged: (val) {
+                                  setDialogState(() {
+                                    query = val;
+                                  });
                                 },
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 4.w,
-                                    vertical: 4.h,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.black,
+                                ),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  hintText:
+                                      searchHint ??
+                                      '${LK.Search.tr} $cleanLabel...',
+                                  hintStyle: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.grey.withValues(
+                                      alpha: 0.6,
+                                    ),
                                   ),
-                                  child: Text(
-                                    LK.Add.tr,
-                                    style: AppTextStyles.bodyMedium.copyWith(
+                                  prefixIcon: Icon(
+                                    Icons.search_rounded,
+                                    size: 20.sp,
+                                    color: AppColors.primary,
+                                  ),
+                                  suffixIcon: query.isNotEmpty
+                                      ? IconButton(
+                                          icon: Icon(
+                                            Icons.cancel_rounded,
+                                            size: 18.sp,
+                                            color: AppColors.grey,
+                                          ),
+                                          onPressed: () {
+                                            searchController.clear();
+                                            setDialogState(() {
+                                              query = '';
+                                            });
+                                          },
+                                        )
+                                      : null,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 14.w,
+                                    vertical: 10.h,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.sfBackground,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    borderSide: BorderSide(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    borderSide: BorderSide(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    borderSide: BorderSide(
                                       color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
+                                      width: 1.2.w,
                                     ),
                                   ),
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),
@@ -242,10 +353,16 @@ class CustomDropdown<T> extends StatelessWidget {
                       child: filteredItems.isEmpty
                           ? Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 24.w,
-                                vertical: 36.h,
+                                horizontal: canAdd ? 16.w : 24.w,
+                                vertical: canAdd ? 16.h : 36.h,
                               ),
-                              child: Column(
+                              child: canAdd
+                                  ? _buildAddOptionCard(
+                                      query: query,
+                                      displayField: displayField,
+                                      dialogContext: dialogContext,
+                                    )
+                                  : Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
@@ -359,6 +476,28 @@ class CustomDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasMatchingItem = value != null && items.any((o) => o.value == value);
+    final effectiveItems = (value != null && !hasMatchingItem)
+        ? [
+            DropdownMenuItem<T>(
+              value: value,
+              child: Text(
+                value is DropdownItem
+                    ? (value as DropdownItem).text
+                    : value.toString(),
+                style:
+                    style ??
+                    AppTextStyles.bodyMedium.copyWith(color: AppColors.black),
+              ),
+            ),
+            ...items,
+          ]
+        : items;
+    final safeValue =
+        (value != null && effectiveItems.any((o) => o.value == value))
+        ? effectiveItems.firstWhere((o) => o.value == value).value
+        : null;
+
     final dropdownWidget = Container(
       height: height ?? 52.h,
       alignment: Alignment.center,
@@ -376,9 +515,7 @@ class CustomDropdown<T> extends StatelessWidget {
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
-          value: (value != null && items.any((o) => o.value == value))
-              ? items.firstWhere((o) => o.value == value).value
-              : null,
+          value: safeValue,
           hint: Text(
             hint,
             style: AppTextStyles.bodyMedium.copyWith(
@@ -405,7 +542,7 @@ class CustomDropdown<T> extends StatelessWidget {
                   color: AppColors.grey,
                   size: iconSize ?? 20.sp,
                 ),
-          items: items.isEmpty ? null : items,
+          items: effectiveItems.isEmpty ? null : effectiveItems,
           onChanged: isEnabled ? onChanged : null,
           borderRadius: BorderRadius.circular(14.r),
           dropdownColor: AppColors.white,

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -322,16 +322,26 @@ class ProfileWorkStepSection extends StatelessWidget {
         ),
         AppSpacing.vM,
         Obx(
-          () => AppFormDropdown<String>(
-            enableAdd: true,
-            value: controller.workTalukaList.contains(controller.workTaluka.value)
-                ? controller.workTaluka.value
-                : null,
-            items: controller.workTalukaList
-                .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
-                    ))
+          () {
+          final workTalukaVal = controller.workTaluka.value;
+          final displayTalukaList =
+              (workTalukaVal.isNotEmpty &&
+                  !controller.workTalukaList.contains(workTalukaVal))
+              ? [workTalukaVal, ...controller.workTalukaList]
+              : controller.workTalukaList;
+          return AppFormDropdown<String>(
+            value: workTalukaVal.isNotEmpty ? workTalukaVal : null,
+            items: displayTalukaList
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: (v) {
               if (v != null) controller.workTaluka.value = v;
@@ -341,20 +351,31 @@ class ProfileWorkStepSection extends StatelessWidget {
               'OccupationTalukaId',
               idMap: controller.workInfo.workTalukaIdMap,
             ),
-          ),
+          );
+        },
         ),
         AppSpacing.vM,
         Obx(
-          () => AppFormDropdown<String>(
-            enableAdd: true,
-            value: controller.workAreaList.contains(controller.workArea.value)
-                ? controller.workArea.value
-                : null,
-            items: controller.workAreaList
-                .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e, overflow: TextOverflow.ellipsis, maxLines: 1),
-                    ))
+          () {
+          final workAreaVal = controller.workArea.value;
+          final displayAreaList =
+              (workAreaVal.isNotEmpty &&
+                  !controller.workAreaList.contains(workAreaVal))
+              ? [workAreaVal, ...controller.workAreaList]
+              : controller.workAreaList;
+          return AppFormDropdown<String>(
+            value: workAreaVal.isNotEmpty ? workAreaVal : null,
+            items: displayAreaList
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: (v) {
               if (v != null) controller.workArea.value = v;
@@ -364,7 +385,8 @@ class ProfileWorkStepSection extends StatelessWidget {
               'OccupationAreaId',
               idMap: controller.workInfo.workAreaIdMap,
             ),
-          ),
+          );
+        },
         ),
         AppSpacing.vM,
         Obx(

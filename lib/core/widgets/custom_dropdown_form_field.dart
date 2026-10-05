@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
@@ -20,6 +21,9 @@ class CustomDropdownFormField<T> extends StatelessWidget {
     this.selectedItemBuilder,
     this.menuMaxHeight,
     this.enableSearch = true,
+    this.enableAdd = false,
+    this.onAdd,
+    this.onAddQuery,
     this.searchHint,
     this.label,
   });
@@ -36,8 +40,126 @@ class CustomDropdownFormField<T> extends StatelessWidget {
   final DropdownButtonBuilder? selectedItemBuilder;
   final double? menuMaxHeight;
   final bool enableSearch;
+  final bool enableAdd;
+  final VoidCallback? onAdd;
+  final void Function(String)? onAddQuery;
   final String? searchHint;
   final String? label;
+
+  Widget _buildAddOptionCard({
+    required String query,
+    required String displayField,
+    required BuildContext dialogContext,
+  }) {
+    final cleanQuery = query.trim();
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (cleanQuery.isEmpty) return;
+          Navigator.of(dialogContext).pop();
+          onAddQuery?.call(cleanQuery);
+          onAdd?.call();
+          if (cleanQuery is T) {
+            onChanged?.call(cleanQuery as T);
+          } else if (T == DropdownItem || <DropdownItem>[] is List<T>) {
+            onChanged?.call(DropdownItem(id: 0, text: cleanQuery) as T);
+          }
+        },
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F5FF),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: const Color(0xFFC7DBFE), width: 1.2.w),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 22.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: [
+                          const TextSpan(text: 'Add '),
+                          if (cleanQuery.isNotEmpty) ...[
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 6.w,
+                                  vertical: 1.5.h,
+                                ),
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(6.r),
+                                  border: Border.all(
+                                    color: AppColors.grey.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    width: 1.w,
+                                  ),
+                                ),
+                                child: Text(
+                                  '"$cleanQuery"',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const TextSpan(text: ' '),
+                          ],
+                          TextSpan(
+                            text: cleanQuery.isNotEmpty
+                                ? 'as new $displayField'
+                                : 'new $displayField',
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Click to add and select',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: const Color(0xFF2563EB),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   String _extractText(Widget widget) {
     if (widget is Text) {
@@ -78,6 +200,8 @@ class CustomDropdownFormField<T> extends StatelessWidget {
 
   void _showSearchDialog(BuildContext context) {
     final cleanLabel = (label ?? hint ?? '').replaceAll('*', '').trim();
+    final canAdd = enableAdd || onAdd != null || onAddQuery != null;
+    final displayField = cleanLabel.isNotEmpty ? cleanLabel : 'Item';
 
     showDialog(
       context: context,
@@ -88,7 +212,24 @@ class CustomDropdownFormField<T> extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final q = query.trim().toLowerCase();
-            final filteredItems = items.where((item) {
+            final allItems =
+                (value != null && !items.any((o) => o.value == value))
+                ? [
+                    DropdownMenuItem<T>(
+                      value: value,
+                      child: Text(
+                        value is DropdownItem
+                            ? (value as DropdownItem).text
+                            : value.toString(),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ),
+                    ...items,
+                  ]
+                : items;
+            final filteredItems = allItems.where((item) {
               if (q.isEmpty) return true;
               final text = _extractText(item.child).toLowerCase();
               final val = (item.value?.toString() ?? '').toLowerCase();
@@ -212,10 +353,16 @@ class CustomDropdownFormField<T> extends StatelessWidget {
                       child: filteredItems.isEmpty
                           ? Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 24.w,
-                                vertical: 36.h,
+                                horizontal: canAdd ? 16.w : 24.w,
+                                vertical: canAdd ? 16.h : 36.h,
                               ),
-                              child: Column(
+                              child: canAdd
+                                  ? _buildAddOptionCard(
+                                      query: query,
+                                      displayField: displayField,
+                                      dialogContext: dialogContext,
+                                    )
+                                  : Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
@@ -329,15 +476,55 @@ class CustomDropdownFormField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final safeValue = (value != null && items.any((o) => o.value == value))
-        ? items.firstWhere((o) => o.value == value).value
+    final hasMatchingItem = value != null && items.any((o) => o.value == value);
+    final effectiveItems = (value != null && !hasMatchingItem)
+        ? [
+            DropdownMenuItem<T>(
+              value: value,
+              child: Text(
+                value is DropdownItem
+                    ? (value as DropdownItem).text
+                    : value.toString(),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+            ...items,
+          ]
+        : items;
+    final safeValue =
+        (value != null && effectiveItems.any((o) => o.value == value))
+        ? effectiveItems.firstWhere((o) => o.value == value).value
         : null;
+
+    DropdownButtonBuilder? effectiveSelectedItemBuilder = selectedItemBuilder;
+    if (selectedItemBuilder != null && effectiveItems.length != items.length) {
+      effectiveSelectedItemBuilder = (BuildContext context) {
+        final built = selectedItemBuilder!(context);
+        return [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value is DropdownItem
+                  ? (value as DropdownItem).text
+                  : value.toString(),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.black,
+              ),
+            ),
+          ),
+          ...built,
+        ];
+      };
+    }
 
     final dropdownWidget = DropdownButtonFormField<T>(
       key: ValueKey(safeValue),
       initialValue: safeValue,
-      items: items.isEmpty ? null : items,
-      selectedItemBuilder: selectedItemBuilder,
+      items: effectiveItems.isEmpty ? null : effectiveItems,
+      selectedItemBuilder: effectiveSelectedItemBuilder,
       menuMaxHeight: menuMaxHeight,
       onChanged: isEnabled ? onChanged : null,
       isExpanded: isExpanded,
@@ -401,7 +588,7 @@ class CustomDropdownFormField<T> extends StatelessWidget {
       ),
     );
 
-    if (isEnabled && (enableSearch)) {
+    if (isEnabled && (enableSearch || enableAdd)) {
       return Stack(
         children: [
           dropdownWidget,

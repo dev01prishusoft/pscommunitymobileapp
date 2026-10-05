@@ -1236,15 +1236,18 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               final talukaList = controller.getAddressTalukas(
                 controller.personalInfo.motherDistrict.value,
               );
+              final motherTalukaVal =
+                  controller.personalInfo.motherTaluka.value;
+              final displayTalukaList =
+                  (motherTalukaVal.isNotEmpty &&
+                      !talukaList.contains(motherTalukaVal))
+                  ? [motherTalukaVal, ...talukaList]
+                  : talukaList;
               return AppFormDropdown<String>(
-                enableAdd: true,
                 value:
-                    talukaList.contains(
-                      controller.personalInfo.motherTaluka.value,
-                    )
-                    ? controller.personalInfo.motherTaluka.value
+                    motherTalukaVal.isNotEmpty ? motherTalukaVal
                     : null,
-                items: talukaList
+                items: displayTalukaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -1274,13 +1277,17 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               final areaList = controller.getAddressAreas(
                 controller.personalInfo.motherTaluka.value,
               );
+              final motherAreaVal = controller.personalInfo.motherArea.value;
+              final displayAreaList =
+                  (motherAreaVal.isNotEmpty &&
+                      !areaList.contains(motherAreaVal))
+                  ? [motherAreaVal, ...areaList]
+                  : areaList;
               return AppFormDropdown<String>(
-                enableAdd: true,
                 value:
-                    areaList.contains(controller.personalInfo.motherArea.value)
-                    ? controller.personalInfo.motherArea.value
+                    motherAreaVal.isNotEmpty ? motherAreaVal
                     : null,
-                items: areaList
+                items: displayAreaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -1483,9 +1490,15 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             onChanged: (v) {
               if (v != null) {
                 addr.state = v;
+                addr.stateId =
+                    controller.workInfo.globalStateIdMap[v] ??
+                    controller.workInfo.workStateIdMap[v];
                 addr.district = '';
+                addr.districtId = null;
                 addr.taluka = '';
+                addr.talukaId = null;
                 addr.area = '';
+                addr.areaId = null;
                 controller.addresses.refresh();
               }
             },
@@ -1520,8 +1533,13 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             onChanged: (v) {
               if (v != null) {
                 addr.district = v;
+                addr.districtId =
+                    controller.workInfo.globalDistrictIdMap[v] ??
+                    controller.workInfo.workDistrictIdMap[v];
                 addr.taluka = '';
+                addr.talukaId = null;
                 addr.area = '';
+                addr.areaId = null;
                 controller.addresses.refresh();
               }
             },
@@ -1539,10 +1557,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         AppSpacing.vM,
         Obx(() {
           final talukaList = controller.getAddressTalukas(addr.district);
+          final displayTalukaList =
+              (addr.taluka.isNotEmpty && !talukaList.contains(addr.taluka))
+              ? [addr.taluka, ...talukaList]
+              : talukaList;
           return AppFormDropdown<String>(
             enableAdd: true,
-            value: talukaList.contains(addr.taluka) ? addr.taluka : null,
-            items: talukaList
+            value: addr.taluka.isNotEmpty ? addr.taluka : null,
+            items: displayTalukaList
                 .map(
                   (e) => DropdownMenuItem(
                     value: e,
@@ -1557,7 +1579,12 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             onChanged: (v) {
               if (v != null) {
                 addr.taluka = v;
+                addr.talukaId =
+                    controller.workInfo.globalTalukaIdMap[v] ??
+                    controller.workInfo.workTalukaIdMap[v] ??
+                    0;
                 addr.area = '';
+                addr.areaId = null;
                 controller.addresses.refresh();
               }
             },
@@ -1575,10 +1602,14 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
         AppSpacing.vM,
         Obx(() {
           final areaList = controller.getAddressAreas(addr.taluka);
+          final displayAreaList =
+              (addr.area.isNotEmpty && !areaList.contains(addr.area))
+              ? [addr.area, ...areaList]
+              : areaList;
           return AppFormDropdown<String>(
             enableAdd: true,
-            value: areaList.contains(addr.area) ? addr.area : null,
-            items: areaList
+            value: addr.area.isNotEmpty ? addr.area : null,
+            items: displayAreaList
                 .map(
                   (e) => DropdownMenuItem(
                     value: e,
@@ -1593,6 +1624,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
             onChanged: (v) {
               if (v != null) {
                 addr.area = v;
+                addr.areaId =
+                    controller.workInfo.globalAreaIdMap[v] ??
+                    controller.workInfo.workAreaIdMap[v] ??
+                    0;
                 controller.addresses.refresh();
               }
             },
@@ -1976,165 +2011,155 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
               ),
             ),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                initialValue: edu.institute,
-                label: LK.instituteNameLabel.tr,
-                prefixIcon: const Icon(Icons.school_outlined),
-                maxLength: 300,
-                onChanged: (v) {
-                  edu.institute = v;
-                  controller.educationList.refresh();
-                },
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('InstitutionName')
-                    : null,
-              ),
+            AppFormTextField(
+              initialValue: edu.institute,
+              label: LK.instituteNameLabel.tr,
+              prefixIcon: const Icon(Icons.school_outlined),
+              maxLength: 300,
+              onChanged: (v) {
+                edu.institute = v;
+                controller.educationList.refresh();
+              },
+              updateStatus: (isHighest && !isNew)
+                  ? controller.getUpdateStatus('InstitutionName')
+                  : null,
             ),
             AppSpacing.vM,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Obx(
-                    () => AppFormTextField(
-                      initialValue: edu.passingYear,
-                      label: LK.passingYearLabel.tr,
-                      prefixIcon: const Icon(Iconsax.calendar_copy),
-                      hint: 'YYYY',
-                      keyboardType: TextInputType.phone,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      maxLength: 4,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return null;
-                        if (v.length != 4) {
-                          return 'Passing Year must be exactly 4 digits';
+                  child: AppFormTextField(
+                    initialValue: edu.passingYear,
+                    label: LK.passingYearLabel.tr,
+                    prefixIcon: const Icon(Iconsax.calendar_copy),
+                    hint: 'YYYY',
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 4,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return null;
+                      if (v.length != 4) {
+                        return 'Passing Year must be exactly 4 digits';
+                      }
+                      final year = int.tryParse(v);
+                      if (year != null) {
+                        final currentYear = DateTime.now().year;
+                        if (year > currentYear) {
+                          return 'Passing Year cannot be greater than the current year';
                         }
-                        final year = int.tryParse(v);
-                        if (year != null) {
-                          final currentYear = DateTime.now().year;
-                          if (year > currentYear) {
-                            return 'Passing Year cannot be greater than the current year';
-                          }
 
-                          final dobStr = controller.dobCtrl.text;
-                          if (dobStr.isNotEmpty) {
-                            try {
-                              DateTime? dobDate;
-                              if (dobStr.contains('-') &&
-                                  dobStr.split('-')[0].length == 2) {
-                                final parts = dobStr.split('-');
-                                dobDate = DateTime(
-                                  int.parse(parts[2]),
-                                  int.parse(parts[1]),
-                                  int.parse(parts[0]),
-                                );
-                              } else {
-                                dobDate = DateTime.tryParse(dobStr);
-                              }
-
-                              if (dobDate != null && year < dobDate.year) {
-                                return 'Passing Year cannot be before year of birth';
-                              }
-                            } catch (e, stack) {
-                              CrashReporter.recordError(
-                                e,
-                                stack,
-                                reason:
-                                    'AddFamilyMemberPage passing year date parse failed',
+                        final dobStr = controller.dobCtrl.text;
+                        if (dobStr.isNotEmpty) {
+                          try {
+                            DateTime? dobDate;
+                            if (dobStr.contains('-') &&
+                                dobStr.split('-')[0].length == 2) {
+                              final parts = dobStr.split('-');
+                              dobDate = DateTime(
+                                int.parse(parts[2]),
+                                int.parse(parts[1]),
+                                int.parse(parts[0]),
                               );
+                            } else {
+                              dobDate = DateTime.tryParse(dobStr);
                             }
+
+                            if (dobDate != null && year < dobDate.year) {
+                              return 'Passing Year cannot be before year of birth';
+                            }
+                          } catch (e, stack) {
+                            CrashReporter.recordError(
+                              e,
+                              stack,
+                              reason:
+                                  'AddFamilyMemberPage passing year date parse failed',
+                            );
                           }
                         }
-                        return null;
-                      },
-                      onChanged: (v) {
-                        edu.passingYear = v;
-                        controller.educationList.refresh();
-                      },
-                      updateStatus: (isHighest && !isNew)
-                          ? controller.getUpdateStatus('YearOfPassing')
-                          : null,
-                    ),
+                      }
+                      return null;
+                    },
+                    onChanged: (v) {
+                      edu.passingYear = v;
+                      controller.educationList.refresh();
+                    },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('YearOfPassing')
+                        : null,
                   ),
                 ),
                 SizedBox(width: 5.w),
                 Expanded(
-                  child: Obx(
-                    () => AppFormTextField(
-                      initialValue: edu.percentage,
-                      label: LK.percentageLabel.tr,
-                      prefixIcon: const Icon(Iconsax.percentage_circle_copy),
-                      hint: '00',
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          if (newValue.text.isEmpty) return newValue;
-                          final numVal = double.tryParse(newValue.text);
-                          if (numVal != null && numVal > 100) return oldValue;
-                          return newValue;
-                        }),
-                      ],
-                      maxLength: 6,
-                      validator: (v) {
-                        if (v != null && v.isNotEmpty) {
-                          final numVal = double.tryParse(v);
-                          if (numVal != null && numVal > 100) {
-                            return LK.cannotExceed100.tr;
-                          }
-                        }
-                        return null;
-                      },
-                      onChanged: (v) {
-                        edu.percentage = v;
-                        controller.educationList.refresh();
-                      },
-                      updateStatus: (isHighest && !isNew)
-                          ? controller.getUpdateStatus('Percentage')
-                          : null,
+                  child: AppFormTextField(
+                    initialValue: edu.percentage,
+                    label: LK.percentageLabel.tr,
+                    prefixIcon: const Icon(Iconsax.percentage_circle_copy),
+                    hint: '00',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
                     ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        if (newValue.text.isEmpty) return newValue;
+                        final numVal = double.tryParse(newValue.text);
+                        if (numVal != null && numVal > 100) return oldValue;
+                        return newValue;
+                      }),
+                    ],
+                    maxLength: 6,
+                    validator: (v) {
+                      if (v != null && v.isNotEmpty) {
+                        final numVal = double.tryParse(v);
+                        if (numVal != null && numVal > 100) {
+                          return LK.cannotExceed100.tr;
+                        }
+                      }
+                      return null;
+                    },
+                    onChanged: (v) {
+                      edu.percentage = v;
+                      controller.educationList.refresh();
+                    },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Percentage')
+                        : null,
                   ),
                 ),
                 SizedBox(width: 5.w),
                 Expanded(
-                  child: Obx(
-                    () => AppFormTextField(
-                      initialValue: edu.grade,
-                      label: 'Grade',
-                      prefixIcon: const Icon(Iconsax.medal_copy),
-                      maxLength: 10,
-                      onChanged: (v) {
-                        edu.grade = v;
-                        controller.educationList.refresh();
-                      },
-                      updateStatus: (isHighest && !isNew)
-                          ? controller.getUpdateStatus('Grade')
-                          : null,
-                    ),
+                  child: AppFormTextField(
+                    initialValue: edu.grade,
+                    label: 'Grade',
+                    prefixIcon: const Icon(Iconsax.medal_copy),
+                    maxLength: 10,
+                    onChanged: (v) {
+                      edu.grade = v;
+                      controller.educationList.refresh();
+                    },
+                    updateStatus: (isHighest && !isNew)
+                        ? controller.getUpdateStatus('Grade')
+                        : null,
                   ),
                 ),
               ],
             ),
             AppSpacing.vM,
-            Obx(
-              () => AppFormTextField(
-                initialValue: edu.description,
-                label: 'Description',
-                keyboardType: TextInputType.multiline,
-                maxLines: 5,
-                minLines: 3,
-                maxLength: 500,
-                onChanged: (v) {
-                  edu.description = v;
-                  controller.educationList.refresh();
-                },
-                updateStatus: (isHighest && !isNew)
-                    ? controller.getUpdateStatus('Description')
-                    : null,
-              ),
+            AppFormTextField(
+              initialValue: edu.description,
+              label: 'Description',
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
+              minLines: 3,
+              maxLength: 500,
+              onChanged: (v) {
+                edu.description = v;
+                controller.educationList.refresh();
+              },
+              updateStatus: (isHighest && !isNew)
+                  ? controller.getUpdateStatus('Description')
+                  : null,
             ),
             AppSpacing.vM,
             Column(
@@ -2591,15 +2616,17 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
                 AppSpacing.vM,
                 Obx(
-                  () => AppFormDropdown<String>(
-                    enableAdd: true,
+                  () {
+                  final workTalukaVal = controller.workTaluka.value;
+                  final displayTalukaList =
+                      (workTalukaVal.isNotEmpty &&
+                          !controller.workTalukaList.contains(workTalukaVal))
+                      ? [workTalukaVal, ...controller.workTalukaList]
+                      : controller.workTalukaList;
+                  return AppFormDropdown<String>(
                     value:
-                        controller.workTalukaList.contains(
-                          controller.workTaluka.value,
-                        )
-                        ? controller.workTaluka.value
-                        : null,
-                    items: controller.workTalukaList
+                          workTalukaVal.isNotEmpty ? workTalukaVal : null,
+                    items: displayTalukaList
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,
@@ -2619,19 +2646,22 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       'OccupationTalukaId',
                       idMap: controller.workInfo.workTalukaIdMap,
                     ),
-                  ),
+                  );
+                },
                 ),
                 AppSpacing.vM,
                 Obx(
-                  () => AppFormDropdown<String>(
-                    enableAdd: true,
+                  () {
+                  final workAreaVal = controller.workArea.value;
+                  final displayAreaList =
+                      (workAreaVal.isNotEmpty &&
+                          !controller.workAreaList.contains(workAreaVal))
+                      ? [workAreaVal, ...controller.workAreaList]
+                      : controller.workAreaList;
+                  return AppFormDropdown<String>(
                     value:
-                        controller.workAreaList.contains(
-                          controller.workArea.value,
-                        )
-                        ? controller.workArea.value
-                        : null,
-                    items: controller.workAreaList
+                          workAreaVal.isNotEmpty ? workAreaVal : null,
+                    items: displayAreaList
                         .map(
                           (e) => DropdownMenuItem(
                             value: e,
@@ -2651,7 +2681,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                       'OccupationAreaId',
                       idMap: controller.workInfo.workAreaIdMap,
                     ),
-                  ),
+                  );
+                },
                 ),
                 AppSpacing.vM,
                 Obx(

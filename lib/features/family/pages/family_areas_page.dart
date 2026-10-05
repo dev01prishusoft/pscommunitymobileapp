@@ -325,7 +325,6 @@ class _FilterDialogState extends State<_FilterDialog> {
               ),
               SizedBox(height: 16.h),
               CustomDropdown<DropdownItem>(
-                enableAdd: true,
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
                 items: _localTalukas

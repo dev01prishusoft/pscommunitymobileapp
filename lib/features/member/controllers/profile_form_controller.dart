@@ -106,6 +106,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     }
     return LK.heightCm.tr;
   }
+
   RxString get gender => personalInfo.gender;
   RxString get maritalStatus => personalInfo.maritalStatus;
 
@@ -269,9 +270,28 @@ class ProfileFormController extends GetxController with FormStateMixin {
       }
     }
 
-    int? getId(String? name, Map<String, int> idMap) {
-      if (name == null || name.isEmpty) return null;
-      return idMap[name];
+    int? getId(
+      String? name,
+      Map<String, int> idMap, [
+      Map<String, int>? fallbackMap,
+    ]) {
+      if (name == null) return null;
+      final trimmed = name.trim();
+      if (trimmed.isEmpty) return null;
+      if (idMap.containsKey(trimmed)) return idMap[trimmed];
+      if (fallbackMap != null && fallbackMap.containsKey(trimmed)) {
+        return fallbackMap[trimmed];
+      }
+      for (final e in idMap.entries) {
+        if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) return e.value;
+      }
+      if (fallbackMap != null) {
+        for (final e in fallbackMap.entries) {
+          if (e.key.trim().toLowerCase() == trimmed.toLowerCase())
+            return e.value;
+        }
+      }
+      return null;
     }
 
     addIfChanged('FirstName', personalInfo.firstName.value, m.firstName);
@@ -720,7 +740,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         final areaId =
             getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
         final initialAreaId = initialAddr?['areaId'] as int?;
-        if (areaId != initialAreaId && areaId != 0)
+        if (areaId != initialAreaId)
           formDataMap['AreaId'] = areaId;
 
         final talukaId =
@@ -728,22 +748,62 @@ class ProfileFormController extends GetxController with FormStateMixin {
             addr.talukaId ??
             0;
         final initialTalukaId = initialAddr?['talukaId'] as int?;
-        if (talukaId != initialTalukaId && talukaId != 0)
+        if (talukaId != initialTalukaId)
           formDataMap['TalukaId'] = talukaId;
 
+        addAddr(
+          'TalukaName',
+          addr.taluka,
+          initialAddr?['taluka'] as String? ??
+              initialAddr?['talukaName'] as String?,
+        );
+        addAddr(
+          'AreaName',
+          addr.area,
+          initialAddr?['area'] as String? ??
+              initialAddr?['areaName'] as String?,
+        );
+
         final districtId =
-            getId(addr.district, workInfo.globalDistrictIdMap) ??
+            getId(
+              addr.district,
+              workInfo.globalDistrictIdMap,
+              workInfo.workDistrictIdMap,
+            ) ??
             addr.districtId ??
+            (initialAddr?['districtId'] as int?) ??
+            _currentMember?.districtId ??
             0;
         final initialDistrictId = initialAddr?['districtId'] as int?;
-        if (districtId != initialDistrictId && districtId != 0)
+        if ((districtId != initialDistrictId && districtId != 0) ||
+            ((formDataMap.containsKey('TalukaName') ||
+                    formDataMap.containsKey('AreaName') ||
+                    formDataMap.containsKey('TalukaId') ||
+                    formDataMap.containsKey('AreaId')) &&
+                districtId != 0)) {
           formDataMap['DistrictId'] = districtId;
+        }
 
         final stateId =
-            getId(addr.state, workInfo.globalStateIdMap) ?? addr.stateId ?? 0;
+            getId(
+              addr.state,
+              workInfo.globalStateIdMap,
+              workInfo.workStateIdMap,
+            ) ??
+            addr.stateId ??
+            (initialAddr?['stateId'] as int?) ??
+            _currentMember?.stateId ??
+            0;
         final initialStateId = initialAddr?['stateId'] as int?;
-        if (stateId != initialStateId && stateId != 0)
+        if ((stateId != initialStateId && stateId != 0) ||
+            ((formDataMap.containsKey('TalukaName') ||
+                    formDataMap.containsKey('AreaName') ||
+                    formDataMap.containsKey('TalukaId') ||
+                    formDataMap.containsKey('AreaId') ||
+                    formDataMap.containsKey('DistrictId')) &&
+                stateId != 0)) {
           formDataMap['StateId'] = stateId;
+        }
       } else {
         formDataMap['AddressTypeId'] = null;
         formDataMap['AddressLine1'] = null;
@@ -2088,9 +2148,31 @@ class ProfileFormController extends GetxController with FormStateMixin {
               formDataMap['ProfilePhotoPath'] = null;
             }
           } else {
-            int? getId(String? name, Map<String, int> idMap) {
-              if (name == null || name.isEmpty) return null;
-              return idMap[name];
+            int? getId(
+              String? name,
+              Map<String, int> idMap, [
+              Map<String, int>? fallbackMap,
+            ]) {
+              if (name == null) return null;
+              final trimmed = name.trim();
+              if (trimmed.isEmpty) return null;
+              if (idMap.containsKey(trimmed)) return idMap[trimmed];
+              if (fallbackMap != null && fallbackMap.containsKey(trimmed)) {
+                return fallbackMap[trimmed];
+              }
+              for (final e in idMap.entries) {
+                if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                  return e.value;
+                }
+              }
+              if (fallbackMap != null) {
+                for (final e in fallbackMap.entries) {
+                  if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                    return e.value;
+                  }
+                }
+              }
+              return null;
             }
 
             String? formatDob(String? d) {
@@ -2262,13 +2344,45 @@ class ProfileFormController extends GetxController with FormStateMixin {
                   ? null
                   : addr.pincode;
               formDataMap['AreaId'] =
-                  getId(addr.area, workInfo.globalAreaIdMap) ??
+                  getId(
+                    addr.area,
+                    workInfo.globalAreaIdMap,
+                    workInfo.workAreaIdMap,
+                  ) ??
                   addr.areaId ??
                   0;
               formDataMap['TalukaId'] =
-                  getId(addr.taluka, workInfo.globalTalukaIdMap) ??
+                  getId(
+                    addr.taluka,
+                    workInfo.globalTalukaIdMap,
+                    workInfo.workTalukaIdMap,
+                  ) ??
                   addr.talukaId ??
                   0;
+              formDataMap['TalukaName'] = addr.taluka;
+              formDataMap['AreaName'] = addr.area;
+              final distId =
+                  getId(
+                    addr.district,
+                    workInfo.globalDistrictIdMap,
+                    workInfo.workDistrictIdMap,
+                  ) ??
+                  addr.districtId ??
+                  0;
+              if (distId != 0) {
+                formDataMap['DistrictId'] = distId;
+              }
+              final stId =
+                  getId(
+                    addr.state,
+                    workInfo.globalStateIdMap,
+                    workInfo.workStateIdMap,
+                  ) ??
+                  addr.stateId ??
+                  0;
+              if (stId != 0) {
+                formDataMap['StateId'] = stId;
+              }
             }
 
             formDataMap['IsHead'] = false;
@@ -2307,8 +2421,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             final apiClient = Get.find<ApiClient>();
             final response = await apiClient.post(
               isEdit
-                  ? '/api/v1/MemberUpdateRequest/create'
-                  : '/api/v1/member/mobile/upsert',
+                  ? '/api/v2/MemberUpdateRequest/create'
+                  : '/api/v2/member/mobile/upsert',
               data: formData,
             );
 
@@ -2321,85 +2435,142 @@ class ProfileFormController extends GetxController with FormStateMixin {
               }
             }
 
-            if (!isEdit &&
-                response.data != null &&
+            int? targetMemberId;
+            if (isEdit) {
+              targetMemberId = _currentMember?.memberId;
+            } else if (response.data != null &&
                 response.data is Map<String, dynamic>) {
-              int? newMemberId;
               final resData = response.data['data'];
               if (resData is int) {
-                newMemberId = resData;
+                targetMemberId = resData;
               } else if (resData is Map<String, dynamic>) {
-                newMemberId =
-                    resData['memberId'] as int? ?? resData['id'] as int?;
+                targetMemberId =
+                    resData['memberId'] as int? ??
+                    resData['id'] as int? ??
+                    resData['MemberId'] as int? ??
+                    resData['Id'] as int?;
+              }
+              targetMemberId ??=
+                  response.data['memberId'] as int? ??
+                  response.data['id'] as int? ??
+                  response.data['MemberId'] as int? ??
+                  response.data['Id'] as int?;
+            }
+
+            if (targetMemberId != null &&
+                (!isEdit ||
+                    hasContactAddressChanged ||
+                    contactInfo.addresses.isNotEmpty)) {
+              int? safeGetId(
+                String? name,
+                Map<String, int> idMap, [
+                Map<String, int>? fallbackMap,
+              ]) {
+                if (name == null) return null;
+                final trimmed = name.trim();
+                if (trimmed.isEmpty) return null;
+                if (idMap.containsKey(trimmed)) return idMap[trimmed];
+                if (fallbackMap != null && fallbackMap.containsKey(trimmed)) {
+                  return fallbackMap[trimmed];
+                }
+                for (final e in idMap.entries) {
+                  if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                    return e.value;
+                  }
+                }
+                if (fallbackMap != null) {
+                  for (final e in fallbackMap.entries) {
+                    if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                      return e.value;
+                    }
+                  }
+                }
+                return null;
               }
 
-              if (newMemberId != null) {
-                int? safeGetId(String? name, Map<String, int> idMap) {
-                  if (name == null || name.isEmpty) return null;
-                  return idMap[name];
-                }
+              try {
+                final addressesPayload = {
+                  "memberId": targetMemberId,
+                  "addresses": contactInfo.addresses.map((addr) {
+                    final distId =
+                        safeGetId(
+                          addr.district,
+                          workInfo.globalDistrictIdMap,
+                          workInfo.workDistrictIdMap,
+                        ) ??
+                        addr.districtId ??
+                        _currentMember?.districtId ??
+                        0;
+                    final stId =
+                        safeGetId(
+                          addr.state,
+                          workInfo.globalStateIdMap,
+                          workInfo.workStateIdMap,
+                        ) ??
+                        addr.stateId ??
+                        _currentMember?.stateId ??
+                        0;
+                    final talId =
+                        safeGetId(
+                          addr.taluka,
+                          workInfo.globalTalukaIdMap,
+                          workInfo.workTalukaIdMap,
+                        ) ??
+                        addr.talukaId ??
+                        0;
+                    final arId =
+                        safeGetId(
+                          addr.area,
+                          workInfo.globalAreaIdMap,
+                          workInfo.workAreaIdMap,
+                        ) ??
+                        addr.areaId ??
+                        0;
 
-                try {
-                  final addressesPayload = {
-                    "memberId": newMemberId,
-                    "addresses": contactInfo.addresses.map((addr) {
-                      return {
-                        "memberAddressId": 0,
-                        "memberId": newMemberId,
-                        "addressTypeId":
-                            safeGetId(
-                              addr.type,
-                              contactInfo.addressTypeIdMap,
-                            ) ??
-                            0,
-                        "stateId":
-                            safeGetId(addr.state, workInfo.globalStateIdMap) ??
-                            0,
-                        "districtId":
-                            safeGetId(
-                              addr.district,
-                              workInfo.globalDistrictIdMap,
-                            ) ??
-                            0,
-                        "talukaId":
-                            safeGetId(
-                              addr.taluka,
-                              workInfo.globalTalukaIdMap,
-                            ) ??
-                            0,
-                        "areaId":
-                            safeGetId(addr.area, workInfo.globalAreaIdMap) ??
-                            addr.areaId ??
-                            0,
-                        "addressLine1": addr.line1,
-                        "addressLine2": addr.line2,
-                        "landmark": addr.landmark,
-                        "pincode": addr.pincode,
-                        "isPrimary": addr.isPrimary,
-                        "isActive": true,
-                      };
-                    }).toList(),
-                  };
-                  await apiClient.post(
-                    '/api/v1/member-address/mobile/upsert',
-                    data: addressesPayload,
-                  );
-                } catch (e, stack) {
-                  CrashReporter.recordError(
-                    e,
-                    stack,
-                    reason:
-                        'ProfileFormController._saveMember member-address/mobile/upsert failed',
-                  );
-                }
+                    return {
+                      "memberAddressId": 0,
+                      "memberId": targetMemberId,
+                      "addressTypeId":
+                          safeGetId(addr.type, contactInfo.addressTypeIdMap) ??
+                          addr.typeId ??
+                          0,
+                      "stateId": stId,
+                      "districtId": distId,
+                      "talukaId": talId,
+                      "areaId": arId,
+                      "addressLine1": addr.line1,
+                      "addressLine2": addr.line2,
+                      "landmark": addr.landmark,
+                      "pincode": addr.pincode,
+                      "isPrimary": addr.isPrimary,
+                      "isActive": true,
+                      "talukaName": addr.taluka,
+                      "areaName": addr.area,
+                    };
+                  }).toList(),
+                };
+                await apiClient.post(
+                  '/api/v2/member-address/mobile/upsert',
+                  data: addressesPayload,
+                );
+              } catch (e, stack) {
+                CrashReporter.recordError(
+                  e,
+                  stack,
+                  reason:
+                      'ProfileFormController._saveMember member-address/mobile/upsert failed',
+                );
+              }
+            }
 
-                try {
-                  final educationsPayload = {
-                    "memberId": newMemberId,
-                    "educations": contactInfo.educationList.map((edu) {
+            if (!isEdit && targetMemberId != null) {
+              try {
+                final educationsPayload = {
+                  "memberId": targetMemberId,
+                  "educations": contactInfo.educationList.map((edu) {
                       return {
                         "memberEducationId": 0,
-                        "memberId": newMemberId,
+                      "memberId": targetMemberId,
                         "educationalQualificationId":
                             contactInfo.educationIdMap[edu.qualification] ??
                             edu.qualificationId ??
@@ -2424,8 +2595,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                     stack,
                     reason:
                         'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
-                  );
-                }
+                );
               }
             }
           }

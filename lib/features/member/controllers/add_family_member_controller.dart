@@ -190,6 +190,106 @@ class AddFamilyMemberController extends ProfileFormController {
             }
           }
 
+          if (hasContactAddressChanged || contactInfo.addresses.isNotEmpty) {
+            try {
+              int? safeGetId(
+                String? name,
+                Map<String, int> idMap, [
+                Map<String, int>? fallbackMap,
+              ]) {
+                if (name == null) return null;
+                final trimmed = name.trim();
+                if (trimmed.isEmpty) return null;
+                if (idMap.containsKey(trimmed)) return idMap[trimmed];
+                if (fallbackMap != null && fallbackMap.containsKey(trimmed)) {
+                  return fallbackMap[trimmed];
+                }
+                for (final e in idMap.entries) {
+                  if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                    return e.value;
+                  }
+                }
+                if (fallbackMap != null) {
+                  for (final e in fallbackMap.entries) {
+                    if (e.key.trim().toLowerCase() == trimmed.toLowerCase()) {
+                      return e.value;
+                    }
+                  }
+                }
+                return null;
+              }
+
+              final addressesPayload = {
+                "memberId": memberId,
+                "addresses": contactInfo.addresses.map((addr) {
+                  final distId = safeGetId(
+                        addr.district,
+                        workInfo.globalDistrictIdMap,
+                        workInfo.workDistrictIdMap,
+                      ) ??
+                      addr.districtId ??
+                      0;
+                  final stId = safeGetId(
+                        addr.state,
+                        workInfo.globalStateIdMap,
+                        workInfo.workStateIdMap,
+                      ) ??
+                      addr.stateId ??
+                      0;
+                  final talId = safeGetId(
+                        addr.taluka,
+                        workInfo.globalTalukaIdMap,
+                        workInfo.workTalukaIdMap,
+                      ) ??
+                      addr.talukaId ??
+                      0;
+                  final arId = safeGetId(
+                        addr.area,
+                        workInfo.globalAreaIdMap,
+                        workInfo.workAreaIdMap,
+                      ) ??
+                      addr.areaId ??
+                      0;
+
+                  return {
+                    "memberAddressId": 0,
+                    "memberId": memberId,
+                    "addressTypeId":
+                        safeGetId(
+                          addr.type,
+                          contactInfo.addressTypeIdMap,
+                        ) ??
+                        addr.typeId ??
+                        0,
+                    "stateId": stId,
+                    "districtId": distId,
+                    "talukaId": talId,
+                    "areaId": arId,
+                    "addressLine1": addr.line1,
+                    "addressLine2": addr.line2,
+                    "landmark": addr.landmark,
+                    "pincode": addr.pincode,
+                    "isPrimary": addr.isPrimary,
+                    "isActive": true,
+                    "talukaName": addr.taluka,
+                    "areaName": addr.area,
+                  };
+                }).toList(),
+              };
+              await apiClient.post(
+                '/api/v2/member-address/mobile/upsert',
+                data: addressesPayload,
+              );
+            } catch (e, stack) {
+              CrashReporter.recordError(
+                e,
+                stack,
+                reason:
+                    'AddFamilyMemberController.updateMember member-address/mobile/upsert failed',
+              );
+            }
+          }
+
           if (!hasProfileUpdates && !hasEducationUpdates) {
             if (navigateBack) {
               await Future<void>.delayed(const Duration(milliseconds: 500));

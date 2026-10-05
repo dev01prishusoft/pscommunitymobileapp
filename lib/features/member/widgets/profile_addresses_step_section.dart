@@ -191,9 +191,15 @@ class ProfileAddressesStepSection extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) {
                     addr.state = v;
+                    addr.stateId =
+                        controller.workInfo.globalStateIdMap[v] ??
+                        controller.workInfo.workStateIdMap[v];
                     addr.district = '';
+                    addr.districtId = null;
                     addr.taluka = '';
+                    addr.talukaId = null;
                     addr.area = '';
+                    addr.areaId = null;
                     controller.addresses.refresh();
                   }
                 },
@@ -229,8 +235,13 @@ class ProfileAddressesStepSection extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) {
                     addr.district = v;
+                    addr.districtId =
+                        controller.workInfo.globalDistrictIdMap[v] ??
+                        controller.workInfo.workDistrictIdMap[v];
                     addr.taluka = '';
+                    addr.talukaId = null;
                     addr.area = '';
+                    addr.areaId = null;
                     controller.addresses.refresh();
                   }
                 },
@@ -247,13 +258,17 @@ class ProfileAddressesStepSection extends StatelessWidget {
             AppSpacing.vM,
             Obx(() {
               final talukaList = controller.getAddressTalukas(addr.district);
+              final displayTalukaList =
+                  (addr.taluka.isNotEmpty && !talukaList.contains(addr.taluka))
+                  ? [addr.taluka, ...talukaList]
+                  : talukaList;
               return AppFormDropdown<String>(
                 enableAdd: true,
-                value: talukaList.contains(addr.taluka) ? addr.taluka : null,
+                value: addr.taluka.isNotEmpty ? addr.taluka : null,
                 isRequired:
                     controller.hasContactAddressChanged &&
                     addr.district.isNotEmpty,
-                items: talukaList
+                items: displayTalukaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -268,7 +283,12 @@ class ProfileAddressesStepSection extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) {
                     addr.taluka = v;
+                    addr.talukaId =
+                        controller.workInfo.globalTalukaIdMap[v] ??
+                        controller.workInfo.workTalukaIdMap[v] ??
+                        0;
                     addr.area = '';
+                    addr.areaId = null;
                     controller.addresses.refresh();
                   }
                 },
@@ -284,13 +304,17 @@ class ProfileAddressesStepSection extends StatelessWidget {
             AppSpacing.vM,
             Obx(() {
               final areaList = controller.getAddressAreas(addr.taluka);
+              final displayAreaList =
+                  (addr.area.isNotEmpty && !areaList.contains(addr.area))
+                  ? [addr.area, ...areaList]
+                  : areaList;
               return AppFormDropdown<String>(
                 enableAdd: true,
-                value: areaList.contains(addr.area) ? addr.area : null,
+                value: addr.area.isNotEmpty ? addr.area : null,
                 isRequired:
                     controller.hasContactAddressChanged &&
                     addr.taluka.isNotEmpty,
-                items: areaList
+                items: displayAreaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -305,6 +329,10 @@ class ProfileAddressesStepSection extends StatelessWidget {
                 onChanged: (v) {
                   if (v != null) {
                     addr.area = v;
+                    addr.areaId =
+                        controller.workInfo.globalAreaIdMap[v] ??
+                        controller.workInfo.workAreaIdMap[v] ??
+                        0;
                     controller.addresses.refresh();
                   }
                 },

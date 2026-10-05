@@ -1238,18 +1238,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
               final talukaList = controller.getAddressTalukas(
                 controller.personalInfo.motherDistrict.value,
               );
+              final motherTalukaVal =
+                  controller.personalInfo.motherTaluka.value;
+              final displayTalukaList =
+                  (motherTalukaVal.isNotEmpty &&
+                      !talukaList.contains(motherTalukaVal))
+                  ? [motherTalukaVal, ...talukaList]
+                  : talukaList;
               return AppFormDropdown<String>(
-                enableAdd: true,
                 value:
-                    talukaList.contains(
-                      controller.personalInfo.motherTaluka.value,
-                    )
-                    ? controller.personalInfo.motherTaluka.value
+                    motherTalukaVal.isNotEmpty ? motherTalukaVal
                     : null,
                 isRequired:
                     controller.hasMotherAddressChanged &&
                     controller.personalInfo.motherDistrict.value.isNotEmpty,
-                items: talukaList
+                items: displayTalukaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -1279,16 +1282,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
               final areaList = controller.getAddressAreas(
                 controller.personalInfo.motherTaluka.value,
               );
+              final motherAreaVal = controller.personalInfo.motherArea.value;
+              final displayAreaList =
+                  (motherAreaVal.isNotEmpty &&
+                      !areaList.contains(motherAreaVal))
+                  ? [motherAreaVal, ...areaList]
+                  : areaList;
               return AppFormDropdown<String>(
-                enableAdd: true,
                 value:
-                    areaList.contains(controller.personalInfo.motherArea.value)
-                    ? controller.personalInfo.motherArea.value
+                    motherAreaVal.isNotEmpty ? motherAreaVal
                     : null,
                 isRequired:
                     controller.hasMotherAddressChanged &&
                     controller.personalInfo.motherTaluka.value.isNotEmpty,
-                items: areaList
+                items: displayAreaList
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,

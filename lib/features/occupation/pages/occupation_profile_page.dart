@@ -340,7 +340,12 @@ class _OccupationFilterDialogState extends State<_OccupationFilterDialog> {
   }
 
   void _onTalukaChanged(DropdownItem? value) {
-    setState(() => _tempTaluka = value);
+    setState(() {
+      _tempTaluka = value;
+      if (value != null && !_localTalukas.any((o) => o.text == value.text)) {
+        _localTalukas.insert(0, value);
+      }
+    });
   }
 
   Future<void> _applyFilters() async {
@@ -479,7 +484,6 @@ class _OccupationFilterDialogState extends State<_OccupationFilterDialog> {
               ),
               SizedBox(height: 16.h),
               CustomDropdown<DropdownItem>(
-                enableAdd: true,
                 hint: LK.selectTaluka.tr,
                 value: _tempTaluka,
                 items: _localTalukas
