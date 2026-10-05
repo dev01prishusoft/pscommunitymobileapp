@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/utils/form_state_mixin.dart';
+import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/models/address_model.dart';
@@ -98,6 +99,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
   RxString get tob => personalInfo.tob;
   RxString get weight => personalInfo.weight;
   RxString get height => personalInfo.height;
+  String get heightLabel {
+    final ft = cmToFeet(height.value);
+    if (ft != null && ft.isNotEmpty) {
+      return '${LK.heightCm.tr} • $ft';
+    }
+    return LK.heightCm.tr;
+  }
   RxString get gender => personalInfo.gender;
   RxString get maritalStatus => personalInfo.maritalStatus;
 

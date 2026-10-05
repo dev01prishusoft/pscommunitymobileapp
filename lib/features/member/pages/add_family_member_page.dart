@@ -770,7 +770,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   Obx(
                     () => AppFormTextField(
                       controller: controller.heightCtrl,
-                      label: LK.heightCm.tr,
+                      label: controller.heightLabel,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),

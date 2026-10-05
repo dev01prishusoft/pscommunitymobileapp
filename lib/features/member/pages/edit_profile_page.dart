@@ -704,7 +704,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Obx(
                     () => AppFormTextField(
                       controller: controller.heightCtrl,
-                      label: LK.heightCm.tr,
+                      label: controller.heightLabel,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),

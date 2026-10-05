@@ -55,3 +55,13 @@ class DecimalAutoInsertFormatter extends TextInputFormatter {
     }
   }
 }
+
+String? cmToFeet(String? cmText) {
+  if (cmText == null) return null;
+  final clean = cmText.replaceAll(' cm', '').replaceAll('cm', '').trim();
+  if (clean.isEmpty) return null;
+  final cm = double.tryParse(clean);
+  if (cm == null || cm <= 0) return null;
+  final feet = cm / 30.48;
+  return '${feet.toStringAsFixed(2)} ft';
+}

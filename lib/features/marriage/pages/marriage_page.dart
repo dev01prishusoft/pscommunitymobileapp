@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
+import 'package:pscommunitymobileapp/core/utils/app_formatters.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
@@ -626,6 +627,10 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                         toRx: controller.selectedHeightTo,
                         errorRx: controller.heightError,
                         staticItems: controller.heights,
+                        mapper: (val) {
+                          final ft = cmToFeet(val);
+                          return ft != null ? '$val ($ft)' : val;
+                        },
                       ),
                     ),
                     SizedBox(height: 16.h),
