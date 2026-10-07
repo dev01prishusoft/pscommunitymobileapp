@@ -838,15 +838,50 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   () => AppFormTextField(
                     controller: controller.mobileCtrl,
                     label: LK.mobileNo.tr,
-                    isRequired: true,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     prefixIcon: const Icon(Iconsax.call_copy),
                     maxLength: 10,
-                    validator: AppValidators.mobile,
+                    validator: AppValidators.optionalMobile,
                     updateStatus: controller.getUpdateStatus('MobileNo'),
                   ),
                 ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.warningLight,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.warning.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 18,
+                        color: AppColors.warning,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          LK.OptionalMobileNo.tr,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            fontSize: 12,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
                 AppSpacing.vM,
                 Obx(
                   () => AppFormTextField(

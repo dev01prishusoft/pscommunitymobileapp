@@ -733,4 +733,5 @@ class LK {
       'This is a computer-generated receipt, signature is not required.';
 
   static const String Search = "Search";
+  static const String OptionalMobileNo = "OptionalMobileNo";
 }

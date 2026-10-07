@@ -737,32 +737,34 @@ class ProfileFormController extends GetxController with FormStateMixin {
         addAddr('Landmark', addr.landmark, initialAddr?['landmark'] as String?);
         addAddr('Pincode', addr.pincode, initialAddr?['pincode'] as String?);
 
-        final areaId =
-            getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId ?? 0;
+        final rawAreaId =
+            getId(addr.area, workInfo.globalAreaIdMap) ?? addr.areaId;
+        final areaId = rawAreaId ?? 0;
         final initialAreaId = initialAddr?['areaId'] as int?;
-        if (areaId != initialAreaId)
-          formDataMap['AreaId'] = areaId;
+        if (areaId != initialAreaId) formDataMap['AreaId'] = areaId;
 
-        final talukaId =
-            getId(addr.taluka, workInfo.globalTalukaIdMap) ??
-            addr.talukaId ??
-            0;
+        final rawTalukaId =
+            getId(addr.taluka, workInfo.globalTalukaIdMap) ?? addr.talukaId;
+        final talukaId = rawTalukaId ?? 0;
         final initialTalukaId = initialAddr?['talukaId'] as int?;
-        if (talukaId != initialTalukaId)
-          formDataMap['TalukaId'] = talukaId;
+        if (talukaId != initialTalukaId) formDataMap['TalukaId'] = talukaId;
 
-        addAddr(
-          'TalukaName',
-          addr.taluka,
-          initialAddr?['taluka'] as String? ??
-              initialAddr?['talukaName'] as String?,
-        );
-        addAddr(
-          'AreaName',
-          addr.area,
-          initialAddr?['area'] as String? ??
-              initialAddr?['areaName'] as String?,
-        );
+        if (rawTalukaId == null || rawTalukaId == 0) {
+          addAddr(
+            'TalukaName',
+            addr.taluka,
+            initialAddr?['taluka'] as String? ??
+                initialAddr?['talukaName'] as String?,
+          );
+        }
+        if (rawAreaId == null || rawAreaId == 0) {
+          addAddr(
+            'AreaName',
+            addr.area,
+            initialAddr?['area'] as String? ??
+                initialAddr?['areaName'] as String?,
+          );
+        }
 
         final districtId =
             getId(
@@ -2115,7 +2117,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
   }) async {
     final isEdit = _currentMember != null;
     bool hasListErrors = false;
-
+    
     if (contactInfo.addresses.isEmpty) {
       hasListErrors = true;
     }
@@ -2343,24 +2345,30 @@ class ProfileFormController extends GetxController with FormStateMixin {
               formDataMap['Pincode'] = addr.pincode.isEmpty
                   ? null
                   : addr.pincode;
-              formDataMap['AreaId'] =
+              final arId =
                   getId(
                     addr.area,
                     workInfo.globalAreaIdMap,
                     workInfo.workAreaIdMap,
                   ) ??
-                  addr.areaId ??
-                  0;
-              formDataMap['TalukaId'] =
+                  addr.areaId;
+              final talId =
                   getId(
                     addr.taluka,
                     workInfo.globalTalukaIdMap,
                     workInfo.workTalukaIdMap,
                   ) ??
-                  addr.talukaId ??
-                  0;
-              formDataMap['TalukaName'] = addr.taluka;
-              formDataMap['AreaName'] = addr.area;
+                  addr.talukaId;
+
+              formDataMap['AreaId'] = arId ?? 0;
+              formDataMap['TalukaId'] = talId ?? 0;
+
+              if (talId == null || talId == 0) {
+                formDataMap['TalukaName'] = addr.taluka;
+              }
+              if (arId == null || arId == 0) {
+                formDataMap['AreaName'] = addr.area;
+              }
               final distId =
                   getId(
                     addr.district,
@@ -2458,9 +2466,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             }
 
             if (targetMemberId != null &&
-                (!isEdit ||
-                    hasContactAddressChanged ||
-                    contactInfo.addresses.isNotEmpty)) {
+                contactInfo.addresses.isNotEmpty &&
+                (!isEdit || hasContactAddressChanged)) {
               int? safeGetId(
                 String? name,
                 Map<String, int> idMap, [
@@ -2527,7 +2534,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
                         addr.areaId ??
                         0;
 
-                    return {
+                    final addrItem = <String, dynamic>{
                       "memberAddressId": 0,
                       "memberId": targetMemberId,
                       "addressTypeId":
@@ -2544,9 +2551,14 @@ class ProfileFormController extends GetxController with FormStateMixin {
                       "pincode": addr.pincode,
                       "isPrimary": addr.isPrimary,
                       "isActive": true,
-                      "talukaName": addr.taluka,
-                      "areaName": addr.area,
                     };
+                    if (talId == 0) {
+                      addrItem["talukaName"] = addr.taluka;
+                    }
+                    if (arId == 0) {
+                      addrItem["areaName"] = addr.area;
+                    }
+                    return addrItem;
                   }).toList(),
                 };
                 await apiClient.post(
@@ -2563,38 +2575,40 @@ class ProfileFormController extends GetxController with FormStateMixin {
               }
             }
 
-            if (!isEdit && targetMemberId != null) {
+            if (!isEdit &&
+                targetMemberId != null &&
+                contactInfo.educationList.isNotEmpty) {
               try {
                 final educationsPayload = {
                   "memberId": targetMemberId,
                   "educations": contactInfo.educationList.map((edu) {
-                      return {
-                        "memberEducationId": 0,
+                    return {
+                      "memberEducationId": 0,
                       "memberId": targetMemberId,
-                        "educationalQualificationId":
-                            contactInfo.educationIdMap[edu.qualification] ??
-                            edu.qualificationId ??
-                            0,
-                        "description": edu.description,
-                        "institutionName": edu.institute,
-                        "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
-                        "percentage": double.tryParse(edu.percentage) ?? 0,
-                        "grade": edu.grade,
-                        "isHighestQualification": edu.isHighest,
-                        "isActive": true,
-                      };
-                    }).toList(),
-                  };
-                  await apiClient.post(
-                    '/api/v1/MemberEducation/mobile/upsert',
-                    data: educationsPayload,
-                  );
-                } catch (e, stack) {
-                  CrashReporter.recordError(
-                    e,
-                    stack,
-                    reason:
-                        'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
+                      "educationalQualificationId":
+                          contactInfo.educationIdMap[edu.qualification] ??
+                          edu.qualificationId ??
+                          0,
+                      "description": edu.description,
+                      "institutionName": edu.institute,
+                      "yearOfPassing": int.tryParse(edu.passingYear) ?? 0,
+                      "percentage": double.tryParse(edu.percentage) ?? 0,
+                      "grade": edu.grade,
+                      "isHighestQualification": edu.isHighest,
+                      "isActive": true,
+                    };
+                  }).toList(),
+                };
+                await apiClient.post(
+                  '/api/v1/MemberEducation/mobile/upsert',
+                  data: educationsPayload,
+                );
+              } catch (e, stack) {
+                CrashReporter.recordError(
+                  e,
+                  stack,
+                  reason:
+                      'ProfileFormController._saveMember MemberEducation/mobile/upsert failed',
                 );
               }
             }

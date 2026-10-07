@@ -97,7 +97,8 @@ class AddFamilyMemberController extends ProfileFormController {
 
     showListErrors.value = hasListErrors;
 
-    if (!hasListErrors && (formKey.currentState?.validate() ?? false)) {
+    if (!hasListErrors &&
+        (formKey.currentState == null || formKey.currentState!.validate())) {
       personalInfo.firstName.value = personalInfo.firstNameCtrl.text;
       personalInfo.lastName.value = personalInfo.lastNameCtrl.text;
 
@@ -131,7 +132,7 @@ class AddFamilyMemberController extends ProfileFormController {
 
             final formData = dio.FormData.fromMap(formDataMap);
             final response = await apiClient.post(
-              '/api/v1/MemberUpdateRequest/create',
+              '/api/v2/MemberUpdateRequest/create',
               data: formData,
             );
             
@@ -190,7 +191,7 @@ class AddFamilyMemberController extends ProfileFormController {
             }
           }
 
-          if (hasContactAddressChanged || contactInfo.addresses.isNotEmpty) {
+          if (contactInfo.addresses.isNotEmpty) {
             try {
               int? safeGetId(
                 String? name,
@@ -251,7 +252,7 @@ class AddFamilyMemberController extends ProfileFormController {
                       addr.areaId ??
                       0;
 
-                  return {
+                  final addrItem = <String, dynamic>{
                     "memberAddressId": 0,
                     "memberId": memberId,
                     "addressTypeId":
@@ -271,9 +272,14 @@ class AddFamilyMemberController extends ProfileFormController {
                     "pincode": addr.pincode,
                     "isPrimary": addr.isPrimary,
                     "isActive": true,
-                    "talukaName": addr.taluka,
-                    "areaName": addr.area,
                   };
+                  if (talId == 0) {
+                    addrItem["talukaName"] = addr.taluka;
+                  }
+                  if (arId == 0) {
+                    addrItem["areaName"] = addr.area;
+                  }
+                  return addrItem;
                 }).toList(),
               };
               await apiClient.post(
