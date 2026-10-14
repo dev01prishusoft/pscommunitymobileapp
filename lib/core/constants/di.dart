@@ -26,6 +26,7 @@ import 'package:pscommunitymobileapp/features/events/controllers/events_controll
 import 'package:pscommunitymobileapp/features/events/controllers/my_events_controller.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repositories.dart';
 import 'package:pscommunitymobileapp/features/events/repositories/events_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/family/repositories/family_repository.dart';
 import 'package:pscommunitymobileapp/features/family/repositories/family_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
@@ -108,6 +109,7 @@ class DI {
         Get.lazyPut(() => SplashController(), fenix: true);
         final memberRepository = MemberRepositoryImpl(apiClient);
         final familyRepository = FamilyRepositoryImpl(apiClient);
+        Get.put<FamilyRepository>(familyRepository, permanent: true);
         Get.lazyPut(() => FamilyController(familyRepository), fenix: true);
         Get.lazyPut(
           () => FindMemberController(memberRepository, familyRepository),

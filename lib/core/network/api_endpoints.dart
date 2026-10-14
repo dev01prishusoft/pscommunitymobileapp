@@ -70,4 +70,6 @@ class ApiEndpoints {
   static String myRegisteredEventDetail(String registrationId) =>
       "/api/v1/EventRegistration/$registrationId";
   static String cancelRegistration = "/api/v1/EventRegistration/cancel";
+  static String familyTree(int memberId) =>
+      "/api/v1/family-tree/member/$memberId";
 }

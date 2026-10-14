@@ -9,6 +9,8 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_tile.dart';
 
@@ -243,6 +245,63 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                                                 color: AppColors.primary,
                                                 fontWeight: FontWeight.bold,
                                               ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Material(
+                                        color: AppColors.transparent,
+                                        child: InkWell(
+                                          onTap: () {
+                                            final headMember =
+                                                family.members.firstWhereOrNull(
+                                                  (m) => m.isHead,
+                                                ) ??
+                                                family.members.firstOrNull;
+                                            final int memberId =
+                                                headMember != null
+                                                ? (int.tryParse(
+                                                        headMember.id,
+                                                      ) ??
+                                                      0)
+                                                : 0;
+                                            if (memberId > 0) {
+                                              Get.toNamed<void>(
+                                                AppRouter.familyTree,
+                                                arguments: {
+                                                  'memberId': memberId,
+                                                },
+                                              );
+                                            } else {
+                                              PSDelightToastBar(
+                                                builder: (_) => const ToastCard(
+                                                  title: 'Family Tree',
+                                                  subtitle:
+                                                      'No valid member found for this family',
+                                                  isErrorMessage: true,
+                                                ),
+                                              ).show();
+                                            }
+                                          },
+                                          borderRadius: BorderRadius.circular(
+                                            8.r,
+                                          ),
+                                          child: Container(
+                                            padding: EdgeInsets.all(6.w),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.25),
+                                              ),
+                                            ),
+                                            child: Icon(
+                                              Icons.account_tree_rounded,
+                                              size: 18.sp,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],

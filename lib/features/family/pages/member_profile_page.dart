@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -204,10 +205,10 @@ class _ProfileHeader extends StatelessWidget {
                               vertical: 4.h,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.pink.withValues(alpha: 0.08),
+                              color: AppColors.pink.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
-                                color: Colors.pink.withValues(alpha: 0.12),
+                                color: AppColors.pink.withValues(alpha: 0.12),
                                 width: 1.w,
                               ),
                             ),
@@ -224,6 +225,34 @@ class _ProfileHeader extends StatelessWidget {
                   ],
                 ),
               ),
+              if (member.memberId > 0) ...[
+                SizedBox(width: 8.w),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed<void>(
+                      AppRouter.familyTree,
+                      arguments: {'memberId': member.memberId},
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        width: 1.w,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.account_tree_rounded,
+                      color: AppColors.primary,
+                      size: 20.sp,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ).paddingSymmetric(vertical: 25.h, horizontal: 20.w),
           if (fromMyMemberList &&

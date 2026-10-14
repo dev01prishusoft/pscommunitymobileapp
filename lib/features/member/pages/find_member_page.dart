@@ -80,7 +80,6 @@ class _FindMemberPageState extends State<FindMemberPage> {
               ),
               IconButton(
                 icon: const Icon(Iconsax.filter_search_copy),
-                tooltip: LK.locationFilters.tr,
                 onPressed: () {
                   Get.dialog<void>(const _FindMemberFilterDialog());
                 },
@@ -208,6 +207,49 @@ class _FindMemberCard extends StatelessWidget {
     );
   }
 
+  Widget _buildFamilyTreeBadge() {
+    return InkWell(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.familyTree,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      borderRadius: BorderRadius.circular(6.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(6.r),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            width: 0.5.w,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.account_tree_rounded,
+              size: 11.sp,
+              color: AppColors.primary,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              LK.familyTree.tr,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String occupationText = member.occupation;
@@ -265,6 +307,7 @@ class _FindMemberCard extends StatelessWidget {
                         _buildMarriageBadge(),
                       if (member.gender.isNotEmpty) _buildGenderAgeBadge(),
                       if (member.gotra.isNotEmpty) _buildGotraBadge(),
+                      if (member.memberId > 0) _buildFamilyTreeBadge(),
                     ],
                   ),
                   if (member.occupation.isNotEmpty) ...[

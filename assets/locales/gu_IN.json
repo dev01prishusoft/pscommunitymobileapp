@@ -544,5 +544,13 @@
     "TIMEOUT": "ટાઈમઆઉટ",
     "Exit App": "એપ્લિકેશનમાંથી બહાર નીકળો",
     "Add": "+ઉમેરો",
-    "Search": "શોધો"
+    "Family Tree": "કુટુંબ વૃક્ષ",
+    "Search": "શોધો",
+    "Generations": "પેઢીઓ",
+    "Spouse": "જીવનસાથી",
+    "Demised": "સ્વર્ગસ્થ",
+    "Unable to render family tree layout": "ફેમિલી ટ્રી લેઆઉટ દર્શાવવામાં અસમર્થ",
+    "No family tree records found.": "ફેમિલી ટ્રીના કોઈ રેકોર્ડ મળ્યા નથી.",
+    "Member information not provided.": "સભ્યની માહિતી પ્રદાન કરેલ નથી.",
+    "Failed to load family tree. Please try again.": "ફેમિલી ટ્રી લોડ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
 }

@@ -14,6 +14,7 @@ import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_areas_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/family_members_list_page.dart';
+import 'package:pscommunitymobileapp/features/family/pages/family_tree_page.dart';
 import 'package:pscommunitymobileapp/features/family/pages/member_profile_page.dart';
 import 'package:pscommunitymobileapp/features/home/pages/home_page.dart';
 import 'package:pscommunitymobileapp/features/home/pages/share_app_page.dart';
@@ -62,6 +63,7 @@ class AppRouter {
   static String postLoginSplash = '/post-login-splash';
   static String familyAreas = '/family-areas';
   static String familyMembers = '/family-members';
+  static String familyTree = '/family-tree';
   static String marriage = '/marriage';
   static String occupationDirectory = '/occupation-directory';
   static String committeeMembers = '/committee-members';
@@ -149,6 +151,11 @@ class AppRouter {
     GetPage<void>(
       name: familyMembers,
       page: () => FamilyMembersListPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: familyTree,
+      page: () => const FamilyTreePage(),
       middlewares: [AuthGuard()],
     ),
     GetPage<void>(

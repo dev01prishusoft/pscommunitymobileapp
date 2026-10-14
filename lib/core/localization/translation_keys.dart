@@ -72,6 +72,7 @@ class LK {
   static const String pleaseEnterConfirmPassword =
       'Please enter Confirm Password';
   static const String family = 'Family';
+  static const String familyTree = 'Family Tree';
   static const String familyByArea = 'family_by_area';
   static const String findMember = 'Find Member';
   static const String committee = 'Committee';
@@ -734,4 +735,14 @@ class LK {
 
   static const String Search = "Search";
   static const String OptionalMobileNo = "OptionalMobileNo";
+  static const String Generations = "Generations";
+  static const String Spouse = "Spouse";
+  static const String Demised = "Demised";
+  static const Unabletorenderfamilytreelayout =
+      "Unable to render family tree layout";
+  static const Nofamilytreerecordsfound = "No family tree records found.";
+  static const Memberinformationnotprovided =
+      "Member information not provided.";
+  static const Failedtoloadfamilytreetryagain =
+      "Failed to load family tree. Please try again.";
 }

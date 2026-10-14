@@ -543,5 +543,13 @@
     "TIMEOUT": "TIMEOUT",
     "Exit App": "Exit App",
     "Add": "+Add",
-    "Search": "Search"
+    "Family Tree": "Family Tree",
+    "Search": "Search",
+    "Generations": "Generations",
+    "Spouse": "Spouse",
+    "Demised": "Demised",
+    "Unable to render family tree layout": "Unable to render family tree layout",
+    "No family tree records found.": "No family tree records found.",
+    "Member information not provided.": "Member information not provided.",
+    "Failed to load family tree. Please try again.": "Failed to load family tree. Please try again."
 }

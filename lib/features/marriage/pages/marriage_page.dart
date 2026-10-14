@@ -81,7 +81,6 @@ class MarriagePage extends GetView<MarriageController> {
           }),
           IconButton(
             icon: Icon(Iconsax.filter_search_copy),
-            tooltip: LK.advancedFilters.tr,
             onPressed: () => _showAdvancedFilters(context),
           ),
         ],
@@ -432,6 +431,7 @@ class _MarriageMemberCard extends StatelessWidget {
                         Iconsax.briefcase_copy,
                         AppColors.chart5,
                       ),
+                    if (member.memberId > 0) _buildFamilyTreeBadge(),
                   ],
                 ),
                 if (member.area.isNotEmpty) ...[
@@ -500,6 +500,48 @@ class _MarriageMemberCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFamilyTreeBadge() {
+    return InkWell(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.toNamed<void>(
+          AppRouter.familyTree,
+          arguments: {'memberId': member.memberId},
+        );
+      },
+      borderRadius: BorderRadius.circular(8.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.15),
+            width: 1.w,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.account_tree_rounded,
+              size: 12.sp,
+              color: AppColors.primary,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              LK.familyTree.tr,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -61,6 +61,42 @@ class AppColors {
   static const chart3 = Color(0xFF0F2444);
   static const chart4 = Color(0xFFD4A24A);
   static const chart5 = Color(0xFFC26A3C);
+
+  // Family Tree Colors
+  static const Color treeCanvasBackground = Color(0xFFF1F5F9);
+  static const Color treeMale = Color(0xFF3B82F6);
+  static const Color treeMaleDark = Color(0xFF1D4ED8);
+  static const Color treeMaleBg = Color(0xFFF0F5FA);
+  static const Color treeMaleBgEnd = Color(0xFFE2EDF7);
+  static const Color treeMaleBorder = Color(0xFF93C5FD);
+  static const Color treeMaleAccent = Color(0xFF1E40AF);
+
+  static const Color treeFemale = Color(0xFFEC4899);
+  static const Color treeFemaleDark = Color(0xFFBE185D);
+  static const Color treeFemaleBg = Color(0xFFFDF2F4);
+  static const Color treeFemaleBgEnd = Color(0xFFFBE4E8);
+  static const Color treeFemaleBorder = Color(0xFFF472B6);
+  static const Color treeFemaleAccent = Color(0xFFBE185D);
+
+  static const Color treeOther = Color(0xFF8B5CF6);
+  static const Color treeOtherDark = Color(0xFF6D28D9);
+  static const Color treeOtherBg = Color(0xFFF5F3FF);
+  static const Color treeOtherBgEnd = Color(0xFFEDE9FE);
+  static const Color treeOtherBorder = Color(0xFFA78BFA);
+  static const Color treeOtherAccent = Color(0xFF7C3AED);
+
+  static const Color treeHead = Color(0xFFF59E0B);
+  static const Color treeHeadDark = Color(0xFFD97706);
+  static const Color treeHeadText = Color(0xFFB45309);
+  static const Color treeHeadBg = Color(0xFFFEF3C7);
+
+  static const Color treeSpouse = Color(0xFFE11D48);
+  static const Color treeSelected = Color(0xFF10B981);
+  static const Color treeBranchLine = Color(0xFF64748B);
+  static const Color treeSlateDark = Color(0xFF0F172A);
+  static const Color treeSlateText = Color(0xFF1E293B);
+  static const Color treeSlateMuted = Color(0xFF475569);
+  static const Color treeSlateLight = Color(0xFF334155);
 }
 
 class AppTheme {

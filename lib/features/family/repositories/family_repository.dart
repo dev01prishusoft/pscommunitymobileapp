@@ -4,6 +4,7 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/member_address.dart';
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
+import 'package:pscommunitymobileapp/features/family/models/family_tree_model.dart';
 
 abstract class FamilyRepository {
   Future<List<FamilyArea>> getFamilyAreas({
@@ -21,6 +22,7 @@ abstract class FamilyRepository {
   Future<Member> getMemberDetails(int memberId);
   Future<List<MemberAddress>> getMemberAddresses(int memberId);
   Future<List<EducationModel>> getMemberEducations(int memberId);
+  Future<FamilyTreeData?> getFamilyTree(int memberId);
 
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -7,10 +8,26 @@ import 'package:pscommunitymobileapp/features/family/repositories/family_reposit
 import 'package:pscommunitymobileapp/core/models/education_model.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/member_address.dart';
+import 'package:pscommunitymobileapp/features/family/models/family_tree_model.dart';
 
 class FamilyRepositoryImpl implements FamilyRepository {
   FamilyRepositoryImpl(this._apiClient);
   final ApiClient _apiClient;
+
+  @override
+  Future<FamilyTreeData?> getFamilyTree(int memberId) async {
+    final response = await _apiClient.get(ApiEndpoints.familyTree(memberId));
+    if (response.statusCode == 200 && response.data != null) {
+      final Map<String, dynamic> dataMap = response.data is Map<String, dynamic>
+          ? response.data as Map<String, dynamic>
+          : (response.data is String
+              ? jsonDecode(response.data as String) as Map<String, dynamic>
+              : <String, dynamic>{});
+      final treeResponse = FamilyTreeResponse.fromJson(dataMap);
+      return treeResponse.data;
+    }
+    return null;
+  }
 
   @override
   Future<Member> getMemberDetails(int memberId) async {
