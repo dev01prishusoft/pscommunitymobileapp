@@ -13,6 +13,7 @@ class AdPlacementSlot extends StatefulWidget {
   final AdLayout layout;
   final int? limit;
   final EdgeInsetsGeometry? padding;
+  final double? height;
 
   const AdPlacementSlot({
     super.key,
@@ -20,6 +21,7 @@ class AdPlacementSlot extends StatefulWidget {
     this.layout = AdLayout.card,
     this.limit,
     this.padding,
+    this.height,
   });
 
   @override
@@ -84,19 +86,23 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> {
         }
       });
 
+      final cardHeight = widget.height ?? 130.h;
+
       final content = widget.placement == AdPlacement.homeTop
           ? AdBannerCarousel(
               advertisements: ads,
               placement: widget.placement,
+              height: cardHeight,
             )
           : AdvertisementCard(
               advertisement: ads.first,
               placement: widget.placement,
               layout: widget.layout,
+              height: cardHeight,
             );
 
       return Padding(
-        padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
         child: content,
       );
     });

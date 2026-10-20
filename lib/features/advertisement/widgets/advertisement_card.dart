@@ -17,6 +17,7 @@ class AdvertisementCard extends StatefulWidget {
   final AdLayout layout;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onVideoPlaybackChanged;
+  final double? height;
 
   const AdvertisementCard({
     super.key,
@@ -25,6 +26,7 @@ class AdvertisementCard extends StatefulWidget {
     this.layout = AdLayout.card,
     this.onTap,
     this.onVideoPlaybackChanged,
+    this.height,
   });
 
   @override
@@ -110,7 +112,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
       label: 'Sponsored advertisement, ${widget.advertisement.title}',
       button: true,
       child: Container(
-        height: 120.h,
+        height: widget.height ?? 130.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,

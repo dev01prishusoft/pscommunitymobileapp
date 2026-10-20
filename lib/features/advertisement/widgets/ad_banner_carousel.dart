@@ -11,11 +11,13 @@ import 'advertisement_card.dart';
 class AdBannerCarousel extends StatefulWidget {
   final List<Advertisement> advertisements;
   final AdPlacement placement;
+  final double? height;
 
   const AdBannerCarousel({
     super.key,
     required this.advertisements,
     this.placement = AdPlacement.homeTop,
+    this.height,
   });
 
   @override
@@ -66,12 +68,15 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
       return const SizedBox.shrink();
     }
 
+    final cardHeight = widget.height ?? 130.h;
+
     // Static banner if only 1 item
     if (widget.advertisements.length == 1) {
       return AdvertisementCard(
         advertisement: widget.advertisements.first,
         placement: widget.placement,
         layout: AdLayout.banner,
+        height: cardHeight,
       );
     }
 
@@ -87,6 +92,7 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
               advertisement: ad,
               placement: widget.placement,
               layout: AdLayout.banner,
+              height: cardHeight,
               onVideoPlaybackChanged: (isPlaying) {
                 if (_isVideoPlaying != isPlaying) {
                   setState(() {
@@ -97,7 +103,7 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
             );
           },
           options: CarouselOptions(
-            height: 120.h,
+            height: cardHeight,
             viewportFraction: 1.0,
             autoPlay: _isResumed && !_isVideoPlaying,
             autoPlayInterval: const Duration(seconds: 5),
