@@ -16,6 +16,10 @@ import 'package:pscommunitymobileapp/core/module_permission/module_permission.da
 
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -75,6 +79,18 @@ class _HomePageState extends State<HomePage> with RouteAware {
               if (Get.isRegistered<ModulePermissionService>())
                 Get.find<ModulePermissionService>().fetchMyModules(),
               Get.find<HomeController>().fetchUnreadNotificationCount(),
+              if (Get.isRegistered<AdvertisementController>()) ...[
+                Get.find<AdvertisementController>().fetchPlacementAds(
+                  AdPlacement.homeTop,
+                  limit: 5,
+                  forceRefresh: true,
+                ),
+                Get.find<AdvertisementController>().fetchPlacementAds(
+                  AdPlacement.homeBottom,
+                  limit: 1,
+                  forceRefresh: true,
+                ),
+              ],
             ]);
           },
           child: SingleChildScrollView(
@@ -83,8 +99,18 @@ class _HomePageState extends State<HomePage> with RouteAware {
               children: [
                 AppSpacing.vL,
                 _HomeHeader(),
+                AdPlacementSlot(
+                  placement: AdPlacement.homeTop,
+                  layout: AdLayout.banner,
+                  limit: 5,
+                ),
                 AppSpacing.vL,
                 _HomeMenuGrid(controller: Get.find<HomeController>()),
+                AdPlacementSlot(
+                  placement: AdPlacement.homeBottom,
+                  layout: AdLayout.banner,
+                ),
+                AppSpacing.vL,
               ],
             ),
           ),

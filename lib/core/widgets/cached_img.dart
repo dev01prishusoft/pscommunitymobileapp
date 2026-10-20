@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 
 class CachedImg extends StatelessWidget {
@@ -25,8 +26,23 @@ class CachedImg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (url.isEmpty) {
-      return errorWidget?.call(context, url, null) ??
+    String resolvedUrl = url.trim();
+    if (resolvedUrl.isNotEmpty &&
+        !resolvedUrl.startsWith('http://') &&
+        !resolvedUrl.startsWith('https://')) {
+      try {
+        final baseUrl = AppEnvironment.I.apiBaseUrl;
+        final cleanBase = baseUrl.endsWith('/')
+            ? baseUrl.substring(0, baseUrl.length - 1)
+            : baseUrl;
+        final cleanPath =
+            resolvedUrl.startsWith('/') ? resolvedUrl : '/$resolvedUrl';
+        resolvedUrl = '$cleanBase$cleanPath';
+      } catch (_) {}
+    }
+
+    if (resolvedUrl.isEmpty) {
+      return errorWidget?.call(context, resolvedUrl, null) ??
           Icon(Icons.broken_image, color: AppColors.grey);
     }
 
@@ -41,7 +57,7 @@ class CachedImg extends StatelessWidget {
             : null);
 
     return Image.network(
-      url,
+      resolvedUrl,
       fit: fit,
       width: width,
       height: height,

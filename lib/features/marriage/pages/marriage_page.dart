@@ -18,6 +18,9 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/controllers/marriage_controller.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 
 class MarriagePage extends GetView<MarriageController> {
   const MarriagePage({super.key});
@@ -98,6 +101,13 @@ class MarriagePage extends GetView<MarriageController> {
                 return const SliverToBoxAdapter(child: SizedBox.shrink());
               }
             }),
+            SliverToBoxAdapter(
+              child: AdPlacementSlot(
+                placement: AdPlacement.matrimonialDirectory,
+                layout: AdLayout.card,
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+              ),
+            ),
             Obx(() {
               if (controller.state.value == AppState.data) {
                 return SliverList(

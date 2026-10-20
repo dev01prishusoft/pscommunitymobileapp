@@ -102,7 +102,6 @@
     "Education:": "Education:",
     "Institute": "Institute",
     "Educational scholarships": "Educational scholarships",
-    "Email": "Email",
     "Emergency Contact No": "Emergency Contact No",
     "Emergency Contact Name": "Emergency Contact Name",
     "End Date": "End Date",
@@ -551,5 +550,14 @@
     "Unable to render family tree layout": "Unable to render family tree layout",
     "No family tree records found.": "No family tree records found.",
     "Member information not provided.": "Member information not provided.",
-    "Failed to load family tree. Please try again.": "Failed to load family tree. Please try again."
+    "Failed to load family tree. Please try again.": "Failed to load family tree. Please try again.",
+    "Advertisements": "Advertisements",
+    "Sponsored": "Sponsored",
+    "Know More": "Know More",
+    "Advertisement is no longer available": "Advertisement is no longer available",
+    "Call": "Call",
+    "Email": "Email",
+    "Open link": "Open link",
+    "No advertisements found": "No advertisements found",
+    "Advertiser Contact": "Advertiser Contact"
 }

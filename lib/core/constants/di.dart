@@ -45,6 +45,12 @@ import 'package:pscommunitymobileapp/features/samaj/controllers/bank_account_con
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/splash/controllers/splash_controller.dart';
 import 'package:pscommunitymobileapp/features/support/controller/support_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_list_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository.dart';
+import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository_impl.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_cache_storage.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_tracking_service.dart';
 
 class DI {
   static Future<void> bootstrap() async {
@@ -162,6 +168,33 @@ class DI {
         final pushNotificationService = PushNotificationService(apiClient);
         await pushNotificationService.init();
         Get.put(pushNotificationService, permanent: true);
+
+        final advertisementRepository = AdvertisementRepositoryImpl(apiClient);
+        Get.put<AdvertisementRepository>(advertisementRepository, permanent: true);
+
+        final advertisementCacheStorage = AdvertisementCacheStorage();
+        Get.put(advertisementCacheStorage, permanent: true);
+
+        final advertisementTrackingService = AdvertisementTrackingService(
+          advertisementRepository,
+        );
+        Get.put(advertisementTrackingService, permanent: true);
+
+        Get.lazyPut(
+          () => AdvertisementController(
+            repository: advertisementRepository,
+            cacheStorage: advertisementCacheStorage,
+            trackingService: advertisementTrackingService,
+            tokenManager: tokenManager,
+            connectivity: connectivity,
+          ),
+          fenix: true,
+        );
+
+        Get.lazyPut(
+          () => AdvertisementListController(advertisementRepository),
+          fenix: true,
+        );
 
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());

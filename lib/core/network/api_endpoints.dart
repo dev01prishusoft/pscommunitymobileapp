@@ -72,4 +72,13 @@ class ApiEndpoints {
   static String cancelRegistration = "/api/v1/EventRegistration/cancel";
   static String familyTree(int memberId) =>
       "/api/v1/family-tree/member/$memberId";
+
+  // Advertisement Endpoints
+  static String advertisementsByPlacement(String placement, {int? limit}) =>
+      '/api/v1/member/advertisements?placement=$placement${limit != null ? '&limit=$limit' : ''}';
+  static String advertisementDetail(int id) =>
+      '/api/v1/member/advertisements/$id';
+  static String advertisementList = '/api/v1/member/advertisements/list';
+  static String advertisementBatchEvents =
+      '/api/v1/member/advertisements/events/batch';
 }

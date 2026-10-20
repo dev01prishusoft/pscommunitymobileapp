@@ -102,7 +102,6 @@
     "Education:": "શિક્ષણ:",
     "Institute": "સંસ્થા",
     "Educational scholarships": "શૈક્ષણિક શિષ્યવૃત્તિ",
-    "Email": "ઈમેલ",
     "Emergency Contact No": "ઇમરજન્સી સંપર્ક નંબર",
     "Emergency Contact Name": "ઇમરજન્સી સંપર્ક વ્યક્તિ",
     "End Date": "અંતિમ તારીખ",
@@ -552,5 +551,14 @@
     "Unable to render family tree layout": "ફેમિલી ટ્રી લેઆઉટ દર્શાવવામાં અસમર્થ",
     "No family tree records found.": "ફેમિલી ટ્રીના કોઈ રેકોર્ડ મળ્યા નથી.",
     "Member information not provided.": "સભ્યની માહિતી પ્રદાન કરેલ નથી.",
-    "Failed to load family tree. Please try again.": "ફેમિલી ટ્રી લોડ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો."
+    "Failed to load family tree. Please try again.": "ફેમિલી ટ્રી લોડ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
+    "Advertisements": "જાહેરાતો",
+    "Sponsored": "પ્રાયોજિત",
+    "Know More": "વધુ જાણો",
+    "Advertisement is no longer available": "જાહેરાત હવે ઉપલબ્ધ નથી",
+    "Call": "કોલ કરો",
+    "Email": "ઈમેલ",
+    "Open link": "લિંક ખોલો",
+    "No advertisements found": "કોઈ જાહેરાત મળી નથી",
+    "Advertiser Contact": "જાહેરાતકર્તાનો સંપર્ક"
 }

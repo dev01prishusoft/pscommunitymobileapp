@@ -13,9 +13,11 @@ class AppWebViewPage extends StatefulWidget {
     super.key,
     required this.title,
     required this.url,
+    this.allowAnyUrl = false,
   });
   final String title;
   final String url;
+  final bool allowAnyUrl;
 
   @override
   State<AppWebViewPage> createState() => _AppWebViewPageState();
@@ -30,6 +32,10 @@ class _AppWebViewPageState extends State<AppWebViewPage> {
       final uri = Uri.parse(urlString);
       if (uri.scheme != 'http' && uri.scheme != 'https') {
         return false;
+      }
+
+      if (widget.allowAnyUrl) {
+        return true;
       }
 
       final host = uri.host.toLowerCase();

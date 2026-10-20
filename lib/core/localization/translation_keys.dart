@@ -745,4 +745,13 @@ class LK {
       "Member information not provided.";
   static const Failedtoloadfamilytreetryagain =
       "Failed to load family tree. Please try again.";
+
+  // Advertisement Keys
+  static const String advertisements = 'Advertisements';
+  static const String sponsored = 'Sponsored';
+  static const String knowMore = 'KnowMore';
+  static const String adUnavailable = 'adUnavailable';
+  static const String call = 'Call';
+  static const String noAdvertisements = 'noAdvertisements';
+  static const String advertiserContact = 'advertiserContact';
 }

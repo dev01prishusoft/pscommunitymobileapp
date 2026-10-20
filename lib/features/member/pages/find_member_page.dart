@@ -17,6 +17,9 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/find_member_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 
 class FindMemberPage extends StatefulWidget {
   const FindMemberPage({super.key});
@@ -87,12 +90,23 @@ class _FindMemberPageState extends State<FindMemberPage> {
             ],
           ],
         ),
-        body: PaginatedListView<Member, FindMemberController>(
-          emptyMessage: LK.noMembersFound.tr,
-          padding: AppSpacing.pagePadding,
-          separatorBuilder: (val, val2) => SizedBox(height: 6.h),
-          itemBuilder: (context, index, member) =>
-              _FindMemberCard(member: member),
+        body: Column(
+          children: [
+            AdPlacementSlot(
+              placement: AdPlacement.memberDirectory,
+              layout: AdLayout.card,
+              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 4.h),
+            ),
+            Expanded(
+              child: PaginatedListView<Member, FindMemberController>(
+                emptyMessage: LK.noMembersFound.tr,
+                padding: AppSpacing.pagePadding,
+                separatorBuilder: (val, val2) => SizedBox(height: 6.h),
+                itemBuilder: (context, index, member) =>
+                    _FindMemberCard(member: member),
+              ),
+            ),
+          ],
         ),
       ),
     );

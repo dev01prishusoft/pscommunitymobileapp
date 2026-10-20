@@ -82,6 +82,12 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       labelKey: LK.customerSupport,
       route: AppRouter.customerSupport,
     ),
+    MenuItem(
+      icon: Icons.campaign_outlined,
+      labelKey: LK.advertisements,
+      route: AppRouter.advertisementList,
+      module: AppModule.advertisement,
+    ),
   ];
 
   /// Returns only the menu items that are permitted/accessible for this member's Samaj.

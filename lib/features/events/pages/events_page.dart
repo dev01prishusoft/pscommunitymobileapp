@@ -10,6 +10,9 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
+import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -352,13 +355,28 @@ class EventsPage extends GetView<EventsController> {
               : type == 2
                   ? 'Ongoing'
                   : 'Past';
-          return Padding(
+          final eventCard = Padding(
             padding: EdgeInsets.only(bottom: 16.h),
             child: EventCard(
               event: events[index],
               eventStatus: status,
             ),
           );
+
+          if (index == 1) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                eventCard,
+                AdPlacementSlot(
+                  placement: AdPlacement.eventList,
+                  layout: AdLayout.card,
+                  padding: EdgeInsets.only(bottom: 16.h),
+                ),
+              ],
+            );
+          }
+          return eventCard;
         },
       );
     }

@@ -10,6 +10,8 @@ import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/module_permission/module_permission.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_drawer.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_cache_storage.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_tracking_service.dart';
 
 class AuthState {
   AuthState(this._tokenManager) {
@@ -36,6 +38,12 @@ class AuthState {
     }
     if (Get.isRegistered<DrawerUserController>()) {
       Get.delete<DrawerUserController>(force: true);
+    }
+    if (Get.isRegistered<AdvertisementCacheStorage>()) {
+      Get.find<AdvertisementCacheStorage>().clear();
+    }
+    if (Get.isRegistered<AdvertisementTrackingService>()) {
+      Get.find<AdvertisementTrackingService>().clear();
     }
     final locService = Get.find<LocalizationService>();
     locService.clearLanguages();

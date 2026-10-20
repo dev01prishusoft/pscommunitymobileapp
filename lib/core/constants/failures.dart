@@ -3,6 +3,9 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 sealed class Result<T> {
   const Result();
 
+  const factory Result.success(T data) = Success<T>;
+  const factory Result.error(Failure failure) = Error<T>;
+
   bool get isSuccess => this is Success<T>;
   bool get isFailure => this is Error<T>;
 

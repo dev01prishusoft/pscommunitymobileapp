@@ -237,6 +237,26 @@ class AppDrawer extends StatelessWidget {
                     title: Text(LK.events_title.tr),
                     onTap: () => Get.toNamed<void>(AppRouter.events),
                   ),
+                  Obx(() {
+                    if (Get.isRegistered<ModulePermissionService>()) {
+                      final isAccessible = ModulePermissionService.to
+                          .isAccessible(AppModule.advertisement);
+                      if (!isAccessible) {
+                        return const SizedBox.shrink();
+                      }
+                    }
+                    return ListTile(
+                      leading: Icon(
+                        Icons.campaign_outlined,
+                        color: AppColors.black,
+                      ),
+                      title: Text(LK.advertisements.tr),
+                      onTap: () {
+                        Get.back<void>();
+                        Get.toNamed<void>(AppRouter.advertisementList);
+                      },
+                    );
+                  }),
                   ListTile(
                     leading: Icon(
                       Icons.privacy_tip_outlined,
