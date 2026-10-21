@@ -117,38 +117,45 @@ class PsCommunityApp extends StatelessWidget {
           return Obx(
             () => SafeArea(
               top: false,
-              child: GetMaterialApp(
-                title: LK.appTitle.tr,
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.light,
-                translations: AppTranslations(localization.keys),
-                locale: localization.currentLocale.value,
-                fallbackLocale: Locale('en', 'US'),
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', 'US'),
-                  Locale('gu', 'IN'),
-                ],
-                initialRoute: Get.find<AuthState>().isAuthenticated.value
-                    ? AppRouter.postLoginSplash
-                    : AppRouter.login,
-                navigatorObservers: [AppRouter.routeObserver],
-                getPages: AppRouter.pages,
-                builder: (context, child) {
-                  final mq = MediaQuery.of(context);
-                  final clamped = mq.textScaler.clamp(
-                    minScaleFactor: 0.85,
-                    maxScaleFactor: 2.0,
-                  );
-                  return MediaQuery(
-                    data: mq.copyWith(textScaler: clamped),
-                    child: child ?? const SizedBox.shrink(),
-                  );
-                },
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiOverlayStyle(
+                  statusBarColor: AppColors.white,
+                  systemNavigationBarColor: AppColors.white,
+                  systemNavigationBarIconBrightness: Brightness.light,
+                ),
+                child: GetMaterialApp(
+                  title: LK.appTitle.tr,
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.light,
+                  translations: AppTranslations(localization.keys),
+                  locale: localization.currentLocale.value,
+                  fallbackLocale: Locale('en', 'US'),
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [
+                    Locale('en', 'US'),
+                    Locale('gu', 'IN'),
+                  ],
+                  initialRoute: Get.find<AuthState>().isAuthenticated.value
+                      ? AppRouter.postLoginSplash
+                      : AppRouter.login,
+                  navigatorObservers: [AppRouter.routeObserver],
+                  getPages: AppRouter.pages,
+                  builder: (context, child) {
+                    final mq = MediaQuery.of(context);
+                    final clamped = mq.textScaler.clamp(
+                      minScaleFactor: 0.85,
+                      maxScaleFactor: 2.0,
+                    );
+                    return MediaQuery(
+                      data: mq.copyWith(textScaler: clamped),
+                      child: child ?? const SizedBox.shrink(),
+                    );
+                  },
+                ),
               ),
             ),
           );

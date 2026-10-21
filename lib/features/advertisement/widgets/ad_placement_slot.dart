@@ -43,7 +43,11 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> {
     if (Get.isRegistered<AdvertisementController>()) {
       _controller = Get.find<AdvertisementController>();
       final limit = widget.limit ?? (widget.placement == AdPlacement.homeTop ? 5 : 1);
-      _controller!.fetchPlacementAds(widget.placement, limit: limit);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _controller?.fetchPlacementAds(widget.placement, limit: limit);
+        }
+      });
     }
   }
 

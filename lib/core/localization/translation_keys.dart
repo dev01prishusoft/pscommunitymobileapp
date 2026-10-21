@@ -754,4 +754,8 @@ class LK {
   static const String call = 'Call';
   static const String noAdvertisements = 'noAdvertisements';
   static const String advertiserContact = 'advertiserContact';
+  static const String quickAccess = "quickAccess";
+  static const String setting = "setting";
+  static const String more = "more";
+  static const String less = "less";
 }

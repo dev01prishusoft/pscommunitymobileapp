@@ -37,12 +37,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with RouteAware {
   int _selectedBottomNavIndex = 0;
+  bool _isQuickAccessExpanded = false;
   late final DrawerUserController _drawerUserController;
 
   @override
   void initState() {
     super.initState();
     _drawerUserController = Get.put(DrawerUserController(), permanent: true);
+    if (Get.isRegistered<AdvertisementController>()) {
+      Get.find<AdvertisementController>().fetchPlacementAds(
+        AdPlacement.homeBottom,
+        limit: 1,
+      );
+    }
   }
 
   @override
@@ -64,6 +71,11 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void didPopNext() {
     Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
     _drawerUserController.fetchUser();
+    if (mounted) {
+      setState(() {
+        _isQuickAccessExpanded = false;
+      });
+    }
   }
 
   Widget _buildFallbackLogoSmall() {
@@ -372,22 +384,37 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
             SizedBox(height: 16.h),
 
-            // 1. Account & Family (Edit Profile menu tile removed)
+            // 1. Navigation & Services (matching drawer list, without Home, Edit Profile, Advertisement)
             _buildSettingsGroup(
-              title: 'Account & Family',
+              title: 'Navigation & Services'.tr,
               items: [
+                _SettingsTile(
+                  icon: Iconsax.search_normal_copy,
+                  title: LK.findMember.tr,
+                  onTap: () => Get.toNamed<void>(AppRouter.findMember),
+                ),
+                if (!Get.isRegistered<ModulePermissionService>() ||
+                    ModulePermissionService.to.isAccessible(
+                      AppModule.matrimonial,
+                    ))
+                  _SettingsTile(
+                    icon: Icons.wc_rounded,
+                    title: LK.marriage.tr,
+                    onTap: () => Get.toNamed<void>(AppRouter.marriage),
+                  ),
+                _SettingsTile(
+                  icon: Iconsax.buildings_copy,
+                  title: LK.samajSansthas.tr,
+                  onTap: () => Get.toNamed<void>(AppRouter.samajSansthas),
+                ),
                 _SettingsTile(
                   icon: Iconsax.user_add_copy,
                   title: LK.addFamilyMember.tr,
-                  iconColor: const Color(0xFF0D9488),
-                  iconBgColor: const Color(0xFFCCFBF1),
                   onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
                 ),
                 _SettingsTile(
                   icon: Iconsax.people_copy,
                   title: LK.addedMembers.tr,
-                  iconColor: const Color(0xFF0284C7),
-                  iconBgColor: const Color(0xFFE0F2FE),
                   onTap: () {
                     setState(() {
                       _selectedBottomNavIndex = 1;
@@ -395,44 +422,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
                   },
                 ),
                 _SettingsTile(
-                  icon: Iconsax.search_normal_copy,
-                  title: LK.findMember.tr,
-                  iconColor: const Color(0xFF7C3AED),
-                  iconBgColor: const Color(0xFFF3E8FF),
-                  onTap: () => Get.toNamed<void>(AppRouter.findMember),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 14.h),
-
-            // 2. Community Services (Advertisement menu tile removed)
-            _buildSettingsGroup(
-              title: 'Community Services',
-              items: [
-                if (!Get.isRegistered<ModulePermissionService>() ||
-                    ModulePermissionService.to.isAccessible(
-                      AppModule.matrimonial,
-                    ))
-                  _SettingsTile(
-                    icon: Iconsax.heart_copy,
-                    title: LK.marriage.tr,
-                    iconColor: const Color(0xFFE11D48),
-                    iconBgColor: const Color(0xFFFFE4E6),
-                    onTap: () => Get.toNamed<void>(AppRouter.marriage),
-                  ),
-                _SettingsTile(
-                  icon: Iconsax.buildings_copy,
-                  title: LK.samajSansthas.tr,
-                  iconColor: const Color(0xFFD97706),
-                  iconBgColor: const Color(0xFFFEF3C7),
-                  onTap: () => Get.toNamed<void>(AppRouter.samajSansthas),
-                ),
-                _SettingsTile(
                   icon: Iconsax.calendar_copy,
                   title: LK.events_title.tr,
-                  iconColor: const Color(0xFF2563EB),
-                  iconBgColor: const Color(0xFFDBEAFE),
                   onTap: () {
                     setState(() {
                       _selectedBottomNavIndex = 2;
@@ -444,42 +435,9 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
             SizedBox(height: 14.h),
 
-            // 3. Legal & Support
+            // 2. Account Actions
             _buildSettingsGroup(
-              title: 'Legal & Support',
-              items: [
-                _SettingsTile(
-                  icon: Iconsax.shield_tick_copy,
-                  title: LK.privacyPolicy.tr,
-                  iconColor: const Color(0xFF475569),
-                  iconBgColor: const Color(0xFFF1F5F9),
-                  onTap: () => Get.to<void>(
-                    () => AppWebViewPage(
-                      title: LK.privacyPolicy.tr,
-                      url: AppEnvironment.I.privacyPolicyUrl,
-                    ),
-                  ),
-                ),
-                _SettingsTile(
-                  icon: Iconsax.document_text_copy,
-                  title: LK.termsAndConditions.tr,
-                  iconColor: const Color(0xFF475569),
-                  iconBgColor: const Color(0xFFF1F5F9),
-                  onTap: () => Get.to<void>(
-                    () => AppWebViewPage(
-                      title: LK.termsAndConditions.tr,
-                      url: AppEnvironment.I.termsAndConditionsUrl,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 14.h),
-
-            // 4. Account Actions
-            _buildSettingsGroup(
-              title: 'Account Actions',
+              title: 'Account Actions'.tr,
               items: [
                 _SettingsTile(
                   icon: Iconsax.user_remove_copy,
@@ -502,7 +460,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
               ],
             ),
 
-            SizedBox(height: 20.h),
+            SizedBox(height: 24.h),
 
             // App Version Footer
             Row(
@@ -510,7 +468,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
               children: [
                 Image.asset(
                   'assets/images/logo.png',
-                  width: 22.r,
+                  width: 20.r,
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
                 SizedBox(width: 8.w),
@@ -533,7 +491,74 @@ class _HomePageState extends State<HomePage> with RouteAware {
               ],
             ),
 
-            SizedBox(height: 24.h),
+            SizedBox(height: 10.h),
+
+            // Privacy Policy • Terms & Conditions links
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () => Get.to<void>(
+                    () => AppWebViewPage(
+                      title: LK.privacyPolicy.tr,
+                      url: AppEnvironment.I.privacyPolicyUrl,
+                    ),
+                  ),
+                  borderRadius: BorderRadius.circular(4.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 4.w,
+                      vertical: 2.h,
+                    ),
+                    child: Text(
+                      LK.privacyPolicy.tr,
+                      style: TextStyle(
+                        color: const Color(0xFF64748B),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        decorationColor: const Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                  child: Text(
+                    '•',
+                    style: TextStyle(
+                      color: const Color(0xFF94A3B8),
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => Get.to<void>(
+                    () => AppWebViewPage(
+                      title: LK.termsAndConditions.tr,
+                      url: AppEnvironment.I.termsAndConditionsUrl,
+                    ),
+                  ),
+                  borderRadius: BorderRadius.circular(4.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Text(
+                      LK.termsAndConditions.tr,
+                      style: TextStyle(
+                        color: const Color(0xFF64748B),
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        decorationColor: const Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 28.h),
           ],
         ),
       ),
@@ -583,14 +608,17 @@ class _HomePageState extends State<HomePage> with RouteAware {
             // 2. Quick Access Title
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                'Quick Access',
-                style: TextStyle(
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1B2559),
-                ),
-              ),
+              child: Obx(() {
+                final _ = Get.find<LocalizationService>().currentLocale.value;
+                return Text(
+                  LK.quickAccess.tr,
+                  style: TextStyle(
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1B2559),
+                  ),
+                );
+              }),
             ),
 
             SizedBox(height: 12.h),
@@ -598,16 +626,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
             // 3. 4*2 Menu Grid
             _buildQuickAccessGrid(context),
 
-            SizedBox(height: 16.h),
-
-            // 4. Bottom Advertisement Banner (exact same 130.h height and 10.w padding)
-            const AdPlacementSlot(
-              placement: AdPlacement.homeBottom,
-              layout: AdLayout.banner,
-              height: 130,
-            ),
-
-            SizedBox(height: 24.h),
+            SizedBox(height: 150.h),
           ],
         ),
       ),
@@ -675,6 +694,27 @@ class _HomePageState extends State<HomePage> with RouteAware {
     );
   }
 
+  Widget? _buildHomeBottomAdFab() {
+    if (Get.isRegistered<ModulePermissionService>()) {
+      if (!ModulePermissionService.to.isAccessible(AppModule.advertisement)) {
+        return null;
+      }
+    }
+    if (!Get.isRegistered<AdvertisementController>()) {
+      return null;
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: AdPlacementSlot(
+        placement: AdPlacement.homeBottom,
+        layout: AdLayout.banner,
+        height: 130,
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -703,226 +743,312 @@ class _HomePageState extends State<HomePage> with RouteAware {
             ],
           ),
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: BottomNavigationBar(
-              currentIndex: _selectedBottomNavIndex,
-              onTap: (index) {
-                setState(() {
-                  _selectedBottomNavIndex = index;
-                });
-              },
-              backgroundColor: Colors.white,
-              elevation: 0,
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: AppColors.primary,
-              unselectedItemColor: const Color(0xFF94A3B8),
-              selectedFontSize: 11.5.sp,
-              unselectedFontSize: 11.sp,
-              selectedLabelStyle: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 11.5.sp,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 11.sp,
-              ),
-              items: [
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.home_2_copy, size: 22.sp),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.home_2, size: 22.sp),
-                  ),
-                  label: LK.home.tr,
-                ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.people_copy, size: 22.sp),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.people, size: 22.sp),
-                  ),
-                  label: LK.addedMembers.tr,
-                ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.calendar_copy, size: 22.sp),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.calendar, size: 22.sp),
-                  ),
-                  label: LK.events_title.tr,
-                ),
-                BottomNavigationBarItem(
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.setting_2_copy, size: 22.sp),
-                  ),
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 3.h),
-                    child: Icon(Iconsax.setting_2, size: 22.sp),
-                  ),
-                  label: 'Setting',
+        floatingActionButton: _selectedBottomNavIndex == 0
+            ? _buildHomeBottomAdFab()
+            : null,
+        floatingActionButtonLocation:
+            const _FullWidthDockedFloatingActionButtonLocation(),
+        bottomNavigationBar: Obx(() {
+          final _ = Get.find<LocalizationService>().currentLocale.value;
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1E293B).withValues(alpha: 0.08),
+                  blurRadius: 16,
+                  offset: const Offset(0, -4),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickAccessGrid(BuildContext context) {
-    final quickItems = [
-      _QuickAccessItem(
-        label: 'Members',
-        icon: Icons.people_alt_rounded,
-        bgColor: const Color(0xFFD8F5E5),
-        iconColor: const Color(0xFF0F766E),
-        onTap: () => Get.toNamed(AppRouter.findMember),
-      ),
-      _QuickAccessItem(
-        label: 'Occupation',
-        icon: Icons.business_center_rounded,
-        bgColor: const Color(0xFFE0E7FE),
-        iconColor: const Color(0xFF4F46E5),
-        onTap: () => Get.toNamed(AppRouter.occupationDirectory),
-      ),
-      _QuickAccessItem(
-        label: 'Matrimonial',
-        icon: Icons.favorite_rounded,
-        bgColor: const Color(0xFFFFE3EC),
-        iconColor: const Color(0xFFE11D48),
-        onTap: () => Get.toNamed(AppRouter.marriage),
-      ),
-      _QuickAccessItem(
-        label: 'Committees',
-        icon: Icons.assignment_rounded,
-        bgColor: const Color(0xFFFEF3C7),
-        iconColor: const Color(0xFFB45309),
-        onTap: () => Get.toNamed(AppRouter.committees),
-      ),
-      _QuickAccessItem(
-        label: 'Events',
-        icon: Icons.calendar_month_rounded,
-        bgColor: const Color(0xFFFFE4E6),
-        iconColor: const Color(0xFF2563EB),
-        onTap: () {
-          setState(() {
-            _selectedBottomNavIndex = 2;
-          });
-        },
-      ),
-      _QuickAccessItem(
-        label: 'Announcements',
-        icon: Icons.campaign_rounded,
-        bgColor: const Color(0xFFF3E8FF),
-        iconColor: const Color(0xFFDB2777),
-        onTap: () => Get.toNamed(AppRouter.notifications),
-      ),
-      _QuickAccessItem(
-        label: 'Payments',
-        icon: Icons.credit_card_rounded,
-        bgColor: const Color(0xFFFEF9C3),
-        iconColor: const Color(0xFF0284C7),
-        onTap: () => Get.toNamed(AppRouter.payments),
-      ),
-      _QuickAccessItem(
-        label: 'More',
-        icon: Icons.more_horiz_rounded,
-        bgColor: const Color(0xFFEEF2F6),
-        iconColor: const Color(0xFF475569),
-        onTap: () {
-          setState(() {
-            _selectedBottomNavIndex = 3;
-          });
-        },
-      ),
-    ];
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 14.w),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: quickItems.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 8.h,
-          crossAxisSpacing: 2.w,
-          childAspectRatio: 0.82,
-        ),
-        itemBuilder: (context, index) {
-          final item = quickItems[index];
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: item.onTap,
-              borderRadius: BorderRadius.circular(16.r),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 54.r,
-                    height: 54.r,
-                    decoration: BoxDecoration(
-                      color: item.bgColor,
-                      borderRadius: BorderRadius.circular(16.r),
+            child: SafeArea(
+              top: false,
+              child: BottomNavigationBar(
+                currentIndex: _selectedBottomNavIndex,
+                onTap: (index) {
+                  setState(() {
+                    if (index != _selectedBottomNavIndex) {
+                      _isQuickAccessExpanded = false;
+                    }
+                    _selectedBottomNavIndex = index;
+                  });
+                },
+                backgroundColor: Colors.white,
+                elevation: 0,
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: AppColors.primary,
+                unselectedItemColor: const Color(0xFF94A3B8),
+                selectedFontSize: 11.5.sp,
+                unselectedFontSize: 11.sp,
+                selectedLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11.5.sp,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11.sp,
+                ),
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.home_2_copy, size: 22.sp),
                     ),
-                    child: Center(
-                      child: Icon(
-                        item.icon,
-                        size: 24.sp,
-                        color: item.iconColor,
-                      ),
+                    activeIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.home_2, size: 22.sp),
                     ),
+                    label: LK.home.tr,
                   ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    item.label,
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1E293B),
+                  BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.people_copy, size: 22.sp),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    activeIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.people, size: 22.sp),
+                    ),
+                    label: LK.addedMembers.tr,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.calendar_copy, size: 22.sp),
+                    ),
+                    activeIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.calendar, size: 22.sp),
+                    ),
+                    label: LK.events_title.tr,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.setting_2_copy, size: 22.sp),
+                    ),
+                    activeIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 3.h),
+                      child: Icon(Iconsax.setting_2, size: 22.sp),
+                    ),
+                    label: LK.setting.tr,
                   ),
                 ],
               ),
             ),
           );
-        },
+        }),
       ),
     );
+  }
+
+  Widget _buildQuickAccessGrid(BuildContext context) {
+    return Obx(() {
+      final _ = Get.find<LocalizationService>().currentLocale.value;
+
+      final List<_QuickAccessItem> collapsedItems = [
+        _QuickAccessItem(
+          label: LK.family.tr,
+          icon: Icons.family_restroom_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.familyAreas),
+        ),
+        _QuickAccessItem(
+          label: LK.findMember.tr,
+          icon: Iconsax.search_normal_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.findMember),
+        ),
+        _QuickAccessItem(
+          label: LK.committee.tr,
+          icon: Icons.group_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.committees),
+        ),
+        _QuickAccessItem(
+          label: LK.payments.tr,
+          icon: Iconsax.wallet_2_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.payments),
+        ),
+        _QuickAccessItem(
+          label: LK.occupationDirectory.tr,
+          icon: Iconsax.briefcase_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
+        ),
+        _QuickAccessItem(
+          label: LK.marriage.tr,
+          icon: Icons.wc_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.marriage),
+        ),
+        _QuickAccessItem(
+          label: LK.events_title.tr,
+          icon: Iconsax.calendar_copy,
+          onTap: () {
+            setState(() {
+              _selectedBottomNavIndex = 2;
+            });
+          },
+        ),
+        _QuickAccessItem(
+          label: LK.more.tr,
+          icon: Iconsax.category_copy,
+          onTap: () {
+            setState(() {
+              _isQuickAccessExpanded = true;
+            });
+          },
+        ),
+      ];
+
+      final List<_QuickAccessItem> expandedItems = [
+        _QuickAccessItem(
+          label: LK.family.tr,
+          icon: Icons.family_restroom_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.familyAreas),
+        ),
+        _QuickAccessItem(
+          label: LK.findMember.tr,
+          icon: Iconsax.search_normal_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.findMember),
+        ),
+        _QuickAccessItem(
+          label: LK.committee.tr,
+          icon: Icons.group_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.committees),
+        ),
+        _QuickAccessItem(
+          label: LK.payments.tr,
+          icon: Iconsax.wallet_2_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.payments),
+        ),
+        _QuickAccessItem(
+          label: LK.occupationDirectory.tr,
+          icon: Iconsax.briefcase_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
+        ),
+        _QuickAccessItem(
+          label: LK.marriage.tr,
+          icon: Icons.wc_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.marriage),
+        ),
+        _QuickAccessItem(
+          label: LK.events_title.tr,
+          icon: Iconsax.calendar_copy,
+          onTap: () {
+            setState(() {
+              _selectedBottomNavIndex = 2;
+            });
+          },
+        ),
+        _QuickAccessItem(
+          label: LK.share.tr,
+          icon: Iconsax.share_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.shareApp),
+        ),
+        _QuickAccessItem(
+          label: LK.samajInfo.tr,
+          icon: Iconsax.info_circle_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.bankDetails),
+        ),
+        _QuickAccessItem(
+          label: LK.customerSupport.tr,
+          icon: Iconsax.call_calling_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.customerSupport),
+        ),
+        _QuickAccessItem(
+          label: LK.less.tr,
+          icon: Iconsax.arrow_up_2_copy,
+          onTap: () {
+            setState(() {
+              _isQuickAccessExpanded = false;
+            });
+          },
+        ),
+      ];
+
+      final currentItems = _isQuickAccessExpanded
+          ? expandedItems
+          : collapsedItems;
+
+      return AnimatedSize(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOut,
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: currentItems.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 8.h,
+              crossAxisSpacing: 2.w,
+              childAspectRatio: 0.80,
+            ),
+            itemBuilder: (context, index) {
+              final item = currentItems[index];
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: item.onTap,
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 6.h),
+                      Container(
+                        width: 52.r,
+                        height: 52.r,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.12),
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            item.icon,
+                            size: 22.sp,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      SizedBox(
+                        height: 30.h,
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Text(
+                            item.label,
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1E293B),
+                              height: 1.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    });
   }
 }
 
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final Color iconColor;
-  final Color iconBgColor;
+  final Color? iconColor;
+  final Color? iconBgColor;
   final Color? textColor;
   final bool showChevron;
   final VoidCallback onTap;
@@ -930,8 +1056,8 @@ class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
     required this.icon,
     required this.title,
-    required this.iconColor,
-    required this.iconBgColor,
+    this.iconColor,
+    this.iconBgColor,
     this.textColor,
     this.showChevron = true,
     required this.onTap,
@@ -939,6 +1065,10 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor ?? AppColors.primary;
+    final effectiveIconBgColor =
+        iconBgColor ?? AppColors.primary.withValues(alpha: 0.08);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -951,12 +1081,15 @@ class _SettingsTile extends StatelessWidget {
                 width: 36.r,
                 height: 36.r,
                 decoration: BoxDecoration(
-                  color: iconBgColor,
+                  color: effectiveIconBgColor,
                   borderRadius: BorderRadius.circular(10.r),
+                  border: Border.all(
+                    color: effectiveIconColor.withValues(alpha: 0.12),
+                    width: 1,
+                  ),
                 ),
                 child: Center(
-                  child: Icon(
-                    icon, size: 19.sp, color: iconColor),
+                  child: Icon(icon, size: 19.sp, color: effectiveIconColor),
                 ),
               ),
               SizedBox(width: 14.w),
@@ -987,15 +1120,11 @@ class _SettingsTile extends StatelessWidget {
 class _QuickAccessItem {
   final String label;
   final IconData icon;
-  final Color bgColor;
-  final Color iconColor;
   final VoidCallback onTap;
 
   const _QuickAccessItem({
     required this.label,
     required this.icon,
-    required this.bgColor,
-    required this.iconColor,
     required this.onTap,
   });
 }
@@ -1144,5 +1273,34 @@ class _NotificationMenu extends GetView<HomeController> {
         },
       );
     });
+  }
+}
+
+class _FullWidthDockedFloatingActionButtonLocation
+    extends FloatingActionButtonLocation {
+  const _FullWidthDockedFloatingActionButtonLocation();
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    if (scaffoldGeometry.floatingActionButtonSize.isEmpty ||
+        scaffoldGeometry.floatingActionButtonSize.height <= 0) {
+      return const Offset(0, -2000);
+    }
+
+    final double fabX =
+        (scaffoldGeometry.scaffoldSize.width -
+            scaffoldGeometry.floatingActionButtonSize.width) /
+        2.0;
+
+    double bottomY = scaffoldGeometry.contentBottom;
+    if (scaffoldGeometry.bottomSheetSize.height > 0.0) {
+      bottomY =
+          scaffoldGeometry.scaffoldSize.height -
+          scaffoldGeometry.bottomSheetSize.height;
+    }
+
+    final double fabY =
+        bottomY - scaffoldGeometry.floatingActionButtonSize.height;
+    return Offset(fabX, fabY);
   }
 }
