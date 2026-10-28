@@ -49,7 +49,6 @@ import 'package:pscommunitymobileapp/features/advertisement/controllers/advertis
 import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_list_controller.dart';
 import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository.dart';
 import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository_impl.dart';
-import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_cache_storage.dart';
 import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_tracking_service.dart';
 
 class DI {
@@ -172,9 +171,6 @@ class DI {
         final advertisementRepository = AdvertisementRepositoryImpl(apiClient);
         Get.put<AdvertisementRepository>(advertisementRepository, permanent: true);
 
-        final advertisementCacheStorage = AdvertisementCacheStorage();
-        Get.put(advertisementCacheStorage, permanent: true);
-
         final advertisementTrackingService = AdvertisementTrackingService(
           advertisementRepository,
         );
@@ -183,9 +179,7 @@ class DI {
         Get.lazyPut(
           () => AdvertisementController(
             repository: advertisementRepository,
-            cacheStorage: advertisementCacheStorage,
             trackingService: advertisementTrackingService,
-            tokenManager: tokenManager,
             connectivity: connectivity,
           ),
           fenix: true,

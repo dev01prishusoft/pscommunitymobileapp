@@ -147,12 +147,38 @@ class Advertisement {
                 '',
             'thumbnailUrl': json['thumbnailUrl'] ??
                 json['thumbnail'] ??
-                json['thumbUrl'],
+                json['thumbUrl'] ??
+                json['coverImage'] ??
+                json['coverImageUrl'] ??
+                json['posterUrl'],
             'contentType': json['contentType'] ?? json['mimeType'],
             'width': json['width'],
             'height': json['height'],
             'durationSeconds': json['durationSeconds'],
           };
+
+    // If media map has no thumbnail, fallback to root json keys
+    if (mediaJson['thumbnailUrl'] == null &&
+        mediaJson['thumbnail'] == null &&
+        mediaJson['thumbUrl'] == null &&
+        mediaJson['coverImageUrl'] == null &&
+        mediaJson['coverImage'] == null) {
+      final rootThumb = json['thumbnailUrl'] ??
+          json['thumbnail'] ??
+          json['thumbUrl'] ??
+          json['coverImage'] ??
+          json['coverImageUrl'] ??
+          json['cover'] ??
+          json['posterUrl'] ??
+          json['poster'] ??
+          json['previewUrl'] ??
+          json['previewImage'] ??
+          json['imageUrl'] ??
+          json['bannerImageUrl'];
+      if (rootThumb != null) {
+        mediaJson['thumbnailUrl'] = rootThumb;
+      }
+    }
 
     final contactJson = json['contact'] is Map<String, dynamic>
         ? json['contact'] as Map<String, dynamic>

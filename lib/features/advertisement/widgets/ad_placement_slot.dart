@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/module_permission/models/app_module.dart';
 import 'package:pscommunitymobileapp/core/module_permission/services/module_permission_service.dart';
 import '../controllers/advertisement_controller.dart';
@@ -28,13 +29,37 @@ class AdPlacementSlot extends StatefulWidget {
   State<AdPlacementSlot> createState() => _AdPlacementSlotState();
 }
 
-class _AdPlacementSlotState extends State<AdPlacementSlot> {
+class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
   AdvertisementController? _controller;
-  bool _hasTrackedImpression = false;
 
   @override
   void initState() {
     super.initState();
+    _fetchAds();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final modalRoute = ModalRoute.of(context);
+    if (modalRoute is PageRoute) {
+      AppRouter.routeObserver.subscribe(this, modalRoute);
+    }
+  }
+
+  @override
+  void dispose() {
+    AppRouter.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // When returning back to this screen from a pushed route, re-validate ads in background
+    _fetchAds();
+  }
+
+  void _fetchAds() {
     if (Get.isRegistered<ModulePermissionService>()) {
       if (!ModulePermissionService.to.isAccessible(AppModule.advertisement)) {
         return;
@@ -42,24 +67,12 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> {
     }
     if (Get.isRegistered<AdvertisementController>()) {
       _controller = Get.find<AdvertisementController>();
-      final limit = widget.limit ?? (widget.placement == AdPlacement.homeTop ? 5 : 1);
+      final limit = widget.limit ?? 5;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _controller?.fetchPlacementAds(widget.placement, limit: limit);
         }
       });
-    }
-  }
-
-  void _checkAndTrackImpression(BuildContext context) {
-    if (_hasTrackedImpression || _controller == null) return;
-    final ads = _controller!.getAds(widget.placement);
-    if (ads.isEmpty) return;
-
-    // Track for non-carousel single ad cards
-    if (widget.placement != AdPlacement.homeTop && ads.isNotEmpty) {
-      _hasTrackedImpression = true;
-      _controller!.recordImpression(ads.first, widget.placement);
     }
   }
 
@@ -83,27 +96,15 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> {
         return const SizedBox.shrink();
       }
 
-      // Schedule impression recording when slot is built and rendered
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _checkAndTrackImpression(context);
-        }
-      });
-
       final cardHeight = widget.height ?? 130.h;
+      final displayAds = ads.take(widget.limit ?? 5).toList();
 
-      final content = widget.placement == AdPlacement.homeTop
-          ? AdBannerCarousel(
-              advertisements: ads,
-              placement: widget.placement,
-              height: cardHeight,
-            )
-          : AdvertisementCard(
-              advertisement: ads.first,
-              placement: widget.placement,
-              layout: widget.layout,
-              height: cardHeight,
-            );
+      final content = AdBannerCarousel(
+        advertisements: displayAds,
+        placement: widget.placement,
+        layout: widget.layout,
+        height: cardHeight,
+      );
 
       return Padding(
         padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),

@@ -59,6 +59,7 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
     _isPlaying = ctrl.value.isPlaying;
     _showThumbnail = false;
     _hasError = ctrl.value.hasError;
+    _controller!.removeListener(_onControllerUpdate);
     _controller!.addListener(_onControllerUpdate);
 
     if (widget.placement != null &&
@@ -67,8 +68,25 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
           .recordImpression(widget.advertisement, widget.placement!);
     }
 
-    if (!_isPlaying) {
-      _controller!.play();
+    if (_initialized) {
+      if (!_isPlaying) {
+        _controller!.play();
+      }
+    } else {
+      ctrl.initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+          _controller?.play();
+        }
+      }).catchError((_) {
+        if (mounted) {
+          setState(() {
+            _hasError = true;
+          });
+        }
+      });
     }
 
     setState(() {});

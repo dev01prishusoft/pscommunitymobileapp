@@ -1,36 +1,57 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
 import 'package:pscommunitymobileapp/core/utils/safe_launcher.dart';
-import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/ad_placement.dart';
 import '../models/advertisement.dart';
 import '../repositories/advertisement_repository.dart';
-import '../services/advertisement_cache_storage.dart';
 import '../services/advertisement_tracking_service.dart';
 
-class AdvertisementController extends GetxController {
+class AdvertisementController extends GetxController
+    with WidgetsBindingObserver {
   final AdvertisementRepository _repository;
-  final AdvertisementCacheStorage _cacheStorage;
   final AdvertisementTrackingService _trackingService;
-  final TokenManager _tokenManager;
   final ConnectivityService _connectivity;
 
   AdvertisementController({
     required AdvertisementRepository repository,
-    required AdvertisementCacheStorage cacheStorage,
     required AdvertisementTrackingService trackingService,
-    required TokenManager tokenManager,
     required ConnectivityService connectivity,
   })  : _repository = repository,
-        _cacheStorage = cacheStorage,
         _trackingService = trackingService,
-        _tokenManager = tokenManager,
         _connectivity = connectivity;
 
   final Map<AdPlacement, RxList<Advertisement>> _placementAds = {};
   final Map<AdPlacement, RxBool> _placementLoading = {};
+
+  @override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refreshActivePlacements();
+    }
+  }
+
+  /// Refreshes all currently loaded placements in the background when app resumes
+  Future<void> refreshActivePlacements() async {
+    final placements = _placementAds.keys.toList();
+    for (final placement in placements) {
+      await fetchPlacementAds(placement, forceRefresh: true);
+    }
+  }
 
   RxList<Advertisement> getAds(AdPlacement placement) {
     return _placementAds.putIfAbsent(placement, () => <Advertisement>[].obs);
@@ -45,58 +66,28 @@ class AdvertisementController extends GetxController {
     int? limit,
     bool forceRefresh = false,
   }) async {
-    final samajId = _tokenManager.samajId ?? 0;
     final adsList = getAds(placement);
     final loading = getLoading(placement);
 
-    // 1. Check cache first unless force refresh requested
-    if (!forceRefresh) {
-      final cached = _cacheStorage.get(samajId, placement);
-      if (cached != null && cached.isNotEmpty) {
-        adsList.assignAll(cached);
-        return;
-      }
+    // Only show loading spinner if we don't have any ads currently displayed
+    if (adsList.isEmpty) {
+      loading.value = true;
     }
-
-    loading.value = true;
 
     try {
       final isConnected = await _connectivity.hasConnection();
       if (!isConnected) {
-        // Fallback to cache even if stale when offline
-        final staleCache = _cacheStorage.get(
-          samajId,
-          placement,
-          allowStaleIfOffline: true,
-        );
-        if (staleCache != null && staleCache.isNotEmpty) {
-          adsList.assignAll(staleCache);
-        } else {
-          adsList.clear();
-        }
         return;
       }
 
-      final result = await _repository.getByPlacement(placement, limit: limit);
+      final fetchLimit = limit ?? 5;
+      final result = await _repository.getByPlacement(placement, limit: fetchLimit);
       if (result.isSuccess) {
         final ads = result.dataOrNull ?? [];
         adsList.assignAll(ads);
-        _cacheStorage.set(samajId, placement, ads);
-      } else {
-        // Fallback to cache if network call fails
-        final cached = _cacheStorage.get(
-          samajId,
-          placement,
-          allowStaleIfOffline: true,
-        );
-        if (cached != null && cached.isNotEmpty) {
-          adsList.assignAll(cached);
-        } else {
-          adsList.clear();
-        }
       }
     } catch (_) {
-      adsList.clear();
+      // Non-fatal error during fetch
     } finally {
       loading.value = false;
     }

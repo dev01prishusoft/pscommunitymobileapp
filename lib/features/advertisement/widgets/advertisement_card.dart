@@ -18,6 +18,7 @@ class AdvertisementCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onVideoPlaybackChanged;
   final double? height;
+  final bool isActive;
 
   const AdvertisementCard({
     super.key,
@@ -27,6 +28,7 @@ class AdvertisementCard extends StatefulWidget {
     this.onTap,
     this.onVideoPlaybackChanged,
     this.height,
+    this.isActive = true,
   });
 
   @override
@@ -37,6 +39,75 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
   bool _isVideoPlaying = false;
   bool _isEnlarged = false;
   VideoPlayerController? _activeVideoController;
+  bool _isControllerInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initVideoPreviewIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant AdvertisementCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.advertisement.id != oldWidget.advertisement.id ||
+        widget.advertisement.media.url != oldWidget.advertisement.media.url) {
+      _activeVideoController?.pause();
+      _activeVideoController?.dispose();
+      _activeVideoController = null;
+      _isControllerInitialized = false;
+      _isVideoPlaying = false;
+      _initVideoPreviewIfNeeded();
+      return;
+    }
+
+    // When slide becomes inactive (user swiped away in carousel), pause video cleanly!
+    if (oldWidget.isActive && !widget.isActive) {
+      _handleSlideInactive();
+    }
+  }
+
+  void _handleSlideInactive() {
+    if (_isVideoPlaying) {
+      _activeVideoController?.pause();
+      if (mounted) {
+        setState(() {
+          _isVideoPlaying = false;
+        });
+      }
+      widget.onVideoPlaybackChanged?.call(false);
+    }
+  }
+
+  void _initVideoPreviewIfNeeded() {
+    final isVideo = widget.advertisement.type == AdvertisementType.video;
+    if (isVideo && !widget.advertisement.media.hasValidImageThumbnail) {
+      final videoUrl = widget.advertisement.media.url.trim();
+      if (videoUrl.isNotEmpty) {
+        final uri = Uri.tryParse(videoUrl);
+        if (uri != null) {
+          final ctrl = VideoPlayerController.networkUrl(uri);
+          _activeVideoController = ctrl;
+          ctrl
+              .initialize()
+              .then((_) {
+                if (mounted && _activeVideoController == ctrl) {
+                  setState(() {
+                    _isControllerInitialized = true;
+                  });
+                }
+              })
+              .catchError((_) {
+                if (mounted && _activeVideoController == ctrl) {
+                  setState(() {
+                    _isControllerInitialized = false;
+                  });
+                }
+              });
+        }
+      }
+    }
+  }
 
   void _handleClick(BuildContext context) {
     if (widget.onTap != null) {
@@ -66,11 +137,17 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
 
   void _stopVideo() {
     _activeVideoController?.pause();
-    _activeVideoController?.dispose();
-    _activeVideoController = null;
-    setState(() {
-      _isVideoPlaying = false;
-    });
+    if (_activeVideoController != null &&
+        _activeVideoController!.value.isInitialized &&
+        _activeVideoController!.value.position >=
+            _activeVideoController!.value.duration) {
+      _activeVideoController?.seekTo(Duration.zero);
+    }
+    if (mounted) {
+      setState(() {
+        _isVideoPlaying = false;
+      });
+    }
     widget.onVideoPlaybackChanged?.call(false);
   }
 
@@ -93,12 +170,18 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
     if (mounted) {
       setState(() {
         _isEnlarged = false;
+        if (_activeVideoController != null &&
+            _activeVideoController!.value.isInitialized) {
+          _isVideoPlaying = _activeVideoController!.value.isPlaying;
+        }
       });
+      widget.onVideoPlaybackChanged?.call(_isVideoPlaying);
     }
   }
 
   @override
   void dispose() {
+    _activeVideoController?.pause();
     _activeVideoController?.dispose();
     _activeVideoController = null;
     super.dispose();
@@ -115,7 +198,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
         height: widget.height ?? 130.h,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isVideo ? const Color(0xFF151515) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
@@ -151,9 +234,9 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
   Widget _buildActiveVideoPlayer(BuildContext context) {
     final thumb =
         widget.advertisement.media.thumbnailUrl != null &&
-            widget.advertisement.media.thumbnailUrl!.isNotEmpty
+            widget.advertisement.media.thumbnailUrl!.trim().isNotEmpty
         ? widget.advertisement.media.thumbnailUrl!
-        : widget.advertisement.media.url;
+        : null;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -241,8 +324,32 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
                 width: double.infinity,
                 height: double.infinity,
               )
+            else if (_isControllerInitialized &&
+                _activeVideoController != null &&
+                _activeVideoController!.value.isInitialized)
+              FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: _activeVideoController!.value.size.width,
+                  height: _activeVideoController!.value.size.height,
+                  child: VideoPlayer(_activeVideoController!),
+                ),
+              )
             else
-              Container(color: Colors.black87)
+              Container(
+                color: Colors.black87,
+                child: const Center(
+                  child: SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: Colors.white70,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              )
           else
             CachedImg(
               url: widget.advertisement.media.url,

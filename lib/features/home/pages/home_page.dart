@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
     if (Get.isRegistered<AdvertisementController>()) {
       Get.find<AdvertisementController>().fetchPlacementAds(
         AdPlacement.homeBottom,
-        limit: 1,
+        limit: 5,
       );
     }
   }
@@ -71,6 +71,14 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void didPopNext() {
     Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
     _drawerUserController.fetchUser();
+    if (Get.isRegistered<AdvertisementController>()) {
+      Get.find<AdvertisementController>().fetchPlacementAds(
+        AdPlacement.homeTop,
+      );
+      Get.find<AdvertisementController>().fetchPlacementAds(
+        AdPlacement.homeBottom,
+      );
+    }
     if (mounted) {
       setState(() {
         _isQuickAccessExpanded = false;
@@ -582,7 +590,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
             ),
             Get.find<AdvertisementController>().fetchPlacementAds(
               AdPlacement.homeBottom,
-              limit: 1,
+              limit: 5,
               forceRefresh: true,
             ),
           ],

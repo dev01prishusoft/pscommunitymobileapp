@@ -11,12 +11,14 @@ import 'advertisement_card.dart';
 class AdBannerCarousel extends StatefulWidget {
   final List<Advertisement> advertisements;
   final AdPlacement placement;
+  final AdLayout layout;
   final double? height;
 
   const AdBannerCarousel({
     super.key,
     required this.advertisements,
     this.placement = AdPlacement.homeTop,
+    this.layout = AdLayout.banner,
     this.height,
   });
 
@@ -38,6 +40,15 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
   }
 
   @override
+  void didUpdateWidget(covariant AdBannerCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final items = widget.advertisements.take(5).toList();
+    if (_currentIndex >= items.length && items.isNotEmpty) {
+      _currentIndex = items.length - 1;
+    }
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final resumed = state == AppLifecycleState.resumed;
     if (_isResumed != resumed) {
@@ -54,9 +65,10 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
   }
 
   void _recordCurrentImpression() {
-    if (widget.advertisements.isEmpty) return;
-    final index = _currentIndex.clamp(0, widget.advertisements.length - 1);
-    final ad = widget.advertisements[index];
+    final items = widget.advertisements.take(5).toList();
+    if (items.isEmpty) return;
+    final index = _currentIndex.clamp(0, items.length - 1);
+    final ad = items[index];
     if (Get.isRegistered<AdvertisementController>()) {
       Get.find<AdvertisementController>().recordImpression(ad, widget.placement);
     }
@@ -64,35 +76,41 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.advertisements.isEmpty) {
+    final items = widget.advertisements.take(5).toList();
+    if (items.isEmpty) {
       return const SizedBox.shrink();
     }
 
     final cardHeight = widget.height ?? 130.h;
 
-    // Static banner if only 1 item
-    if (widget.advertisements.length == 1) {
+    // Static banner if only 1 item: neither auto-scroll nor carousel
+    if (items.length == 1) {
       return AdvertisementCard(
-        advertisement: widget.advertisements.first,
+        key: ValueKey('ad_banner_${widget.placement.code}_${items.first.id}'),
+        advertisement: items.first,
         placement: widget.placement,
-        layout: AdLayout.banner,
+        layout: widget.layout,
         height: cardHeight,
+        isActive: true,
       );
     }
 
-    // Carousel for multiple items
+    // Carousel for multiple items (max 5)
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         CarouselSlider.builder(
-          itemCount: widget.advertisements.length,
+          itemCount: items.length,
           itemBuilder: (context, index, realIndex) {
-            final ad = widget.advertisements[index];
+            final ad = items[index];
+            final isActive = _currentIndex == index;
             return AdvertisementCard(
+              key: ValueKey('ad_banner_${widget.placement.code}_${ad.id}_$index'),
               advertisement: ad,
               placement: widget.placement,
-              layout: AdLayout.banner,
+              layout: widget.layout,
               height: cardHeight,
+              isActive: isActive,
               onVideoPlaybackChanged: (isPlaying) {
                 if (_isVideoPlaying != isPlaying) {
                   setState(() {
@@ -122,10 +140,10 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
         SizedBox(height: 8.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: widget.advertisements.asMap().entries.map((entry) {
+          children: items.asMap().entries.map((entry) {
             final isSelected = _currentIndex == entry.key;
             return Semantics(
-              label: 'Slide ${entry.key + 1} of ${widget.advertisements.length}',
+              label: 'Slide ${entry.key + 1} of ${items.length}',
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: isSelected ? 18.w : 6.w,

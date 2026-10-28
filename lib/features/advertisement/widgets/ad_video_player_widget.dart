@@ -64,28 +64,27 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
   Future<void> _useExistingController(VideoPlayerController ctrl) async {
     _controller = ctrl;
     _isExternalController = true;
-    if (!ctrl.value.isInitialized) {
-      try {
+    try {
+      if (!ctrl.value.isInitialized) {
         await ctrl.initialize();
-      } catch (_) {
-        if (mounted) {
-          setState(() {
-            _hasError = true;
-          });
-        }
-        return;
       }
-    }
-    _isPlaying = ctrl.value.isPlaying;
-    _hasStartedPlaying = ctrl.value.isPlaying;
-    _hasError = ctrl.value.hasError;
-    _controller!.addListener(_handleControllerUpdate);
-    widget.onControllerCreated?.call(ctrl);
+      if (!mounted) return;
+      _isPlaying = ctrl.value.isPlaying;
+      _hasStartedPlaying = ctrl.value.isPlaying;
+      _hasError = ctrl.value.hasError;
+      _controller?.removeListener(_handleControllerUpdate);
+      _controller?.addListener(_handleControllerUpdate);
+      widget.onControllerCreated?.call(ctrl);
 
-    if (mounted) {
       setState(() {});
       if (widget.autoPlay && !_isPlaying) {
-        _play();
+        await _play();
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+        });
       }
     }
   }
@@ -184,12 +183,10 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
   @override
   void dispose() {
     _controller?.removeListener(_handleControllerUpdate);
-    if (_isPlaying) {
-      widget.onPlaybackChanged?.call(false);
-    }
     if (!_isExternalController) {
       _controller?.dispose();
     }
+    _controller = null;
     super.dispose();
   }
 
@@ -223,22 +220,92 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
 
     // If video is NOT playing: ALWAYS SHOW THUMBNAIL with Play button!
     if (!_isPlaying) {
-      return GestureDetector(
+      return Container(
+        color: Colors.black,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _togglePlayPause,
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.center,
+            children: [
+              // 1. Thumbnail Image or Initialized Video 1st Frame
+              if (hasValidThumb)
+                CachedImg(
+                  url: widget.thumbnailUrl!,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                )
+              else if (_controller != null &&
+                  _controller!.value.isInitialized &&
+                  _controller!.value.size.width > 0 &&
+                  _controller!.value.size.height > 0)
+                FittedBox(
+                  fit: widget.fit,
+                  clipBehavior: Clip.hardEdge,
+                  child: SizedBox(
+                    width: _controller!.value.size.width,
+                    height: _controller!.value.size.height,
+                    child: VideoPlayer(_controller!),
+                  ),
+                )
+              else
+                Container(
+                  color: Colors.black87,
+                  child: const Center(
+                    child: SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white70,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // 2. Play Button Icon (▶️)
+              Center(
+                child: Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // When video IS PLAYING: show video with Pause button (⏸) only!
+    return Container(
+      color: Colors.black,
+      child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _togglePlayPause,
         child: Stack(
           fit: StackFit.expand,
           alignment: Alignment.center,
           children: [
-            // 1. Thumbnail Image or Initialized Video 1st Frame
-            if (hasValidThumb)
-              CachedImg(
-                url: widget.thumbnailUrl!,
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
-              )
-            else if (_controller != null && _controller!.value.isInitialized)
+            // 1. Video Playing
+            if (_controller != null &&
+                _controller!.value.isInitialized &&
+                _controller!.value.size.width > 0 &&
+                _controller!.value.size.height > 0)
               FittedBox(
                 fit: widget.fit,
                 clipBehavior: Clip.hardEdge,
@@ -249,67 +316,16 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
                 ),
               )
             else
-              Container(
-                color: Colors.black87,
-                child: const Center(
+              const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: Colors.white70,
                     strokeWidth: 2,
                   ),
                 ),
               ),
-
-            // 2. Play Button Icon (▶️)
-            Center(
-              child: Container(
-                width: 44.r,
-                height: 44.r,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // When video IS PLAYING: show video with Pause button (⏸) only!
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _togglePlayPause,
-      child: Stack(
-        fit: StackFit.expand,
-        alignment: Alignment.center,
-        children: [
-          // 1. Video Playing
-          if (_controller != null && _controller!.value.isInitialized)
-            FittedBox(
-              fit: widget.fit,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                width: _controller!.value.size.width,
-                height: _controller!.value.size.height,
-                child: VideoPlayer(_controller!),
-              ),
-            )
-          else
-            const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2.5,
-              ),
-            ),
 
           // 2. Pause Icon (⏸) Only
           Center(
@@ -356,6 +372,7 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
             ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

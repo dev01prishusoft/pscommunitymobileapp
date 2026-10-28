@@ -58,6 +58,13 @@ class AdvertisementMedia {
     final rawThumb = json['thumbnailUrl'] ??
         json['thumbUrl'] ??
         json['thumbnail'] ??
+        json['coverImage'] ??
+        json['coverImageUrl'] ??
+        json['cover'] ??
+        json['posterUrl'] ??
+        json['poster'] ??
+        json['previewUrl'] ??
+        json['previewImage'] ??
         json['imageUrl'] ??
         json['bannerImageUrl'];
     final resolvedThumb = rawThumb != null ? resolveUrl(rawThumb.toString()) : '';

@@ -363,7 +363,8 @@ class EventsPage extends GetView<EventsController> {
             ),
           );
 
-          if (index == 1) {
+          final adTargetIndex = events.length >= 2 ? 1 : 0;
+          if (index == adTargetIndex) {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [

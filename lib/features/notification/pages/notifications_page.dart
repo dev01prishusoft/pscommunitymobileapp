@@ -158,7 +158,7 @@ class NotificationsPage extends GetView<NotificationController> {
                 if (Get.isRegistered<AdvertisementController>()) {
                   await Get.find<AdvertisementController>().fetchPlacementAds(
                     AdPlacement.notifications,
-                    limit: 1,
+                    limit: 5,
                     forceRefresh: true,
                   );
                 }
@@ -201,7 +201,7 @@ class NotificationsPage extends GetView<NotificationController> {
               if (Get.isRegistered<AdvertisementController>()) {
                 await Get.find<AdvertisementController>().fetchPlacementAds(
                   AdPlacement.notifications,
-                  limit: 1,
+                  limit: 5,
                   forceRefresh: true,
                 );
               }
