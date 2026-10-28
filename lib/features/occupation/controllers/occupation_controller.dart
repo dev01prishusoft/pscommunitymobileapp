@@ -174,6 +174,14 @@ class OccupationController extends GetxController {
     }
   }
 
+  int get activeLocationFilterCount {
+    int count = 0;
+    if (selectedState.value != null) count++;
+    if (selectedDistrict.value != null) count++;
+    if (selectedTaluka.value != null) count++;
+    return count;
+  }
+
   Future<void> loadOccupationTypes() async {
     isOccupationTypesLoading.value = true;
     try {

@@ -104,7 +104,18 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
               },
             ),
             IconButton(
-              icon: const Icon(Iconsax.filter_search_copy),
+              icon: Obx(() {
+                final count = controller.activeLocationFilterCount;
+                if (count > 0) {
+                  return Badge(
+                    label: Text('$count'),
+                    backgroundColor: AppColors.primary,
+                    textColor: AppColors.white,
+                    child: const Icon(Iconsax.filter_search_copy),
+                  );
+                }
+                return const Icon(Iconsax.filter_search_copy);
+              }),
               tooltip: LK.locationFilters.tr,
               onPressed: () {
                 Get.dialog<void>(const _OccupationFilterDialog());
@@ -115,53 +126,45 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
       ),
       body: Padding(
         padding: AppSpacing.pagePadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Obx(
-                () => AppStateView(
-                  state: controller.membersState.value,
-                  onRetry: () =>
-                      controller.loadOccupationMembers(_occupationId),
-                  child: RefreshIndicator(
-                    onRefresh: () => controller.loadOccupationMembers(
-                      _occupationId,
-                      refresh: true,
-                    ),
-                    color: AppColors.primary,
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount:
-                          controller.occupationMembers.length +
-                          (controller.hasMoreMembers.value ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == controller.occupationMembers.length) {
-                          return const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          );
-                        }
-                        return _OccupationMemberCard(
-                          member: controller.occupationMembers[index],
-                          onReturn: () {
-                            if (mounted) {
-                              _searchController.clear();
-                              controller.clearMemberSearch();
-                              controller.resetFilters();
-                              setState(() {
-                                _isSearchVisible = false;
-                              });
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
+        child: Obx(
+          () => AppStateView(
+            state: controller.membersState.value,
+            onRetry: () =>
+                controller.loadOccupationMembers(_occupationId),
+            child: RefreshIndicator(
+              onRefresh: () => controller.loadOccupationMembers(
+                _occupationId,
+                refresh: true,
+              ),
+              color: AppColors.primary,
+              child: ListView.builder(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount:
+                    controller.occupationMembers.length +
+                    (controller.hasMoreMembers.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == controller.occupationMembers.length) {
+                    return const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    );
+                  }
+                  return _OccupationMemberCard(
+                    member: controller.occupationMembers[index],
+                    onReturn: () {
+                      if (mounted) {
+                        _searchController.clear();
+                        controller.clearMemberSearch();
+                        setState(() {
+                          _isSearchVisible = false;
+                        });
+                      }
+                    },
+                  );
+                },
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
