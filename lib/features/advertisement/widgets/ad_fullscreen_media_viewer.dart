@@ -64,8 +64,10 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
 
     if (widget.placement != null &&
         Get.isRegistered<AdvertisementController>()) {
-      Get.find<AdvertisementController>()
-          .recordImpression(widget.advertisement, widget.placement!);
+      Get.find<AdvertisementController>().recordImpression(
+        widget.advertisement,
+        widget.placement!,
+      );
     }
 
     if (_initialized) {
@@ -73,20 +75,23 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
         _controller!.play();
       }
     } else {
-      ctrl.initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _initialized = true;
+      ctrl
+          .initialize()
+          .then((_) {
+            if (mounted) {
+              setState(() {
+                _initialized = true;
+              });
+              _controller?.play();
+            }
+          })
+          .catchError((_) {
+            if (mounted) {
+              setState(() {
+                _hasError = true;
+              });
+            }
           });
-          _controller?.play();
-        }
-      }).catchError((_) {
-        if (mounted) {
-          setState(() {
-            _hasError = true;
-          });
-        }
-      });
     }
 
     setState(() {});
@@ -101,10 +106,10 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
     }
     try {
       final base = AppEnvironment.I.apiBaseUrl;
-      final cleanBase =
-          base.endsWith('/') ? base.substring(0, base.length - 1) : base;
-      final cleanPath =
-          trimmed.startsWith('/') ? trimmed : '/$trimmed';
+      final cleanBase = base.endsWith('/')
+          ? base.substring(0, base.length - 1)
+          : base;
+      final cleanPath = trimmed.startsWith('/') ? trimmed : '/$trimmed';
       return '$cleanBase$cleanPath';
     } catch (_) {
       return trimmed;
@@ -141,11 +146,7 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
 
     try {
       final raw = widget.advertisement.media.url;
-      // media.url is already resolved by AdvertisementMedia.fromJson,
-      // but apply _resolveUrl as a safety net for relative paths.
       final url = _resolveUrl(raw);
-      debugPrint('AdFullScreenMediaViewer: loading video → $url');
-
       if (url.isEmpty) throw StateError('Video URL is empty after resolution.');
 
       Uri uri;
@@ -162,17 +163,15 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
 
       await controller.initialize();
 
-      debugPrint(
-          'AdFullScreenMediaViewer: initialized – size=${controller.value.size}, '
-          'duration=${controller.value.duration}');
-
       if (!mounted) return;
 
       // Record impression
       if (widget.placement != null &&
           Get.isRegistered<AdvertisementController>()) {
-        Get.find<AdvertisementController>()
-            .recordImpression(widget.advertisement, widget.placement!);
+        Get.find<AdvertisementController>().recordImpression(
+          widget.advertisement,
+          widget.placement!,
+        );
       }
 
       setState(() {
@@ -180,8 +179,7 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
       });
 
       await controller.play();
-    } catch (e, st) {
-      debugPrint('AdFullScreenMediaViewer: ERROR – $e\n$st');
+    } catch (e, _) {
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -288,12 +286,17 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.videocam_off_outlined,
-                color: Colors.white70, size: 48.sp),
+            Icon(
+              Icons.videocam_off_outlined,
+              color: Colors.white70,
+              size: 48.sp,
+            ),
             SizedBox(height: 12.h),
-            Text('Failed to load video',
-                style: TextStyle(color: Colors.white, fontSize: 14.sp)),
-            if (_lastError.isNotEmpty) ...[  
+            Text(
+              'Failed to load video',
+              style: TextStyle(color: Colors.white, fontSize: 14.sp),
+            ),
+            if (_lastError.isNotEmpty) ...[
               SizedBox(height: 6.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -312,8 +315,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Retry'),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white),
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
             ),
           ],
         ),
@@ -332,8 +336,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
 
     // Compute aspect ratio
     final size = _controller!.value.size;
-    final aspectRatio =
-        (size.width > 0 && size.height > 0) ? size.width / size.height : 16 / 9;
+    final aspectRatio = (size.width > 0 && size.height > 0)
+        ? size.width / size.height
+        : 16 / 9;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -363,11 +368,15 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
                     color: Colors.black.withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        width: 1.5),
+                      color: Colors.white.withValues(alpha: 0.85),
+                      width: 1.5,
+                    ),
                   ),
-                  child: const Icon(Icons.play_arrow_rounded,
-                      color: Colors.white, size: 38),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 38,
+                  ),
                 ),
               ),
             ),
@@ -400,10 +409,14 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor, strokeWidth: 2.5),
+                color: Theme.of(context).primaryColor,
+                strokeWidth: 2.5,
+              ),
               SizedBox(height: 12.h),
-              Text('Loading video…',
-                  style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+              Text(
+                'Loading video…',
+                style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+              ),
             ],
           ),
         ),
@@ -449,21 +462,27 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
               color: Colors.black.withValues(alpha: 0.6),
               shape: BoxShape.circle,
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.35), width: 1),
+                color: Colors.white.withValues(alpha: 0.35),
+                width: 1,
+              ),
             ),
-            child:
-                const Icon(Icons.close_rounded, color: Colors.white, size: 22),
+            child: const Icon(
+              Icons.close_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
         ),
         if (widget.advertisement.showSponsoredLabel)
           Container(
-            padding:
-                EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.55),
               borderRadius: BorderRadius.circular(8.r),
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.35), width: 0.8),
+                color: Colors.white.withValues(alpha: 0.35),
+                width: 0.8,
+              ),
             ),
             child: Text(
               'Sponsored',
@@ -531,8 +550,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 11.5.sp),
+                          color: Colors.white.withValues(alpha: 0.85),
+                          fontSize: 11.5.sp,
+                        ),
                       ),
                     ],
                   ],
@@ -552,21 +572,26 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
                     if (widget.placement != null &&
                         Get.isRegistered<AdvertisementController>()) {
                       Get.find<AdvertisementController>().handleAdClick(
-                          widget.advertisement, widget.placement!);
+                        widget.advertisement,
+                        widget.placement!,
+                      );
                     }
                   },
                   borderRadius: BorderRadius.circular(20.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 14.w, vertical: 7.h),
+                      horizontal: 14.w,
+                      vertical: 7.h,
+                    ),
                     child: Text(
                       widget.advertisement.ctaLabel.isNotEmpty
                           ? widget.advertisement.ctaLabel
                           : 'Know More',
                       style: TextStyle(
-                          color: const Color(0xFF222222),
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold),
+                        color: const Color(0xFF222222),
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -603,8 +628,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
               child: Container(
                 padding: EdgeInsets.all(4.r),
                 decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    shape: BoxShape.circle),
+                  color: Colors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
                   _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   color: Colors.white,
@@ -616,8 +642,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
             Text(
               '${_fmt(pos)} / ${_fmt(dur)}',
               style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 11.sp),
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 11.sp,
+              ),
             ),
             const Spacer(),
             GestureDetector(
@@ -625,8 +652,9 @@ class _AdFullScreenMediaViewerState extends State<AdFullScreenMediaViewer> {
               child: Container(
                 padding: EdgeInsets.all(4.r),
                 decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    shape: BoxShape.circle),
+                  color: Colors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
                   _isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
                   color: Colors.white,

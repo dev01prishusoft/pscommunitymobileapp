@@ -758,4 +758,5 @@ class LK {
   static const String setting = "setting";
   static const String more = "more";
   static const String less = "less";
+  static const String selectAll = "selectAll";
 }

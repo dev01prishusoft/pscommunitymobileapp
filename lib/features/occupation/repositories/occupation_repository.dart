@@ -5,6 +5,7 @@ import 'package:pscommunitymobileapp/core/models/member.dart';
 abstract class OccupationRepository {
   Future<List<OccupationItem>> getOccupations({
     int? occupationTypeId,
+    List<int>? occupationTypeIds,
     String? search,
     int pageNumber = 1,
     int pageSize = 20,

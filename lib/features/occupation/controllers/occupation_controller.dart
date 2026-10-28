@@ -20,6 +20,10 @@ class OccupationController extends GetxController {
   final RxList<DropdownItem> occupationTypes = <DropdownItem>[].obs;
   final RxString searchQuery = ''.obs;
   final Rxn<DropdownItem> selectedOccupationType = Rxn<DropdownItem>();
+  final RxList<String> selectedCategories = <String>[].obs;
+  final RxBool isOccupationTypesLoading = false.obs;
+  final Set<String> _allCategoriesCache = <String>{};
+  final Map<String, int> _categoryToIdMap = <String, int>{};
 
   final RxBool isStatesLoading = false.obs;
   final RxBool isDistrictsLoading = false.obs;
@@ -69,6 +73,55 @@ class OccupationController extends GetxController {
     await loadOccupationTypes();
     await loadOccupations();
     await loadStates();
+  }
+
+  List<String> get availableCategories {
+    final set = Set<String>.from(_allCategoriesCache);
+    for (final item in occupationTypes) {
+      final text = item.text.trim();
+      if (text.isNotEmpty && text.toLowerCase() != 'all') {
+        set.add(text);
+      }
+    }
+    for (final occ in occupations) {
+      final type = occ.occupationType?.trim();
+      if (type != null && type.isNotEmpty) {
+        set.add(type);
+      }
+    }
+    final list = set.toList();
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return list;
+  }
+
+  List<int> get selectedCategoryIds {
+    final ids = <int>{};
+    for (final cat in selectedCategories) {
+      final catLower = cat.trim().toLowerCase();
+      final id = _categoryToIdMap[catLower];
+      if (id != null && id != 0) {
+        ids.add(id);
+      } else {
+        for (final item in occupationTypes) {
+          if (item.id != 0 && item.text.trim().toLowerCase() == catLower) {
+            ids.add(item.id);
+            _categoryToIdMap[catLower] = item.id;
+            break;
+          }
+        }
+      }
+    }
+    return ids.toList();
+  }
+
+  void applyCategoryFilters(List<String> categories) {
+    selectedCategories.assignAll(categories);
+    loadOccupations(refresh: true);
+  }
+
+  void resetCategoryFilters() {
+    selectedCategories.clear();
+    loadOccupations(refresh: true);
   }
 
   Future<void> loadStates() async {
@@ -122,22 +175,31 @@ class OccupationController extends GetxController {
   }
 
   Future<void> loadOccupationTypes() async {
+    isOccupationTypesLoading.value = true;
     try {
       final results = await _repository.getOccupationDropdown();
       occupationTypes.assignAll([DropdownItem(id: 0, text: 'All'), ...results]);
+      for (final item in results) {
+        if (item.id != 0 && item.text.trim().isNotEmpty) {
+          _allCategoriesCache.add(item.text.trim());
+          _categoryToIdMap[item.text.trim().toLowerCase()] = item.id;
+        }
+      }
     } catch (e, stack) {
       CrashReporter.recordError(
         e,
         stack,
         reason: 'OccupationController.loadOccupationTypes failed',
       );
+    } finally {
+      isOccupationTypesLoading.value = false;
     }
   }
 
   void onOccupationTypeChanged(DropdownItem? type) {
     if (selectedOccupationType.value?.id == type?.id) return;
     selectedOccupationType.value = type;
-    loadOccupations(occupationTypeId: type?.id);
+    loadOccupations(occupationTypeId: type?.id, refresh: true);
   }
 
   Future<void> loadOccupationMembers(
@@ -190,6 +252,7 @@ class OccupationController extends GetxController {
 
   Future<void> loadOccupations({
     int? occupationTypeId,
+    List<int>? occupationTypeIds,
     bool refresh = true,
   }) async {
     if (refresh) {
@@ -204,25 +267,48 @@ class OccupationController extends GetxController {
     }
 
     try {
+      final effectiveTypeIds = occupationTypeIds ??
+          (selectedCategoryIds.isNotEmpty
+              ? selectedCategoryIds
+              : (occupationTypeId != null && occupationTypeId != 0
+                  ? [occupationTypeId]
+                  : (selectedOccupationType.value?.id != null &&
+                          selectedOccupationType.value!.id != 0
+                      ? [selectedOccupationType.value!.id]
+                      : null)));
+
       final results = await _repository.getOccupations(
-        occupationTypeId: occupationTypeId ?? selectedOccupationType.value?.id,
+        occupationTypeIds: effectiveTypeIds,
         search: searchQuery.value,
         pageNumber: _currentPage,
         pageSize: _pageSize,
       );
+
+      for (final occ in results) {
+        final type = occ.occupationType?.trim();
+        if (type != null && type.isNotEmpty) {
+          _allCategoriesCache.add(type);
+          if (occ.occupationTypeId != null && occ.occupationTypeId != 0) {
+            _categoryToIdMap.putIfAbsent(
+              type.toLowerCase(),
+              () => occ.occupationTypeId!,
+            );
+          }
+        }
+      }
 
       if (results.isEmpty) {
         hasMore.value = false;
       } else {
         final activeOccupations = results.where((occ) => occ.isActive).toList();
         occupations.addAll(activeOccupations);
-        filteredOccupations.addAll(activeOccupations);
 
         _currentPage++;
         if (results.length < _pageSize) {
           hasMore.value = false;
         }
       }
+      filteredOccupations.assignAll(occupations);
       state.value = filteredOccupations.isEmpty
           ? AppState.empty
           : AppState.data;

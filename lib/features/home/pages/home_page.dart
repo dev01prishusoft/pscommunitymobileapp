@@ -634,7 +634,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
             // 3. 4*2 Menu Grid
             _buildQuickAccessGrid(context),
 
-            SizedBox(height: 150.h),
+            Obx(() => SizedBox(height: _hasHomeBottomAd() ? 150.h : 24.h)),
           ],
         ),
       ),
@@ -702,25 +702,35 @@ class _HomePageState extends State<HomePage> with RouteAware {
     );
   }
 
-  Widget? _buildHomeBottomAdFab() {
+  bool _hasHomeBottomAd() {
     if (Get.isRegistered<ModulePermissionService>()) {
       if (!ModulePermissionService.to.isAccessible(AppModule.advertisement)) {
-        return null;
+        return false;
       }
     }
     if (!Get.isRegistered<AdvertisementController>()) {
-      return null;
+      return false;
     }
+    return Get.find<AdvertisementController>()
+        .getAds(AdPlacement.homeBottom)
+        .isNotEmpty;
+  }
 
-    return SizedBox(
-      width: double.infinity,
-      child: AdPlacementSlot(
-        placement: AdPlacement.homeBottom,
-        layout: AdLayout.banner,
-        height: 130,
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-      ),
-    );
+  Widget? _buildHomeBottomAdFab() {
+    return Obx(() {
+      if (!_hasHomeBottomAd()) {
+        return const SizedBox.shrink();
+      }
+      return SizedBox(
+        width: double.infinity,
+        child: AdPlacementSlot(
+          placement: AdPlacement.homeBottom,
+          layout: AdLayout.banner,
+          height: 130,
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
+        ),
+      );
+    });
   }
 
   @override
@@ -853,59 +863,9 @@ class _HomePageState extends State<HomePage> with RouteAware {
   Widget _buildQuickAccessGrid(BuildContext context) {
     return Obx(() {
       final _ = Get.find<LocalizationService>().currentLocale.value;
+      final hasHomeBottomAd = _hasHomeBottomAd();
 
-      final List<_QuickAccessItem> collapsedItems = [
-        _QuickAccessItem(
-          label: LK.family.tr,
-          icon: Icons.family_restroom_outlined,
-          onTap: () => Get.toNamed<void>(AppRouter.familyAreas),
-        ),
-        _QuickAccessItem(
-          label: LK.findMember.tr,
-          icon: Iconsax.search_normal_copy,
-          onTap: () => Get.toNamed<void>(AppRouter.findMember),
-        ),
-        _QuickAccessItem(
-          label: LK.committee.tr,
-          icon: Icons.group_outlined,
-          onTap: () => Get.toNamed<void>(AppRouter.committees),
-        ),
-        _QuickAccessItem(
-          label: LK.payments.tr,
-          icon: Iconsax.wallet_2_copy,
-          onTap: () => Get.toNamed<void>(AppRouter.payments),
-        ),
-        _QuickAccessItem(
-          label: LK.occupationDirectory.tr,
-          icon: Iconsax.briefcase_copy,
-          onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
-        ),
-        _QuickAccessItem(
-          label: LK.marriage.tr,
-          icon: Icons.wc_outlined,
-          onTap: () => Get.toNamed<void>(AppRouter.marriage),
-        ),
-        _QuickAccessItem(
-          label: LK.events_title.tr,
-          icon: Iconsax.calendar_copy,
-          onTap: () {
-            setState(() {
-              _selectedBottomNavIndex = 2;
-            });
-          },
-        ),
-        _QuickAccessItem(
-          label: LK.more.tr,
-          icon: Iconsax.category_copy,
-          onTap: () {
-            setState(() {
-              _isQuickAccessExpanded = true;
-            });
-          },
-        ),
-      ];
-
-      final List<_QuickAccessItem> expandedItems = [
+      final List<_QuickAccessItem> allItems = [
         _QuickAccessItem(
           label: LK.family.tr,
           icon: Icons.family_restroom_outlined,
@@ -960,7 +920,26 @@ class _HomePageState extends State<HomePage> with RouteAware {
           icon: Iconsax.call_calling_copy,
           onTap: () => Get.toNamed<void>(AppRouter.customerSupport),
         ),
-        _QuickAccessItem(
+      ];
+
+      List<_QuickAccessItem> currentItems;
+
+      if (!hasHomeBottomAd) {
+        // When there is no home-bottom advertisement, show all menu items by default without More/Less option
+        currentItems = allItems;
+      } else {
+        // When home-bottom advertisement is present, show 7 items + More (collapsed) or all items + Less (expanded)
+        final moreItem = _QuickAccessItem(
+          label: LK.more.tr,
+          icon: Iconsax.category_copy,
+          onTap: () {
+            setState(() {
+              _isQuickAccessExpanded = true;
+            });
+          },
+        );
+
+        final lessItem = _QuickAccessItem(
           label: LK.less.tr,
           icon: Iconsax.arrow_up_2_copy,
           onTap: () {
@@ -968,12 +947,14 @@ class _HomePageState extends State<HomePage> with RouteAware {
               _isQuickAccessExpanded = false;
             });
           },
-        ),
-      ];
+        );
 
-      final currentItems = _isQuickAccessExpanded
-          ? expandedItems
-          : collapsedItems;
+        final collapsedItems = [...allItems.take(7), moreItem];
+
+        final expandedItems = [...allItems, lessItem];
+
+        currentItems = _isQuickAccessExpanded ? expandedItems : collapsedItems;
+      }
 
       return AnimatedSize(
         duration: const Duration(milliseconds: 280),

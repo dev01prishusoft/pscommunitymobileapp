@@ -19,8 +19,27 @@ class SafeLauncher {
     ).show();
   }
 
+  static String normalizeUrl(String raw) {
+    var trimmed = raw.trim();
+    if (trimmed.isEmpty) return trimmed;
+    final lower = trimmed.toLowerCase();
+    if (lower.startsWith('tel:') ||
+        lower.startsWith('mailto:') ||
+        lower.startsWith('sms:') ||
+        lower.startsWith('http://') ||
+        lower.startsWith('https://')) {
+      return trimmed;
+    }
+    final digitsOnly = trimmed.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+    if (RegExp(r'^\+?[0-9]{7,15}$').hasMatch(digitsOnly)) {
+      return 'tel:$digitsOnly';
+    }
+    return 'https://$trimmed';
+  }
+
   static Future<bool> open(String rawUrl, {LaunchMode? mode}) async {
-    final uri = Uri.tryParse(rawUrl);
+    final normalized = normalizeUrl(rawUrl);
+    final uri = Uri.tryParse(normalized);
     if (uri == null || !_allowedSchemes.contains(uri.scheme)) {
       _showUnavailableToast();
       return false;
@@ -32,11 +51,19 @@ class SafeLauncher {
               ? LaunchMode.externalApplication
               : LaunchMode.platformDefault);
 
-      final launched = await launchUrl(uri, mode: launchMode);
-      if (!launched) {
-        _showUnavailableToast();
+      if (await canLaunchUrl(uri)) {
+        final launched = await launchUrl(uri, mode: launchMode);
+        if (!launched) {
+          _showUnavailableToast();
+        }
+        return launched;
+      } else {
+        final launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+        if (!launched) {
+          _showUnavailableToast();
+        }
+        return launched;
       }
-      return launched;
     } catch (e, stack) {
       final scheme = uri.scheme;
       CrashReporter.recordError(
@@ -54,8 +81,8 @@ class SafeLauncher {
   }
 
   static Future<bool> openInAppBrowser(String rawUrl, {String? title}) async {
-    final trimmed = rawUrl.trim();
-    final uri = Uri.tryParse(trimmed);
+    final normalized = normalizeUrl(rawUrl);
+    final uri = Uri.tryParse(normalized);
     if (uri == null || (uri.scheme != 'https' && uri.scheme != 'http')) {
       _showUnavailableToast();
       return false;
@@ -67,7 +94,7 @@ class SafeLauncher {
           title: title != null && title.trim().isNotEmpty
               ? title.trim()
               : (uri.host.isNotEmpty ? uri.host : 'Browser'),
-          url: trimmed,
+          url: normalized,
           allowAnyUrl: true,
         ),
       );
@@ -78,7 +105,7 @@ class SafeLauncher {
         stack,
         reason: 'SafeLauncher.openInAppBrowser failed, falling back to external',
       );
-      return openExternal(trimmed);
+      return openExternal(normalized);
     }
   }
 }

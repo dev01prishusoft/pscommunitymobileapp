@@ -7,6 +7,7 @@ class OccupationItem {
     this.count,
     this.iconKey,
     this.memberName,
+    this.occupationTypeId,
     this.occupationType,
     this.companyName,
     this.businessAddress,
@@ -24,7 +25,13 @@ class OccupationItem {
       count: json['memberCount'] as int? ?? json['count'] as int?,
       iconKey: json['iconKey'] as String?,
       memberName: json['memberName'] as String?,
-      occupationType: json['occupationTypeName'] as String?,
+      occupationTypeId: json['occupationTypeId'] as int? ??
+          int.tryParse(json['occupationTypeId']?.toString() ?? '') ??
+          (json['occupationType'] is int ? json['occupationType'] as int : null) ??
+          int.tryParse(json['OccupationTypeId']?.toString() ?? ''),
+      occupationType: json['occupationTypeName'] as String? ??
+          (json['occupationType'] is String ? json['occupationType'] as String : null) ??
+          json['OccupationTypeName'] as String?,
       companyName: json['companyName'] as String?,
       businessAddress: json['businessAddress'] as String?,
       mobile: json['mobileNo'] as String?,
@@ -39,6 +46,7 @@ class OccupationItem {
   final int? count;
   final String? iconKey;
   final String? memberName;
+  final int? occupationTypeId;
   final String? occupationType;
   final String? companyName;
   final String? businessAddress;

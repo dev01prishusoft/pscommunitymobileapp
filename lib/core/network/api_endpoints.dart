@@ -18,7 +18,7 @@ class ApiEndpoints {
   static String committeeDetail = '/api/v1/committee';
   static String committeeRoleDropdown = '/api/v1/CommitteeRole/dropdown';
   static String payments = '/api/v1/PaymentMode/list';
-  static String occupations = '/api/v1/Occupation/list-by-samaj';
+  static String occupations = '/api/v2/Occupation/list-by-samaj';
   static String occupationDetail = '/api/v1/Occupation';
   static String business = '/api/v1/AddressType/list';
   static String marriage = '/api/v1/marriage/list';

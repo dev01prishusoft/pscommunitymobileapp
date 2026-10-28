@@ -13,13 +13,24 @@ class OccupationRepositoryImpl implements OccupationRepository {
   @override
   Future<List<OccupationItem>> getOccupations({
     int? occupationTypeId,
+    List<int>? occupationTypeIds,
     String? search,
     int pageNumber = 1,
     int pageSize = 20,
   }) async {
+    String? idsString;
+    if (occupationTypeIds != null && occupationTypeIds.isNotEmpty) {
+      final validIds = occupationTypeIds.where((id) => id != 0).toList();
+      if (validIds.isNotEmpty) {
+        idsString = validIds.join(',');
+      }
+    } else if (occupationTypeId != null && occupationTypeId != 0) {
+      idsString = occupationTypeId.toString();
+    }
+
     final queryParameters = <String, dynamic>{
-      if (occupationTypeId != null && occupationTypeId != 0)
-        'occupationTypeId': occupationTypeId,
+      if (idsString != null && idsString.isNotEmpty)
+        'occupationTypeIds': idsString,
     };
 
     try {
