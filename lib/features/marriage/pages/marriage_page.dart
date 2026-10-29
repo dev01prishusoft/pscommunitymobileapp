@@ -114,6 +114,15 @@ class MarriagePage extends GetView<MarriageController> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       if (index == controller.filteredMembers.length) {
+                        if (controller.hasPageError.value) {
+                          return Center(
+                            child: TextButton.icon(
+                              onPressed: controller.loadNextPage,
+                              icon: const Icon(Icons.refresh),
+                              label: Text(LK.retry.tr),
+                            ),
+                          );
+                        }
                         return controller.isNextPageLoading.value
                             ? const Center(
                                 child: Padding(
@@ -138,6 +147,7 @@ class MarriagePage extends GetView<MarriageController> {
                     child: AppStateView(
                       state: controller.state.value,
                       emptyMessage: LK.noMatchesFound.tr,
+                      onRetry: controller.applyFilters,
                       child: const SizedBox.shrink(),
                     ),
                   ),
@@ -710,7 +720,8 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                                     value: controller.excludeSameGotra.value,
                                     activeColor: AppColors.primary,
                                     onChanged: (val) => controller
-                                        .excludeSameGotra.value = val!,
+                                      .excludeSameGotra.value =
+                                            val!,
                                   ),
                                 ),
                               ),

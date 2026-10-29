@@ -139,35 +139,6 @@ class _FindMemberCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMarriageBadge() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-      decoration: BoxDecoration(
-        color: AppColors.pink.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(6.r),
-        border: Border.all(
-          color: AppColors.pink.withValues(alpha: 0.2),
-          width: 0.5.w,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite_rounded, size: 10.sp, color: AppColors.pink),
-          SizedBox(width: 3.w),
-          Text(
-            LK.lookingForMarriage.tr,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: AppColors.pink,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildGenderAgeBadge() {
     final infoParts = <String>[];
     final genderKey = GenderMapper.getLabelKey(member.gender);
@@ -317,8 +288,6 @@ class _FindMemberCard extends StatelessWidget {
                     runSpacing: 8.h,
                     children: [
                       if (member.isHead == true) _buildHeadBadge(),
-                      if (member.isLookingforMarriage == true)
-                        _buildMarriageBadge(),
                       if (member.gender.isNotEmpty) _buildGenderAgeBadge(),
                       if (member.gotra.isNotEmpty) _buildGotraBadge(),
                       if (member.memberId > 0) _buildFamilyTreeBadge(),

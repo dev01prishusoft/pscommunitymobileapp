@@ -85,6 +85,8 @@ class MarriageController extends GetxController {
   final int _pageSize = 20;
   final RxBool hasMore = true.obs;
   final RxBool isNextPageLoading = false.obs;
+  final RxBool hasPageError = false.obs;
+  bool _isRefreshingProfiles = false;
   int _currentLoadRequestId = 0;
 
   int get unmarriedMaleCount =>
@@ -257,7 +259,9 @@ class MarriageController extends GetxController {
     }
 
     final districtId =
-        districts.firstWhereOrNull((d) => d.text == districtName)?.id;
+      districts
+        .firstWhereOrNull((d) => d.text == districtName)
+        ?.id;
     if (districtId != null) {
       final t = await _familyRepository.getTalukas(districtId);
       talukas.assignAll(t);
@@ -284,16 +288,23 @@ class MarriageController extends GetxController {
     bool showLoading = true,
     bool isRefresh = true,
   }) async {
+    if (!isRefresh &&
+        (_isRefreshingProfiles || !hasMore.value || isNextPageLoading.value)) {
+      return;
+    }
+
     final requestId = ++_currentLoadRequestId;
 
     if (isRefresh) {
+      _isRefreshingProfiles = true;
       _currentPage = 1;
       hasMore.value = true;
+      hasPageError.value = false;
       if (showLoading) state.value = AppState.loading;
       _allMembers.clear();
     } else {
-      if (!hasMore.value || isNextPageLoading.value) return;
       isNextPageLoading.value = true;
+      hasPageError.value = false;
     }
 
     try {
@@ -318,7 +329,26 @@ class MarriageController extends GetxController {
       if (requestId != _currentLoadRequestId) return;
 
       final memberResult = results[0] as Result<PaginatedResponse<Member>>;
-      final List<Member> newMembers = memberResult.dataOrNull?.data ?? [];
+      if (memberResult.isFailure) {
+        if (isRefresh || filteredMembers.isEmpty) {
+          state.value = AppState.error;
+        } else {
+          hasPageError.value = true;
+        }
+        return;
+      }
+
+      final pageData = memberResult.dataOrNull;
+      if (pageData == null) {
+        if (isRefresh || filteredMembers.isEmpty) {
+          state.value = AppState.error;
+        } else {
+          hasPageError.value = true;
+        }
+        return;
+      }
+
+      final List<Member> newMembers = pageData.data;
       if (newMembers.isEmpty) {
         hasMore.value = false;
         if (_allMembers.isEmpty) {
@@ -331,11 +361,14 @@ class MarriageController extends GetxController {
       }
 
       _allMembers.addAll(newMembers);
+      hasPageError.value = false;
 
       _currentPage++;
-      if (newMembers.length < _pageSize) {
-        hasMore.value = false;
-      }
+      hasMore.value = pageData.totalPages > 0
+          ? pageData.pageNumber < pageData.totalPages
+          : pageData.totalRecords > 0
+          ? _allMembers.length < pageData.totalRecords
+          : newMembers.length >= pageData.pageSize;
 
       _updateDynamicLists(_allMembers);
 
@@ -357,12 +390,16 @@ class MarriageController extends GetxController {
         selectedTaluka: selectedTaluka.value,
         selectedArea: selectedArea.value,
         selectedStateId:
-            states.firstWhereOrNull((s) => s.text == selectedState.value)?.id,
+          states
+            .firstWhereOrNull((s) => s.text == selectedState.value)
+            ?.id,
         selectedDistrictId: districts
             .firstWhereOrNull((d) => d.text == selectedDistrict.value)
             ?.id,
         selectedTalukaId:
-            talukas.firstWhereOrNull((t) => t.text == selectedTaluka.value)?.id,
+          talukas
+            .firstWhereOrNull((t) => t.text == selectedTaluka.value)
+            ?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
         selectedIncomeFrom: selectedIncomeFrom.value,
@@ -378,7 +415,13 @@ class MarriageController extends GetxController {
         unmarriedCounts.assignAll(results[1] as List<UnmarriedCount>);
       }
 
-      state.value = filteredMembers.isEmpty ? AppState.empty : AppState.data;
+      state.value = filteredMembers.isEmpty
+          ? (hasMore.value ? AppState.loading : AppState.empty)
+          : AppState.data;
+
+      if (filteredMembers.isEmpty && hasMore.value) {
+        Future.microtask(loadNextPage);
+      }
     } catch (e, stack) {
       if (requestId != _currentLoadRequestId) return;
       CrashReporter.recordError(
@@ -386,12 +429,15 @@ class MarriageController extends GetxController {
         stack,
         reason: 'MarriageController.loadProfiles failed',
       );
-      if (isRefresh) {
+      if (isRefresh || filteredMembers.isEmpty) {
         state.value = AppState.error;
+      } else {
+        hasPageError.value = true;
       }
     } finally {
       if (requestId == _currentLoadRequestId) {
         isNextPageLoading.value = false;
+        if (isRefresh) _isRefreshingProfiles = false;
       }
     }
   }
@@ -557,7 +603,7 @@ class MarriageController extends GetxController {
           } else if (rawData is Map<String, dynamic>) {
             list =
                 (rawData['data'] ?? rawData['list'] ?? <dynamic>[]) as List? ??
-                    [];
+                [];
           }
           if (idMap != null && clearMap) idMap.clear();
           final items = list
@@ -625,6 +671,7 @@ class MarriageController extends GetxController {
 
   @override
   void onClose() {
+    _currentLoadRequestId++;
     searchTextController.dispose();
     scrollController.dispose();
     _debounceTimer?.cancel();
