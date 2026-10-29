@@ -254,8 +254,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
                         : (logoUrl != null && logoUrl.isNotEmpty
                               ? CachedImg(
                                   url: logoUrl,
-                                  width: 58.r,
-                                  height: 58.r,
                                   fit: BoxFit.cover,
                                   errorWidget: (_, __, ___) => Image.asset(
                                     FallBackImage,
