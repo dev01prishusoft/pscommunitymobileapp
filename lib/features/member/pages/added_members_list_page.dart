@@ -45,6 +45,7 @@ class _AddedMembersListPageState extends State<AddedMembersListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final _ = Localizations.localeOf(context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(

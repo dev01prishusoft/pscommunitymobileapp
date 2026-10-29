@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -20,6 +21,7 @@ class EventsPage extends GetView<EventsController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      final _ = Get.find<LocalizationService>().currentLocale.value;
       final isFabVisible = controller.isFabVisible.value;
       return Scaffold(
         appBar: AppBar(
