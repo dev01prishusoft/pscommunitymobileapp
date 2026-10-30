@@ -401,6 +401,15 @@ class _HomePageState extends State<HomePage> with RouteAware {
                 ),
                 if (!Get.isRegistered<ModulePermissionService>() ||
                     ModulePermissionService.to.isAccessible(
+                      AppModule.library,
+                    ))
+                  _SettingsTile(
+                    icon: Icons.menu_book_rounded,
+                    title: LK.library_categories_title.tr,
+                    onTap: () => Get.toNamed<void>(AppRouter.libraryCategories),
+                  ),
+                if (!Get.isRegistered<ModulePermissionService>() ||
+                    ModulePermissionService.to.isAccessible(
                       AppModule.matrimonial,
                     ))
                   _SettingsTile(
@@ -606,7 +615,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
               placement: AdPlacement.homeTop,
               layout: AdLayout.banner,
               limit: 5,
-              height: 130,
+              height: 110,
             ),
 
             SizedBox(height: 16.h),
@@ -724,7 +733,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
         child: AdPlacementSlot(
           placement: AdPlacement.homeBottom,
           layout: AdLayout.banner,
-          height: 130,
+          height: 110,
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
         ),
       );
@@ -875,16 +884,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
           onTap: () => Get.toNamed<void>(AppRouter.findMember),
         ),
         _QuickAccessItem(
-          label: LK.committee.tr,
-          icon: Icons.group_outlined,
-          onTap: () => Get.toNamed<void>(AppRouter.committees),
-        ),
-        _QuickAccessItem(
-          label: LK.payments.tr,
-          icon: Iconsax.wallet_2_copy,
-          onTap: () => Get.toNamed<void>(AppRouter.payments),
-        ),
-        _QuickAccessItem(
           label: LK.occupationDirectory.tr,
           icon: Iconsax.briefcase_copy,
           onTap: () => Get.toNamed<void>(AppRouter.occupationDirectory),
@@ -895,6 +894,16 @@ class _HomePageState extends State<HomePage> with RouteAware {
           onTap: () => Get.toNamed<void>(AppRouter.marriage),
         ),
         _QuickAccessItem(
+          label: LK.committee.tr,
+          icon: Icons.group_outlined,
+          onTap: () => Get.toNamed<void>(AppRouter.committees),
+        ),
+        _QuickAccessItem(
+          label: LK.payments.tr,
+          icon: Iconsax.wallet_2_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.payments),
+        ),
+        _QuickAccessItem(
           label: LK.events_title.tr,
           icon: Iconsax.calendar_copy,
           onTap: () {
@@ -903,15 +912,24 @@ class _HomePageState extends State<HomePage> with RouteAware {
             });
           },
         ),
-        _QuickAccessItem(
-          label: LK.share.tr,
-          icon: Iconsax.share_copy,
-          onTap: () => Get.toNamed<void>(AppRouter.shareApp),
-        ),
+        if (!Get.isRegistered<ModulePermissionService>() ||
+            ModulePermissionService.to.isAccessible(
+              AppModule.library,
+            ))
+          _QuickAccessItem(
+            label: LK.library_categories_title.tr,
+            icon: Icons.menu_book_rounded,
+            onTap: () => Get.toNamed<void>(AppRouter.libraryCategories),
+          ),
         _QuickAccessItem(
           label: LK.samajInfo.tr,
           icon: Iconsax.info_circle_copy,
           onTap: () => Get.toNamed<void>(AppRouter.bankDetails),
+        ),
+        _QuickAccessItem(
+          label: LK.share.tr,
+          icon: Iconsax.share_copy,
+          onTap: () => Get.toNamed<void>(AppRouter.shareApp),
         ),
         _QuickAccessItem(
           label: LK.customerSupport.tr,

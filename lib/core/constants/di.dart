@@ -51,6 +51,10 @@ import 'package:pscommunitymobileapp/features/advertisement/repositories/adverti
 import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_tracking_service.dart';
 
+import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
+import 'package:pscommunitymobileapp/features/library/repositories/library_repository.dart';
+import 'package:pscommunitymobileapp/features/library/repositories/library_repository_impl.dart';
+
 class DI {
   static Future<void> bootstrap() async {
     try {
@@ -189,6 +193,10 @@ class DI {
           () => AdvertisementListController(advertisementRepository),
           fenix: true,
         );
+
+        final libraryRepository = LibraryRepositoryImpl(apiClient);
+        Get.lazyPut<LibraryRepository>(() => libraryRepository, fenix: true);
+        Get.lazyPut(() => LibraryController(libraryRepository), fenix: true);
 
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());

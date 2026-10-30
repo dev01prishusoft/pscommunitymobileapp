@@ -168,9 +168,6 @@ class _LoginPageState extends State<LoginPage> {
                                 suffixIcon: IconButton(
                                   onPressed:
                                       _controller.togglePasswordVisibility,
-                                  tooltip: _controller.obscurePassword.value
-                                      ? LK.showPassword.tr
-                                      : LK.hidePassword.tr,
                                   icon: Icon(
                                     _controller.obscurePassword.value
                                         ? Iconsax.eye_copy

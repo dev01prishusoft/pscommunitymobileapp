@@ -116,7 +116,6 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 }
                 return const Icon(Iconsax.filter_search_copy);
               }),
-              tooltip: LK.locationFilters.tr,
               onPressed: () {
                 Get.dialog<void>(const _OccupationFilterDialog());
               },

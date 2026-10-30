@@ -52,7 +52,9 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> {
   @override
   void didUpdateWidget(covariant AdVideoPlayerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller && widget.controller != null) {
+    if (widget.controller != oldWidget.controller &&
+        widget.controller != null &&
+        widget.controller != _controller) {
       _controller?.removeListener(_handleControllerUpdate);
       if (!_isExternalController) {
         _controller?.dispose();

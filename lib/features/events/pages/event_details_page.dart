@@ -1092,7 +1092,7 @@ class EventTimelineWidget extends StatelessWidget {
             ),
             SizedBox(width: 6.w),
             GestureDetector(
-              onTap: () => _showSessionDetailsTooltip(context, schedule),
+              onTap: () => _showSessionDetailsDialog(context, schedule),
               behavior: HitTestBehavior.opaque,
               child: Container(
                 padding: EdgeInsets.all(4.w),
@@ -1113,11 +1113,11 @@ class EventTimelineWidget extends StatelessWidget {
     );
   }
 
-  void _showSessionDetailsTooltip(BuildContext context, Schedules schedule) {
+  void _showSessionDetailsDialog(BuildContext context, Schedules schedule) {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (ctx) => _SessionDetailsTooltipDialog(schedule: schedule),
+      builder: (ctx) => _SessionDetailsDialog(schedule: schedule),
     );
   }
 }
@@ -1377,10 +1377,10 @@ class _OrganizerPerson {
   _OrganizerPerson({this.id, required this.name, this.mobile, this.email});
 }
 
-class _SessionDetailsTooltipDialog extends StatelessWidget {
+class _SessionDetailsDialog extends StatelessWidget {
   final Schedules schedule;
 
-  const _SessionDetailsTooltipDialog({Key? key, required this.schedule})
+  const _SessionDetailsDialog({Key? key, required this.schedule})
     : super(key: key);
 
   String _formatDateTime(String? raw) {
