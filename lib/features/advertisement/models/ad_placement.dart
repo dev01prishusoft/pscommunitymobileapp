@@ -9,7 +9,9 @@ enum AdPlacement {
   notifications,
   announcements,
   other,
-  advertisementList;
+  advertisementList,
+  libraryList,
+  libraryDetail;
 
   String get code {
     switch (this) {
@@ -35,6 +37,10 @@ enum AdPlacement {
         return 'other';
       case AdPlacement.advertisementList:
         return 'advertisement-list';
+      case AdPlacement.libraryList:
+        return 'library-list';
+      case AdPlacement.libraryDetail:
+        return 'library-detail';
     }
   }
 
@@ -64,6 +70,10 @@ enum AdPlacement {
         return AdPlacement.announcements;
       case 'advertisement-list':
         return AdPlacement.advertisementList;
+      case 'library-list':
+        return AdPlacement.libraryList;
+      case 'library-detail':
+        return AdPlacement.libraryDetail;
       case 'other':
       default:
         return AdPlacement.other;

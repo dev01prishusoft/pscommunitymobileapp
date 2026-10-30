@@ -123,6 +123,9 @@ class AppTheme {
       strokeWidth: 1.5,
       color: AppColors.primary,
     ),
+    tooltipTheme: const TooltipThemeData(
+      triggerMode: TooltipTriggerMode.manual,
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,

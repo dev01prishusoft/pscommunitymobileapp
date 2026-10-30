@@ -195,7 +195,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
       label: 'Sponsored advertisement, ${widget.advertisement.title}',
       button: true,
       child: Container(
-        height: widget.height ?? 130.h,
+        height: widget.height ?? 110.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: isVideo ? const Color(0xFF151515) : Theme.of(context).cardColor,

@@ -45,6 +45,13 @@ import 'package:pscommunitymobileapp/core/services/notification_navigation_servi
 import 'package:pscommunitymobileapp/core/widgets/network_error_page.dart';
 import 'package:pscommunitymobileapp/features/advertisement/pages/advertisement_detail_page.dart';
 import 'package:pscommunitymobileapp/features/advertisement/pages/advertisement_list_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_categories_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_items_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_pdf_viewer_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_text_viewer_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_video_player_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_image_viewer_page.dart';
+import 'package:pscommunitymobileapp/features/library/pages/library_audio_player_page.dart';
 
 class AppRouter {
   static final RouteObserver<PageRoute> routeObserver =
@@ -87,6 +94,13 @@ class AppRouter {
   static String networkError = '/network-error';
   static String advertisementList = '/advertisement-list';
   static String advertisementDetail = '/advertisement-detail';
+  static String libraryCategories = '/library';
+  static String libraryItems = '/library-items';
+  static String libraryPdf = '/library-pdf';
+  static String libraryText = '/library-text';
+  static String libraryVideo = '/library-video';
+  static String libraryImage = '/library-image';
+  static String libraryAudio = '/library-audio';
 
   static final List<GetPage<dynamic>> pages = [
     GetPage<void>(name: login, page: () => LoginPage()),
@@ -292,6 +306,41 @@ class AppRouter {
       name: advertisementDetail,
       page: () => const AdvertisementDetailPage(),
       middlewares: [AuthGuard(), ModuleGuard(AppModule.advertisement)],
+    ),
+    GetPage<void>(
+      name: libraryCategories,
+      page: () => const LibraryCategoriesPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryItems,
+      page: () => const LibraryItemsPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryPdf,
+      page: () => const LibraryPdfViewerPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryText,
+      page: () => const LibraryTextViewerPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryVideo,
+      page: () => const LibraryVideoPlayerPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryImage,
+      page: () => const LibraryImageViewerPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
+    ),
+    GetPage<void>(
+      name: libraryAudio,
+      page: () => const LibraryAudioPlayerPage(),
+      middlewares: [AuthGuard(), ModuleGuard(AppModule.library)],
     ),
   ];
 }

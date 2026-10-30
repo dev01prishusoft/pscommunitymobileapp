@@ -81,7 +81,7 @@ class _AdBannerCarouselState extends State<AdBannerCarousel>
       return const SizedBox.shrink();
     }
 
-    final cardHeight = widget.height ?? 130.h;
+    final cardHeight = widget.height ?? 110.h;
 
     // Static banner if only 1 item: neither auto-scroll nor carousel
     if (items.length == 1) {

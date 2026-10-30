@@ -5,16 +5,60 @@ String formatDate(DateTime date, {String locale = 'en_US'}) {
   return formatter.format(date);
 }
 
-String formatDateString(String? isoDate, {String format = 'dd/MM/yyyy', String fallback = '-'}) {
-  if (isoDate == null || isoDate.isEmpty) return fallback;
+String formatDateString(
+  String? isoDate, {
+  String format = 'dd/MM/yyyy',
+  String fallback = '-',
+}) {
+  if (isoDate == null || isoDate.trim().isEmpty) return fallback;
+  final cleaned = isoDate.trim();
   try {
-    final parsedDate = DateTime.parse(isoDate);
-    return DateFormat(format).format(parsedDate);
+    final parsedDate = DateTime.parse(cleaned);
+    return DateFormat(format).format(parsedDate.toLocal());
   } catch (_) {
     try {
-      return isoDate.split('T').first;
+      if (cleaned.contains('/')) {
+        final parts = cleaned.split(' ');
+        final datePart = parts.first;
+        final dParts = datePart.split('/');
+        if (dParts.length == 3) {
+          if (dParts[0].length == 4) {
+            final parsedDate = DateTime(
+              int.parse(dParts[0]),
+              int.parse(dParts[1]),
+              int.parse(dParts[2]),
+            );
+            return DateFormat(format).format(parsedDate);
+          }
+          if (dParts[2].length == 4) {
+            final parsedDate = DateTime(
+              int.parse(dParts[2]),
+              int.parse(dParts[1]),
+              int.parse(dParts[0]),
+            );
+            return DateFormat(format).format(parsedDate);
+          }
+        }
+      } else if (cleaned.contains('-')) {
+        final parts = cleaned.split(' ');
+        final datePart = parts.first;
+        final dParts = datePart.split('-');
+        if (dParts.length == 3 && dParts[2].length == 4) {
+          final parsedDate = DateTime(
+            int.parse(dParts[2]),
+            int.parse(dParts[1]),
+            int.parse(dParts[0]),
+          );
+          return DateFormat(format).format(parsedDate);
+        }
+      }
+      return cleaned.split('T').first;
     } catch (_) {
-      return isoDate;
+      try {
+        return cleaned.split('T').first;
+      } catch (_) {
+        return cleaned;
+      }
     }
   }
 }

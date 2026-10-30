@@ -96,7 +96,7 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
         return const SizedBox.shrink();
       }
 
-      final cardHeight = widget.height ?? 130.h;
+      final cardHeight = widget.height ?? 110.h;
       final displayAds = ads.take(widget.limit ?? 5).toList();
 
       final content = AdBannerCarousel(

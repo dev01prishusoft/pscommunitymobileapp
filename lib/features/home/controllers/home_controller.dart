@@ -44,6 +44,12 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       route: AppRouter.findMember,
     ),
     MenuItem(
+      icon: Icons.work,
+      labelKey: LK.occupationDirectory,
+      route: AppRouter.occupationDirectory,
+      module: AppModule.occupation,
+    ),
+    MenuItem(
       icon: Icons.groups_outlined,
       labelKey: LK.committee,
       route: AppRouter.committees,
@@ -55,32 +61,32 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       module: AppModule.payment,
     ),
     MenuItem(
-      icon: Icons.work,
-      labelKey: LK.occupationDirectory,
-      route: AppRouter.occupationDirectory,
-      module: AppModule.occupation,
+      icon: Icons.event,
+      labelKey: LK.events_title,
+      route: AppRouter.events,
+    ),
+    MenuItem(
+      icon: Icons.menu_book_rounded,
+      labelKey: LK.library_categories_title,
+      route: AppRouter.libraryCategories,
+      module: AppModule.library,
+    ),
+    MenuItem(
+      icon: Icons.info_outline,
+      labelKey: LK.samajInfo,
+      route: AppRouter.bankDetails,
+    ),
+    MenuItem(icon: Icons.share, labelKey: LK.share, route: AppRouter.shareApp),
+    MenuItem(
+      icon: Icons.support_agent,
+      labelKey: LK.customerSupport,
+      route: AppRouter.customerSupport,
     ),
     MenuItem(
       icon: Icons.wc,
       labelKey: LK.marriage,
       route: AppRouter.marriage,
       module: AppModule.matrimonial,
-    ),
-    MenuItem(
-      icon: Icons.event,
-      labelKey: LK.events_title,
-      route: AppRouter.events,
-    ),
-    MenuItem(icon: Icons.share, labelKey: LK.share, route: AppRouter.shareApp),
-    MenuItem(
-      icon: Icons.info_outline,
-      labelKey: LK.samajInfo,
-      route: AppRouter.bankDetails,
-    ),
-    MenuItem(
-      icon: Icons.support_agent,
-      labelKey: LK.customerSupport,
-      route: AppRouter.customerSupport,
     ),
     MenuItem(
       icon: Icons.campaign_outlined,

@@ -9,7 +9,8 @@ enum AppModule {
   occupation('OCCUPATION'),
   event('EVENT'),
   dailyNotification('DAILY_NOTIFICATION'),
-  advertisement('ADVERTISEMENT');
+  advertisement('ADVERTISEMENT'),
+  library('LIBRARY');
 
   final String code;
   const AppModule(this.code);
@@ -29,6 +30,8 @@ enum AppModule {
         return LK.notifications;
       case AppModule.advertisement:
         return LK.advertisements;
+      case AppModule.library:
+        return LK.library_categories_title;
     }
   }
 

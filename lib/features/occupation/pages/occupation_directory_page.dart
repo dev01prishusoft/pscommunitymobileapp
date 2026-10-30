@@ -105,7 +105,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
               }
               return const Icon(Iconsax.filter_search_copy);
             }),
-            tooltip: LK.selectCategory.tr,
             onPressed: () {
               Get.dialog<void>(const _OccupationCategoryFilterDialog());
             },

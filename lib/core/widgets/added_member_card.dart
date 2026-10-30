@@ -108,15 +108,12 @@ class AddedMemberCard extends StatelessWidget {
           FocusManager.instance.primaryFocus?.unfocus();
           onEdit!();
         },
-        child: Tooltip(
-          message: LK.edit.tr,
-          child: Padding(
-            padding: EdgeInsets.all(8.w),
-            child: Icon(
-              Icons.edit_outlined,
-              size: 18.sp,
-              color: AppColors.primary,
-            ),
+        child: Padding(
+          padding: EdgeInsets.all(8.w),
+          child: Icon(
+            Icons.edit_outlined,
+            size: 18.sp,
+            color: AppColors.primary,
           ),
         ),
       ),

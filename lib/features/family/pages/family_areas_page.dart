@@ -54,7 +54,6 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.filter_search_copy),
-            tooltip: LK.locationFilters.tr,
             onPressed: () {
               Get.dialog<void>(const _FilterDialog());
             },

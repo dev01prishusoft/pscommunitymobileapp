@@ -390,7 +390,6 @@ class MyEventDetailsPage extends StatelessWidget {
                               ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              tooltip: LK.my_event_details_open_maps.tr,
                             ),
                           ],
                         ),
