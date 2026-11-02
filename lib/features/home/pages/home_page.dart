@@ -395,19 +395,24 @@ class _HomePageState extends State<HomePage> with RouteAware {
               title: 'Navigation & Services'.tr,
               items: [
                 _SettingsTile(
+                  icon: Iconsax.people_copy,
+                  title: LK.addedMembers.tr,
+                  onTap: () {
+                    setState(() {
+                      _selectedBottomNavIndex = 1;
+                    });
+                  },
+                ),
+                _SettingsTile(
+                  icon: Iconsax.user_add_copy,
+                  title: LK.addFamilyMember.tr,
+                  onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
+                ),
+                _SettingsTile(
                   icon: Iconsax.search_normal_copy,
                   title: LK.findMember.tr,
                   onTap: () => Get.toNamed<void>(AppRouter.findMember),
                 ),
-                if (!Get.isRegistered<ModulePermissionService>() ||
-                    ModulePermissionService.to.isAccessible(
-                      AppModule.library,
-                    ))
-                  _SettingsTile(
-                    icon: Icons.menu_book_rounded,
-                    title: LK.library_categories_title.tr,
-                    onTap: () => Get.toNamed<void>(AppRouter.libraryCategories),
-                  ),
                 if (!Get.isRegistered<ModulePermissionService>() ||
                     ModulePermissionService.to.isAccessible(
                       AppModule.matrimonial,
@@ -418,25 +423,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
                     onTap: () => Get.toNamed<void>(AppRouter.marriage),
                   ),
                 _SettingsTile(
-                  icon: Iconsax.buildings_copy,
-                  title: LK.samajSansthas.tr,
-                  onTap: () => Get.toNamed<void>(AppRouter.samajSansthas),
-                ),
-                _SettingsTile(
-                  icon: Iconsax.user_add_copy,
-                  title: LK.addFamilyMember.tr,
-                  onTap: () => Get.toNamed<void>(AppRouter.addFamilyMember),
-                ),
-                _SettingsTile(
-                  icon: Iconsax.people_copy,
-                  title: LK.addedMembers.tr,
-                  onTap: () {
-                    setState(() {
-                      _selectedBottomNavIndex = 1;
-                    });
-                  },
-                ),
-                _SettingsTile(
                   icon: Iconsax.calendar_copy,
                   title: LK.events_title.tr,
                   onTap: () {
@@ -444,6 +430,19 @@ class _HomePageState extends State<HomePage> with RouteAware {
                       _selectedBottomNavIndex = 2;
                     });
                   },
+                ),
+                if (!Get.isRegistered<ModulePermissionService>() ||
+                    ModulePermissionService.to.isAccessible(AppModule.library))
+                  _SettingsTile(
+                    icon: Icons.menu_book_rounded,
+                    title: LK.library_categories_title.tr,
+                    onTap: () => Get.toNamed<void>(AppRouter.libraryCategories),
+                  ),
+
+                _SettingsTile(
+                  icon: Iconsax.buildings_copy,
+                  title: LK.samajSansthas.tr,
+                  onTap: () => Get.toNamed<void>(AppRouter.samajSansthas),
                 ),
               ],
             ),
@@ -771,6 +770,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
         floatingActionButton: _selectedBottomNavIndex == 0
             ? _buildHomeBottomAdFab()
             : null,
+        floatingActionButtonAnimator: FloatingActionButtonAnimator.noAnimation,
         floatingActionButtonLocation:
             const _FullWidthDockedFloatingActionButtonLocation(),
         bottomNavigationBar: Obx(() {
