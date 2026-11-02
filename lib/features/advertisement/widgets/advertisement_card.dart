@@ -386,7 +386,7 @@ class _AdvertisementCardState extends State<AdvertisementCard> {
               children: [
                 Text(
                   widget.advertisement.title,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14.sp,

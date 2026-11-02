@@ -385,7 +385,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
       final initialStr = _initialDropdownValues[key];
 
       if (currentStr != initialStr) {
-        final currentId = getId(currentStr, idMap);
+        final currentId = getId(
+          currentStr,
+          idMap,
+          key.toLowerCase().contains('sign')
+              ? PersonalInfoController.defaultSignIdMap
+              : null,
+        );
         if (currentId != null) {
           formDataMap[key] = currentId;
         } else if (currentStr.isEmpty &&
@@ -1471,6 +1477,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     await workInfo.fetchAreas();
 
     areDropdownsLoaded = true;
+    personalInfo.syncSignWithDropdown();
     sanitizeAddresses();
     _checkAndTakeSnapshot();
   }
@@ -1774,6 +1781,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(workInfo.occupationType, workInfo.occupationTypeList);
     _ensureSelectionValue(workInfo.occupation, workInfo.occupationList);
     _ensureSelectionValue(workInfo.jobPosition, workInfo.jobPositionList);
+    personalInfo.syncSignWithDropdown();
     _ensureSelectionValue(personalInfo.sign, personalInfo.signList);
 
     if (_currentMember != null) {
@@ -2254,6 +2262,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['signId'] = getId(
               personalInfo.sign.value,
               personalInfo.signIdMap,
+              PersonalInfoController.defaultSignIdMap,
             );
             formDataMap['IsLookingforMarriage'] =
                 personalInfo.openToMarriage.value;

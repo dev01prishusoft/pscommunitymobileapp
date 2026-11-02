@@ -79,6 +79,7 @@ class _AdvertisementListPageState extends State<AdvertisementListPage> {
           onRefresh: _controller.onRefresh,
           child: ListView.separated(
             controller: _scrollController,
+            physics: AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             itemCount: _controller.advertisements.length +
                 (_controller.isMoreLoading.value ? 1 : 0),
@@ -102,6 +103,7 @@ class _AdvertisementListPageState extends State<AdvertisementListPage> {
                 advertisement: ad,
                 placement: AdPlacement.advertisementList,
                 layout: AdLayout.card,
+                height: 150.h,
               );
             },
           ),

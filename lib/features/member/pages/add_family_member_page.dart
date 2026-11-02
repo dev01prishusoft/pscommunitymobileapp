@@ -718,7 +718,10 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                   ),
                   Obx(
                     () => AppFormDropdown<String>(
-                      value: controller.signList.contains(controller.sign.value)
+                      value: (controller.signList.isEmpty
+                              ? controller.defaultSigns
+                              : controller.signList)
+                          .contains(controller.sign.value)
                           ? controller.sign.value
                           : null,
                       items:

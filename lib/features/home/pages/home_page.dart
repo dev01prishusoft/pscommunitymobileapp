@@ -444,6 +444,11 @@ class _HomePageState extends State<HomePage> with RouteAware {
                   title: LK.samajSansthas.tr,
                   onTap: () => Get.toNamed<void>(AppRouter.samajSansthas),
                 ),
+                _SettingsTile(
+                  icon: Icons.celebration_outlined,
+                  title: LK.advertisements.tr,
+                  onTap: () => Get.toNamed<void>(AppRouter.advertisementList),
+                ),
               ],
             ),
 

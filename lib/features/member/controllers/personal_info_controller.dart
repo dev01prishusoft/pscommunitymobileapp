@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 import 'package:pscommunitymobileapp/core/models/family_member_dropdown.dart';
+import 'package:pscommunitymobileapp/core/utils/astrology_calculator.dart';
 
 class PersonalInfoController extends GetxController {
   final defaultGenders = ['Male', 'Female', 'Other'];
@@ -38,6 +39,48 @@ class PersonalInfoController extends GetxController {
     'Aquarius',
     'Pisces',
   ];
+
+  static const Map<String, int> defaultSignIdMap = {
+    'Aries': 3,
+    'Taurus': 4,
+    'Gemini': 5,
+    'Cancer': 17,
+    'Leo': 7,
+    'Virgo': 8,
+    'Libra': 9,
+    'Scorpio': 10,
+    'Sagittarius': 11,
+    'Capricorn': 12,
+    'Aquarius': 13,
+    'Pisces': 14,
+    'Mesha': 3,
+    'Vrishabha': 4,
+    'Mithuna': 5,
+    'Karka': 17,
+    'Simha': 7,
+    'Kanya': 8,
+    'Tula': 9,
+    'Vrischika': 10,
+    'Dhanu': 11,
+    'Makara': 12,
+    'Kumbha': 13,
+    'Meena': 14,
+    'મેષ': 3,
+    'વૃષભ': 4,
+    'મિથુન': 5,
+    'કર્ક': 17,
+    'સિંહ': 7,
+    'કન્યા': 8,
+    'તુલા': 9,
+    'વૃશ્ચિક': 10,
+    'ધનુ': 11,
+    'મકર': 12,
+    'કુંભ': 13,
+    'મીન': 14,
+  };
+
+  bool _isInitialLoading = false;
+  
 
   final genderList = <String>[].obs;
   final maritalStatusList = <String>[].obs;
@@ -138,7 +181,7 @@ class PersonalInfoController extends GetxController {
     monthlyIncomeCtrl = TextEditingController();
 
     memberNoCtrl.addListener(() => memberNo.value = memberNoCtrl.text);
-    tobCtrl.addListener(() => tob.value = tobCtrl.text);
+    tobCtrl.addListener(_onTobChanged);
     motherFatherNameCtrl.addListener(
       () => motherFatherName.value = motherFatherNameCtrl.text,
     );
@@ -147,7 +190,7 @@ class PersonalInfoController extends GetxController {
     lastNameCtrl.addListener(() => lastName.value = lastNameCtrl.text);
     firstNameEnCtrl.addListener(() => firstNameEn.value = firstNameEnCtrl.text);
     lastNameEnCtrl.addListener(() => lastNameEn.value = lastNameEnCtrl.text);
-    dobCtrl.addListener(() => dob.value = dobCtrl.text);
+    dobCtrl.addListener(_onDobChanged);
     bornPlaceCtrl.addListener(() => bornPlace.value = bornPlaceCtrl.text);
     bornPlaceLatCtrl.addListener(
       () => bornPlaceLat.value = double.parse(bornPlaceLatCtrl.text),
@@ -183,6 +226,8 @@ class PersonalInfoController extends GetxController {
   }
 
   void loadFromMember(Member m) {
+    _isInitialLoading = true;
+    try {
     String formatDob(String? dobRaw) {
       if (dobRaw == null || dobRaw.isEmpty) return '';
       try {
@@ -247,6 +292,100 @@ class PersonalInfoController extends GetxController {
     heightCtrl.text = height.value;
     weightCtrl.text = weight.value;
     monthlyIncomeCtrl.text = monthlyIncome.value;
+      if (sign.value.isEmpty && dob.value.isNotEmpty) {
+        autoSelectSign();
+      }
+    } finally {
+      _isInitialLoading = false;
+    }
+  }
+
+  void _onDobChanged() {
+    dob.value = dobCtrl.text;
+    if (_isInitialLoading) return;
+    autoSelectSign();
+  }
+
+  void _onTobChanged() {
+    tob.value = tobCtrl.text;
+    if (_isInitialLoading) return;
+    autoSelectSign();
+  }
+
+  void autoSelectSign() {
+    final dobText = dobCtrl.text.isNotEmpty ? dobCtrl.text : dob.value;
+    final tobText = tobCtrl.text.isNotEmpty ? tobCtrl.text : tob.value;
+
+    if (dobText.trim().isEmpty) return;
+
+    final signInfo = AstrologyCalculator.calculateSignFromStrings(
+      dobString: dobText,
+      tobString: tobText,
+    );
+
+    if (signInfo != null) {
+      _applyCalculatedSign(signInfo);
+    }
+  }
+
+  void _applyCalculatedSign(AstrologicalSignInfo info) {
+    if (signIdMap.isNotEmpty) {
+      for (final entry in signIdMap.entries) {
+        if (entry.value == info.id) {
+          sign.value = entry.key;
+          return;
+        }
+      }
+    }
+
+    if (signList.isNotEmpty) {
+      final eng = info.englishName.toLowerCase();
+      final sanskrit = info.sanskritName.toLowerCase();
+      final guj = info.gujaratiName;
+
+      for (final item in signList) {
+        final itemLower = item.toLowerCase();
+        if (itemLower == eng ||
+            itemLower == sanskrit ||
+            item == guj ||
+            itemLower.contains(eng) ||
+            itemLower.contains(sanskrit) ||
+            item.contains(guj)) {
+          sign.value = item;
+          return;
+        }
+      }
+    }
+
+    for (final item in defaultSigns) {
+      if (item.toLowerCase() == info.englishName.toLowerCase()) {
+        sign.value = item;
+        return;
+      }
+    }
+
+    sign.value = info.englishName;
+  }
+
+  void syncSignWithDropdown() {
+    if (sign.value.isNotEmpty && signIdMap.isNotEmpty) {
+      if (signIdMap.containsKey(sign.value)) return;
+
+      final currentId = defaultSignIdMap[sign.value];
+      if (currentId != null) {
+        for (final entry in signIdMap.entries) {
+          if (entry.value == currentId) {
+            sign.value = entry.key;
+            return;
+          }
+        }
+      }
+    }
+
+    if (sign.value.isEmpty &&
+        (dobCtrl.text.isNotEmpty || dob.value.isNotEmpty)) {
+      autoSelectSign();
+    }
   }
 
   Future<void> pickProfilePhoto() async {
