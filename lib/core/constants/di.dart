@@ -50,6 +50,7 @@ import 'package:pscommunitymobileapp/features/advertisement/controllers/advertis
 import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository.dart';
 import 'package:pscommunitymobileapp/features/advertisement/repositories/advertisement_repository_impl.dart';
 import 'package:pscommunitymobileapp/features/advertisement/services/advertisement_tracking_service.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
 
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 import 'package:pscommunitymobileapp/features/library/repositories/library_repository.dart';
@@ -180,6 +181,10 @@ class DI {
         );
         Get.put(advertisementTrackingService, permanent: true);
 
+        final adScreenConfigService = AdScreenConfigService(apiClient);
+        await adScreenConfigService.init();
+        Get.put(adScreenConfigService, permanent: true);
+
         Get.lazyPut(
           () => AdvertisementController(
             repository: advertisementRepository,
@@ -201,6 +206,7 @@ class DI {
         if (authState.isAuthenticated.value) {
           unawaited(samajController.fetchAll());
           unawaited(appSettingService.getGoogleApiKey());
+          unawaited(adScreenConfigService.fetchScreenConfig());
         }
       });
     } catch (e) {

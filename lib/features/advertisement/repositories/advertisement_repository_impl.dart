@@ -18,9 +18,17 @@ class AdvertisementRepositoryImpl implements AdvertisementRepository {
     AdPlacement placement, {
     int? limit,
   }) async {
+    return getByPlacementCode(placement.code, limit: limit);
+  }
+
+  @override
+  Future<Result<List<Advertisement>>> getByPlacementCode(
+    String placementCode, {
+    int? limit,
+  }) async {
     try {
       final response = await _apiClient.get(
-        ApiEndpoints.advertisementsByPlacement(placement.code, limit: limit),
+        ApiEndpoints.advertisementsByPlacement(placementCode, limit: limit),
         queryParameters: null,
       );
 
@@ -49,9 +57,9 @@ class AdvertisementRepositoryImpl implements AdvertisementRepository {
 
       // If notifications placement is empty, fallback to check announcements (or vice-versa)
       if (ads.isEmpty &&
-          (placement == AdPlacement.notifications ||
-              placement == AdPlacement.announcements)) {
-        final fallbackCode = placement == AdPlacement.notifications
+          (placementCode == 'notifications' ||
+              placementCode == 'announcements')) {
+        final fallbackCode = placementCode == 'notifications'
             ? 'announcements'
             : 'notifications';
         try {

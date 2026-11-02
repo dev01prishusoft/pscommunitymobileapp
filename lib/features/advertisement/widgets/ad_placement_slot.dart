@@ -10,7 +10,8 @@ import 'ad_banner_carousel.dart';
 import 'advertisement_card.dart';
 
 class AdPlacementSlot extends StatefulWidget {
-  final AdPlacement placement;
+  final AdPlacement? placement;
+  final String? placementCode;
   final AdLayout layout;
   final int? limit;
   final EdgeInsetsGeometry? padding;
@@ -18,12 +19,22 @@ class AdPlacementSlot extends StatefulWidget {
 
   const AdPlacementSlot({
     super.key,
-    required this.placement,
+    this.placement,
+    this.placementCode,
     this.layout = AdLayout.card,
     this.limit,
     this.padding,
     this.height,
-  });
+  }) : assert(
+          placement != null || placementCode != null,
+          'Either placement or placementCode must be provided',
+        );
+
+  String get effectivePlacementCode =>
+      placementCode ?? placement?.code ?? 'other';
+
+  AdPlacement get effectivePlacement =>
+      placement ?? AdPlacement.fromCode(effectivePlacementCode);
 
   @override
   State<AdPlacementSlot> createState() => _AdPlacementSlotState();
@@ -70,7 +81,7 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
       final limit = widget.limit ?? 5;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          _controller?.fetchPlacementAds(widget.placement, limit: limit);
+          _controller?.fetchAdsByCode(widget.effectivePlacementCode, limit: limit);
         }
       });
     }
@@ -91,7 +102,7 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
         }
       }
 
-      final ads = _controller!.getAds(widget.placement);
+      final ads = _controller!.getAdsByCode(widget.effectivePlacementCode);
       if (ads.isEmpty) {
         return const SizedBox.shrink();
       }
@@ -101,7 +112,7 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
 
       final content = AdBannerCarousel(
         advertisements: displayAds,
-        placement: widget.placement,
+        placement: widget.effectivePlacement,
         layout: widget.layout,
         height: cardHeight,
       );

@@ -79,6 +79,8 @@ class ApiEndpoints {
   static String advertisementDetail(int id) =>
       '/api/v1/member/advertisements/$id';
   static String advertisementList = '/api/v1/member/advertisements/list';
+  static String advertisementScreenConfig =
+      '/api/v1/member/advertisements/screen-config';
   static String advertisementBatchEvents =
       '/api/v1/member/advertisements/events/batch';
   static String categoriesList = "/api/v1/Library/mobile/categories";
