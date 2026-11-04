@@ -82,6 +82,7 @@ class ApiEndpoints {
   static String advertisementBatchEvents =
       '/api/v1/member/advertisements/events/batch';
   static String categoriesList = "/api/v1/Library/mobile/categories";
+  static String nativePlaceDropdown = '/api/v1/NativePlace/dropdown';
   static String categoryItems = "/api/v1/Library/mobile/items";
   static String itemDetails(id) => "/api/v1/Library/mobile/item/$id";
 }

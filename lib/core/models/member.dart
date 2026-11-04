@@ -7,9 +7,12 @@ class Member {
     this.memberNo,
     required this.firstName,
     this.firstNameEnglish,
+    this.middleNameEnglish,
     this.middleName,
     required this.lastName,
     this.lastNameEnglish,
+    this.nativePlaceId,
+    this.nativePlaceName,
     this.fullNameSearchText,
     this.dateOfBirth,
     this.dateOfBirthTime,
@@ -139,9 +142,12 @@ class Member {
       memberNo: getString('memberNo'),
       firstName: getString('firstName') ?? fallbackFirst,
       firstNameEnglish: getString('firstNameEnglish'),
+      middleNameEnglish: getString('middleNameEnglish', 'MiddleNameEnglish'),
       middleName: getString('middleName'),
       lastName: getString('lastName') ?? fallbackLast,
       lastNameEnglish: getString('lastNameEnglish'),
+      nativePlaceId: (json['nativePlaceId'] ?? json['NativePlaceId']) as int?,
+      nativePlaceName: getString('nativePlaceName', 'NativePlaceName', 'nativePlace', 'NativePlace'),
       fullNameSearchText: getString('fullNameSearchText'),
       dateOfBirth: getString('dateOfBirth'),
       dateOfBirthTime: getString('dateOfBirthTime'),
@@ -261,9 +267,12 @@ class Member {
   final String? memberNo;
   final String firstName;
   final String? firstNameEnglish;
+  final String? middleNameEnglish;
   final String? middleName;
   final String lastName;
   final String? lastNameEnglish;
+  final int? nativePlaceId;
+  final String? nativePlaceName;
   final String? fullNameSearchText;
   final String? dateOfBirth;
   final String? dateOfBirthTime;
@@ -376,6 +385,11 @@ class Member {
       'memberNo': memberNo,
       'firstName': firstName,
       'middleName': middleName,
+      'firstNameEnglish': firstNameEnglish,
+      'middleNameEnglish': middleNameEnglish,
+      'lastNameEnglish': lastNameEnglish,
+      'nativePlaceId': nativePlaceId,
+      'nativePlaceName': nativePlaceName,
       'lastName': lastName,
       'dateOfBirth': dateOfBirth,
       'dateOfBirthTime': dateOfBirthTime,
