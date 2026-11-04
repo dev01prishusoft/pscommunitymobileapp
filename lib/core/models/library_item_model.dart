@@ -51,7 +51,7 @@ class LibraryItemsModel {
   }
 }
 
-class LibraryItemData {
+class LibraryItemData implements Comparable<LibraryItemData> {
   int? libraryItemId;
   int? libraryCategoryId;
   String? categoryName;
@@ -289,9 +289,13 @@ class LibraryItemData {
         ? json['fileSizeBytes'] as int
         : int.tryParse(json['fileSizeBytes']?.toString() ?? '');
     primaryFilePath = json['primaryFilePath']?.toString();
-    sortOrder = json['sortOrder'] is int
-        ? json['sortOrder'] as int
-        : int.tryParse(json['sortOrder']?.toString() ?? '');
+    final dynamic rawSortOrder =
+        json['sortOrder'] ?? json['SortOrder'] ?? json['sort_order'];
+    sortOrder = rawSortOrder is int
+        ? rawSortOrder
+        : (rawSortOrder is num
+              ? rawSortOrder.toInt()
+              : int.tryParse(rawSortOrder?.toString() ?? ''));
     canDownload = _parseBool(json['canDownload'] ?? json['CanDownload']);
     canShare = _parseBool(json['canShare'] ?? json['CanShare']);
     canOpenInBrowser = _parseBool(json['canOpenInBrowser'] ??
@@ -459,6 +463,32 @@ class LibraryItemData {
       photos: photos ?? this.photos,
     );
   }
+
+  static int compareBySortOrder(LibraryItemData a, LibraryItemData b) {
+    final orderA = a.sortOrder;
+    final orderB = b.sortOrder;
+
+    if (orderA != null && orderB != null) {
+      final cmp = orderA.compareTo(orderB);
+      if (cmp != 0) return cmp;
+    } else if (orderA != null) {
+      return -1;
+    } else if (orderB != null) {
+      return 1;
+    }
+
+    final titleA = a.title.trim().toLowerCase();
+    final titleB = b.title.trim().toLowerCase();
+    final titleCmp = titleA.compareTo(titleB);
+    if (titleCmp != 0) return titleCmp;
+
+    final idA = a.libraryItemId ?? 0;
+    final idB = b.libraryItemId ?? 0;
+    return idA.compareTo(idB);
+  }
+
+  @override
+  int compareTo(LibraryItemData other) => compareBySortOrder(this, other);
 }
 
 class Pagination {

@@ -126,11 +126,14 @@ class LibraryController extends GetxController {
 
   List<LibraryCategoryData> get filteredCategories {
     final query = categorySearchQuery.value.trim().toLowerCase();
-    if (query.isEmpty) return categories;
-    return categories.where((c) {
-      return c.name.toLowerCase().contains(query) ||
-          c.description.toLowerCase().contains(query);
-    }).toList();
+    final list = query.isEmpty
+        ? categories.toList()
+        : categories.where((c) {
+            return c.name.toLowerCase().contains(query) ||
+                c.description.toLowerCase().contains(query);
+          }).toList();
+    list.sort(LibraryCategoryData.compareBySortOrder);
+    return list;
   }
 
   void onCategorySearchChanged(String val) {
@@ -157,7 +160,8 @@ class LibraryController extends GetxController {
       );
 
       if (result is Success<List<LibraryCategoryData>>) {
-        final loaded = result.data;
+        final loaded = List<LibraryCategoryData>.from(result.data);
+        loaded.sort(LibraryCategoryData.compareBySortOrder);
         categories.assignAll(loaded);
 
         if (categories.isEmpty) {
@@ -206,14 +210,23 @@ class LibraryController extends GetxController {
     Get.toNamed<void>(AppRouter.libraryItems);
   }
 
+  List<LibraryItemData> get sortedItems {
+    final list = List<LibraryItemData>.from(items);
+    list.sort(LibraryItemData.compareBySortOrder);
+    return list;
+  }
+
   List<LibraryItemData> get filteredItems {
     final query = itemSearchQuery.value.trim().toLowerCase();
-    if (query.isEmpty) return items;
-    return items.where((i) {
-      return i.title.toLowerCase().contains(query) ||
-          i.description.toLowerCase().contains(query) ||
-          i.type.toLowerCase().contains(query);
-    }).toList();
+    final list = query.isEmpty
+        ? items.toList()
+        : items.where((i) {
+            return i.title.toLowerCase().contains(query) ||
+                i.description.toLowerCase().contains(query) ||
+                i.type.toLowerCase().contains(query);
+          }).toList();
+    list.sort(LibraryItemData.compareBySortOrder);
+    return list;
   }
 
   void onItemSearchChanged(String val) {
@@ -266,11 +279,11 @@ class LibraryController extends GetxController {
         final pageData = result.data;
         final newItems = pageData.data;
 
-        if (isRefresh) {
-          items.assignAll(newItems);
-        } else {
-          items.addAll(newItems);
-        }
+        final List<LibraryItemData> updated = isRefresh
+            ? List<LibraryItemData>.from(newItems)
+            : <LibraryItemData>[...items, ...newItems];
+        updated.sort(LibraryItemData.compareBySortOrder);
+        items.assignAll(updated);
 
         if (items.isEmpty) {
           itemsState.value = AppState.empty;

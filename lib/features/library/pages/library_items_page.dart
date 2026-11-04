@@ -21,6 +21,7 @@ class LibraryItemsPage extends StatelessWidget {
     return Obx(() {
       final category = controller.selectedCategory.value;
       final categoryTitle = category?.name ?? LK.library_items_fallback_title.tr;
+      final items = controller.sortedItems;
 
       return Scaffold(
         backgroundColor: AppColors.sfBackground,
@@ -61,13 +62,13 @@ class LibraryItemsPage extends StatelessWidget {
                       horizontal: 16.w,
                       vertical: 6.h,
                     ),
-                    itemCount: controller.items.length +
+                    itemCount: items.length +
                         (controller.isNextPageLoading.value ||
                                 controller.hasPageError.value
                             ? 1
                             : 0),
                     itemBuilder: (context, index) {
-                      if (index == controller.items.length) {
+                      if (index == items.length) {
                         if (controller.hasPageError.value) {
                           return Padding(
                             padding: EdgeInsets.symmetric(vertical: 16.h),
@@ -97,16 +98,16 @@ class LibraryItemsPage extends StatelessWidget {
                         );
                       }
 
-                      final item = controller.items[index];
+                      final item = items[index];
                       final itemCard = LibraryItemCard(
                         item: item,
                         onTap: () => controller.openItem(item),
                       );
 
                       // In-feed advertisement placed inside the list (between items)
-                      final adTargetIndex = controller.items.length >= 3
+                      final adTargetIndex = items.length >= 3
                           ? 1
-                          : (controller.items.length >= 2 ? 0 : 0);
+                          : (items.length >= 2 ? 0 : 0);
                       if (index == adTargetIndex) {
                         return Column(
                           mainAxisSize: MainAxisSize.min,

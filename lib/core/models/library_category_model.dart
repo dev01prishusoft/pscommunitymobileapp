@@ -43,7 +43,7 @@ class LibraryCategoriesModel {
   }
 }
 
-class LibraryCategoryData {
+class LibraryCategoryData implements Comparable<LibraryCategoryData> {
   int? libraryCategoryId;
   String? _name;
   String? _description;
@@ -84,9 +84,13 @@ class LibraryCategoryData {
     iconName = json['iconName']?.toString();
     iconColor = json['iconColor']?.toString();
     bgColor = json['bgColor']?.toString();
-    sortOrder = json['sortOrder'] is int
-        ? json['sortOrder'] as int
-        : int.tryParse(json['sortOrder']?.toString() ?? '');
+    final dynamic rawSortOrder =
+        json['sortOrder'] ?? json['SortOrder'] ?? json['sort_order'];
+    sortOrder = rawSortOrder is int
+        ? rawSortOrder
+        : (rawSortOrder is num
+            ? rawSortOrder.toInt()
+            : int.tryParse(rawSortOrder?.toString() ?? ''));
     _itemCount = json['itemCount'] is int
         ? json['itemCount'] as int
         : int.tryParse(json['itemCount']?.toString() ?? '');
@@ -125,6 +129,32 @@ class LibraryCategoryData {
       return fallback;
     }
   }
+
+  static int compareBySortOrder(LibraryCategoryData a, LibraryCategoryData b) {
+    final orderA = a.sortOrder;
+    final orderB = b.sortOrder;
+
+    if (orderA != null && orderB != null) {
+      final cmp = orderA.compareTo(orderB);
+      if (cmp != 0) return cmp;
+    } else if (orderA != null) {
+      return -1;
+    } else if (orderB != null) {
+      return 1;
+    }
+
+    final titleA = a.name.trim().toLowerCase();
+    final titleB = b.name.trim().toLowerCase();
+    final titleCmp = titleA.compareTo(titleB);
+    if (titleCmp != 0) return titleCmp;
+
+    final idA = a.libraryCategoryId ?? 0;
+    final idB = b.libraryCategoryId ?? 0;
+    return idA.compareTo(idB);
+  }
+
+  @override
+  int compareTo(LibraryCategoryData other) => compareBySortOrder(this, other);
 }
 
 typedef Data = LibraryCategoryData;
