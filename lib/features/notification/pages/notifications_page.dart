@@ -11,6 +11,8 @@ import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/notification/controllers/notification_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/notification_card.dart';
 
@@ -21,7 +23,8 @@ class NotificationsPage extends GetView<NotificationController> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.notifications,
         appBar: AppBar(
           title: Text(LK.notifications.tr),
           actions: [

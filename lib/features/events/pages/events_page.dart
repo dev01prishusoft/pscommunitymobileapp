@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -20,7 +21,8 @@ class EventsPage extends GetView<EventsController> {
     return Obx(() {
       final _ = Get.find<LocalizationService>().currentLocale.value;
       final isFabVisible = controller.isFabVisible.value;
-      return Scaffold(
+      return DynamicAdScaffold(
+        route: AppRouter.events,
         appBar: AppBar(
           title: Obx(() {
             if (controller.isSearchVisible.value) {

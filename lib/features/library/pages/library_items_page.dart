@@ -6,6 +6,8 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_item_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_search_bar.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 
 class LibraryItemsPage extends StatelessWidget {
@@ -19,7 +21,8 @@ class LibraryItemsPage extends StatelessWidget {
       final category = controller.selectedCategory.value;
       final categoryTitle = category?.name ?? LK.library_items_fallback_title.tr;
 
-      return Scaffold(
+      return DynamicAdScaffold(
+        route: AppRouter.libraryItems,
         backgroundColor: AppColors.sfBackground,
         appBar: AppBar(
           title: Text(categoryTitle),

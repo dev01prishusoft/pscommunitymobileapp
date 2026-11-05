@@ -53,7 +53,6 @@ import 'package:pscommunitymobileapp/features/library/pages/library_text_viewer_
 import 'package:pscommunitymobileapp/features/library/pages/library_video_player_page.dart';
 import 'package:pscommunitymobileapp/features/library/pages/library_image_viewer_page.dart';
 import 'package:pscommunitymobileapp/features/library/pages/library_audio_player_page.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_screen_wrapper.dart';
 
 class AppRouter {
   static final RouteObserver<PageRoute> routeObserver =
@@ -105,17 +104,7 @@ class AppRouter {
   static String libraryImage = '/library-image';
   static String libraryAudio = '/library-audio';
 
-  static List<GetPage<dynamic>> get pages =>
-      _rawPages.map((page) => _wrapWithDynamicAd(page)).toList();
-
-  static GetPage<T> _wrapWithDynamicAd<T>(GetPage<T> page) {
-    return page.copy(
-      page: () => DynamicAdScreenWrapper(
-        route: page.name,
-        child: page.page(),
-      ),
-    );
-  }
+  static List<GetPage<dynamic>> get pages => _rawPages;
 
   static final List<GetPage<dynamic>> _rawPages = [
     GetPage<void>(name: login, page: () => LoginPage()),

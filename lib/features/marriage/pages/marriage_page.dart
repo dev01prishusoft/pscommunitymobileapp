@@ -17,6 +17,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/controllers/marriage_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 
 class MarriagePage extends GetView<MarriageController> {
@@ -39,7 +40,8 @@ class MarriagePage extends GetView<MarriageController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.marriage,
       appBar: AppBar(
         title: Obx(() {
           if (controller.isSearchVisible.value) {

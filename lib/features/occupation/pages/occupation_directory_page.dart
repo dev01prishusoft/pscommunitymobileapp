@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/occupation_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/occupation/controllers/occupation_controller.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
@@ -51,7 +52,8 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.occupationDirectory,
       appBar: AppBar(
         title: _isSearchVisible
             ? CupertinoSearchbar(

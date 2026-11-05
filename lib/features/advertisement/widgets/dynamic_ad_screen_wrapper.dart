@@ -4,6 +4,8 @@ import '../services/ad_screen_config_service.dart';
 import 'advertisement_card.dart';
 import 'smart_ad_widget.dart';
 
+export 'dynamic_ad_scaffold.dart';
+
 /// A route-level wrapper that automatically renders Top or Bottom advertisement
 /// banners on any screen based on backend configuration ([AdScreenConfigService]).
 ///

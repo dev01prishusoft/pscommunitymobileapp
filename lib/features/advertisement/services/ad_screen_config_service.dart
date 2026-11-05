@@ -62,6 +62,7 @@ class AdScreenConfigService extends GetxService {
       final response = await client.get(ApiEndpoints.advertisementScreenConfig);
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
+        printInfo(info: jsonEncode(data));
         if (data is Map<String, dynamic> && data['succeeded'] == true) {
           final rawData = data['data'];
           if (rawData is Map<String, dynamic>) {

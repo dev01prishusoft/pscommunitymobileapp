@@ -16,6 +16,7 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/find_member_controller.dart';
 
 class FindMemberPage extends StatefulWidget {
@@ -40,7 +41,8 @@ class _FindMemberPageState extends State<FindMemberPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.findMember,
         appBar: AppBar(
           title: _isSearchVisible
               ? CupertinoSearchbar(

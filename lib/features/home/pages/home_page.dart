@@ -20,6 +20,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 
 import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_widget.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
@@ -610,12 +611,19 @@ class _HomePageState extends State<HomePage> with RouteAware {
             SizedBox(height: 10.h),
 
             // 1. Top Advertisement Banner (exact same 130.h height and 10.w padding)
-            const SmartAdWidget(
-              placementCode: 'home-top',
-              layout: AdLayout.banner,
-              limit: 5,
-              height: 110,
-            ),
+            Obx(() {
+              if (Get.isRegistered<AdScreenConfigService>()) {
+                if (!AdScreenConfigService.to.shouldShowTopBanner('/home')) {
+                  return const SizedBox.shrink();
+                }
+              }
+              return const SmartAdWidget(
+                placementCode: 'home-top',
+                layout: AdLayout.banner,
+                limit: 5,
+                height: 110,
+              );
+            }),
 
             SizedBox(height: 16.h),
 
@@ -711,6 +719,11 @@ class _HomePageState extends State<HomePage> with RouteAware {
   bool _hasHomeBottomAd() {
     if (Get.isRegistered<ModulePermissionService>()) {
       if (!ModulePermissionService.to.isAccessible(AppModule.advertisement)) {
+        return false;
+      }
+    }
+    if (Get.isRegistered<AdScreenConfigService>()) {
+      if (!AdScreenConfigService.to.shouldShowBottomBanner('/home')) {
         return false;
       }
     }

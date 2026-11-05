@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
 import 'package:pscommunitymobileapp/features/advertisement/models/ad_screen_config.dart';
 import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_screen_wrapper.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_widget.dart';
 
@@ -166,18 +167,19 @@ void main() {
     });
   });
 
-  group('DynamicAdScreenWrapper', () {
-    testWidgets('Excludes login and splash from automatic banners', (tester) async {
+  group('DynamicAdScaffold and DynamicAdBody', () {
+    testWidgets('Renders Scaffold content cleanly without outer wrapper interference', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: DynamicAdScreenWrapper(
-            route: '/login',
-            child: Text('Login Content'),
+          home: DynamicAdScaffold(
+            route: '/custom-route',
+            appBar: null,
+            body: Text('Page Content Inside Scaffold'),
           ),
         ),
       );
 
-      expect(find.text('Login Content'), findsOneWidget);
+      expect(find.text('Page Content Inside Scaffold'), findsOneWidget);
     });
   });
 }
