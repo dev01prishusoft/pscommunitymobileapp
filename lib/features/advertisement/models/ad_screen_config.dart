@@ -117,6 +117,35 @@ class AdGlobalConfig {
 
   /// Sensible default configuration when offline or backend API is not yet available.
   factory AdGlobalConfig.defaults() {
+    return AdGlobalConfig(
+      isGloballyEnabled: true,
+      defaultInListInterval: 4,
+      screens: {
+        '/library': const AdScreenConfig(
+          route: '/library',
+          screenName: 'Library Categories',
+          topBanner: AdBannerConfig(enabled: false),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'library-list',
+          ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/library-items': const AdScreenConfig(
+          route: '/library-items',
+          screenName: 'Library Items',
+          topBanner: AdBannerConfig(enabled: false),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'library-detail',
+          ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+      },
+    );
+  }
+
+  factory AdGlobalConfig.emptyDefaults() {
     return const AdGlobalConfig(
       isGloballyEnabled: true,
       defaultInListInterval: 4,

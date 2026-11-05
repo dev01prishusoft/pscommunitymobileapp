@@ -60,8 +60,16 @@ void main() {
       expect(eventConfig.inList.enabled, false);
     });
 
-    test('AdGlobalConfig.defaults returns clean fallback state', () {
+    test('AdGlobalConfig.defaults returns clean fallback state with default screens', () {
       final defaults = AdGlobalConfig.defaults();
+      expect(defaults.isGloballyEnabled, true);
+      expect(defaults.defaultInListInterval, 4);
+      expect(defaults.screens.containsKey('/library'), true);
+      expect(defaults.screens['/library']?.bottomBanner.enabled, true);
+    });
+
+    test('AdGlobalConfig.emptyDefaults returns empty state', () {
+      final defaults = AdGlobalConfig.emptyDefaults();
       expect(defaults.isGloballyEnabled, true);
       expect(defaults.defaultInListInterval, 4);
       expect(defaults.screens.isEmpty, true);
