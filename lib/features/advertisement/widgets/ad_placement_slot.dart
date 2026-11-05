@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/module_permission/models/app_module.da
 import 'package:pscommunitymobileapp/core/module_permission/services/module_permission_service.dart';
 import '../controllers/advertisement_controller.dart';
 import '../models/ad_placement.dart';
+import '../models/advertisement.dart';
 import 'ad_banner_carousel.dart';
 import 'advertisement_card.dart';
 
@@ -16,6 +17,7 @@ class AdPlacementSlot extends StatefulWidget {
   final int? limit;
   final EdgeInsetsGeometry? padding;
   final double? height;
+  final int? adIndex;
 
   const AdPlacementSlot({
     super.key,
@@ -25,6 +27,7 @@ class AdPlacementSlot extends StatefulWidget {
     this.limit,
     this.padding,
     this.height,
+    this.adIndex,
   }) : assert(
           placement != null || placementCode != null,
           'Either placement or placementCode must be provided',
@@ -112,7 +115,13 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
       }
 
       final cardHeight = widget.height ?? 110.h;
-      final displayAds = ads.take(widget.limit ?? 5).toList();
+      final List<Advertisement> displayAds;
+      if (widget.adIndex != null && ads.isNotEmpty) {
+        final rotatedAd = ads[widget.adIndex! % ads.length];
+        displayAds = [rotatedAd];
+      } else {
+        displayAds = ads.take(widget.limit ?? 5).toList();
+      }
 
       final content = AdBannerCarousel(
         advertisements: displayAds,

@@ -26,6 +26,14 @@ class FindMemberController extends PaginationMixin<Member> {
   final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
 
+  int get activeFilterCount {
+    int count = 0;
+    if (selectedState.value != null) count++;
+    if (selectedDistrict.value != null) count++;
+    if (selectedTaluka.value != null) count++;
+    return count;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -65,7 +73,7 @@ class FindMemberController extends PaginationMixin<Member> {
     selectedState.value = state;
     selectedDistrict.value = district;
     selectedTaluka.value = taluka;
-
+ 
     refreshData(showInitialLoading: true);
   }
 

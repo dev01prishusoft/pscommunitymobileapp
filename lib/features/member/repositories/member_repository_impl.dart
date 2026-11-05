@@ -23,7 +23,6 @@ class MemberRepositoryImpl implements MemberRepository {
     int? stateId,
     int? districtId,
     int? talukaId,
-    int? nativePlaceId,
     int pageNumber = 1,
     int pageSize = 20,
     CancelToken? cancelToken,
@@ -37,7 +36,6 @@ class MemberRepositoryImpl implements MemberRepository {
       if (stateId != null) 'stateId': stateId,
       if (districtId != null) 'districtId': districtId,
       if (talukaId != null) 'talukaId': talukaId,
-      if (nativePlaceId != null) 'nativePlaceId': nativePlaceId,
     };
 
     return await _apiClient.getPaginated<Member>(

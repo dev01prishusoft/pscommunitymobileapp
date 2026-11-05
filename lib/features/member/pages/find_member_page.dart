@@ -81,7 +81,18 @@ class _FindMemberPageState extends State<FindMemberPage> {
                 },
               ),
               IconButton(
-                icon: const Icon(Iconsax.filter_search_copy),
+                icon: Obx(() {
+                  final count = _controller.activeFilterCount;
+                  if (count > 0) {
+                    return Badge(
+                      label: Text('$count'),
+                      backgroundColor: AppColors.primary,
+                      textColor: AppColors.white,
+                      child: const Icon(Iconsax.filter_search_copy),
+                    );
+                  }
+                  return const Icon(Iconsax.filter_search_copy);
+                }),
                 onPressed: () {
                   Get.dialog<void>(const _FindMemberFilterDialog());
                 },
@@ -458,7 +469,9 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
   }
 
   bool get _hasSelection =>
-      _tempState != null || _tempDistrict != null || _tempTaluka != null;
+      _tempState != null ||
+      _tempDistrict != null ||
+      _tempTaluka != null;
 
   @override
   Widget build(BuildContext context) {

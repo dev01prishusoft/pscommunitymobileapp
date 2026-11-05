@@ -28,6 +28,7 @@ class SmartAdWidget extends StatelessWidget {
   final int? limit;
   final EdgeInsetsGeometry? padding;
   final double? height;
+  final int? adIndex;
 
   const SmartAdWidget({
     super.key,
@@ -37,6 +38,7 @@ class SmartAdWidget extends StatelessWidget {
     this.limit,
     this.padding,
     this.height,
+    this.adIndex,
   });
 
   String _resolvePlacementCode() {
@@ -61,6 +63,7 @@ class SmartAdWidget extends StatelessWidget {
       limit: limit,
       padding: padding,
       height: height,
+      adIndex: adIndex,
     );
   }
 }

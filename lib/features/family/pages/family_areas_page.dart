@@ -55,7 +55,18 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
         title: Text(LK.familyByArea.tr),
         actions: [
           IconButton(
-            icon: const Icon(Iconsax.filter_search_copy),
+            icon: Obx(() {
+              final count = controller.activeFilterCount;
+              if (count > 0) {
+                return Badge(
+                  label: Text('$count'),
+                  backgroundColor: AppColors.primary,
+                  textColor: AppColors.white,
+                  child: const Icon(Iconsax.filter_search_copy),
+                );
+              }
+              return const Icon(Iconsax.filter_search_copy);
+            }),
             onPressed: () {
               Get.dialog<void>(const _FilterDialog());
             },

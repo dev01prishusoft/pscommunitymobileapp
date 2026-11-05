@@ -37,6 +37,14 @@ class FamilyController extends GetxController {
   final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
 
+  int get activeFilterCount {
+    int count = 0;
+    if (selectedState.value != null) count++;
+    if (selectedDistrict.value != null) count++;
+    if (selectedTaluka.value != null) count++;
+    return count;
+  }
+
   Future<void> loadMemberDetails(int memberId) async {
     memberDetailState.value = AppState.loading;
     try {
