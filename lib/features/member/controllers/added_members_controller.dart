@@ -99,6 +99,7 @@ class AddedMembersController extends GetxController {
   }
 
   void refreshMembers() {
+    isLoading.value = false;
     _currentPage = 1;
     hasMore.value = true;
     members.clear();

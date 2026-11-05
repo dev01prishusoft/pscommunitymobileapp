@@ -29,6 +29,7 @@ class _LibraryAudioPlayerPageState extends State<LibraryAudioPlayerPage>
   bool _isPlaying = false;
   bool _isMuted = false;
   bool _isLoading = true;
+  bool _isDragging = false;
   Duration _currentPosition = Duration.zero;
   Duration _totalDuration = Duration.zero;
   late AnimationController _waveAnimController;
@@ -144,7 +145,6 @@ class _LibraryAudioPlayerPageState extends State<LibraryAudioPlayerPage>
         }
       }
     } catch (e) {
-      debugPrint('Error initializing audio: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -187,7 +187,9 @@ class _LibraryAudioPlayerPageState extends State<LibraryAudioPlayerPage>
     final pos = controller.value.position;
 
     setState(() {
-      _currentPosition = pos;
+      if (!_isDragging) {
+        _currentPosition = pos;
+      }
       _isPlaying = isPlayingNow;
       if (controller.value.duration > Duration.zero) {
         _totalDuration = controller.value.duration;
@@ -245,16 +247,41 @@ class _LibraryAudioPlayerPageState extends State<LibraryAudioPlayerPage>
     }
   }
 
-  void _seekTo(double seconds) {
-    final controller = _audioController;
+  void _onSeekStart(double seconds) {
+    _isDragging = true;
+  }
+
+  void _onSeekChanged(double seconds) {
+    setState(() {
+      _currentPosition = Duration(seconds: seconds.toInt());
+    });
+  }
+
+  void _onSeekEnd(double seconds) async {
     final target = Duration(seconds: seconds.toInt());
-    if (controller != null && controller.value.isInitialized) {
-      controller.seekTo(target);
-    }
     setState(() {
       _currentPosition = target;
     });
+
+    final controller = _audioController;
+    if (controller != null && controller.value.isInitialized) {
+      await controller.seekTo(target);
+      await controller.play();
+      if (mounted) {
+        setState(() {
+          _isPlaying = true;
+          _isDragging = false;
+        });
+        if (!_waveAnimController.isAnimating) {
+          _waveAnimController.repeat(reverse: true);
+        }
+      }
+    } else {
+      _isDragging = false;
+    }
   }
+
+
 
   String _formatDuration(Duration d) {
     final m = d.inMinutes;
@@ -528,7 +555,9 @@ class _LibraryAudioPlayerPageState extends State<LibraryAudioPlayerPage>
                                 value: currentSec,
                                 min: 0.0,
                                 max: maxSeconds,
-                                onChanged: _seekTo,
+                                onChangeStart: _onSeekStart,
+                                onChanged: _onSeekChanged,
+                                onChangeEnd: _onSeekEnd,
                               ),
                             ),
                           ],

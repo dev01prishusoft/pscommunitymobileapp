@@ -652,7 +652,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: const Icon(Iconsax.location_copy),
                     controller: controller.bornPlaceCtrl,
                     label: LK.BornPlace.tr,
-                    isRequired: true,
+                    isRequired: false,
                     onLocationSelected: (location, lat, lng) {
                       if (location.isEmpty || location == "") return;
                       controller.bornPlaceCtrl.text = location;

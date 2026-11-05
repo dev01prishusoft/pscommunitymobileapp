@@ -156,6 +156,22 @@ class EventsController extends GetxController
     await _fetchEvents(type, isRefresh: true);
   }
 
+  Future<void> refreshAllEvents() async {
+    _cancelToken?.cancel();
+    _cancelToken = CancelToken();
+    upcomingPage = 1;
+    ongoingPage = 1;
+    pastPage = 1;
+    upcomingHasMore = true;
+    ongoingHasMore = true;
+    pastHasMore = true;
+    await Future.wait([
+      _fetchEvents(1, isRefresh: true),
+      _fetchEvents(2, isRefresh: true),
+      _fetchEvents(3, isRefresh: true),
+    ]);
+  }
+
   Future<void> refreshEventsSilently() async {
     upcomingPage = 1;
     ongoingPage = 1;

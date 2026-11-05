@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,7 +10,7 @@ import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/utils/date_formatter.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_video_player_widget.dart';
+import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 import 'package:video_player/video_player.dart';
 
@@ -25,11 +27,23 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
   bool _isLoadingDetails = false;
   int _selectedFileIndex = 0;
 
-  VideoPlayerController? _activeVideoController;
-
-  bool _isVideoPlaying = false;
+  VideoPlayerController? _videoController;
+  bool _isLoading = true;
+  bool _hasError = false;
   bool _isMuted = false;
   bool _isLandscape = false;
+  bool _showControls = true;
+  Timer? _controlsTimer;
+
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = Duration.zero;
+  bool _isDraggingSeekBar = false;
+  double _dragPositionMs = 0;
+
+  final List<double> _speeds = [1.0, 1.25, 1.5, 2.0, 0.75];
+  int _speedIndex = 0;
+
+  String? _currentlyLoadedUrl;
 
   List<LibraryItemFile> get _files => _details?.files ?? <LibraryItemFile>[];
   LibraryItemFile? get _currentFile =>
@@ -60,7 +74,9 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
     } else {
       item = LibraryItemModel();
     }
+
     _fetchDetails();
+    _initVideo();
   }
 
   Future<void> _fetchDetails() async {
@@ -82,42 +98,162 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
             }
           }
         });
+
+        // If the primary file points to a different URL, switch to it
+        final newUrl = _playableVideoUrl;
+        if (newUrl.isNotEmpty && newUrl != _currentlyLoadedUrl) {
+          _setupController(newUrl);
+        }
       }
     }
+  }
+
+  void _initVideo() {
+    final targetUrl = _playableVideoUrl;
+    if (targetUrl.isEmpty || targetUrl == _currentlyLoadedUrl) return;
+    _setupController(targetUrl);
+  }
+
+  Future<void> _setupController(String url) async {
+    _currentlyLoadedUrl = url;
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+      _currentPosition = Duration.zero;
+      _totalDuration = Duration.zero;
+    });
+
+    _controlsTimer?.cancel();
+    _videoController?.removeListener(_videoListener);
+    final oldController = _videoController;
+    _videoController = null;
+    oldController?.dispose();
+
+    try {
+      final uri = Uri.parse(url);
+      final controller = VideoPlayerController.networkUrl(uri);
+      _videoController = controller;
+
+      await controller.initialize();
+      if (!mounted || _videoController != controller) {
+        controller.dispose();
+        return;
+      }
+
+      controller.addListener(_videoListener);
+      if (_isMuted) {
+        await controller.setVolume(0.0);
+      }
+      if (_speedIndex != 0) {
+        await controller.setPlaybackSpeed(_speeds[_speedIndex]);
+      }
+      await controller.play();
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _totalDuration = controller.value.duration;
+          _currentPosition = controller.value.position;
+        });
+        _resetControlsTimer();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
+    }
+  }
+
+  void _videoListener() {
+    if (_videoController == null || !mounted) return;
+    final val = _videoController!.value;
+    if (val.hasError && !_hasError) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final pos = val.position;
+    final dur = val.duration;
+    final isPlaying = val.isPlaying;
+
+    if (!_isDraggingSeekBar) {
+      _currentPosition = pos;
+    }
+    _totalDuration = dur;
+
+    // When video finishes playing, show controls with replay option
+    if (dur > Duration.zero && pos >= dur && !isPlaying) {
+      _showControls = true;
+      _controlsTimer?.cancel();
+    }
+
+    setState(() {});
   }
 
   void _switchVideo(int index) {
     if (index < 0 || index >= _files.length) return;
     if (index == _selectedFileIndex) return;
 
-    _activeVideoController?.pause();
-    _activeVideoController?.removeListener(_onControllerUpdate);
-    _activeVideoController = null;
-
     setState(() {
       _selectedFileIndex = index;
     });
+
+    final newUrl = _playableVideoUrl;
+    if (newUrl.isNotEmpty) {
+      _setupController(newUrl);
+    }
   }
 
-  void _onControllerUpdate() {
-    if (!mounted || _activeVideoController == null) return;
-    final isPlaying = _activeVideoController!.value.isPlaying;
-    if (isPlaying != _isVideoPlaying) {
-      setState(() {
-        _isVideoPlaying = isPlaying;
-      });
+  void _togglePlayPause() {
+    if (_videoController == null || !_videoController!.value.isInitialized)
+      return;
+
+    final val = _videoController!.value;
+    if (val.duration > Duration.zero && val.position >= val.duration) {
+      _videoController!.seekTo(Duration.zero);
+      _videoController!.play();
+      _resetControlsTimer();
+    } else if (val.isPlaying) {
+      _videoController!.pause();
+      _showControls = true;
+      _controlsTimer?.cancel();
+    } else {
+      _videoController!.play();
+      _resetControlsTimer();
     }
+    setState(() {});
+  }
+
+  void _seekRelative(int seconds) {
+    if (_videoController == null || !_videoController!.value.isInitialized)
+      return;
+    final currentMs = _videoController!.value.position.inMilliseconds;
+    final totalMs = _videoController!.value.duration.inMilliseconds;
+    final targetMs = (currentMs + (seconds * 1000)).clamp(0, totalMs);
+    _videoController!.seekTo(Duration(milliseconds: targetMs));
+    _resetControlsTimer();
   }
 
   void _toggleMute() {
     setState(() {
       _isMuted = !_isMuted;
     });
+    _videoController?.setVolume(_isMuted ? 0.0 : 1.0);
+    _resetControlsTimer();
+  }
 
-    if (_activeVideoController != null &&
-        _activeVideoController!.value.isInitialized) {
-      _activeVideoController!.setVolume(_isMuted ? 0.0 : 1.0);
-    }
+  void _cycleSpeed() {
+    _speedIndex = (_speedIndex + 1) % _speeds.length;
+    final speed = _speeds[_speedIndex];
+    _videoController?.setPlaybackSpeed(speed);
+    setState(() {});
+    _resetControlsTimer();
   }
 
   void _toggleOrientation() {
@@ -141,11 +277,49 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
         DeviceOrientation.portraitDown,
       ]);
     }
+    _resetControlsTimer();
+  }
+
+  void _toggleControls() {
+    setState(() {
+      _showControls = !_showControls;
+    });
+    if (_showControls) {
+      _resetControlsTimer();
+    } else {
+      _controlsTimer?.cancel();
+    }
+  }
+
+  void _resetControlsTimer() {
+    _controlsTimer?.cancel();
+    if (_videoController?.value.isPlaying == true) {
+      _controlsTimer = Timer(const Duration(seconds: 4), () {
+        if (mounted && _videoController?.value.isPlaying == true) {
+          setState(() {
+            _showControls = false;
+          });
+        }
+      });
+    }
+  }
+
+  static String _formatTime(Duration duration) {
+    final int hours = duration.inHours;
+    final int minutes = duration.inMinutes.remainder(60);
+    final int seconds = duration.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    } else {
+      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
   }
 
   @override
   void dispose() {
-    _activeVideoController?.removeListener(_onControllerUpdate);
+    _controlsTimer?.cancel();
+    _videoController?.removeListener(_videoListener);
+    _videoController?.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -159,7 +333,6 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
     final isLandscapeNow =
         MediaQuery.of(context).orientation == Orientation.landscape || _isLandscape;
 
-    final targetUrl = _playableVideoUrl;
     final displayTitle = _details?.title ?? item.videoTitle ?? item.title;
     final displayDescription = _details?.description ??
         _details?.shortDescription ??
@@ -168,7 +341,7 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
     final rawDate = _details?.publishedOn ?? item.date;
     final displayDate = formatDateString(rawDate, fallback: '');
 
-    final videoSurface = _buildVideoSurface(targetUrl, isLandscapeNow, displayTitle);
+    final videoSurface = _buildVideoSurface(isLandscapeNow, displayTitle);
 
     return PopScope(
       canPop: !isLandscapeNow,
@@ -185,7 +358,12 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                 title: Text(displayTitle),
               ),
         body: isLandscapeNow
-            ? SizedBox.expand(child: videoSurface)
+            ? Container(
+                color: Colors.black,
+                width: double.infinity,
+                height: double.infinity,
+                child: videoSurface,
+              )
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,7 +375,7 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                         minHeight: 2.h,
                       ),
 
-                    // Video Player using AdVideoPlayerWidget
+                    // Video Player Surface
                     videoSurface,
 
                     // "About this video" Section
@@ -214,6 +392,428 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildVideoSurface(bool isLandscape, [String? title]) {
+    final displayTitle =
+        title ?? (_details?.title ?? item.videoTitle ?? item.title);
+    final targetUrl = _playableVideoUrl;
+
+    if (targetUrl.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: isLandscape ? double.infinity : 225.h,
+        color: Colors.black,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.videocam_off_rounded,
+                color: Colors.white60,
+                size: 48.sp,
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                LK.library_video_unavailable_stream.tr,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Colors.white70,
+                  fontSize: 13.sp,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final isInitialized =
+        _videoController != null && _videoController!.value.isInitialized;
+    final isPlaying = isInitialized && _videoController!.value.isPlaying;
+    final isEnded =
+        isInitialized &&
+        _totalDuration > Duration.zero &&
+        _currentPosition >= _totalDuration;
+    final isBuffering = isInitialized && _videoController!.value.isBuffering;
+
+    return Container(
+      width: double.infinity,
+      height: isLandscape ? double.infinity : 225.h,
+      color: Colors.black,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggleControls,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 1. Video Texture
+            if (isInitialized)
+              Center(
+                child: AspectRatio(
+                  aspectRatio: _videoController!.value.aspectRatio > 0
+                      ? _videoController!.value.aspectRatio
+                      : 16 / 9,
+                  child: VideoPlayer(_videoController!),
+                ),
+              )
+            else if (item.thumbnail != null && item.thumbnail!.isNotEmpty)
+              CachedImg(
+                url: item.thumbnail!,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+              ),
+
+            // 2. Loading / Buffering Indicator
+            if (_isLoading || isBuffering)
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(12),
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                  strokeWidth: 3,
+                ),
+              ),
+
+            // 3. Error Overlay
+            if (_hasError)
+              Container(
+                color: Colors.black87,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.redAccent,
+                        size: 40.sp,
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        'Failed to load video',
+                        style: TextStyle(color: Colors.white, fontSize: 13.sp),
+                      ),
+                      SizedBox(height: 12.h),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        onPressed: () => _setupController(_playableVideoUrl),
+                        icon: const Icon(
+                          Icons.refresh_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Retry',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // 4. Interactive Controls Overlay (Fades out when not touched)
+            if (!_hasError && isInitialized)
+              AnimatedOpacity(
+                opacity: _showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                child: IgnorePointer(
+                  ignoring: !_showControls,
+                  child: Stack(
+                    children: [
+                      // Dark gradient background for readability
+                      Container(color: Colors.black.withValues(alpha: 0.35)),
+
+                      // Top Bar (Back button in landscape + Video title)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isLandscape ? 20 : 12.w,
+                            vertical: isLandscape ? 12 : 8.h,
+                          ),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.black87, Colors.transparent],
+                            ),
+                          ),
+                          child: SafeArea(
+                            bottom: false,
+                            child: Row(
+                              children: [
+                                if (isLandscape) ...[
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: _toggleOrientation,
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                Expanded(
+                                  child: Text(
+                                    displayTitle,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTextStyles.titleSmall.copyWith(
+                                      color: Colors.white,
+                                      fontSize: isLandscape ? 14.5 : 13.5.sp,
+                                      fontWeight: FontWeight.w700,
+                                      shadows: const [
+                                        Shadow(
+                                          color: Colors.black87,
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Center Controls: Rewind 10s | Play/Pause/Replay | Forward 10s
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // 10s Rewind
+                            IconButton(
+                              iconSize: isLandscape ? 36 : 30.sp,
+                              color: Colors.white,
+                              onPressed: () => _seekRelative(-10),
+                              icon: const Icon(Icons.replay_10_rounded),
+                              tooltip: 'Rewind 10s',
+                            ),
+                            SizedBox(width: isLandscape ? 40 : 28.w),
+
+                            // Play / Pause / Replay Center Button
+                            GestureDetector(
+                              onTap: _togglePlayPause,
+                              child: Container(
+                                width: isLandscape ? 58 : 52.r,
+                                height: isLandscape ? 58 : 52.r,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.65),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white70,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Icon(
+                                  isEnded
+                                      ? Icons.replay_rounded
+                                      : (isPlaying
+                                            ? Icons.pause_rounded
+                                            : Icons.play_arrow_rounded),
+                                  color: Colors.white,
+                                  size: isLandscape ? 34 : 32.sp,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: isLandscape ? 40 : 28.w),
+
+                            // 10s Forward
+                            IconButton(
+                              iconSize: isLandscape ? 36 : 30.sp,
+                              color: Colors.white,
+                              onPressed: () => _seekRelative(10),
+                              icon: const Icon(Icons.forward_10_rounded),
+                              tooltip: 'Forward 10s',
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Bottom Bar: Progress Scrubber, Timestamps, Speed, Mute, Fullscreen
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(
+                            isLandscape ? 20 : 12.w,
+                            10.h,
+                            isLandscape ? 20 : 12.w,
+                            isLandscape ? 12.h : 6.h,
+                          ),
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [Colors.black87, Colors.transparent],
+                            ),
+                          ),
+                          child: SafeArea(
+                            top: false,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Slider Track
+                                SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    trackHeight: 3.h,
+                                    thumbShape: RoundSliderThumbShape(
+                                      enabledThumbRadius: 6.r,
+                                    ),
+                                    overlayShape: RoundSliderOverlayShape(
+                                      overlayRadius: 14.r,
+                                    ),
+                                    activeTrackColor: AppColors.primary,
+                                    inactiveTrackColor: Colors.white24,
+                                    thumbColor: AppColors.primary,
+                                    overlayColor: AppColors.primary.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                  ),
+                                  child: Slider(
+                                    min: 0.0,
+                                    max:
+                                        _totalDuration.inMilliseconds
+                                                .toDouble() >
+                                            0
+                                        ? _totalDuration.inMilliseconds
+                                              .toDouble()
+                                        : 1.0,
+                                    value: _isDraggingSeekBar
+                                        ? _dragPositionMs.clamp(
+                                            0.0,
+                                            _totalDuration.inMilliseconds
+                                                .toDouble(),
+                                          )
+                                        : _currentPosition.inMilliseconds
+                                              .toDouble()
+                                              .clamp(
+                                                0.0,
+                                                _totalDuration.inMilliseconds
+                                                    .toDouble(),
+                                              ),
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _isDraggingSeekBar = true;
+                                        _dragPositionMs = val;
+                                        _currentPosition = Duration(
+                                          milliseconds: val.toInt(),
+                                        );
+                                      });
+                                      _controlsTimer?.cancel();
+                                    },
+                                    onChangeEnd: (val) {
+                                      _isDraggingSeekBar = false;
+                                      _videoController?.seekTo(
+                                        Duration(milliseconds: val.toInt()),
+                                      );
+                                      _resetControlsTimer();
+                                    },
+                                  ),
+                                ),
+
+                                // Bottom Row Controls
+                                Row(
+                                  children: [
+                                    // Timestamp: 01:23 / 10:45
+                                    Text(
+                                      '${_formatTime(_currentPosition)} / ${_formatTime(_totalDuration)}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: isLandscape ? 12.5 : 11.5.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Spacer(),
+
+                                    // Playback Speed Button (1x, 1.25x, 1.5x...)
+                                    InkWell(
+                                      onTap: _cycleSpeed,
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 6.w,
+                                          vertical: 2.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6.r,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${_speeds[_speedIndex]}x',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.w),
+
+                                    // Mute / Unmute Button
+                                    IconButton(
+                                      iconSize: isLandscape ? 22 : 20.sp,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: Icon(
+                                        _isMuted
+                                            ? Icons.volume_off_rounded
+                                            : Icons.volume_up_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: _toggleMute,
+                                      tooltip: _isMuted ? 'Unmute' : 'Mute',
+                                    ),
+                                    SizedBox(width: 12.w),
+
+                                    // Fullscreen / Exit Fullscreen Button
+                                    IconButton(
+                                      iconSize: isLandscape ? 23 : 21.sp,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: Icon(
+                                        isLandscape
+                                            ? Icons.fullscreen_exit_rounded
+                                            : Icons.fullscreen_rounded,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: _toggleOrientation,
+                                      tooltip: isLandscape
+                                          ? 'Exit Fullscreen'
+                                          : 'Fullscreen',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -259,10 +859,10 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                   : (file.fileName?.isNotEmpty == true
                       ? file.fileName!
                       : '${LK.library_video_item_fallback.tr} ${idx + 1}');
-              final dur =
-                  LibraryController.formatDuration(file.durationSeconds);
-              final size =
-                  LibraryController.formatFileSize(file.fileSizeBytes);
+              final dur = LibraryController.formatDuration(
+                file.durationSeconds,
+              );
+              final size = LibraryController.formatFileSize(file.fileSizeBytes);
               final meta = [
                 if (dur.isNotEmpty) dur,
                 if (size.isNotEmpty) size,
@@ -304,8 +904,9 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppColors.primary
-                                  : const Color(0xFFD4973B)
-                                      .withValues(alpha: 0.2),
+                                  : const Color(
+                                      0xFFD4973B,
+                                    ).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Center(
@@ -358,7 +959,9 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                           if (isSelected)
                             Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 8.w, vertical: 3.h),
+                                horizontal: 8.w,
+                                vertical: 3.h,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(6.r),
@@ -401,8 +1004,11 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.video_file_outlined,
-                  color: Color(0xFF64748B), size: 20),
+              const Icon(
+                Icons.video_file_outlined,
+                color: Color(0xFF64748B),
+                size: 20,
+              ),
               SizedBox(width: 8.w),
               Expanded(
                 child: Text(
@@ -430,175 +1036,6 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
         ),
       );
     }
-  }
-
-  Widget _buildVideoSurface(String targetUrl, bool isLandscape, [String? title]) {
-    final displayTitle = title ?? (_details?.title ?? item.videoTitle ?? item.title);
-    if (targetUrl.isEmpty) {
-      return Container(
-        width: double.infinity,
-        height: isLandscape ? double.infinity : 230.h,
-        color: Colors.black,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.videocam_off_rounded, color: Colors.white60, size: 48.sp),
-              SizedBox(height: 8.h),
-              Text(
-                LK.library_video_unavailable_stream.tr,
-                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70, fontSize: 13.sp),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-    return Container(
-      width: double.infinity,
-      height: isLandscape ? double.infinity : 230.h,
-      color: Colors.black,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // 1. Same AdVideoPlayerWidget as used in Advertisement
-          Center(
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: AdVideoPlayerWidget(
-                key: ValueKey(targetUrl),
-                videoUrl: targetUrl,
-                thumbnailUrl: item.thumbnail,
-                autoPlay: true,
-                fit: BoxFit.contain,
-                showProgressBar: true,
-                onControllerCreated: (ctrl) {
-                  _activeVideoController?.removeListener(_onControllerUpdate);
-                  _activeVideoController = ctrl;
-                  _activeVideoController?.addListener(_onControllerUpdate);
-                  if (_isMuted) {
-                    _activeVideoController?.setVolume(0.0);
-                  }
-                },
-                onPlaybackChanged: (isPlaying) {
-                  if (mounted && _isVideoPlaying != isPlaying) {
-                    setState(() {
-                      _isVideoPlaying = isPlaying;
-                    });
-                  }
-                },
-              ),
-            ),
-          ),
-
-          // 2. Top-bar controls (in Landscape: Back button + title)
-          if (isLandscape)
-            Positioned(
-              top: 14,
-              left: 20,
-              right: 20,
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: _toggleOrientation,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      displayTitle,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: Colors.white,
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        shadows: const [
-                          Shadow(color: Colors.black87, blurRadius: 6),
-                        ],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // 3. Bottom Quick Controls: Mute/Unmute & Fullscreen/Rotate Buttons
-          Positioned(
-            bottom: isLandscape ? 12 : 8.h,
-            right: isLandscape ? 20 : 12.w,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Mute / Unmute Button (Left of Fullscreen)
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _toggleMute,
-                    borderRadius: BorderRadius.circular(20.r),
-                    child: Container(
-                      padding: EdgeInsets.all(isLandscape ? 6 : 7.r),
-                      decoration: BoxDecoration(
-                        color: _isMuted
-                            ? const Color(0xFFDC2626).withValues(alpha: 0.85)
-                            : Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        _isMuted
-                            ? Icons.volume_off_rounded
-                            : Icons.volume_up_rounded,
-                        color: Colors.white,
-                        size: isLandscape ? 18 : 20.sp,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: isLandscape ? 10 : 10.w),
-
-                // Fullscreen / Rotate Button
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _toggleOrientation,
-                    borderRadius: BorderRadius.circular(20.r),
-                    child: Container(
-                      padding: EdgeInsets.all(isLandscape ? 6 : 7.r),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        isLandscape
-                            ? Icons.fullscreen_exit_rounded
-                            : Icons.fullscreen_rounded,
-                        color: Colors.white,
-                        size: isLandscape ? 19 : 21.sp,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildAboutSection(String displayDescription, String displayDate) {
@@ -682,10 +1119,9 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    final nextUrl = LibraryController.resolveMediaUrl(rel.videoUrl);
-                    _activeVideoController?.pause();
-                    _activeVideoController?.removeListener(_onControllerUpdate);
-                    _activeVideoController = null;
+                    final nextUrl = LibraryController.resolveMediaUrl(
+                      rel.videoUrl,
+                    );
                     setState(() {
                       item = item.copyWith(
                         title: rel.title,
@@ -695,6 +1131,9 @@ class _LibraryVideoPlayerPageState extends State<LibraryVideoPlayerPage> {
                         thumbnail: rel.thumbnail,
                       );
                     });
+                    if (nextUrl.isNotEmpty) {
+                      _setupController(nextUrl);
+                    }
                   },
                   borderRadius: BorderRadius.circular(14.r),
                   child: Padding(
