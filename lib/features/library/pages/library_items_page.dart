@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/widgets/library_item_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_search_bar.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 
 class LibraryItemsPage extends StatelessWidget {
@@ -54,7 +55,7 @@ class LibraryItemsPage extends StatelessWidget {
                   onRetry: () => controller.loadCategoryItems(isRefresh: true),
                   emptyIcon: Icons.menu_book_rounded,
                   emptyMessage: LK.library_no_items_found.tr,
-                  child: ListView.builder(
+                  child: ListView.separated(
                     controller: controller.itemScrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(
@@ -63,6 +64,13 @@ class LibraryItemsPage extends StatelessWidget {
                     ),
                     itemCount: controller.items.length +
                         (controller.isNextPageLoading.value ? 1 : 0),
+                    separatorBuilder: (context, index) {
+                      return DynamicAdSeparator(
+                        route: AppRouter.libraryItems,
+                        index: index,
+                        regularSeparator: SizedBox(height: 6.h),
+                      );
+                    },
                     itemBuilder: (context, index) {
                       if (index >= controller.items.length) {
                         return Padding(

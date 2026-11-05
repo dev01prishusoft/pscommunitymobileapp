@@ -18,6 +18,7 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/controllers/marriage_controller.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
 
 class MarriagePage extends GetView<MarriageController> {
@@ -124,8 +125,19 @@ class MarriagePage extends GetView<MarriageController> {
                               )
                             : const SizedBox.shrink();
                       }
-                      return _MarriageMemberCard(
+                      final card = _MarriageMemberCard(
                         member: controller.filteredMembers[index],
+                      );
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          card,
+                          DynamicAdSeparator(
+                            route: AppRouter.marriage,
+                            index: index,
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                          ),
+                        ],
                       );
                     },
                     childCount: controller.filteredMembers.length +
@@ -897,7 +909,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
                       child: Text(
-                        LK.applyFilters.tr,
+                        LK.applyFilters.tr + "nik",
                         style: AppTextStyles.labelLarge.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.white,

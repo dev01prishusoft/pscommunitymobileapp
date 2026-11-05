@@ -159,6 +159,18 @@ void main() {
       // Index 7 (Item 8) -> AD SLOT
       expect((7 + 1) % interval == 0, true);
     });
+
+    test('Calculates interval: 2 ad injection cleanly', () {
+      const interval = 2;
+      // Index 0 (Item 1) -> no ad
+      expect((0 + 1) % interval == 0, false);
+      // Index 1 (Item 2) -> AD SLOT
+      expect((1 + 1) % interval == 0, true);
+      // Index 2 (Item 3) -> no ad
+      expect((2 + 1) % interval == 0, false);
+      // Index 3 (Item 4) -> AD SLOT
+      expect((3 + 1) % interval == 0, true);
+    });
   });
 
   group('SmartAdWidget and PlacementCode', () {

@@ -6,6 +6,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 
 class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
   const PaginatedListView({
@@ -93,13 +94,15 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
             if (headerWidget != null && index == 0) {
               return const SizedBox.shrink();
             }
-            if (separatorBuilder != null) {
-              return separatorBuilder!(
-                context,
-                headerWidget != null ? index - 1 : index,
-              );
-            }
-            return const SizedBox.shrink();
+            final regularIndex = headerWidget != null ? index - 1 : index;
+            final regularSeparator = separatorBuilder != null
+                ? separatorBuilder!(context, regularIndex)
+                : const SizedBox.shrink();
+
+            return DynamicAdSeparator(
+              index: regularIndex,
+              regularSeparator: regularSeparator,
+            );
           },
           itemBuilder: (context, index) {
             if (headerWidget != null) {

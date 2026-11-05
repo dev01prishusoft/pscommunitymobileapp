@@ -11,7 +11,8 @@ enum AdPlacement {
   other,
   advertisementList,
   libraryList,
-  libraryDetail;
+  libraryDetail,
+  paymentHistory;
 
   String get code {
     switch (this) {
@@ -41,6 +42,8 @@ enum AdPlacement {
         return 'library-list';
       case AdPlacement.libraryDetail:
         return 'library-detail';
+      case AdPlacement.paymentHistory:
+        return 'payment-history';
     }
   }
 
@@ -74,6 +77,8 @@ enum AdPlacement {
         return AdPlacement.libraryList;
       case 'library-detail':
         return AdPlacement.libraryDetail;
+      case 'payment-history':
+        return AdPlacement.paymentHistory;
       case 'other':
       default:
         return AdPlacement.other;

@@ -20,6 +20,7 @@ import 'smart_ad_widget.dart';
 /// ```
 class DynamicAdSeparator extends StatelessWidget {
   final int index;
+  final String? route;
   final int? interval;
   final String? placementCode;
   final Widget? regularSeparator;
@@ -30,6 +31,7 @@ class DynamicAdSeparator extends StatelessWidget {
   const DynamicAdSeparator({
     super.key,
     required this.index,
+    this.route,
     this.interval,
     this.placementCode,
     this.regularSeparator,
@@ -40,43 +42,48 @@ class DynamicAdSeparator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentRoute = Get.currentRoute;
-    final inListConfig = AdScreenConfigService.to.getInListConfig(currentRoute);
+    final effectiveRoute = route ??
+        ModalRoute.of(context)?.settings.name ??
+        Get.currentRoute;
 
-    // If explicit interval is given, use it; otherwise check backend config
-    final isEnabled = inListConfig?.enabled ?? (interval != null && interval! > 0);
-    if (!isEnabled) {
-      return regularSeparator ?? const SizedBox.shrink();
-    }
+    return Obx(() {
+      final inListConfig =
+          AdScreenConfigService.to.getInListConfig(effectiveRoute);
 
-    final effectiveInterval = interval ?? (inListConfig?.interval ?? 4);
-    if (effectiveInterval <= 0) {
-      return regularSeparator ?? const SizedBox.shrink();
-    }
+      // If explicit interval is given, use it; otherwise check backend config
+      final isEnabled =
+          inListConfig?.enabled ?? (interval != null && interval! > 0);
+      if (!isEnabled) {
+        return regularSeparator ?? const SizedBox.shrink();
+      }
 
-    // Check if current item index qualifies for an ad injection
-    final isAdSlot = (index + 1) % effectiveInterval == 0;
-    if (!isAdSlot) {
-      return regularSeparator ?? const SizedBox.shrink();
-    }
+      final effectiveInterval = interval ?? (inListConfig?.interval ?? 4);
+      if (effectiveInterval <= 0) {
+        return regularSeparator ?? const SizedBox.shrink();
+      }
 
-    final code = placementCode ??
-        inListConfig?.placementCode ??
-        '${AdScreenConfigService.normalizeRoute(currentRoute).replaceAll('/', '')}-infeed';
+      // Check if current item index qualifies for an ad injection
+      final isAdSlot = (index + 1) % effectiveInterval == 0;
+      if (!isAdSlot) {
+        return regularSeparator ?? const SizedBox.shrink();
+      }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (regularSeparator != null) regularSeparator!,
-        SmartAdWidget(
-          placementCode: code,
-          layout: layout,
-          height: height,
-          padding: padding,
-        ),
-        if (regularSeparator != null) regularSeparator!,
-      ],
-    );
+      final code = placementCode ??
+          inListConfig?.placementCode ??
+          '${AdScreenConfigService.normalizeRoute(effectiveRoute).replaceAll('/', '')}-infeed';
+
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (regularSeparator != null) regularSeparator!,
+          SmartAdWidget(
+            placementCode: code,
+            layout: layout,
+            height: height,
+            padding: padding,
+          ),
+        ],
+      );
+    });
   }
 }
-

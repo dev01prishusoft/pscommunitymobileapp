@@ -16,6 +16,7 @@ class DynamicAdListView extends StatelessWidget {
   final int itemCount;
   final NullableIndexedWidgetBuilder itemBuilder;
   final Widget Function(BuildContext, int)? separatorBuilder;
+  final String? route;
   final int? adInterval;
   final String? placementCode;
   final ScrollPhysics? physics;
@@ -31,6 +32,7 @@ class DynamicAdListView extends StatelessWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.separatorBuilder,
+    this.route,
     this.adInterval,
     this.placementCode,
     this.physics,
@@ -63,6 +65,7 @@ class DynamicAdListView extends StatelessWidget {
 
         return DynamicAdSeparator(
           index: index,
+          route: route,
           interval: adInterval,
           placementCode: placementCode,
           regularSeparator: regularSeparator,

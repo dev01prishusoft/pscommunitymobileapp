@@ -13,6 +13,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/notification/controllers/notification_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/notification_card.dart';
 
@@ -182,11 +183,17 @@ class NotificationsPage extends GetView<NotificationController> {
                 }
                 return false;
               },
-              child: ListView.builder(
+              child: ListView.separated(
                 padding: EdgeInsets.fromLTRB(0.w, 10.h, 0.w, 50.h),
                 itemCount:
                     controller.notifications.length +
                     (controller.isLoadingMore.value ? 1 : 0),
+                separatorBuilder: (context, index) {
+                  return DynamicAdSeparator(
+                    route: AppRouter.notifications,
+                    index: index,
+                  );
+                },
                 itemBuilder: (context, index) {
                   if (index == controller.notifications.length) {
                     return const Padding(
