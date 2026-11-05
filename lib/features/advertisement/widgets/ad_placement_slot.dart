@@ -31,7 +31,7 @@ class AdPlacementSlot extends StatefulWidget {
         );
 
   String get effectivePlacementCode =>
-      placementCode ?? placement?.code ?? 'other';
+      (placementCode ?? placement?.code ?? 'other').trim().toLowerCase();
 
   AdPlacement get effectivePlacement =>
       placement ?? AdPlacement.fromCode(effectivePlacementCode);
@@ -89,6 +89,10 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null && Get.isRegistered<AdvertisementController>()) {
+      _controller = Get.find<AdvertisementController>();
+      _fetchAds();
+    }
     if (_controller == null) {
       return const SizedBox.shrink();
     }

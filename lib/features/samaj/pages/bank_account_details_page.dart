@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -17,7 +19,8 @@ class BankAccountDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final SamajBankDetais bank = Get.arguments as SamajBankDetais;
 
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.bankAccountDetails,
       appBar: AppBar(title: Text(LK.bankAccountDetails.tr)),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

@@ -61,43 +61,71 @@ class AdScreenConfigService extends GetxService {
     try {
       final response = await client.get(ApiEndpoints.advertisementScreenConfig);
       if (response.statusCode == 200 && response.data != null) {
-        final data = response.data;
-        printInfo(info: jsonEncode(data));
-        if (data is Map<String, dynamic> && data['succeeded'] == true) {
-          final rawData = data['data'];
-          if (rawData is Map<String, dynamic>) {
-            final parsed = AdGlobalConfig.fromJson(rawData);
-            config.value = parsed;
-            // Persist to storage for offline/instant startup
-            try {
-              final storage = _storageService ??
-                  (Get.isRegistered<SecureStorageService>()
-                      ? Get.find<SecureStorageService>()
-                      : null);
-              if (storage != null) {
-                await storage.write(_storageKey, jsonEncode(parsed.toJson()));
-              }
-            } catch (_) {}
+        dynamic data = response.data;
+        printInfo(info: 'AdScreenConfig fetched raw: ${jsonEncode(data)}');
+
+        // Unpack nested response if wrapped in data or result
+        if (data is Map<String, dynamic>) {
+          if (data['data'] != null) {
+            data = data['data'];
+          } else if (data['result'] != null) {
+            data = data['result'];
           }
+        }
+
+        AdGlobalConfig? parsed;
+        if (data is Map<String, dynamic>) {
+          parsed = AdGlobalConfig.fromJson(data);
+        } else if (data is List) {
+          parsed = AdGlobalConfig.fromList(data);
+        }
+
+        if (parsed != null) {
+          config.value = parsed;
+          printInfo(
+            info:
+                'AdScreenConfig loaded successfully with ${parsed.screens.length} screens: ${parsed.screens.keys.toList()}',
+          );
+
+          // Persist to storage for offline/instant startup
+          try {
+            final storage = _storageService ??
+                (Get.isRegistered<SecureStorageService>()
+                    ? Get.find<SecureStorageService>()
+                    : null);
+            if (storage != null) {
+              await storage.write(_storageKey, jsonEncode(parsed.toJson()));
+            }
+          } catch (_) {}
         }
       }
     } catch (e, stack) {
-      // Backend may not have implemented the endpoint yet; non-fatal fallback
       CrashReporter.recordError(
         e,
         stack,
         reason:
-            'AdScreenConfigService.fetchScreenConfig failed (using cached/default config)',
+            'AdScreenConfigService.fetchScreenConfig failed (using cached config)',
       );
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Normalizes route string to ensure leading slash, no trailing slashes, and lowercase.
+  /// Normalizes route string to ensure leading slash, no trailing slashes, no query/fragments, and lowercase.
   static String normalizeRoute(String? route) {
     if (route == null || route.trim().isEmpty) return '';
     var cleaned = route.trim().toLowerCase();
+
+    // Strip query parameters (?key=value)
+    if (cleaned.contains('?')) {
+      cleaned = cleaned.substring(0, cleaned.indexOf('?'));
+    }
+    // Strip URL fragments (#anchor)
+    if (cleaned.contains('#')) {
+      cleaned = cleaned.substring(0, cleaned.indexOf('#'));
+    }
+
+    cleaned = cleaned.trim();
     if (!cleaned.startsWith('/')) {
       cleaned = '/$cleaned';
     }
@@ -107,11 +135,32 @@ class AdScreenConfigService extends GetxService {
     return cleaned;
   }
 
-  /// Retrieves screen configuration for a given route.
+  /// Retrieves screen configuration for a given route with smart fallback matching.
   AdScreenConfig? getConfigForRoute(String? route) {
     final normalized = normalizeRoute(route);
     if (normalized.isEmpty) return null;
-    return config.value.screens[normalized];
+
+    // 1. Direct match (e.g. '/events')
+    final direct = config.value.screens[normalized];
+    if (direct != null) return direct;
+
+    // 2. Bare route match without leading slash (e.g. 'events')
+    final bare =
+        normalized.startsWith('/') ? normalized.substring(1) : normalized;
+    final bareMatch = config.value.screens[bare];
+    if (bareMatch != null) return bareMatch;
+
+    // 3. Prefix/parent matching (e.g. '/events/123' -> matches '/events' config)
+    for (final entry in config.value.screens.entries) {
+      final pattern = entry.key;
+      if (pattern.isNotEmpty &&
+          pattern != '/' &&
+          normalized.startsWith('$pattern/')) {
+        return entry.value;
+      }
+    }
+
+    return null;
   }
 
   /// True if a top banner should be displayed on this screen route.

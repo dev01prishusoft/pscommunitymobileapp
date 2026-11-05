@@ -11,6 +11,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
 
 class CommitteeDetailsPage extends StatefulWidget {
@@ -35,7 +36,8 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.committeeDetails,
         appBar: AppBar(title: Text(node.name)),
         body: Obx(
           () => AppStateView(

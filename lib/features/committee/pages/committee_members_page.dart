@@ -18,6 +18,8 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_members_controller.dart';
 
 class CommitteeMembersPage extends StatefulWidget {
@@ -58,7 +60,8 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.committeeMembers,
       appBar: AppBar(
         title: _isSearchVisible
             ? CupertinoSearchbar(
@@ -174,7 +177,11 @@ class _CommitteeMembersPageState extends State<CommitteeMembersPage> {
               : ListView.separated(
                   itemCount: groups.length,
                   padding: AppSpacing.pagePadding,
-                  separatorBuilder: (context, index) => SizedBox(height: 10.h),
+                  separatorBuilder: (context, index) => DynamicAdSeparator(
+                    index: index,
+                    route: AppRouter.committeeMembers,
+                    regularSeparator: SizedBox(height: 10.h),
+                  ),
                   itemBuilder: (context, index) {
                     final role = groups.keys.elementAt(index);
                     final members = groups[role]!;

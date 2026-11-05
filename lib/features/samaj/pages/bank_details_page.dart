@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/network/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -29,7 +30,8 @@ class BankDetailsPage extends StatelessWidget {
         });
       },
       builder: (controller) {
-        return Scaffold(
+        return DynamicAdScaffold(
+          route: AppRouter.bankDetails,
           appBar: AppBar(title: Text(LK.samajInfo.tr)),
           body: Obx(() {
             if (controller.isLoading.value) {

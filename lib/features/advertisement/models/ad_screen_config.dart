@@ -1,3 +1,5 @@
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
+
 /// Represents banner ad settings (Top or Bottom) for a specific screen route.
 class AdBannerConfig {
   final bool enabled;
@@ -12,9 +14,22 @@ class AdBannerConfig {
     if (json is! Map<String, dynamic>) {
       return const AdBannerConfig(enabled: false);
     }
+
+    final rawEnabled = json['enabled'] ?? json['isEnabled'] ?? json['active'];
+    final isEnabled = rawEnabled == true ||
+        rawEnabled == 1 ||
+        rawEnabled?.toString().toLowerCase() == 'true' ||
+        rawEnabled?.toString() == '1';
+
+    final code = (json['placementCode'] ??
+            json['placement_code'] ??
+            json['placement'])
+        ?.toString()
+        .trim();
+
     return AdBannerConfig(
-      enabled: json['enabled'] == true,
-      placementCode: json['placementCode']?.toString().trim(),
+      enabled: isEnabled,
+      placementCode: (code == null || code.isEmpty) ? null : code,
     );
   }
 
@@ -40,7 +55,11 @@ class AdInListConfig {
     if (json is! Map<String, dynamic>) {
       return const AdInListConfig(enabled: false, interval: 0);
     }
-    final rawInterval = json['interval'];
+
+    final rawInterval = json['interval'] ??
+        json['adInterval'] ??
+        json['frequency'] ??
+        json['every'];
     int parsedInterval = defaultInterval;
     if (rawInterval is int && rawInterval > 0) {
       parsedInterval = rawInterval;
@@ -48,10 +67,22 @@ class AdInListConfig {
       parsedInterval = int.tryParse(rawInterval.toString()) ?? defaultInterval;
     }
 
+    final rawEnabled = json['enabled'] ?? json['isEnabled'] ?? json['active'];
+    final isEnabled = rawEnabled == true ||
+        rawEnabled == 1 ||
+        rawEnabled?.toString().toLowerCase() == 'true' ||
+        rawEnabled?.toString() == '1';
+
+    final code = (json['placementCode'] ??
+            json['placement_code'] ??
+            json['placement'])
+        ?.toString()
+        .trim();
+
     return AdInListConfig(
-      enabled: json['enabled'] == true,
+      enabled: isEnabled,
       interval: parsedInterval,
-      placementCode: json['placementCode']?.toString().trim(),
+      placementCode: (code == null || code.isEmpty) ? null : code,
     );
   }
 
@@ -81,16 +112,36 @@ class AdScreenConfig {
   factory AdScreenConfig.fromJson(
     Map<String, dynamic> json, [
     int defaultInterval = 4,
+    String? fallbackRoute,
   ]) {
-    final routeStr = (json['route']?.toString() ?? '').trim();
-    final screenNameStr = (json['screenName']?.toString() ?? routeStr).trim();
+    final routeStr = (json['route'] ??
+            json['path'] ??
+            json['screenRoute'] ??
+            json['screen_route'] ??
+            fallbackRoute ??
+            '')
+        .toString()
+        .trim();
+    final normalizedRoute = AdScreenConfigService.normalizeRoute(routeStr);
+    final screenNameStr = (json['screenName'] ??
+            json['screen_name'] ??
+            json['name'] ??
+            normalizedRoute)
+        .toString()
+        .trim();
+
+    final topJson = json['topBanner'] ?? json['top_banner'] ?? json['top'];
+    final bottomJson =
+        json['bottomBanner'] ?? json['bottom_banner'] ?? json['bottom'];
+    final inListJson =
+        json['inList'] ?? json['in_list'] ?? json['inFeed'] ?? json['in_feed'];
 
     return AdScreenConfig(
-      route: routeStr.startsWith('/') ? routeStr : '/$routeStr',
-      screenName: screenNameStr,
-      topBanner: AdBannerConfig.fromJson(json['topBanner']),
-      bottomBanner: AdBannerConfig.fromJson(json['bottomBanner']),
-      inList: AdInListConfig.fromJson(json['inList'], defaultInterval),
+      route: normalizedRoute,
+      screenName: screenNameStr.isEmpty ? normalizedRoute : screenNameStr,
+      topBanner: AdBannerConfig.fromJson(topJson),
+      bottomBanner: AdBannerConfig.fromJson(bottomJson),
+      inList: AdInListConfig.fromJson(inListJson, defaultInterval),
     );
   }
 
@@ -103,7 +154,9 @@ class AdScreenConfig {
       };
 }
 
-/// Global advertisement configuration returned by the backend.
+/// Global advertisement configuration returned dynamically by the backend.
+/// Contains no static hardcoded screen dictionary — all screens are dynamically
+/// managed via API response.
 class AdGlobalConfig {
   final bool isGloballyEnabled;
   final int defaultInListInterval;
@@ -115,147 +168,17 @@ class AdGlobalConfig {
     required this.screens,
   });
 
-  /// Sensible default configuration when offline or backend API is not yet available.
+  /// Default configuration when offline or before backend API responds.
+  /// Fully dynamic: no static screens are hardcoded.
   factory AdGlobalConfig.defaults() {
-    return AdGlobalConfig(
+    return const AdGlobalConfig(
       isGloballyEnabled: true,
       defaultInListInterval: 4,
-      screens: {
-        '/home': const AdScreenConfig(
-          route: '/home',
-          screenName: 'Home Screen',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'home-top',
-          ),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'home-bottom',
-          ),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/library': const AdScreenConfig(
-          route: '/library',
-          screenName: 'Library Categories',
-          topBanner: AdBannerConfig(enabled: false),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'library-list',
-          ),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/library-items': const AdScreenConfig(
-          route: '/library-items',
-          screenName: 'Library Items',
-          topBanner: AdBannerConfig(enabled: false),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'library-detail',
-          ),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/events': const AdScreenConfig(
-          route: '/events',
-          screenName: 'Events',
-          topBanner: AdBannerConfig(enabled: false),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'event-list',
-          ),
-          inList: AdInListConfig(
-            enabled: true,
-            interval: 4,
-            placementCode: 'event-list',
-          ),
-        ),
-        '/event-details': const AdScreenConfig(
-          route: '/event-details',
-          screenName: 'Event Details',
-          topBanner: AdBannerConfig(enabled: false),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'event-detail',
-          ),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/find-member': const AdScreenConfig(
-          route: '/find-member',
-          screenName: 'Member Directory',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'member-directory',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/occupation-directory': const AdScreenConfig(
-          route: '/occupation-directory',
-          screenName: 'Occupation Directory',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'occupation-directory',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/marriage': const AdScreenConfig(
-          route: '/marriage',
-          screenName: 'Matrimonial Directory',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'matrimonial-directory',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(
-            enabled: true,
-            interval: 2,
-            placementCode: 'matrimonial-directory',
-          ),
-        ),
-        '/notifications': const AdScreenConfig(
-          route: '/notifications',
-          screenName: 'Notifications',
-          topBanner: AdBannerConfig(enabled: false),
-          bottomBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'notifications',
-          ),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/announcements': const AdScreenConfig(
-          route: '/announcements',
-          screenName: 'Announcements',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'announcements',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/advertisement-list': const AdScreenConfig(
-          route: '/advertisement-list',
-          screenName: 'Advertisement Directory',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'advertisement-list',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-        '/other': const AdScreenConfig(
-          route: '/other',
-          screenName: 'General / Other',
-          topBanner: AdBannerConfig(
-            enabled: true,
-            placementCode: 'other',
-          ),
-          bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
-        ),
-      },
+      screens: {},
     );
   }
 
+  /// Empty defaults.
   factory AdGlobalConfig.emptyDefaults() {
     return const AdGlobalConfig(
       isGloballyEnabled: true,
@@ -264,14 +187,28 @@ class AdGlobalConfig {
     );
   }
 
+  /// Dynamically parses backend API response in either List or Map format.
   factory AdGlobalConfig.fromJson(Map<String, dynamic> json) {
-    final isGloballyEnabled = json['isGloballyEnabled'] != false;
-    final defaultInterval = (json['defaultInListInterval'] is int)
-        ? json['defaultInListInterval'] as int
-        : (int.tryParse(json['defaultInListInterval']?.toString() ?? '') ?? 4);
+    final rawGloballyEnabled = json['isGloballyEnabled'] ??
+        json['is_globally_enabled'] ??
+        json['enabled'];
+    final isGloballyEnabled = rawGloballyEnabled == null ||
+        rawGloballyEnabled == true ||
+        rawGloballyEnabled == 1 ||
+        rawGloballyEnabled?.toString().toLowerCase() == 'true' ||
+        rawGloballyEnabled?.toString() == '1';
+
+    final rawInterval = json['defaultInListInterval'] ??
+        json['default_in_list_interval'] ??
+        json['interval'];
+    final defaultInterval = (rawInterval is int)
+        ? rawInterval
+        : (int.tryParse(rawInterval?.toString() ?? '') ?? 4);
 
     final screensMap = <String, AdScreenConfig>{};
-    final rawScreens = json['screens'];
+    final rawScreens =
+        json['screens'] ?? json['screenConfigs'] ?? json['routes'];
+
     if (rawScreens is List) {
       for (final item in rawScreens) {
         if (item is Map<String, dynamic>) {
@@ -280,9 +217,20 @@ class AdGlobalConfig {
             if (config.route.isNotEmpty) {
               screensMap[config.route.toLowerCase()] = config;
             }
-          } catch (_) {
-            // Skip invalid screen config item
-          }
+          } catch (_) {}
+        }
+      }
+    } else if (rawScreens is Map) {
+      for (final entry in rawScreens.entries) {
+        final key = entry.key?.toString() ?? '';
+        final val = entry.value;
+        if (val is Map<String, dynamic>) {
+          try {
+            final config = AdScreenConfig.fromJson(val, defaultInterval, key);
+            if (config.route.isNotEmpty) {
+              screensMap[config.route.toLowerCase()] = config;
+            }
+          } catch (_) {}
         }
       }
     }
@@ -294,10 +242,29 @@ class AdGlobalConfig {
     );
   }
 
+  /// Dynamically parses a list of screen configurations from backend.
+  factory AdGlobalConfig.fromList(List<dynamic> list, [int defaultInterval = 4]) {
+    final screensMap = <String, AdScreenConfig>{};
+    for (final item in list) {
+      if (item is Map<String, dynamic>) {
+        try {
+          final config = AdScreenConfig.fromJson(item, defaultInterval);
+          if (config.route.isNotEmpty) {
+            screensMap[config.route.toLowerCase()] = config;
+          }
+        } catch (_) {}
+      }
+    }
+    return AdGlobalConfig(
+      isGloballyEnabled: true,
+      defaultInListInterval: defaultInterval,
+      screens: screensMap,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'isGloballyEnabled': isGloballyEnabled,
         'defaultInListInterval': defaultInListInterval,
         'screens': screens.values.map((s) => s.toJson()).toList(),
       };
 }
-

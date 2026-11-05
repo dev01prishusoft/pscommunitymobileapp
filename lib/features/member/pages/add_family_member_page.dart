@@ -21,6 +21,8 @@ import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/profile_update_status_badge.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/add_family_member_controller.dart';
 
@@ -204,7 +206,8 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
     return SafeArea(
       top: false,
       bottom: true,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.addFamilyMember,
         appBar: AppBar(
           title: Text(
             _isEditMode ? LK.editFamilyMember.tr : LK.addFamilyMember.tr,

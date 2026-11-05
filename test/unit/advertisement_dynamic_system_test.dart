@@ -61,29 +61,48 @@ void main() {
       expect(eventConfig.inList.enabled, false);
     });
 
-    test('AdGlobalConfig.defaults returns clean fallback state with default screens', () {
+    test('AdGlobalConfig.defaults returns clean fallback state without static screens', () {
       final defaults = AdGlobalConfig.defaults();
       expect(defaults.isGloballyEnabled, true);
       expect(defaults.defaultInListInterval, 4);
-      expect(defaults.screens.containsKey('/home'), true);
-      expect(defaults.screens['/home']?.topBanner.enabled, true);
-      expect(defaults.screens['/home']?.bottomBanner.enabled, true);
-      expect(defaults.screens.containsKey('/library'), true);
-      expect(defaults.screens['/library']?.bottomBanner.enabled, true);
-      expect(defaults.screens.containsKey('/events'), true);
-      expect(defaults.screens['/events']?.bottomBanner.enabled, true);
-      expect(defaults.screens.containsKey('/find-member'), true);
-      expect(defaults.screens['/find-member']?.topBanner.enabled, true);
-      expect(defaults.screens.containsKey('/announcements'), true);
-      expect(defaults.screens.containsKey('/advertisement-list'), true);
-      expect(defaults.screens.containsKey('/other'), true);
+      expect(defaults.screens.isEmpty, true);
     });
 
-    test('AdGlobalConfig.emptyDefaults returns empty state', () {
-      final defaults = AdGlobalConfig.emptyDefaults();
-      expect(defaults.isGloballyEnabled, true);
-      expect(defaults.defaultInListInterval, 4);
-      expect(defaults.screens.isEmpty, true);
+    test('AdPlacement.fromCode handles dynamic placement codes without collapsing to other', () {
+      final custom1 = AdPlacement.fromCode('xyz');
+      expect(custom1.code, 'xyz');
+      expect(custom1 == AdPlacement.other, false);
+
+      final custom2 = AdPlacement.fromCode('committee-infeed');
+      expect(custom2.code, 'committee-infeed');
+
+      final wellKnown = AdPlacement.fromCode('home-top');
+      expect(wellKnown, AdPlacement.homeTop);
+      expect(wellKnown.code, 'home-top');
+
+      final fallback = AdPlacement.fromCode(null);
+      expect(fallback, AdPlacement.other);
+    });
+
+    test('AdGlobalConfig.fromJson parses both List and Map screen configurations', () {
+      // Map format
+      final mapJson = {
+        'isGloballyEnabled': true,
+        'defaultInListInterval': 2,
+        'screens': {
+          '/custom-route': {
+            'topBanner': {'enabled': true, 'placementCode': 'custom-top'},
+            'bottomBanner': {'enabled': false},
+            'inList': {'enabled': true, 'interval': 3, 'placementCode': 'custom-feed'},
+          }
+        }
+      };
+      final parsedMap = AdGlobalConfig.fromJson(mapJson);
+      expect(parsedMap.screens.containsKey('/custom-route'), true);
+      expect(parsedMap.screens['/custom-route']?.topBanner.enabled, true);
+      expect(parsedMap.screens['/custom-route']?.topBanner.placementCode, 'custom-top');
+      expect(parsedMap.screens['/custom-route']?.inList.interval, 3);
+      expect(parsedMap.screens['/custom-route']?.inList.placementCode, 'custom-feed');
     });
   });
 

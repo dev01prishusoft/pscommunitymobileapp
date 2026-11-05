@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
@@ -47,7 +48,8 @@ class _FromPageCommitteeState extends State<FromPageCommittee> {
     return SafeArea(
       top: false,
       bottom: true,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.frompageCommittee,
         appBar: AppBar(title: Text(LK.memberDetails.tr)),
         body: Obx(
           () => AppStateView(

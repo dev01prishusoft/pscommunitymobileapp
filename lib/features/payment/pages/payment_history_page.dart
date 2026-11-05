@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -56,7 +58,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.paymentHistory,
       appBar: AppBar(
         title: Obx(() {
           if (controller.isSearchVisible.value) {
@@ -121,12 +124,17 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 }
                 return false;
               },
-              child: ListView.builder(
+              child: ListView.separated(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: AppSpacing.pagePadding,
                 itemCount:
                     controller.payments.length +
                     (controller.isLoadingMore.value ? 1 : 0),
+                separatorBuilder: (context, index) => DynamicAdSeparator(
+                  index: index,
+                  route: AppRouter.paymentHistory,
+                  regularSeparator: SizedBox(height: 12.h),
+                ),
                 itemBuilder: (context, index) {
                   if (index == controller.payments.length) {
                     return const Padding(

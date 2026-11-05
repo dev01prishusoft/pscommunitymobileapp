@@ -12,6 +12,8 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/models/samaj_sanstha.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_sanstha_controller.dart';
@@ -28,7 +30,8 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.samajSansthas,
       appBar: AppBar(title: Text(LK.samajSansthas.tr)),
       body: PaginatedListView<SamajSanstha, SamajSansthaController>(
         headerWidget: _buildHeader(_controller),

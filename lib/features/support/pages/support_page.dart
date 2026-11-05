@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -22,7 +23,8 @@ class SupportPage extends StatelessWidget {
       },
       builder: (controller) {
         final support = controller.supportData.value;
-        return Scaffold(
+        return DynamicAdScaffold(
+          route: AppRouter.customerSupport,
           appBar: AppBar(title: Text(LK.support.tr)),
           body: controller.isLoading.value
               ? const Center(child: CircularProgressIndicator())
