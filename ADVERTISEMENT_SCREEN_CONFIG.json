@@ -68,9 +68,9 @@
           "placementCode": null
         },
         "inList": {
-          "enabled": false,
-          "interval": 0,
-          "placementCode": null
+          "enabled": true,
+          "interval": 2,
+          "placementCode": "matrimonial-directory"
         }
       },
       {

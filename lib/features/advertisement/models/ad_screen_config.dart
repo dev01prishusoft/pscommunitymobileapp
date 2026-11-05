@@ -206,7 +206,11 @@ class AdGlobalConfig {
             placementCode: 'matrimonial-directory',
           ),
           bottomBanner: AdBannerConfig(enabled: false),
-          inList: AdInListConfig(enabled: false, interval: 0),
+          inList: AdInListConfig(
+            enabled: true,
+            interval: 2,
+            placementCode: 'matrimonial-directory',
+          ),
         ),
         '/notifications': const AdScreenConfig(
           route: '/notifications',

@@ -17,6 +17,9 @@ import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/controllers/marriage_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_widget.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
@@ -43,6 +46,7 @@ class MarriagePage extends GetView<MarriageController> {
   Widget build(BuildContext context) {
     return DynamicAdScaffold(
       route: AppRouter.marriage,
+      disableTopAd: true,
       appBar: AppBar(
         title: Obx(() {
           if (controller.isSearchVisible.value) {
@@ -101,6 +105,21 @@ class MarriagePage extends GetView<MarriageController> {
                 return const SliverToBoxAdapter(child: SizedBox.shrink());
               }
             }),
+            // Matrimonial Dynamic Advertisement Banner (scrolls naturally below filters)
+            SliverToBoxAdapter(
+              child: Obx(() {
+                if (AdScreenConfigService.to.shouldShowTopBanner('/marriage')) {
+                  final placementCode = AdScreenConfigService.to
+                      .getTopPlacementCode('/marriage');
+                  return SmartAdWidget(
+                    placementCode: placementCode,
+                    layout: AdLayout.card,
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ),
             Obx(() {
               if (controller.state.value == AppState.data) {
                 return SliverList(
@@ -134,6 +153,7 @@ class MarriagePage extends GetView<MarriageController> {
                           card,
                           DynamicAdSeparator(
                             route: AppRouter.marriage,
+                            placementCode: 'matrimonial-directory',
                             index: index,
                             padding: EdgeInsets.symmetric(vertical: 8.h),
                           ),
@@ -909,7 +929,7 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
                       child: Text(
-                        LK.applyFilters.tr + "nik",
+                        LK.applyFilters.tr,
                         style: AppTextStyles.labelLarge.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.white,
