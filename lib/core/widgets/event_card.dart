@@ -6,7 +6,7 @@ import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
-import 'package:pscommunitymobileapp/features/events/pages/event_details_page.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 
@@ -101,7 +101,10 @@ class EventCard extends StatelessWidget {
                   ),
                 );
               } else {
-                await Get.to(() => EventDetailsPage(eventId: event.eventId!));
+                await Get.toNamed(
+                  AppRouter.eventDetails,
+                  arguments: event.eventId!,
+                );
               }
               if (Get.isRegistered<EventsController>()) {
                 Get.find<EventsController>().refreshEventsSilently();

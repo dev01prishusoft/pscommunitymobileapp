@@ -12,10 +12,7 @@ import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import 'package:pscommunitymobileapp/core/models/occupation_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 import 'package:pscommunitymobileapp/features/occupation/controllers/occupation_controller.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
 
 class OccupationDirectoryPage extends StatefulWidget {
   const OccupationDirectoryPage({super.key});
@@ -114,11 +111,6 @@ class _OccupationDirectoryPageState extends State<OccupationDirectoryPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AdPlacementSlot(
-            placement: AdPlacement.occupationDirectory,
-            layout: AdLayout.card,
-            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 4.h),
-          ),
           Obx(() {
             if (_controller.selectedCategories.isEmpty) {
               return const SizedBox.shrink();

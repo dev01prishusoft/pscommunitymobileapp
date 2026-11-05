@@ -32,6 +32,11 @@ class DynamicAdScreenWrapper extends StatelessWidget {
       return child;
     }
 
+    // Avoid duplicate wrappers if nested
+    if (context.findAncestorWidgetOfExactType<DynamicAdScreenWrapper>() != null) {
+      return child;
+    }
+
     // List of system or full-screen routes that should never show automatic screen banners
     final cleanRoute = AdScreenConfigService.normalizeRoute(route);
     const excludedRoutes = {

@@ -66,6 +66,10 @@ void main() {
       expect(defaults.defaultInListInterval, 4);
       expect(defaults.screens.containsKey('/library'), true);
       expect(defaults.screens['/library']?.bottomBanner.enabled, true);
+      expect(defaults.screens.containsKey('/events'), true);
+      expect(defaults.screens['/events']?.bottomBanner.enabled, true);
+      expect(defaults.screens.containsKey('/find-member'), true);
+      expect(defaults.screens['/find-member']?.topBanner.enabled, true);
     });
 
     test('AdGlobalConfig.emptyDefaults returns empty state', () {

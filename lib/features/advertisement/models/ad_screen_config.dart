@@ -141,6 +141,70 @@ class AdGlobalConfig {
           ),
           inList: AdInListConfig(enabled: false, interval: 0),
         ),
+        '/events': const AdScreenConfig(
+          route: '/events',
+          screenName: 'Events',
+          topBanner: AdBannerConfig(enabled: false),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'event-list',
+          ),
+          inList: AdInListConfig(
+            enabled: true,
+            interval: 4,
+            placementCode: 'event-list',
+          ),
+        ),
+        '/event-details': const AdScreenConfig(
+          route: '/event-details',
+          screenName: 'Event Details',
+          topBanner: AdBannerConfig(enabled: false),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'event-detail',
+          ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/find-member': const AdScreenConfig(
+          route: '/find-member',
+          screenName: 'Member Directory',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'member-directory',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/occupation-directory': const AdScreenConfig(
+          route: '/occupation-directory',
+          screenName: 'Occupation Directory',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'occupation-directory',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/marriage': const AdScreenConfig(
+          route: '/marriage',
+          screenName: 'Matrimonial Directory',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'matrimonial-directory',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/notifications': const AdScreenConfig(
+          route: '/notifications',
+          screenName: 'Notifications',
+          topBanner: AdBannerConfig(enabled: false),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'notifications',
+          ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
       },
     );
   }
