@@ -1254,7 +1254,7 @@ class _NotificationMenu extends GetView<HomeController> {
           children: [
             Icon(
               Iconsax.notification_bing_copy,
-              color: const Color(0xFF1E293B),
+              color: AppColors.primary,
               size: 23.sp,
             ),
             if (count > 0) ...[
@@ -1263,8 +1263,8 @@ class _NotificationMenu extends GetView<HomeController> {
                 top: -2,
                 child: Container(
                   padding: EdgeInsets.all(count > 9 ? 2.5.r : 3.5.r),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
                   constraints: BoxConstraints(minWidth: 14.r, minHeight: 14.r),
