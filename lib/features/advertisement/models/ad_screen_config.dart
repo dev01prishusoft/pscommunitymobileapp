@@ -121,6 +121,19 @@ class AdGlobalConfig {
       isGloballyEnabled: true,
       defaultInListInterval: 4,
       screens: {
+        '/home': const AdScreenConfig(
+          route: '/home',
+          screenName: 'Home Screen',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'home-top',
+          ),
+          bottomBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'home-bottom',
+          ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
         '/library': const AdScreenConfig(
           route: '/library',
           screenName: 'Library Categories',
@@ -203,6 +216,36 @@ class AdGlobalConfig {
             enabled: true,
             placementCode: 'notifications',
           ),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/announcements': const AdScreenConfig(
+          route: '/announcements',
+          screenName: 'Announcements',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'announcements',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/advertisement-list': const AdScreenConfig(
+          route: '/advertisement-list',
+          screenName: 'Advertisement Directory',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'advertisement-list',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
+          inList: AdInListConfig(enabled: false, interval: 0),
+        ),
+        '/other': const AdScreenConfig(
+          route: '/other',
+          screenName: 'General / Other',
+          topBanner: AdBannerConfig(
+            enabled: true,
+            placementCode: 'other',
+          ),
+          bottomBanner: AdBannerConfig(enabled: false),
           inList: AdInListConfig(enabled: false, interval: 0),
         ),
       },
