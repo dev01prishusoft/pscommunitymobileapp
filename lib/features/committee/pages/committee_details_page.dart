@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/models/committee_detail.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
 
 class CommitteeDetailsPage extends StatefulWidget {
@@ -139,10 +140,15 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
             _buildSection(
               title: '${LK.roles.tr} (${detail.roles.length})',
               icon: Icons.verified_user_rounded,
-              child: ListView.builder(
+              child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: detail.roles.length,
+                separatorBuilder: (context, index) => DynamicAdSeparator(
+                  route: AppRouter.committeeDetails,
+                  index: index,
+                  regularSeparator: SizedBox(height: 6.h),
+                ),
                 itemBuilder: (context, index) {
                   final role = detail.roles[index];
                   return GestureDetector(

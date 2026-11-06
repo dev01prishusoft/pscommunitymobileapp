@@ -90,9 +90,11 @@ class AdvertisementController extends GetxController
     final adsList = getAdsByCode(cleanCode);
     final loading = getLoadingByCode(cleanCode);
 
-    if (adsList.isEmpty) {
-      loading.value = true;
-    }
+    if (loading.value && !forceRefresh) return;
+    if (adsList.isNotEmpty && !forceRefresh) return;
+
+    // Always mark loading when actually proceeding with a fetch
+    loading.value = true;
 
     try {
       final isConnected = await _connectivity.hasConnection();

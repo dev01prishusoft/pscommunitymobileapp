@@ -140,7 +140,6 @@ class MarriagePage extends GetView<MarriageController> {
                   separatorBuilder: (context, index) {
                     return DynamicAdSeparator(
                       route: AppRouter.marriage,
-                      placementCode: 'matrimonial-directory',
                       index: index,
                       regularSeparator: SizedBox(height: 6.h),
                     );

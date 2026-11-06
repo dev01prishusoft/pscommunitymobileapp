@@ -243,7 +243,11 @@ class AdGlobalConfig {
   }
 
   /// Dynamically parses a list of screen configurations from backend.
-  factory AdGlobalConfig.fromList(List<dynamic> list, [int defaultInterval = 4]) {
+  factory AdGlobalConfig.fromList(
+    List<dynamic> list, [
+    int defaultInterval = 4,
+    bool isGloballyEnabled = true,
+  ]) {
     final screensMap = <String, AdScreenConfig>{};
     for (final item in list) {
       if (item is Map<String, dynamic>) {
@@ -256,7 +260,7 @@ class AdGlobalConfig {
       }
     }
     return AdGlobalConfig(
-      isGloballyEnabled: true,
+      isGloballyEnabled: isGloballyEnabled,
       defaultInListInterval: defaultInterval,
       screens: screensMap,
     );

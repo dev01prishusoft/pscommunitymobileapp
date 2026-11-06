@@ -185,14 +185,12 @@ class DI {
         await adScreenConfigService.init();
         Get.put(adScreenConfigService, permanent: true);
 
-        Get.lazyPut(
-          () => AdvertisementController(
-            repository: advertisementRepository,
-            trackingService: advertisementTrackingService,
-            connectivity: connectivity,
-          ),
-          fenix: true,
+        final advertisementController = AdvertisementController(
+          repository: advertisementRepository,
+          trackingService: advertisementTrackingService,
+          connectivity: connectivity,
         );
+        Get.put(advertisementController, permanent: true);
 
         Get.lazyPut(
           () => AdvertisementListController(advertisementRepository),

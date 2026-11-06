@@ -8,6 +8,7 @@ import 'package:pscommunitymobileapp/core/widgets/library_category_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_search_bar.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 
 class LibraryCategoriesPage extends StatelessWidget {
@@ -51,13 +52,18 @@ class LibraryCategoriesPage extends StatelessWidget {
                   onRetry: () => controller.loadCategories(isRefresh: true),
                   emptyIcon: Icons.folder_off_rounded,
                   emptyMessage: LK.library_no_categories_found.tr,
-                  child: ListView.builder(
+                  child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
                       vertical: 6.h,
                     ),
                     itemCount: controller.categories.length,
+                    separatorBuilder: (context, index) => DynamicAdSeparator(
+                      route: AppRouter.libraryCategories,
+                      index: index,
+                      regularSeparator: SizedBox(height: 6.h),
+                    ),
                     itemBuilder: (context, index) {
                       final category = controller.categories[index];
                       return LibraryCategoryCard(

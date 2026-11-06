@@ -19,6 +19,8 @@ class DynamicAdSeparator extends StatelessWidget {
   final int index;
   final String? route;
   final int? interval;
+  final int? adIndex;
+  final bool repeat;
   final String? placementCode;
   final Widget? regularSeparator;
   final EdgeInsetsGeometry? padding;
@@ -30,6 +32,8 @@ class DynamicAdSeparator extends StatelessWidget {
     required this.index,
     this.route,
     this.interval,
+    this.adIndex,
+    this.repeat = false,
     this.placementCode,
     this.regularSeparator,
     this.padding,
@@ -39,45 +43,38 @@ class DynamicAdSeparator extends StatelessWidget {
 
   /// Determines whether an in-list advertisement should be injected at [index].
   ///
-  /// For larger intervals (>= 5), uses standard modulo interval spacing.
-  /// For smaller intervals (< 5, e.g. 2 or 3), avoids overwhelming the user by
-  /// showing the 1st ad at (interval - 1) and spacing subsequent ads with a
-  /// comfortable progressive gap of 5+ items.
-  static bool shouldShowAdAt(int index, int interval) {
+  /// By default ([repeat] = false), the ad is shown ONLY ONCE at the specified index/slot
+  /// (e.g. interval: 4 -> index 3, after 4 items; or exact [adIndex] if given)
+  /// instead of repeating indefinitely across the entire list.
+  static bool shouldShowAdAt(
+    int index,
+    int interval, {
+    int? adIndex,
+    bool repeat = false,
+  }) {
+    if (adIndex != null) {
+      return index == adIndex;
+    }
     if (interval <= 0) return false;
-    if (interval >= 5) {
+    if (repeat) {
       return (index + 1) % interval == 0;
     }
-
-    int currentAdIndex = interval - 1;
-    const int gap = 5;
-    int step = 0;
-    while (currentAdIndex <= index) {
-      if (currentAdIndex == index) return true;
-      currentAdIndex += gap + (step ~/ 2);
-      step++;
-    }
-    return false;
+    // Single placement at the configured position
+    return (index + 1) == interval;
   }
 
   /// Calculates the 0-based ad slot sequence number at [index].
-  static int getAdSlotIndex(int index, int interval) {
+  static int getAdSlotIndex(
+    int index,
+    int interval, {
+    int? adIndex,
+    bool repeat = false,
+  }) {
+    if (adIndex != null || !repeat) {
+      return 0;
+    }
     if (interval <= 0) return 0;
-    if (interval >= 5) {
-      return (index + 1) ~/ interval - 1;
-    }
-
-    int currentAdIndex = interval - 1;
-    const int gap = 5;
-    int slot = 0;
-    int step = 0;
-    while (currentAdIndex <= index) {
-      if (currentAdIndex == index) return slot;
-      currentAdIndex += gap + (step ~/ 2);
-      slot++;
-      step++;
-    }
-    return slot;
+    return (index + 1) ~/ interval - 1;
   }
 
   @override
@@ -90,20 +87,28 @@ class DynamicAdSeparator extends StatelessWidget {
       final inListConfig =
           AdScreenConfigService.to.getInListConfig(effectiveRoute);
 
-      // If explicit interval is given, use it; otherwise check backend config
-      final isEnabled =
-          inListConfig?.enabled ?? (interval != null && interval! > 0);
+      // If explicit interval or adIndex is given, use it; otherwise check backend config
+      // NOTE: Parentheses around the ?? RHS are required to avoid operator-precedence
+      // misparse: `a ?? b || c` is `(a ?? b) || c`, NOT `a ?? (b || c)`.
+      final isEnabled = inListConfig?.enabled ??
+          ((interval != null && interval! > 0) ||
+              (adIndex != null && adIndex! >= 0));
       if (!isEnabled) {
         return regularSeparator ?? const SizedBox.shrink();
       }
 
       final effectiveInterval = interval ?? (inListConfig?.interval ?? 4);
-      if (effectiveInterval <= 0) {
+      if (adIndex == null && effectiveInterval <= 0) {
         return regularSeparator ?? const SizedBox.shrink();
       }
 
       // Check cadence
-      if (!shouldShowAdAt(index, effectiveInterval)) {
+      if (!shouldShowAdAt(
+        index,
+        effectiveInterval,
+        adIndex: adIndex,
+        repeat: repeat,
+      )) {
         return regularSeparator ?? const SizedBox.shrink();
       }
 
@@ -111,19 +116,37 @@ class DynamicAdSeparator extends StatelessWidget {
           inListConfig?.placementCode ??
           "${AdScreenConfigService.normalizeRoute(effectiveRoute).replaceAll('/', '')}-infeed";
 
-      // Check if advertisement permission is granted and ads exist before adding spacing
+      // Check if advertisement permission is granted
+      final hasPermission = !Get.isRegistered<ModulePermissionService>() ||
+          ModulePermissionService.to.isAccessible(AppModule.advertisement);
       final controller = Get.isRegistered<AdvertisementController>()
           ? Get.find<AdvertisementController>()
           : null;
-      final ads = controller?.getAdsByCode(code) ?? const [];
-      final hasPermission = !Get.isRegistered<ModulePermissionService>() ||
-          ModulePermissionService.to.isAccessible(AppModule.advertisement);
 
-      if (!hasPermission || ads.isEmpty) {
+      if (!hasPermission || controller == null) {
         return regularSeparator ?? const SizedBox.shrink();
       }
 
-      final adSlot = getAdSlotIndex(index, effectiveInterval);
+      final ads = controller.getAdsByCode(code);
+      final loading = controller.getLoadingByCode(code);
+
+      // If ads haven't been fetched yet and not currently loading, trigger background fetch
+      if (ads.isEmpty && !loading.value) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.fetchAdsByCode(code);
+        });
+      }
+
+      if (ads.isEmpty) {
+        return regularSeparator ?? const SizedBox.shrink();
+      }
+
+      final adSlot = getAdSlotIndex(
+        index,
+        effectiveInterval,
+        adIndex: adIndex,
+        repeat: repeat,
+      );
       final spacing = regularSeparator ?? SizedBox(height: 8.h);
 
       return Column(

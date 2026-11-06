@@ -101,6 +101,7 @@ class _FindMemberPageState extends State<FindMemberPage> {
           ],
         ),
         body: PaginatedListView<Member, FindMemberController>(
+          route: AppRouter.findMember,
           emptyMessage: LK.noMembersFound.tr,
           padding: AppSpacing.pagePadding,
           separatorBuilder: (val, val2) => SizedBox(height: 6.h),

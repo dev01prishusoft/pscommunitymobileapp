@@ -78,6 +78,7 @@ class _CommitteesPageState extends State<CommitteesPage> {
         children: [
           Expanded(
             child: PaginatedListView<CommitteeNode, CommitteeController>(
+              route: AppRouter.committees,
               itemBuilder: (context, index, node) => CommitteeCard(node: node),
               separatorBuilder: (context, index) => SizedBox(height: 12.h),
               padding: AppSpacing.pagePadding,

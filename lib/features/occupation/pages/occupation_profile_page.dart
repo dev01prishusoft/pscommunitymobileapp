@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -138,12 +139,17 @@ class _OccupationProfilePageState extends State<OccupationProfilePage> {
                 refresh: true,
               ),
               color: AppColors.primary,
-              child: ListView.builder(
+              child: ListView.separated(
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount:
                     controller.occupationMembers.length +
                     (controller.hasMoreMembers.value ? 1 : 0),
+                separatorBuilder: (context, index) => DynamicAdSeparator(
+                  route: AppRouter.occupationProfile,
+                  index: index,
+                  regularSeparator: SizedBox(height: 6.h),
+                ),
                 itemBuilder: (context, index) {
                   if (index == controller.occupationMembers.length) {
                     return const Center(

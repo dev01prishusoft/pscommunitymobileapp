@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
@@ -123,7 +124,11 @@ class SupportPage extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: support.members.length,
                           separatorBuilder: (context, index) =>
-                              SizedBox(height: 10.h),
+                              DynamicAdSeparator(
+                                route: AppRouter.customerSupport,
+                                index: index,
+                                regularSeparator: SizedBox(height: 10.h),
+                              ),
                           itemBuilder: (context, index) {
                             final member = support.members[index];
                             return Container(

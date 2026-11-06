@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/advertisement_controller.dart';
 import '../services/ad_screen_config_service.dart';
 import 'advertisement_card.dart';
 import 'smart_ad_widget.dart';
 
 /// A body wrapper that injects Top and/or Bottom advertisement banners
 /// INSIDE the Scaffold body (below AppBar, above bottomNavigationBar).
-class DynamicAdBody extends StatelessWidget {
+class DynamicAdBody extends StatefulWidget {
   final Widget child;
   final String? route;
   final bool disableTopAd;
@@ -21,28 +22,77 @@ class DynamicAdBody extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final cleanRoute = AdScreenConfigService.normalizeRoute(
-      route ?? ModalRoute.of(context)?.settings.name ?? Get.currentRoute,
-    );
+  State<DynamicAdBody> createState() => _DynamicAdBodyState();
+}
 
-    if (cleanRoute.isEmpty) {
-      return child;
+class _DynamicAdBodyState extends State<DynamicAdBody> {
+  late final String _cleanRoute;
+  bool _prefetchTriggered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Compute the route once — it never changes for a given widget instance.
+    _cleanRoute = AdScreenConfigService.normalizeRoute(
+      widget.route ?? Get.currentRoute,
+    );
+    // Eagerly trigger infeed (in-list) ad pre-fetch exactly once per mount,
+    // outside of any reactive Obx builder to avoid repeated callbacks.
+    _scheduleInfeedPrefetch();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // On first dependency resolution we can safely read ModalRoute.
+    if (!_prefetchTriggered) {
+      final modalRouteName = ModalRoute.of(context)?.settings.name;
+      if (modalRouteName != null && _cleanRoute.isEmpty) {
+        // Re-compute with modal route name if initState had an empty route
+        final routeFromModal = AdScreenConfigService.normalizeRoute(modalRouteName);
+        _triggerInfeedPrefetch(routeFromModal);
+      }
+      _prefetchTriggered = true;
     }
+  }
+
+  void _scheduleInfeedPrefetch() {
+    if (_cleanRoute.isEmpty) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _triggerInfeedPrefetch(_cleanRoute);
+    });
+  }
+
+  void _triggerInfeedPrefetch(String routeKey) {
+    if (routeKey.isEmpty) return;
+    final service = AdScreenConfigService.to;
+    final inListConfig = service.getInListConfig(routeKey);
+    if (inListConfig != null && inListConfig.enabled) {
+      final inListCode = inListConfig.placementCode ??
+          '${routeKey.replaceAll('/', '')}-infeed';
+      if (Get.isRegistered<AdvertisementController>()) {
+        Get.find<AdvertisementController>().fetchAdsByCode(inListCode);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_cleanRoute.isEmpty) return widget.child;
 
     return Obx(() {
       final service = AdScreenConfigService.to;
-      final showTop = !disableTopAd && service.shouldShowTopBanner(cleanRoute);
+      final showTop = !widget.disableTopAd && service.shouldShowTopBanner(_cleanRoute);
       final showBottom =
-          !disableBottomAd && service.shouldShowBottomBanner(cleanRoute);
+          !widget.disableBottomAd && service.shouldShowBottomBanner(_cleanRoute);
 
       if (!showTop && !showBottom) {
-        return child;
+        return widget.child;
       }
 
       final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-      final topCode = service.getTopPlacementCode(cleanRoute);
-      final bottomCode = service.getBottomPlacementCode(cleanRoute);
+      final topCode = service.getTopPlacementCode(_cleanRoute);
+      final bottomCode = service.getBottomPlacementCode(_cleanRoute);
 
       return Column(
         children: [
@@ -51,7 +101,7 @@ class DynamicAdBody extends StatelessWidget {
               placementCode: topCode,
               layout: AdLayout.banner,
             ),
-          Expanded(child: child),
+          Expanded(child: widget.child),
           if (showBottom && !keyboardVisible)
             SmartAdWidget(
               placementCode: bottomCode,

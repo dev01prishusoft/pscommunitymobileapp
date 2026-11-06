@@ -18,6 +18,11 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
     this.padding = const EdgeInsets.all(16.0),
     this.onRetry,
     this.headerWidget,
+    this.route,
+    this.adIndex,
+    this.adInterval,
+    this.placementCode,
+    this.repeatAds = false,
   });
 
   final Widget Function(BuildContext, int, T) itemBuilder;
@@ -27,6 +32,11 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
   final EdgeInsetsGeometry padding;
   final VoidCallback? onRetry;
   final Widget? headerWidget;
+  final String? route;
+  final int? adIndex;
+  final int? adInterval;
+  final String? placementCode;
+  final bool repeatAds;
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +111,11 @@ class PaginatedListView<T, C extends PaginationMixin<T>> extends GetView<C> {
 
             return DynamicAdSeparator(
               index: regularIndex,
+              route: route,
+              adIndex: adIndex,
+              interval: adInterval,
+              placementCode: placementCode,
+              repeat: repeatAds,
               regularSeparator: regularSeparator,
             );
           },

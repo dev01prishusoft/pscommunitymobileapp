@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/network/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -80,7 +81,11 @@ class BankDetailsPage extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               padding: AppSpacing.pagePadding,
               itemCount: accounts.length + 1,
-              separatorBuilder: (context, index) => SizedBox(height: 16.h),
+              separatorBuilder: (context, index) => DynamicAdSeparator(
+                route: AppRouter.bankDetails,
+                index: index,
+                regularSeparator: SizedBox(height: 16.h),
+              ),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return Column(

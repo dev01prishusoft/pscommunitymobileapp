@@ -34,6 +34,7 @@ class _SamajSansthaPageState extends State<SamajSansthaPage> {
       route: AppRouter.samajSansthas,
       appBar: AppBar(title: Text(LK.samajSansthas.tr)),
       body: PaginatedListView<SamajSanstha, SamajSansthaController>(
+        route: AppRouter.samajSansthas,
         headerWidget: _buildHeader(_controller),
         padding: AppSpacing.pagePadding,
         emptyMessage: LK.noItemsFound.tr,

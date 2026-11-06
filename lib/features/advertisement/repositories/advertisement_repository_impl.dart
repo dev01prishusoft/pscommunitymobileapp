@@ -26,9 +26,14 @@ class AdvertisementRepositoryImpl implements AdvertisementRepository {
     String placementCode, {
     int? limit,
   }) async {
+    final cleanCode = placementCode.trim().toLowerCase();
+    if (cleanCode.isEmpty) {
+      return const Success<List<Advertisement>>([]);
+    }
+
     try {
       final response = await _apiClient.get(
-        ApiEndpoints.advertisementsByPlacement(placementCode, limit: limit),
+        ApiEndpoints.advertisementsByPlacement(cleanCode, limit: limit),
         queryParameters: null,
       );
 
@@ -55,13 +60,27 @@ class AdvertisementRepositoryImpl implements AdvertisementRepository {
         }
       }
 
-      // If notifications placement is empty, fallback to check announcements (or vice-versa)
-      if (ads.isEmpty &&
-          (placementCode == 'notifications' ||
-              placementCode == 'announcements')) {
-        final fallbackCode = placementCode == 'notifications'
-            ? 'announcements'
-            : 'notifications';
+      // If placement is empty, fallback to check well-known aliases
+      // (e.g. 'find-member' <-> 'member-directory', 'marriage' <-> 'matrimonial-directory')
+      const placementAliases = <String, String>{
+        'find-member': 'member-directory',
+        'member-directory': 'find-member',
+        'marriage': 'matrimonial-directory',
+        'matrimonial-directory': 'marriage',
+        'event-list': 'events',
+        'events': 'event-list',
+        'notifications': 'announcements',
+        'announcements': 'notifications',
+        'library-list': 'library',
+        'library': 'library-list',
+        'library-detail': 'library-items',
+        'library-items': 'library-detail',
+        'payment-history': 'payment',
+        'payment': 'payment-history',
+      };
+
+      if (ads.isEmpty && placementAliases.containsKey(cleanCode)) {
+        final fallbackCode = placementAliases[cleanCode]!;
         try {
           final fallbackResp = await _apiClient.get(
             ApiEndpoints.advertisementsByPlacement(fallbackCode, limit: limit),
