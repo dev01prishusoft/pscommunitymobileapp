@@ -849,6 +849,19 @@ class _AdvancedFiltersBottomSheet extends StatelessWidget {
                     ),
                     SizedBox(height: 16.h),
                     _buildFieldSection(
+                      label: LK.Native_Place.tr,
+                      icon: Iconsax.buildings_copy,
+                      child: _FilterDropdownField(
+                        hint: LK.Native_Place.tr,
+                        rxValue: controller.selectedNativePlace,
+                        rxItems: controller.nativePlaces,
+                        prependAll: true,
+                        itemStringifier: (e) => (e as dynamic).text as String,
+                        mapper: _translateFallback,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    _buildFieldSection(
                       label: LK.educationLabel.tr,
                       icon: Iconsax.teacher_copy,
                       child: _FilterDropdownField(

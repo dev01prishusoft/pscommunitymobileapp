@@ -20,15 +20,14 @@ class LibraryItemsPage extends StatelessWidget {
 
     return Obx(() {
       final category = controller.selectedCategory.value;
-      final categoryTitle = category?.name ?? LK.library_items_fallback_title.tr;
+      final categoryTitle =
+          category?.name ?? LK.library_items_fallback_title.tr;
       final items = controller.sortedItems;
 
       return DynamicAdScaffold(
         route: AppRouter.libraryItems,
         backgroundColor: AppColors.sfBackground,
-        appBar: AppBar(
-          title: Text(categoryTitle),
-        ),
+        appBar: AppBar(title: Text(categoryTitle)),
         body: RefreshIndicator(
           color: AppColors.primary,
           onRefresh: () => controller.loadCategoryItems(isRefresh: true),
@@ -63,11 +62,19 @@ class LibraryItemsPage extends StatelessWidget {
                       horizontal: 16.w,
                       vertical: 6.h,
                     ),
-                    itemCount: items.length +
+                    itemCount:
+                        items.length +
                         (controller.isNextPageLoading.value ||
                                 controller.hasPageError.value
                             ? 1
                             : 0),
+                    separatorBuilder: (context, index) {
+                      return DynamicAdSeparator(
+                        route: AppRouter.libraryItems,
+                        index: index,
+                        regularSeparator: SizedBox(height: 6.h),
+                      );
+                    },
                     itemBuilder: (context, index) {
                       if (index == items.length) {
                         if (controller.hasPageError.value) {
@@ -77,9 +84,7 @@ class LibraryItemsPage extends StatelessWidget {
                               child: TextButton.icon(
                                 onPressed: controller.loadNextPage,
                                 icon: const Icon(Icons.refresh_rounded),
-                                label: Text(
-                                  LK.library_failed_to_load_more.tr,
-                                ),
+                                label: Text(LK.library_failed_to_load_more.tr),
                               ),
                             ),
                           );
@@ -100,29 +105,10 @@ class LibraryItemsPage extends StatelessWidget {
                       }
 
                       final item = items[index];
-                      final itemCard = LibraryItemCard(
+                      return LibraryItemCard(
                         item: item,
                         onTap: () => controller.openItem(item),
                       );
-
-                      // In-feed advertisement placed inside the list (between items)
-                      final adTargetIndex = items.length >= 3
-                          ? 1
-                          : (items.length >= 2 ? 0 : 0);
-                      if (index == adTargetIndex) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            itemCard,
-                            AdPlacementSlot(
-                              placement: AdPlacement.libraryDetail,
-                              layout: AdLayout.card,
-                              padding: EdgeInsets.only(bottom: 12.h),
-                            ),
-                          ],
-                        );
-                      }
-                      return itemCard;
                     },
                   ),
                 ),

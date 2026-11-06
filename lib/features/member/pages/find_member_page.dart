@@ -376,6 +376,7 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
   DropdownItem? _tempState;
   DropdownItem? _tempDistrict;
   DropdownItem? _tempTaluka;
+  DropdownItem? _tempNativePlace;
 
   List<DropdownItem> _localDistricts = [];
   List<DropdownItem> _localTalukas = [];
@@ -389,6 +390,7 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
     _tempState = controller.selectedState.value;
     _tempDistrict = controller.selectedDistrict.value;
     _tempTaluka = controller.selectedTaluka.value;
+    _tempNativePlace = controller.selectedNativePlace.value;
 
     _localDistricts = List<DropdownItem>.from(controller.districts);
     _localTalukas = List<DropdownItem>.from(controller.talukas);
@@ -459,6 +461,7 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
       state: _tempState,
       district: _tempDistrict,
       taluka: _tempTaluka,
+      nativePlace: _tempNativePlace,
     );
     Get.back<void>();
   }
@@ -471,7 +474,8 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
   bool get _hasSelection =>
       _tempState != null ||
       _tempDistrict != null ||
-      _tempTaluka != null;
+      _tempTaluka != null ||
+      _tempNativePlace != null;
 
   @override
   Widget build(BuildContext context) {
@@ -608,6 +612,29 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
                 onChanged: _onTalukaChanged,
                 isEnabled: _tempDistrict != null,
                 isLoading: _isTalukasLoading,
+              ),
+              SizedBox(height: 16.h),
+              Obx(
+                () => CustomDropdown<DropdownItem>(
+                  hint: LK.Native_Place.tr,
+                  value: _tempNativePlace,
+                  items: controller.nativePlaces
+                      .map(
+                        (o) => DropdownMenuItem(
+                          value: o,
+                          child: Text(
+                            o.text,
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) => setState(() => _tempNativePlace = v),
+                  isLoading: controller.isNativePlacesLoading.value,
+                ),
               ),
               if (_hasSelection) ...[
                 SizedBox(height: 24.h),

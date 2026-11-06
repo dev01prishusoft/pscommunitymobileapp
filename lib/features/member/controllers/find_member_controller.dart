@@ -19,18 +19,22 @@ class FindMemberController extends PaginationMixin<Member> {
   final RxBool isStatesLoading = false.obs;
   final RxBool isDistrictsLoading = false.obs;
   final RxBool isTalukasLoading = false.obs;
+  final RxBool isNativePlacesLoading = false.obs;
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
+  final RxList<DropdownItem> nativePlaces = <DropdownItem>[].obs;
   final Rxn<DropdownItem> selectedState = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
+  final Rxn<DropdownItem> selectedNativePlace = Rxn<DropdownItem>();
 
   int get activeFilterCount {
     int count = 0;
     if (selectedState.value != null) count++;
     if (selectedDistrict.value != null) count++;
     if (selectedTaluka.value != null) count++;
+    if (selectedNativePlace.value != null) count++;
     return count;
   }
 
@@ -39,6 +43,7 @@ class FindMemberController extends PaginationMixin<Member> {
     super.onInit();
     refreshData(showInitialLoading: true);
     loadStates();
+    loadNativePlaces();
   }
 
   Future<void> loadStates() async {
@@ -57,6 +62,22 @@ class FindMemberController extends PaginationMixin<Member> {
     }
   }
 
+  Future<void> loadNativePlaces() async {
+    isNativePlacesLoading.value = true;
+    try {
+      final results = await _familyRepository.getNativePlaces();
+      nativePlaces.assignAll(results);
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'FindMemberController.loadNativePlaces failed',
+      );
+    } finally {
+      isNativePlacesLoading.value = false;
+    }
+  }
+
   Future<List<DropdownItem>> fetchDistricts(int stateId) async {
     return _familyRepository.getDistricts(stateId);
   }
@@ -69,11 +90,13 @@ class FindMemberController extends PaginationMixin<Member> {
     required DropdownItem? state,
     required DropdownItem? district,
     required DropdownItem? taluka,
+    DropdownItem? nativePlace,
   }) async {
     selectedState.value = state;
     selectedDistrict.value = district;
     selectedTaluka.value = taluka;
- 
+    selectedNativePlace.value = nativePlace;
+
     refreshData(showInitialLoading: true);
   }
 
@@ -81,6 +104,7 @@ class FindMemberController extends PaginationMixin<Member> {
     selectedState.value = null;
     selectedDistrict.value = null;
     selectedTaluka.value = null;
+    selectedNativePlace.value = null;
     districts.clear();
     talukas.clear();
 
@@ -97,6 +121,7 @@ class FindMemberController extends PaginationMixin<Member> {
       stateId: selectedState.value?.id,
       districtId: selectedDistrict.value?.id,
       talukaId: selectedTaluka.value?.id,
+      nativePlaceId: selectedNativePlace.value?.id,
       pageNumber: page,
       pageSize: pageSize,
       cancelToken: cancelToken,

@@ -13,6 +13,7 @@ abstract class MemberRepository {
     int? stateId,
     int? districtId,
     int? talukaId,
+    int? nativePlaceId,
     int pageNumber = 1,
     int pageSize = 20,
     CancelToken? cancelToken,

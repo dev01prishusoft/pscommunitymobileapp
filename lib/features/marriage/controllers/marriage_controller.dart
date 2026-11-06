@@ -50,6 +50,7 @@ class MarriageController extends GetxController {
   final RxString selectedDistrict = 'All'.obs;
   final RxString selectedTaluka = 'All'.obs;
   final RxString selectedArea = 'All'.obs;
+  final RxString selectedNativePlace = 'All'.obs;
 
   int get activeAdvancedFilterCount {
     int count = 0;
@@ -64,6 +65,7 @@ class MarriageController extends GetxController {
     if (selectedDistrict.value != 'All') count++;
     if (selectedTaluka.value != 'All') count++;
     if (selectedArea.value != 'All') count++;
+    if (selectedNativePlace.value != 'All') count++;
     if (selectedEducation.value != 'Any') count++;
     if (selectedOccupation.value != 'Any') count++;
     if (selectedIncomeFrom.value.isNotEmpty ||
@@ -98,6 +100,7 @@ class MarriageController extends GetxController {
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
   final RxList<DropdownItem> talukas = <DropdownItem>[].obs;
   final RxList<DropdownItem> areas = <DropdownItem>[].obs;
+  final RxList<DropdownItem> nativePlaces = <DropdownItem>[].obs;
 
   final RxList<Member> filteredMembers = <Member>[].obs;
   final List<Member> _allMembers = [];
@@ -137,6 +140,7 @@ class MarriageController extends GetxController {
       selectedDistrict,
       selectedTaluka,
       selectedArea,
+      selectedNativePlace,
       selectedEducation,
       selectedOccupation,
       selectedIncomeFrom,
@@ -175,6 +179,7 @@ class MarriageController extends GetxController {
 
     loadProfiles();
     loadLocations();
+    loadNativePlaces();
     loadAllDropdowns();
     _loadMyGotra();
   }
@@ -244,6 +249,19 @@ class MarriageController extends GetxController {
         e,
         stack,
         reason: 'MarriageController.loadLocations failed',
+      );
+    }
+  }
+
+  Future<void> loadNativePlaces() async {
+    try {
+      final n = await _familyRepository.getNativePlaces();
+      nativePlaces.assignAll(n);
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'MarriageController.loadNativePlaces failed',
       );
     }
   }
@@ -410,6 +428,7 @@ class MarriageController extends GetxController {
         selectedDistrict: selectedDistrict.value,
         selectedTaluka: selectedTaluka.value,
         selectedArea: selectedArea.value,
+        selectedNativePlace: selectedNativePlace.value,
         selectedStateId:
           states
             .firstWhereOrNull((s) => s.text == selectedState.value)
@@ -420,6 +439,9 @@ class MarriageController extends GetxController {
         selectedTalukaId:
           talukas
             .firstWhereOrNull((t) => t.text == selectedTaluka.value)
+            ?.id,
+        selectedNativePlaceId: nativePlaces
+            .firstWhereOrNull((n) => n.text == selectedNativePlace.value)
             ?.id,
         selectedEducation: selectedEducation.value,
         selectedOccupation: selectedOccupation.value,
@@ -487,6 +509,7 @@ class MarriageController extends GetxController {
     selectedDistrict.value = 'All';
     selectedTaluka.value = 'All';
     selectedArea.value = 'All';
+    selectedNativePlace.value = 'All';
     districts.clear();
     talukas.clear();
     areas.clear();
@@ -539,6 +562,7 @@ class MarriageController extends GetxController {
       'district': selectedDistrict.value,
       'taluka': selectedTaluka.value,
       'area': selectedArea.value,
+      'nativePlace': selectedNativePlace.value,
       'education': selectedEducation.value,
       'occupation': selectedOccupation.value,
       'incomeFrom': selectedIncomeFrom.value,
@@ -559,6 +583,7 @@ class MarriageController extends GetxController {
     selectedDistrict.value = _savedFilters['district'];
     selectedTaluka.value = _savedFilters['taluka'];
     selectedArea.value = _savedFilters['area'];
+    selectedNativePlace.value = _savedFilters['nativePlace'] ?? 'All';
     selectedEducation.value = _savedFilters['education'];
     selectedOccupation.value = _savedFilters['occupation'];
     selectedIncomeFrom.value = _savedFilters['incomeFrom'];

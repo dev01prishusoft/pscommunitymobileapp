@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
@@ -106,6 +108,20 @@ class FamilyRepositoryImpl implements FamilyRepository {
     final response = await _apiClient.getParsed<List<DropdownItem>>(
       ApiEndpoints.areaDropdown,
       queryParameters: {'talukaId': talukaId},
+      fromJsonT: (json) => _parseDropdownListData(json),
+    );
+    return response.dataOrNull?.data ?? [];
+  }
+
+  @override
+  Future<List<DropdownItem>> getNativePlaces({int? samajId}) async {
+    final tokenManager = Get.isRegistered<TokenManager>()
+        ? Get.find<TokenManager>()
+        : null;
+    final effectiveSamajId = samajId ?? tokenManager?.samajId ?? 10083;
+    final response = await _apiClient.getParsed<List<DropdownItem>>(
+      ApiEndpoints.nativePlaceDropdown,
+      queryParameters: {'samajId': effectiveSamajId},
       fromJsonT: (json) => _parseDropdownListData(json),
     );
     return response.dataOrNull?.data ?? [];

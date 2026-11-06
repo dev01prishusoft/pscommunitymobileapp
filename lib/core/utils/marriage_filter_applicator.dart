@@ -13,9 +13,11 @@ class MarriageFilterState {
     this.selectedDistrict = 'All',
     this.selectedTaluka = 'All',
     this.selectedArea = 'All',
+    this.selectedNativePlace = 'All',
     this.selectedStateId,
     this.selectedDistrictId,
     this.selectedTalukaId,
+    this.selectedNativePlaceId,
     this.selectedEducation = 'Any',
     this.selectedOccupation = 'Any',
     this.selectedIncomeFrom = '',
@@ -35,9 +37,11 @@ class MarriageFilterState {
   final String selectedDistrict;
   final String selectedTaluka;
   final String selectedArea;
+  final String selectedNativePlace;
   final int? selectedStateId;
   final int? selectedDistrictId;
   final int? selectedTalukaId;
+  final int? selectedNativePlaceId;
   final String selectedEducation;
   final String selectedOccupation;
   final String selectedIncomeFrom;
@@ -130,6 +134,17 @@ class MarriageFilterApplicator {
 
     if (filters.selectedArea != 'All') {
       result = result.where((m) => m.area == filters.selectedArea).toList();
+    }
+
+    if (filters.selectedNativePlace != 'All' &&
+        filters.selectedNativePlace.isNotEmpty) {
+      final selectedLower = filters.selectedNativePlace.trim().toLowerCase();
+      result = result.where((m) {
+        if (filters.selectedNativePlaceId != null && m.nativePlaceId != null) {
+          if (m.nativePlaceId == filters.selectedNativePlaceId) return true;
+        }
+        return (m.nativePlaceName ?? '').trim().toLowerCase() == selectedLower;
+      }).toList();
     }
 
     if (filters.selectedEducation != 'Any') {
