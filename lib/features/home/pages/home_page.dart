@@ -25,7 +25,9 @@ import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_wid
 import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/member/controllers/added_members_controller.dart';
 import 'package:pscommunitymobileapp/features/member/pages/added_members_list_page.dart';
+import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,6 +41,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
   int _selectedBottomNavIndex = 0;
   bool _isQuickAccessExpanded = false;
   late final DrawerUserController _drawerUserController;
+  Worker? _localeWorker;
 
   @override
   void initState() {
@@ -49,6 +52,88 @@ class _HomePageState extends State<HomePage> with RouteAware {
         'home-bottom',
         limit: 5,
       );
+    }
+    if (Get.isRegistered<LocalizationService>()) {
+      _localeWorker = ever(Get.find<LocalizationService>().currentLocale, (_) {
+        if (mounted) {
+          _refreshTab(_selectedBottomNavIndex);
+        }
+      });
+    }
+  }
+
+  void _onBottomNavTapped(int index) {
+    setState(() {
+      if (index != _selectedBottomNavIndex) {
+        _isQuickAccessExpanded = false;
+      }
+      _selectedBottomNavIndex = index;
+    });
+
+    _refreshTab(index);
+  }
+
+  void _refreshTab(int index) {
+    switch (index) {
+      case 0:
+        _refreshHomeTab();
+        break;
+      case 1:
+        _refreshAddedMembersTab();
+        break;
+      case 2:
+        _refreshEventsTab();
+        break;
+      case 3:
+        _refreshSettingsTab();
+        break;
+    }
+  }
+
+  void _refreshHomeTab() {
+    if (Get.isRegistered<SamajController>()) {
+      Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
+    }
+    _drawerUserController.fetchUser();
+    if (Get.isRegistered<ModulePermissionService>()) {
+      Get.find<ModulePermissionService>().fetchMyModules();
+    }
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().fetchUnreadNotificationCount();
+    }
+    if (Get.isRegistered<AdvertisementController>()) {
+      Get.find<AdvertisementController>().fetchPlacementAds(
+        AdPlacement.homeTop,
+        limit: 5,
+        forceRefresh: true,
+      );
+      Get.find<AdvertisementController>().fetchPlacementAds(
+        AdPlacement.homeBottom,
+        limit: 5,
+        forceRefresh: true,
+      );
+    }
+  }
+
+  void _refreshAddedMembersTab() {
+    if (Get.isRegistered<AddedMembersController>()) {
+      Get.find<AddedMembersController>().refreshMembers();
+    } else {
+      Get.put(AddedMembersController()).refreshMembers();
+    }
+  }
+
+  void _refreshEventsTab() {
+    try {
+      final eventsCtrl = Get.find<EventsController>();
+      eventsCtrl.refreshAllEvents();
+    } catch (_) {}
+  }
+
+  void _refreshSettingsTab() {
+    _drawerUserController.fetchUser();
+    if (Get.isRegistered<SamajController>()) {
+      Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
     }
   }
 
@@ -63,6 +148,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   @override
   void dispose() {
+    _localeWorker?.dispose();
     AppRouter.routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -393,11 +479,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                 _SettingsTile(
                   icon: Iconsax.people_copy,
                   title: LK.addedMembers.tr,
-                  onTap: () {
-                    setState(() {
-                      _selectedBottomNavIndex = 1;
-                    });
-                  },
+                  onTap: () => _onBottomNavTapped(1),
                 ),
                 _SettingsTile(
                   icon: Iconsax.user_add_copy,
@@ -421,11 +503,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                 _SettingsTile(
                   icon: Iconsax.calendar_copy,
                   title: LK.events_title.tr,
-                  onTap: () {
-                    setState(() {
-                      _selectedBottomNavIndex = 2;
-                    });
-                  },
+                  onTap: () => _onBottomNavTapped(2),
                 ),
                 if (!Get.isRegistered<ModulePermissionService>() ||
                     ModulePermissionService.to.isAccessible(AppModule.library))
@@ -758,9 +836,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
       canPop: _selectedBottomNavIndex == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && _selectedBottomNavIndex != 0) {
-          setState(() {
-            _selectedBottomNavIndex = 0;
-          });
+          _onBottomNavTapped(0);
         }
       },
       child: Scaffold(
@@ -803,14 +879,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
               top: false,
               child: BottomNavigationBar(
                 currentIndex: _selectedBottomNavIndex,
-                onTap: (index) {
-                  setState(() {
-                    if (index != _selectedBottomNavIndex) {
-                      _isQuickAccessExpanded = false;
-                    }
-                    _selectedBottomNavIndex = index;
-                  });
-                },
+                onTap: _onBottomNavTapped,
                 backgroundColor: Colors.white,
                 elevation: 0,
                 type: BottomNavigationBarType.fixed,
@@ -919,11 +988,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
         _QuickAccessItem(
           label: LK.events_title.tr,
           icon: Iconsax.calendar_copy,
-          onTap: () {
-            setState(() {
-              _selectedBottomNavIndex = 2;
-            });
-          },
+          onTap: () => _onBottomNavTapped(2),
         ),
         if (!Get.isRegistered<ModulePermissionService>() ||
             ModulePermissionService.to.isAccessible(

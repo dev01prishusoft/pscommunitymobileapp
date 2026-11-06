@@ -1,4 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:pscommunitymobileapp/core/models/native_place_model.dart'
+    hide Data;
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
+import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
+import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 
 import 'package:flutter/material.dart';
 
@@ -89,6 +96,10 @@ class PersonalInfoController extends GetxController {
   final signList = <String>[].obs;
   final gotraList = <String>[].obs;
   final mothersGotraList = <String>[].obs;
+  final nativePlaceList = <String>[].obs;
+  final nativePlaceIdMap = <String, int>{}.obs;
+  final nativePlace = ''.obs;
+  final RxList<NativePlaceData> nativePlaces = <NativePlaceData>[].obs;
 
   final familyMemberList = <Data>[].obs;
   final Rxn<int> selectedFamilyMemberId = Rxn<int>();
@@ -111,6 +122,7 @@ class PersonalInfoController extends GetxController {
   final middleName = ''.obs;
   final lastName = ''.obs;
   final firstNameEn = ''.obs;
+  final middleNameEn = ''.obs;
   final lastNameEn = ''.obs;
   final dob = ''.obs;
   final bornPlace = ''.obs;
@@ -152,6 +164,7 @@ class PersonalInfoController extends GetxController {
   late final TextEditingController middleNameCtrl;
   late final TextEditingController lastNameCtrl;
   late final TextEditingController firstNameEnCtrl;
+  late final TextEditingController middleNameEnCtrl;
   late final TextEditingController lastNameEnCtrl;
   late final TextEditingController dobCtrl;
   late final TextEditingController bornPlaceCtrl;
@@ -171,6 +184,7 @@ class PersonalInfoController extends GetxController {
     middleNameCtrl = TextEditingController();
     lastNameCtrl = TextEditingController();
     firstNameEnCtrl = TextEditingController();
+    middleNameEnCtrl = TextEditingController();
     lastNameEnCtrl = TextEditingController();
     dobCtrl = TextEditingController();
     bornPlaceCtrl = TextEditingController();
@@ -189,6 +203,10 @@ class PersonalInfoController extends GetxController {
     middleNameCtrl.addListener(() => middleName.value = middleNameCtrl.text);
     lastNameCtrl.addListener(() => lastName.value = lastNameCtrl.text);
     firstNameEnCtrl.addListener(() => firstNameEn.value = firstNameEnCtrl.text);
+    middleNameEnCtrl.addListener(
+      () => middleNameEn.value = middleNameEnCtrl.text,
+    );
+    fetchNativePlaces();
     lastNameEnCtrl.addListener(() => lastNameEn.value = lastNameEnCtrl.text);
     dobCtrl.addListener(_onDobChanged);
     bornPlaceCtrl.addListener(() => bornPlace.value = bornPlaceCtrl.text);
@@ -214,6 +232,7 @@ class PersonalInfoController extends GetxController {
     middleNameCtrl.dispose();
     lastNameCtrl.dispose();
     firstNameEnCtrl.dispose();
+    middleNameEnCtrl.dispose();
     lastNameEnCtrl.dispose();
     dobCtrl.dispose();
     bornPlaceCtrl.dispose();
@@ -242,6 +261,8 @@ class PersonalInfoController extends GetxController {
     memberNo.value = m.memberNo ?? '';
     firstName.value = m.firstName;
     firstNameEn.value = m.firstNameEnglish ?? '';
+      middleNameEn.value = m.middleNameEnglish ?? '';
+      nativePlace.value = m.nativePlaceName ?? '';
     middleName.value = m.middleName ?? '';
     lastName.value = m.lastName;
     lastNameEn.value = m.lastNameEnglish ?? '';
@@ -282,6 +303,7 @@ class PersonalInfoController extends GetxController {
     middleNameCtrl.text = middleName.value;
     lastNameCtrl.text = lastName.value;
     firstNameEnCtrl.text = firstNameEn.value;
+      middleNameEnCtrl.text = middleNameEn.value;
     lastNameEnCtrl.text = lastNameEn.value;
     dobCtrl.text = dob.value;
     bornPlaceCtrl.text = bornPlace.value;
@@ -497,6 +519,50 @@ class PersonalInfoController extends GetxController {
       Future<void>.delayed(
         Duration(milliseconds: 500),
         () => uploadProgress.value = 0.0,
+      );
+    }
+  }
+
+  Future<void> fetchNativePlaces({int? samajId}) async {
+    try {
+      final tokenManager = Get.isRegistered<TokenManager>()
+          ? Get.find<TokenManager>()
+          : null;
+      final effectiveSamajId = samajId ?? tokenManager?.samajId ?? 10083;
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(
+        ApiEndpoints.nativePlaceDropdown,
+        queryParameters: {'samajId': effectiveSamajId},
+      );
+      if (response.data != null) {
+        final dynamic raw = response.data;
+        final Map<String, dynamic> json = raw is Map<String, dynamic>
+            ? raw
+            : (raw is String
+                  ? jsonDecode(raw) as Map<String, dynamic>
+                  : <String, dynamic>{});
+        final model = NativePlaceModel.fromJson(json);
+        if (model.succeeded == true && model.data != null) {
+          nativePlaces.assignAll(model.data!);
+          nativePlaceList.clear();
+          nativePlaceIdMap.clear();
+          for (final item in model.data!) {
+            final name = item.name?.trim() ?? '';
+            final id = item.id;
+            if (name.isNotEmpty && id != null) {
+              if (!nativePlaceList.contains(name)) {
+                nativePlaceList.add(name);
+              }
+              nativePlaceIdMap[name] = id;
+            }
+          }
+        }
+      }
+    } catch (e, stack) {
+      CrashReporter.recordError(
+        e,
+        stack,
+        reason: 'PersonalInfoController.fetchNativePlaces failed',
       );
     }
   }

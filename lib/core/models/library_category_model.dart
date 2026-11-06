@@ -43,7 +43,7 @@ class LibraryCategoriesModel {
   }
 }
 
-class LibraryCategoryData {
+class LibraryCategoryData implements Comparable<LibraryCategoryData> {
   int? libraryCategoryId;
   String? _name;
   String? _description;
@@ -79,14 +79,24 @@ class LibraryCategoryData {
     libraryCategoryId = json['libraryCategoryId'] is int
         ? json['libraryCategoryId'] as int
         : int.tryParse(json['libraryCategoryId']?.toString() ?? '');
-    _name = json['name']?.toString();
-    _description = json['description']?.toString();
-    iconName = json['iconName']?.toString();
-    iconColor = json['iconColor']?.toString();
-    bgColor = json['bgColor']?.toString();
-    sortOrder = json['sortOrder'] is int
-        ? json['sortOrder'] as int
-        : int.tryParse(json['sortOrder']?.toString() ?? '');
+    _name = (json['name'] ?? json['Name'] ?? json['categoryName'] ?? json['CategoryName'])?.toString();
+    _description = (json['description'] ?? json['Description'])?.toString();
+    final dynamic rawIconName =
+        json['iconName'] ?? json['IconName'] ?? json['icon_name'];
+    iconName = rawIconName?.toString();
+    final dynamic rawIconColor =
+        json['iconColor'] ?? json['IconColor'] ?? json['icon_color'];
+    iconColor = rawIconColor?.toString();
+    final dynamic rawBgColor =
+        json['bgColor'] ?? json['BgColor'] ?? json['bg_color'];
+    bgColor = rawBgColor?.toString();
+    final dynamic rawSortOrder =
+        json['sortOrder'] ?? json['SortOrder'] ?? json['sort_order'];
+    sortOrder = rawSortOrder is int
+        ? rawSortOrder
+        : (rawSortOrder is num
+            ? rawSortOrder.toInt()
+            : int.tryParse(rawSortOrder?.toString() ?? ''));
     _itemCount = json['itemCount'] is int
         ? json['itemCount'] as int
         : int.tryParse(json['itemCount']?.toString() ?? '');
@@ -109,22 +119,72 @@ class LibraryCategoryData {
   int get id => libraryCategoryId ?? 0;
   String get iconType => iconName ?? '';
 
-  Color get backgroundColor => _parseHexColor(bgColor, const Color(0xFFF1F5F9));
   Color get iconColorResolved =>
       _parseHexColor(iconColor, const Color(0xFF475569));
 
+  Color get backgroundColor {
+    if (iconColor != null && iconColor!.trim().isNotEmpty) {
+      final parsed = _parseHexColor(iconColor, const Color(0xFF475569));
+      return Color.alphaBlend(parsed.withValues(alpha: 0.12), Colors.white);
+    }
+    if (bgColor != null && bgColor!.trim().isNotEmpty) {
+      return _parseHexColor(bgColor, const Color(0xFFF1F5F9));
+    }
+    return const Color(0xFFF1F5F9);
+  }
+
   static Color _parseHexColor(String? hexString, Color fallback) {
-    if (hexString == null || hexString.isEmpty) return fallback;
-    var cleaned = hexString.replaceAll('#', '').trim();
+    if (hexString == null) return fallback;
+    var cleaned = hexString.trim();
+    if (cleaned.isEmpty) return fallback;
+    if (cleaned.startsWith('#')) {
+      cleaned = cleaned.substring(1).trim();
+    }
+    if (cleaned.startsWith('0x') || cleaned.startsWith('0X')) {
+      cleaned = cleaned.substring(2).trim();
+    }
+    if (cleaned.length == 3) {
+      cleaned =
+          '${cleaned[0]}${cleaned[0]}${cleaned[1]}${cleaned[1]}${cleaned[2]}${cleaned[2]}';
+    }
     if (cleaned.length == 6) {
       cleaned = 'ff$cleaned';
     }
-    try {
-      return Color(int.parse(cleaned, radix: 16));
-    } catch (_) {
-      return fallback;
+    if (cleaned.length == 8) {
+      try {
+        return Color(int.parse(cleaned, radix: 16));
+      } catch (_) {
+        return fallback;
+      }
     }
+    return fallback;
   }
+
+  static int compareBySortOrder(LibraryCategoryData a, LibraryCategoryData b) {
+    final orderA = a.sortOrder;
+    final orderB = b.sortOrder;
+
+    if (orderA != null && orderB != null) {
+      final cmp = orderA.compareTo(orderB);
+      if (cmp != 0) return cmp;
+    } else if (orderA != null) {
+      return -1;
+    } else if (orderB != null) {
+      return 1;
+    }
+
+    final titleA = a.name.trim().toLowerCase();
+    final titleB = b.name.trim().toLowerCase();
+    final titleCmp = titleA.compareTo(titleB);
+    if (titleCmp != 0) return titleCmp;
+
+    final idA = a.libraryCategoryId ?? 0;
+    final idB = b.libraryCategoryId ?? 0;
+    return idA.compareTo(idB);
+  }
+
+  @override
+  int compareTo(LibraryCategoryData other) => compareBySortOrder(this, other);
 }
 
 typedef Data = LibraryCategoryData;

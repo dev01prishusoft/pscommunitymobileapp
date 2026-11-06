@@ -530,6 +530,38 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                 ),
                 const Divider(height: 24),
                 Obx(
+                  () => AppFormDropdown<String>(
+                    enableSearch: true,
+                    value:
+                        controller.personalInfo.nativePlaceList.contains(
+                          controller.personalInfo.nativePlace.value,
+                        )
+                        ? controller.personalInfo.nativePlace.value
+                        : null,
+                    items: controller.personalInfo.nativePlaceList
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) =>
+                        controller.personalInfo.nativePlace.value = v ?? '',
+                    label: LK.Native_Place.tr,
+                    isRequired: false,
+                    updateStatus: controller.getUpdateStatus(
+                      'NativePlaceId',
+                      idMap: controller.personalInfo.nativePlaceIdMap,
+                    ),
+                  ),
+                ),
+                AppSpacing.vM,
+                Obx(
                   () => AppFormTextField(
                     controller: controller.firstNameCtrl,
                     label: '${LK.firstName.tr}$_nativeLangSuffix',
@@ -561,16 +593,28 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     ),
                   ),
                 ),
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.firstNameEnCtrl,
+                    label: LK.firstNameEnglish.tr,
+                    isRequired: true,
+                    prefixIcon: const Icon(Icons.language),
+                    maxLength: 100,
+                    updateStatus: controller.getUpdateStatus(
+                      'FirstNameEnglish',
+                    ),
+                  ),
+                ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   Obx(
                     () => AppFormTextField(
-                      controller: controller.firstNameEnCtrl,
-                      label: LK.firstNameEnglish.tr,
-                      isRequired: true,
+                      controller: controller.middleNameEnCtrl,
+                      label: LK.Middle_Name_English.tr,
                       prefixIcon: const Icon(Icons.language),
                       maxLength: 100,
                       updateStatus: controller.getUpdateStatus(
-                        'FirstNameEnglish',
+                        'MiddleNameEnglish',
                       ),
                     ),
                   ),
@@ -611,7 +655,7 @@ class _AddFamilyMemberPageState extends State<AddFamilyMemberPage> {
                     prefixIcon: const Icon(Iconsax.location_copy),
                     controller: controller.bornPlaceCtrl,
                     label: LK.BornPlace.tr,
-                    isRequired: true,
+                    isRequired: false,
                     onLocationSelected: (location, lat, lng) {
                       if (location.isEmpty || location == "") return;
                       controller.bornPlaceCtrl.text = location;

@@ -141,9 +141,13 @@ class LibraryItemDetailsData {
         json['CanOpenInBrowser'] ??
         json['canOpenInNewTab'] ??
         json['CanOpenInNewTab']);
-    sortOrder = json['sortOrder'] is int
-        ? json['sortOrder'] as int
-        : int.tryParse(json['sortOrder']?.toString() ?? '');
+    final dynamic rawSortOrder =
+        json['sortOrder'] ?? json['SortOrder'] ?? json['sort_order'];
+    sortOrder = rawSortOrder is int
+        ? rawSortOrder
+        : (rawSortOrder is num
+            ? rawSortOrder.toInt()
+            : int.tryParse(rawSortOrder?.toString() ?? ''));
     if (json['files'] != null) {
       files = <LibraryItemFile>[];
       if (json['files'] is List) {
@@ -152,6 +156,7 @@ class LibraryItemDetailsData {
             files!.add(LibraryItemFile.fromJson(v));
           }
         }
+        files!.sort(LibraryItemFile.compareBySortOrder);
       }
     }
   }
@@ -235,9 +240,13 @@ class LibraryItemFile {
     durationSeconds = json['durationSeconds'];
     pageCount = json['pageCount'];
     isPrimary = json['isPrimary'] as bool?;
-    sortOrder = json['sortOrder'] is int
-        ? json['sortOrder'] as int
-        : int.tryParse(json['sortOrder']?.toString() ?? '');
+    final dynamic rawSortOrder =
+        json['sortOrder'] ?? json['SortOrder'] ?? json['sort_order'];
+    sortOrder = rawSortOrder is int
+        ? rawSortOrder
+        : (rawSortOrder is num
+            ? rawSortOrder.toInt()
+            : int.tryParse(rawSortOrder?.toString() ?? ''));
   }
 
   Map<String, dynamic> toJson() {
@@ -255,6 +264,23 @@ class LibraryItemFile {
     jsonMap['isPrimary'] = isPrimary;
     jsonMap['sortOrder'] = sortOrder;
     return jsonMap;
+  }
+  static int compareBySortOrder(LibraryItemFile a, LibraryItemFile b) {
+    final orderA = a.sortOrder;
+    final orderB = b.sortOrder;
+
+    if (orderA != null && orderB != null) {
+      final cmp = orderA.compareTo(orderB);
+      if (cmp != 0) return cmp;
+    } else if (orderA != null) {
+      return -1;
+    } else if (orderB != null) {
+      return 1;
+    }
+
+    final idA = a.libraryItemFileId ?? 0;
+    final idB = b.libraryItemFileId ?? 0;
+    return idA.compareTo(idB);
   }
 }
 

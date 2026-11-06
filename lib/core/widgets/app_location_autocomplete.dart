@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -72,11 +71,66 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
 
   Future<List<Map<String, dynamic>>> _getSuggestions(String query) async {
     if (_googleApiKey.isEmpty || query.trim().length < 3) return [];
-    final String url =
+
+    // 1. Try Places API (New)
+    try {
+      final response = await _dio.post(
+        'https://places.googleapis.com/v1/places:autocomplete',
+        data: {
+          'input': query,
+          'includedRegionCodes': ['in'],
+          'includedPrimaryTypes': ['(regions)'],
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': _googleApiKey,
+            'X-Goog-FieldMask':
+                'suggestions.placePrediction.placeId,suggestions.placePrediction.text.text',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final suggestions = response.data['suggestions'] as List?;
+        if (suggestions != null && suggestions.isNotEmpty) {
+          final List<Map<String, dynamic>> results = [];
+          for (final item in suggestions) {
+            final prediction = item['placePrediction'] as Map<String, dynamic>?;
+            if (prediction != null) {
+              final placeId =
+                  (prediction['placeId'] as String?) ??
+                  ((prediction['place'] as String?)?.replaceFirst(
+                        'places/',
+                        '',
+                      ) ??
+                      '');
+              final textObj = prediction['text'] as Map<String, dynamic>?;
+              var desc = textObj?['text'] as String?;
+
+              if (desc != null && desc.isNotEmpty) {
+                var parts = desc.split(', ');
+                if (parts.length > 1) {
+                  parts.removeLast();
+                  desc = parts.join(', ');
+                }
+                results.add({'place_id': placeId, 'description': desc});
+              }
+            }
+          }
+          if (results.isNotEmpty) return results;
+        }
+      }
+    } catch (_) {
+      // Fallback to legacy API below
+    }
+
+    // 2. Fallback to Legacy Places API
+    const String legacyUrl =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     try {
       final response = await _dio.get(
-        url,
+        legacyUrl,
         queryParameters: {
           'input': query,
           'types': '(regions)',
@@ -113,14 +167,45 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
 
   Future<void> _getPlaceDetails(String placeId, String description) async {
     if (_googleApiKey.isEmpty || placeId.isEmpty) return;
-    const String url =
-        'https://maps.googleapis.com/maps/api/place/details/json';
 
+    final cleanPlaceId = placeId.replaceFirst('places/', '');
     try {
       final response = await _dio.get(
-        url,
+        'https://places.googleapis.com/v1/places/$cleanPlaceId',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': _googleApiKey,
+            'X-Goog-FieldMask': 'id,location',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final location = response.data['location'] as Map<String, dynamic>?;
+        if (location != null) {
+          final lat = location['latitude'];
+          final lng = location['longitude'];
+
+          if (lat != null && lng != null && widget.onLocationSelected != null) {
+            widget.onLocationSelected!(
+              description,
+              (lat as num).toDouble(),
+              (lng as num).toDouble(),
+            );
+            return;
+          }
+        }
+      }
+    } catch (_) {}
+
+    const String legacyUrl =
+        'https://maps.googleapis.com/maps/api/place/details/json';
+    try {
+      final response = await _dio.get(
+        legacyUrl,
         queryParameters: {
-          'place_id': placeId,
+          'place_id': cleanPlaceId,
           'fields': 'geometry',
           'key': _googleApiKey,
         },
@@ -128,16 +213,19 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data['status'] == 'OK') {
-          final location = data['result']['geometry']['location'];
-          final lat = location['lat'];
-          final lng = location['lng'];
+          final location = data['result']?['geometry']?['location'];
+          if (location != null) {
+            final lat = location['lat'];
+            final lng = location['lng'];
 
-          if (widget.onLocationSelected != null) {
-            widget.onLocationSelected!(
-              description,
-              (lat as num).toDouble(),
-              (lng as num).toDouble(),
-            );
+            if (widget.onLocationSelected != null) {
+              widget.onLocationSelected!(
+                description,
+                (lat as num).toDouble(),
+                (lng as num).toDouble(),
+              );
+              return;
+            }
           }
         }
       }

@@ -155,6 +155,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
   TextEditingController get middleNameCtrl => personalInfo.middleNameCtrl;
   TextEditingController get lastNameCtrl => personalInfo.lastNameCtrl;
   TextEditingController get firstNameEnCtrl => personalInfo.firstNameEnCtrl;
+  TextEditingController get middleNameEnCtrl => personalInfo.middleNameEnCtrl;
+  RxString get middleNameEn => personalInfo.middleNameEn;
+  RxList<String> get nativePlaceList => personalInfo.nativePlaceList;
+  RxString get nativePlace => personalInfo.nativePlace;
+  Map<String, int> get nativePlaceIdMap => personalInfo.nativePlaceIdMap;
   TextEditingController get lastNameEnCtrl => personalInfo.lastNameEnCtrl;
   TextEditingController get dobCtrl => personalInfo.dobCtrl;
   TextEditingController get bornPlaceCtrl => personalInfo.bornPlaceCtrl;
@@ -305,6 +310,11 @@ class ProfileFormController extends GetxController with FormStateMixin {
       personalInfo.middleName.value,
       m.middleName ?? '',
     );
+    addIfChanged(
+      'MiddleNameEnglish',
+      personalInfo.middleNameEn.value,
+      m.middleNameEnglish ?? '',
+    );
     addIfChanged('LastName', personalInfo.lastName.value, m.lastName);
     addIfChanged(
       'LastNameEnglish',
@@ -409,6 +419,13 @@ class ProfileFormController extends GetxController with FormStateMixin {
       personalInfo.gender,
       personalInfo.genderIdMap,
       m.genderName,
+    );
+    addDropdown(
+      'NativePlaceId',
+      personalInfo.nativePlace,
+      personalInfo.nativePlaceIdMap,
+      m.nativePlaceName,
+      m.nativePlaceId,
     );
     addDropdown(
       'MaritalStatusId',
@@ -1396,6 +1413,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
         : '/Gotra/dropdown';
 
     await Future.wait([
+      personalInfo.fetchNativePlaces(samajId: samajId ?? 10083),
       workInfo.fetchDropdown(
         '/gender/dropdown',
         personalInfo.genderList,
@@ -1719,6 +1737,18 @@ class ProfileFormController extends GetxController with FormStateMixin {
           }
         }
       }
+      if (_currentMember!.nativePlaceId != null) {
+        final id = _currentMember!.nativePlaceId;
+        for (final entry in personalInfo.nativePlaceIdMap.entries) {
+          if (entry.value == id) {
+            personalInfo.nativePlace.value = entry.key;
+            break;
+          }
+        }
+      } else if (_currentMember!.nativePlaceName != null &&
+          _currentMember!.nativePlaceName!.isNotEmpty) {
+        personalInfo.nativePlace.value = _currentMember!.nativePlaceName!;
+      }
       if (_currentMember!.relationTypeId != null) {
         final id = _currentMember!.relationTypeId;
         for (final entry in personalInfo.relationIdMap.entries) {
@@ -1852,6 +1882,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
         }
       }
     }
+    _ensureSelectionValue(
+      personalInfo.nativePlace,
+      personalInfo.nativePlaceList,
+    );
     _ensureSelectionValue(personalInfo.gotra, personalInfo.gotraList);
     _ensureSelectionValue(
       personalInfo.mothersGotra,
@@ -1866,6 +1900,7 @@ class ProfileFormController extends GetxController with FormStateMixin {
     _ensureSelectionValue(workInfo.workArea, workInfo.workAreaList);
 
     _initialDropdownValues['GenderId'] = personalInfo.gender.value;
+    _initialDropdownValues['NativePlaceId'] = personalInfo.nativePlace.value;
     _initialDropdownValues['MaritalStatusId'] =
         personalInfo.maritalStatus.value;
     _initialDropdownValues['BloodGroupId'] = personalInfo.bloodGroup.value;
@@ -2209,6 +2244,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['MiddleName'] = personalInfo.middleNameCtrl.text;
             formDataMap['LastName'] = personalInfo.lastNameCtrl.text;
             formDataMap['FirstNameEnglish'] = personalInfo.firstNameEnCtrl.text;
+            formDataMap['MiddleNameEnglish'] =
+                personalInfo.middleNameEnCtrl.text;
             formDataMap['LastNameEnglish'] = personalInfo.lastNameEnCtrl.text;
             formDataMap['DateOfBirth'] = formatDob(personalInfo.dob.value);
             formDataMap['DateOfBirthTime'] = personalInfo.tob.value;
@@ -2220,6 +2257,10 @@ class ProfileFormController extends GetxController with FormStateMixin {
             formDataMap['GenderId'] = getId(
               personalInfo.gender.value,
               personalInfo.genderIdMap,
+            );
+            formDataMap['NativePlaceId'] = getId(
+              personalInfo.nativePlace.value,
+              personalInfo.nativePlaceIdMap,
             );
             formDataMap['MaritalStatusId'] = getId(
               personalInfo.maritalStatus.value,
