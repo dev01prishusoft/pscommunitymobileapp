@@ -10,6 +10,11 @@ abstract class AdvertisementRepository {
     int? limit,
   });
 
+  Future<Result<List<Advertisement>>> getByPlacementCode(
+    String placementCode, {
+    int? limit,
+  });
+
   Future<Result<Advertisement>> getById(int id);
 
   Future<Result<PaginatedResponse<Advertisement>>> getList({

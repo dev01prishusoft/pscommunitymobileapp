@@ -9,6 +9,7 @@ import 'package:pscommunitymobileapp/features/committee/pages/committee_members_
 import 'package:pscommunitymobileapp/features/committee/pages/committees_page.dart';
 import 'package:pscommunitymobileapp/features/committee/pages/frompage_committee.dart';
 import 'package:pscommunitymobileapp/features/events/pages/events_page.dart';
+import 'package:pscommunitymobileapp/features/events/pages/event_details_page.dart';
 import 'package:pscommunitymobileapp/features/events/pages/event_registration_page.dart';
 import 'package:pscommunitymobileapp/features/events/pages/my_events_page.dart';
 import 'package:pscommunitymobileapp/core/models/events_details_model.dart';
@@ -88,6 +89,7 @@ class AppRouter {
   static String frompageOccupation = '/frompageOccupation';
   static String frompageCommittee = '/frompageCommittee';
   static String events = '/events';
+  static String eventDetails = '/event-details';
   static String eventRegistration = '/event-registration';
   static String myEvents = '/my-events';
   static String eventScanner = '/event-scanner';
@@ -102,7 +104,9 @@ class AppRouter {
   static String libraryImage = '/library-image';
   static String libraryAudio = '/library-audio';
 
-  static final List<GetPage<dynamic>> pages = [
+  static List<GetPage<dynamic>> get pages => _rawPages;
+
+  static final List<GetPage<dynamic>> _rawPages = [
     GetPage<void>(name: login, page: () => LoginPage()),
     GetPage<void>(name: resetPassword, page: () => ResetPasswordPage()),
     GetPage<void>(
@@ -267,6 +271,19 @@ class AppRouter {
     GetPage<void>(
       name: events,
       page: () => EventsPage(),
+      middlewares: [AuthGuard()],
+    ),
+    GetPage<void>(
+      name: eventDetails,
+      page: () {
+        final args = Get.arguments;
+        final int eventId = (args is int)
+            ? args
+            : (args is Map<String, dynamic>
+                ? (args['eventId'] as int? ?? 0)
+                : 0);
+        return EventDetailsPage(eventId: eventId);
+      },
       middlewares: [AuthGuard()],
     ),
     GetPage<void>(

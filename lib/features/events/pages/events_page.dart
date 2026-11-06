@@ -11,9 +11,8 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/event_card.dart';
 import 'package:pscommunitymobileapp/core/models/get_all_events.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 
 class EventsPage extends GetView<EventsController> {
   const EventsPage({Key? key}) : super(key: key);
@@ -23,7 +22,8 @@ class EventsPage extends GetView<EventsController> {
     return Obx(() {
       final _ = Get.find<LocalizationService>().currentLocale.value;
       final isFabVisible = controller.isFabVisible.value;
-      return Scaffold(
+      return DynamicAdScaffold(
+        route: AppRouter.events,
         appBar: AppBar(
           title: Obx(() {
             if (controller.isSearchVisible.value) {
@@ -335,7 +335,7 @@ class EventsPage extends GetView<EventsController> {
         ),
       );
     } else {
-      content = ListView.builder(
+      content = ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         controller: scrollController,
         padding: EdgeInsets.only(
@@ -345,6 +345,13 @@ class EventsPage extends GetView<EventsController> {
           bottom: 100.h,
         ),
         itemCount: events.length + (hasMore ? 1 : 0),
+        separatorBuilder: (context, index) {
+          return DynamicAdSeparator(
+            route: AppRouter.events,
+            index: index,
+            regularSeparator: SizedBox(height: 16.h),
+          );
+        },
         itemBuilder: (context, index) {
           if (index == events.length) {
             return const Padding(
@@ -357,29 +364,10 @@ class EventsPage extends GetView<EventsController> {
               : type == 2
                   ? 'Ongoing'
                   : 'Past';
-          final eventCard = Padding(
-            padding: EdgeInsets.only(bottom: 16.h),
-            child: EventCard(
-              event: events[index],
-              eventStatus: status,
-            ),
+          return EventCard(
+            event: events[index],
+            eventStatus: status,
           );
-
-          final adTargetIndex = events.length >= 2 ? 1 : 0;
-          if (index == adTargetIndex) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                eventCard,
-                AdPlacementSlot(
-                  placement: AdPlacement.eventList,
-                  layout: AdLayout.card,
-                  padding: EdgeInsets.only(bottom: 16.h),
-                ),
-              ],
-            );
-          }
-          return eventCard;
         },
       );
     }

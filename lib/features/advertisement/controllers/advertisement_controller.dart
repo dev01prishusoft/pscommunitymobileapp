@@ -23,8 +23,8 @@ class AdvertisementController extends GetxController
         _trackingService = trackingService,
         _connectivity = connectivity;
 
-  final Map<AdPlacement, RxList<Advertisement>> _placementAds = {};
-  final Map<AdPlacement, RxBool> _placementLoading = {};
+  final Map<String, RxList<Advertisement>> _stringPlacementAds = {};
+  final Map<String, RxBool> _stringPlacementLoading = {};
 
   @override
   void onInit() {
@@ -47,18 +47,28 @@ class AdvertisementController extends GetxController
 
   /// Refreshes all currently loaded placements in the background when app resumes
   Future<void> refreshActivePlacements() async {
-    final placements = _placementAds.keys.toList();
-    for (final placement in placements) {
-      await fetchPlacementAds(placement, forceRefresh: true);
+    final codes = _stringPlacementAds.keys.toList();
+    for (final code in codes) {
+      await fetchAdsByCode(code, forceRefresh: true);
     }
   }
 
   RxList<Advertisement> getAds(AdPlacement placement) {
-    return _placementAds.putIfAbsent(placement, () => <Advertisement>[].obs);
+    return getAdsByCode(placement.code);
   }
 
   RxBool getLoading(AdPlacement placement) {
-    return _placementLoading.putIfAbsent(placement, () => false.obs);
+    return getLoadingByCode(placement.code);
+  }
+
+  RxList<Advertisement> getAdsByCode(String placementCode) {
+    final key = placementCode.trim().toLowerCase();
+    return _stringPlacementAds.putIfAbsent(key, () => <Advertisement>[].obs);
+  }
+
+  RxBool getLoadingByCode(String placementCode) {
+    final key = placementCode.trim().toLowerCase();
+    return _stringPlacementLoading.putIfAbsent(key, () => false.obs);
   }
 
   Future<void> fetchPlacementAds(
@@ -66,10 +76,20 @@ class AdvertisementController extends GetxController
     int? limit,
     bool forceRefresh = false,
   }) async {
-    final adsList = getAds(placement);
-    final loading = getLoading(placement);
+    return fetchAdsByCode(placement.code, limit: limit, forceRefresh: forceRefresh);
+  }
 
-    // Only show loading spinner if we don't have any ads currently displayed
+  Future<void> fetchAdsByCode(
+    String placementCode, {
+    int? limit,
+    bool forceRefresh = false,
+  }) async {
+    final cleanCode = placementCode.trim().toLowerCase();
+    if (cleanCode.isEmpty) return;
+
+    final adsList = getAdsByCode(cleanCode);
+    final loading = getLoadingByCode(cleanCode);
+
     if (adsList.isEmpty) {
       loading.value = true;
     }
@@ -81,7 +101,7 @@ class AdvertisementController extends GetxController
       }
 
       final fetchLimit = limit ?? 5;
-      final result = await _repository.getByPlacement(placement, limit: fetchLimit);
+      final result = await _repository.getByPlacementCode(cleanCode, limit: fetchLimit);
       if (result.isSuccess) {
         final ads = result.dataOrNull ?? [];
         adsList.assignAll(ads);
@@ -103,6 +123,20 @@ class AdvertisementController extends GetxController
 
   void recordImpression(Advertisement ad, AdPlacement placement) {
     _trackingService.recordImpression(ad, placement);
+  }
+
+  void recordImpressionByCode(Advertisement ad, String placementCode) {
+    final placement = AdPlacement.fromCode(placementCode);
+    _trackingService.recordImpression(ad, placement);
+  }
+
+  Future<void> handleAdClickByCode(
+    Advertisement ad,
+    String placementCode, {
+    String action = 'cta',
+  }) async {
+    final placement = AdPlacement.fromCode(placementCode);
+    return handleAdClick(ad, placement, action: action);
   }
 
   Future<void> handleAdClick(

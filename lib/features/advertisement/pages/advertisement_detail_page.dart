@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import '../widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 import '../controllers/advertisement_controller.dart';
@@ -88,7 +90,11 @@ class _AdvertisementDetailPageState extends State<AdvertisementDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(), body: _buildBody(context));
+    return DynamicAdScaffold(
+      route: AppRouter.advertisementDetail,
+      appBar: AppBar(),
+      body: _buildBody(context),
+    );
   }
 
   Widget _buildBody(BuildContext context) {

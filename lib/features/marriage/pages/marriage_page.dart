@@ -17,10 +17,12 @@ import 'package:pscommunitymobileapp/core/widgets/app_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/responsive_containers.dart';
 import 'package:pscommunitymobileapp/features/marriage/controllers/marriage_controller.dart';
-import 'package:pscommunitymobileapp/core/models/member.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_widget.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
+import 'package:pscommunitymobileapp/core/models/member.dart';
 
 class MarriagePage extends GetView<MarriageController> {
   const MarriagePage({super.key});
@@ -42,7 +44,9 @@ class MarriagePage extends GetView<MarriageController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.marriage,
+      disableTopAd: true,
       appBar: AppBar(
         title: Obx(() {
           if (controller.isSearchVisible.value) {
@@ -83,7 +87,18 @@ class MarriagePage extends GetView<MarriageController> {
             );
           }),
           IconButton(
-            icon: Icon(Iconsax.filter_search_copy),
+            icon: Obx(() {
+              final count = controller.activeAdvancedFilterCount;
+              if (count > 0) {
+                return Badge(
+                  label: Text('$count'),
+                  backgroundColor: AppColors.primary,
+                  textColor: AppColors.white,
+                  child: const Icon(Iconsax.filter_search_copy),
+                );
+              }
+              return const Icon(Iconsax.filter_search_copy);
+            }),
             onPressed: () => _showAdvancedFilters(context),
           ),
         ],
@@ -101,44 +116,59 @@ class MarriagePage extends GetView<MarriageController> {
                 return const SliverToBoxAdapter(child: SizedBox.shrink());
               }
             }),
+            // Matrimonial Dynamic Advertisement Banner (scrolls naturally below filters)
             SliverToBoxAdapter(
-              child: AdPlacementSlot(
-                placement: AdPlacement.matrimonialDirectory,
-                layout: AdLayout.card,
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-              ),
+              child: Obx(() {
+                if (AdScreenConfigService.to.shouldShowTopBanner('/marriage')) {
+                  final placementCode = AdScreenConfigService.to
+                      .getTopPlacementCode('/marriage');
+                  return SmartAdWidget(
+                    placementCode: placementCode,
+                    layout: AdLayout.card,
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
             ),
             Obx(() {
               if (controller.state.value == AppState.data) {
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == controller.filteredMembers.length) {
-                        if (controller.hasPageError.value) {
-                          return Center(
-                            child: TextButton.icon(
-                              onPressed: controller.loadNextPage,
-                              icon: const Icon(Icons.refresh),
-                              label: Text(LK.retry.tr),
-                            ),
-                          );
-                        }
-                        return controller.isNextPageLoading.value
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: CircularProgressIndicator(),
-                                ),
-                              )
-                            : const SizedBox.shrink();
+                return SliverList.separated(
+                  itemCount:
+                      controller.filteredMembers.length +
+                      (controller.hasMore.value ? 1 : 0),
+                  separatorBuilder: (context, index) {
+                    return DynamicAdSeparator(
+                      route: AppRouter.marriage,
+                      placementCode: 'matrimonial-directory',
+                      index: index,
+                      regularSeparator: SizedBox(height: 6.h),
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    if (index == controller.filteredMembers.length) {
+                      if (controller.hasPageError.value) {
+                        return Center(
+                          child: TextButton.icon(
+                            onPressed: controller.loadNextPage,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(LK.retry.tr),
+                          ),
+                        );
                       }
-                      return _MarriageMemberCard(
-                        member: controller.filteredMembers[index],
-                      );
-                    },
-                    childCount: controller.filteredMembers.length +
-                        (controller.hasMore.value ? 1 : 0),
-                  ),
+                      return controller.isNextPageLoading.value
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : const SizedBox.shrink();
+                    }
+                    return _MarriageMemberCard(
+                      member: controller.filteredMembers[index],
+                    );
+                  },
                 );
               } else {
                 return SliverToBoxAdapter(
@@ -381,7 +411,7 @@ class _MarriageMemberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      margin: EdgeInsets.only(bottom: 6.h),
+      margin: EdgeInsets.zero,
       elevation: 0.03,
       border: Border.all(
         color: AppColors.grey.withValues(alpha: 0.15),

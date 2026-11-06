@@ -11,12 +11,11 @@ import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_error_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_loading_indicator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_primary_button.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/notification/controllers/notification_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/notification_card.dart';
-import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_controller.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 
 class NotificationsPage extends GetView<NotificationController> {
   const NotificationsPage({super.key});
@@ -25,7 +24,8 @@ class NotificationsPage extends GetView<NotificationController> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.notifications,
         appBar: AppBar(
           title: Text(LK.notifications.tr),
           actions: [
@@ -153,42 +153,19 @@ class NotificationsPage extends GetView<NotificationController> {
 
           if (controller.notifications.isEmpty) {
             return RefreshIndicator(
-              onRefresh: () async {
-                await controller.fetchNotifications();
-                if (Get.isRegistered<AdvertisementController>()) {
-                  await Get.find<AdvertisementController>().fetchPlacementAds(
-                    AdPlacement.notifications,
-                    limit: 5,
-                    forceRefresh: true,
-                  );
-                }
-              },
+              onRefresh: controller.fetchNotifications,
               color: AppColors.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
                   height: 0.8.sh,
-                  child: Column(
-                    children: [
-                      AdPlacementSlot(
-                        placement: AdPlacement.notifications,
-                        layout: AdLayout.card,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 12.h,
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: AppEmptyState(
-                            icon: Iconsax.notification,
-                            secondaryIcon: Iconsax.search_normal_copy,
-                            subtitle: "",
-                            title: LK.noNotificationsFound.tr,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Center(
+                    child: AppEmptyState(
+                      icon: Iconsax.notification,
+                      secondaryIcon: Iconsax.search_normal_copy,
+                      subtitle: "",
+                      title: LK.noNotificationsFound.tr,
+                    ),
                   ),
                 ),
               ),
@@ -196,16 +173,7 @@ class NotificationsPage extends GetView<NotificationController> {
           }
 
           return RefreshIndicator(
-            onRefresh: () async {
-              await controller.fetchNotifications();
-              if (Get.isRegistered<AdvertisementController>()) {
-                await Get.find<AdvertisementController>().fetchPlacementAds(
-                  AdPlacement.notifications,
-                  limit: 5,
-                  forceRefresh: true,
-                );
-              }
-            },
+            onRefresh: controller.fetchNotifications,
             color: AppColors.primary,
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
@@ -215,11 +183,17 @@ class NotificationsPage extends GetView<NotificationController> {
                 }
                 return false;
               },
-              child: ListView.builder(
+              child: ListView.separated(
                 padding: EdgeInsets.fromLTRB(0.w, 10.h, 0.w, 50.h),
                 itemCount:
                     controller.notifications.length +
                     (controller.isLoadingMore.value ? 1 : 0),
+                separatorBuilder: (context, index) {
+                  return DynamicAdSeparator(
+                    route: AppRouter.notifications,
+                    index: index,
+                  );
+                },
                 itemBuilder: (context, index) {
                   if (index == controller.notifications.length) {
                     return const Padding(
@@ -229,7 +203,7 @@ class NotificationsPage extends GetView<NotificationController> {
                   }
 
                   final notification = controller.notifications[index];
-                  final dismissibleCard = Dismissible(
+                  return Dismissible(
                     key: Key(notification.memberNotificationId.toString()),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
@@ -271,28 +245,6 @@ class NotificationsPage extends GetView<NotificationController> {
                           controller.handleNotificationClick(notification),
                     ),
                   ).paddingSymmetric(horizontal: 16.w);
-
-                  final adTargetIndex = controller.notifications.length >= 3
-                      ? 2
-                      : controller.notifications.length - 1;
-
-                  if (index == adTargetIndex) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        dismissibleCard,
-                        AdPlacementSlot(
-                          placement: AdPlacement.notifications,
-                          layout: AdLayout.card,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 8.h,
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  return dismissibleCard;
                 },
               ),
             ),

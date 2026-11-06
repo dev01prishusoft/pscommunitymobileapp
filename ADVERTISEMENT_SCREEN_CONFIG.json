@@ -1,0 +1,215 @@
+{
+  "succeeded": true,
+  "message": "Advertisement screen configuration retrieved successfully",
+  "data": {
+    "isGloballyEnabled": true,
+    "defaultInListInterval": 4,
+    "screens": [
+      {
+        "route": "/home",
+        "screenName": "Home Screen",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "home-top"
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "home-bottom"
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/find-member",
+        "screenName": "Member Directory",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "member-directory"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/occupation-directory",
+        "screenName": "Occupation Directory",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "occupation-directory"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/marriage",
+        "screenName": "Matrimonial Directory",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "matrimonial-directory"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": true,
+          "interval": 2,
+          "placementCode": "matrimonial-directory"
+        }
+      },
+      {
+        "route": "/events",
+        "screenName": "Events List",
+        "topBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "event-list"
+        },
+        "inList": {
+          "enabled": true,
+          "interval": 4,
+          "placementCode": "event-list"
+        }
+      },
+      {
+        "route": "/event-details",
+        "screenName": "Event Details",
+        "topBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "event-detail"
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/notifications",
+        "screenName": "Notifications",
+        "topBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "notifications"
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/announcements",
+        "screenName": "Announcements",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "announcements"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/advertisement-list",
+        "screenName": "Advertisement Directory",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "advertisement-list"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/library",
+        "screenName": "Library Categories",
+        "topBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "library-list"
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/library-items",
+        "screenName": "Library Items",
+        "topBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "bottomBanner": {
+          "enabled": true,
+          "placementCode": "library-detail"
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      },
+      {
+        "route": "/other",
+        "screenName": "General / Other",
+        "topBanner": {
+          "enabled": true,
+          "placementCode": "other"
+        },
+        "bottomBanner": {
+          "enabled": false,
+          "placementCode": null
+        },
+        "inList": {
+          "enabled": false,
+          "interval": 0,
+          "placementCode": null
+        }
+      }
+    ]
+  }
+}
+

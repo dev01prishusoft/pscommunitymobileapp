@@ -20,8 +20,8 @@ import 'package:pscommunitymobileapp/core/widgets/app_webview_page.dart';
 import 'package:pscommunitymobileapp/core/widgets/cached_img.dart';
 
 import 'package:pscommunitymobileapp/features/advertisement/controllers/advertisement_controller.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/smart_ad_widget.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 import 'package:pscommunitymobileapp/features/home/controllers/home_controller.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
@@ -48,8 +48,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
     super.initState();
     _drawerUserController = Get.put(DrawerUserController(), permanent: true);
     if (Get.isRegistered<AdvertisementController>()) {
-      Get.find<AdvertisementController>().fetchPlacementAds(
-        AdPlacement.homeBottom,
+      Get.find<AdvertisementController>().fetchAdsByCode(
+        'home-bottom',
         limit: 5,
       );
     }
@@ -158,12 +158,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
     Get.find<SamajController>().fetchSamajDetail(updateLanguage: false);
     _drawerUserController.fetchUser();
     if (Get.isRegistered<AdvertisementController>()) {
-      Get.find<AdvertisementController>().fetchPlacementAds(
-        AdPlacement.homeTop,
-      );
-      Get.find<AdvertisementController>().fetchPlacementAds(
-        AdPlacement.homeBottom,
-      );
+      Get.find<AdvertisementController>().fetchAdsByCode('home-top');
+      Get.find<AdvertisementController>().fetchAdsByCode('home-bottom');
     }
     if (mounted) {
       setState(() {
@@ -672,13 +668,13 @@ class _HomePageState extends State<HomePage> with RouteAware {
             Get.find<ModulePermissionService>().fetchMyModules(),
           Get.find<HomeController>().fetchUnreadNotificationCount(),
           if (Get.isRegistered<AdvertisementController>()) ...[
-            Get.find<AdvertisementController>().fetchPlacementAds(
-              AdPlacement.homeTop,
+            Get.find<AdvertisementController>().fetchAdsByCode(
+              'home-top',
               limit: 5,
               forceRefresh: true,
             ),
-            Get.find<AdvertisementController>().fetchPlacementAds(
-              AdPlacement.homeBottom,
+            Get.find<AdvertisementController>().fetchAdsByCode(
+              'home-bottom',
               limit: 5,
               forceRefresh: true,
             ),
@@ -693,12 +689,19 @@ class _HomePageState extends State<HomePage> with RouteAware {
             SizedBox(height: 10.h),
 
             // 1. Top Advertisement Banner (exact same 130.h height and 10.w padding)
-            const AdPlacementSlot(
-              placement: AdPlacement.homeTop,
-              layout: AdLayout.banner,
-              limit: 5,
-              height: 110,
-            ),
+            Obx(() {
+              if (Get.isRegistered<AdScreenConfigService>()) {
+                if (!AdScreenConfigService.to.shouldShowTopBanner('/home')) {
+                  return const SizedBox.shrink();
+                }
+              }
+              return const SmartAdWidget(
+                placementCode: 'home-top',
+                layout: AdLayout.banner,
+                limit: 5,
+                height: 110,
+              );
+            }),
 
             SizedBox(height: 16.h),
 
@@ -797,11 +800,16 @@ class _HomePageState extends State<HomePage> with RouteAware {
         return false;
       }
     }
+    if (Get.isRegistered<AdScreenConfigService>()) {
+      if (!AdScreenConfigService.to.shouldShowBottomBanner('/home')) {
+        return false;
+      }
+    }
     if (!Get.isRegistered<AdvertisementController>()) {
       return false;
     }
     return Get.find<AdvertisementController>()
-        .getAds(AdPlacement.homeBottom)
+        .getAdsByCode('home-bottom')
         .isNotEmpty;
   }
 
@@ -812,8 +820,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
       }
       return SizedBox(
         width: double.infinity,
-        child: AdPlacementSlot(
-          placement: AdPlacement.homeBottom,
+        child: SmartAdWidget(
+          placementCode: 'home-bottom',
           layout: AdLayout.banner,
           height: 110,
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
@@ -1311,7 +1319,7 @@ class _NotificationMenu extends GetView<HomeController> {
           children: [
             Icon(
               Iconsax.notification_bing_copy,
-              color: const Color(0xFF1E293B),
+              color: AppColors.primary,
               size: 23.sp,
             ),
             if (count > 0) ...[
@@ -1320,8 +1328,8 @@ class _NotificationMenu extends GetView<HomeController> {
                 top: -2,
                 child: Container(
                   padding: EdgeInsets.all(count > 9 ? 2.5.r : 3.5.r),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
                   constraints: BoxConstraints(minWidth: 14.r, minHeight: 14.r),

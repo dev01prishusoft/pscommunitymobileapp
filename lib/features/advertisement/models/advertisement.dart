@@ -94,6 +94,7 @@ class Advertisement {
   final String? description;
   final AdvertisementType type;
   final AdPlacement placement;
+  String get placementCode => placement.code;
   final ClickAction clickAction;
   final String? targetUrl;
   final String ctaLabel;
@@ -184,7 +185,12 @@ class Advertisement {
         ? json['contact'] as Map<String, dynamic>
         : null;
 
-    final placementVal = json['placement']?.toString();
+    final placementVal = (json['placementCode'] ??
+            json['placement_code'] ??
+            json['placement'])
+        ?.toString()
+        .trim();
+    final placementObj = AdPlacement.fromCode(placementVal);
 
     return Advertisement(
       id: json['id'] is int
@@ -194,7 +200,7 @@ class Advertisement {
       subtitle: json['subtitle']?.toString(),
       description: json['description']?.toString(),
       type: AdvertisementType.fromJson(json['type'] ?? json['advertisementTypeId']),
-      placement: AdPlacement.fromCode(placementVal),
+      placement: placementObj,
       clickAction: ClickAction.fromJson(
         json['clickAction'] ??
             json['clickActionId'] ??
@@ -228,7 +234,8 @@ class Advertisement {
       if (subtitle != null) 'subtitle': subtitle,
       if (description != null) 'description': description,
       'type': type.toJson(),
-      'placement': placement.code,
+      'placement': placementCode,
+      'placementCode': placementCode,
       'clickAction': clickAction.toJson(),
       if (targetUrl != null) 'targetUrl': targetUrl,
       'ctaLabel': ctaLabel,

@@ -6,6 +6,8 @@ import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/committee/controllers/committee_controller.dart';
 import 'package:pscommunitymobileapp/core/models/committee_node.dart';
 import 'package:pscommunitymobileapp/core/widgets/committee_card.dart';
@@ -31,7 +33,8 @@ class _CommitteesPageState extends State<CommitteesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.committees,
       appBar: AppBar(
         title: _isSearchVisible
             ? CupertinoSearchbar(

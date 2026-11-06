@@ -6,24 +6,38 @@ import 'package:pscommunitymobileapp/core/module_permission/models/app_module.da
 import 'package:pscommunitymobileapp/core/module_permission/services/module_permission_service.dart';
 import '../controllers/advertisement_controller.dart';
 import '../models/ad_placement.dart';
+import '../models/advertisement.dart';
 import 'ad_banner_carousel.dart';
 import 'advertisement_card.dart';
 
 class AdPlacementSlot extends StatefulWidget {
-  final AdPlacement placement;
+  final AdPlacement? placement;
+  final String? placementCode;
   final AdLayout layout;
   final int? limit;
   final EdgeInsetsGeometry? padding;
   final double? height;
+  final int? adIndex;
 
   const AdPlacementSlot({
     super.key,
-    required this.placement,
+    this.placement,
+    this.placementCode,
     this.layout = AdLayout.card,
     this.limit,
     this.padding,
     this.height,
-  });
+    this.adIndex,
+  }) : assert(
+          placement != null || placementCode != null,
+          'Either placement or placementCode must be provided',
+        );
+
+  String get effectivePlacementCode =>
+      (placementCode ?? placement?.code ?? 'other').trim().toLowerCase();
+
+  AdPlacement get effectivePlacement =>
+      placement ?? AdPlacement.fromCode(effectivePlacementCode);
 
   @override
   State<AdPlacementSlot> createState() => _AdPlacementSlotState();
@@ -70,7 +84,7 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
       final limit = widget.limit ?? 5;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          _controller?.fetchPlacementAds(widget.placement, limit: limit);
+          _controller?.fetchAdsByCode(widget.effectivePlacementCode, limit: limit);
         }
       });
     }
@@ -78,6 +92,10 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null && Get.isRegistered<AdvertisementController>()) {
+      _controller = Get.find<AdvertisementController>();
+      _fetchAds();
+    }
     if (_controller == null) {
       return const SizedBox.shrink();
     }
@@ -91,17 +109,23 @@ class _AdPlacementSlotState extends State<AdPlacementSlot> with RouteAware {
         }
       }
 
-      final ads = _controller!.getAds(widget.placement);
+      final ads = _controller!.getAdsByCode(widget.effectivePlacementCode);
       if (ads.isEmpty) {
         return const SizedBox.shrink();
       }
 
       final cardHeight = widget.height ?? 110.h;
-      final displayAds = ads.take(widget.limit ?? 5).toList();
+      final List<Advertisement> displayAds;
+      if (widget.adIndex != null && ads.isNotEmpty) {
+        final rotatedAd = ads[widget.adIndex! % ads.length];
+        displayAds = [rotatedAd];
+      } else {
+        displayAds = ads.take(widget.limit ?? 5).toList();
+      }
 
       final content = AdBannerCarousel(
         advertisements: displayAds,
-        placement: widget.placement,
+        placement: widget.effectivePlacement,
         layout: widget.layout,
         height: cardHeight,
       );

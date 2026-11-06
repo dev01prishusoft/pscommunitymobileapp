@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/network/app_config.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -51,13 +53,15 @@ class _PaymentReceiptPageState extends State<PaymentReceiptPage> {
   @override
   Widget build(BuildContext context) {
     if (_receiptId == null) {
-      return Scaffold(
+      return DynamicAdScaffold(
+      route: AppRouter.paymentReceipt,
         appBar: AppBar(title: Text(LK.paymentReceipt.tr)),
         body: Center(child: Text(LK.invalidReceiptId.tr)),
       );
     }
 
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.paymentReceipt,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

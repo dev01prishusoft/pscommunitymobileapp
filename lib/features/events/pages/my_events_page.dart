@@ -8,6 +8,9 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/models/registered_events_model.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/my_events_controller.dart';
 import 'package:pscommunitymobileapp/features/events/pages/my_event_details_page.dart';
 
@@ -63,7 +66,8 @@ class _MyEventsPageState extends State<MyEventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.myEvents,
       appBar: AppBar(
         title: Obx(() {
           if (controller.isSearchVisible.value) {
@@ -316,7 +320,11 @@ class _MyEventsPageState extends State<MyEventsPage> {
                         itemCount:
                             displayedList.length +
                             (controller.isLoadingMore.value ? 1 : 0),
-                        separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                        separatorBuilder: (context, index) => DynamicAdSeparator(
+                          index: index,
+                          route: AppRouter.myEvents,
+                          regularSeparator: SizedBox(height: 12.h),
+                        ),
                         itemBuilder: (context, index) {
                           if (index == displayedList.length) {
                             return Center(

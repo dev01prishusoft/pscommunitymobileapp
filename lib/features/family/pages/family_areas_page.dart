@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
 import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/theme/app_text_styles.dart';
@@ -48,12 +49,24 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.familyAreas,
       appBar: AppBar(
         title: Text(LK.familyByArea.tr),
         actions: [
           IconButton(
-            icon: const Icon(Iconsax.filter_search_copy),
+            icon: Obx(() {
+              final count = controller.activeFilterCount;
+              if (count > 0) {
+                return Badge(
+                  label: Text('$count'),
+                  backgroundColor: AppColors.primary,
+                  textColor: AppColors.white,
+                  child: const Icon(Iconsax.filter_search_copy),
+                );
+              }
+              return const Icon(Iconsax.filter_search_copy);
+            }),
             onPressed: () {
               Get.dialog<void>(const _FilterDialog());
             },

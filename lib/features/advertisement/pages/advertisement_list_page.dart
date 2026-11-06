@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
+import '../widgets/dynamic_ad_scaffold.dart';
 import '../controllers/advertisement_list_controller.dart';
 import '../models/ad_placement.dart';
 import '../widgets/advertisement_card.dart';
@@ -40,7 +42,8 @@ class _AdvertisementListPageState extends State<AdvertisementListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.advertisementList,
       appBar: AppBar(
         title: Text(
           LK.advertisements.tr,

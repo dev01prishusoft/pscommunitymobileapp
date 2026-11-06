@@ -50,6 +50,27 @@ class MarriageController extends GetxController {
   final RxString selectedDistrict = 'All'.obs;
   final RxString selectedTaluka = 'All'.obs;
   final RxString selectedArea = 'All'.obs;
+
+  int get activeAdvancedFilterCount {
+    int count = 0;
+    if (selectedAgeFrom.value != '18' || selectedAgeTo.value != '60') count++;
+    if (selectedHeightFrom.value != '120 cm' ||
+        selectedHeightTo.value != '210 cm')
+      count++;
+    if (selectedGotra.value != 'Any') count++;
+    if (excludeSameGotra.value) count++;
+    if (selectedMaritalStatus.value != 'All') count++;
+    if (selectedState.value != 'All') count++;
+    if (selectedDistrict.value != 'All') count++;
+    if (selectedTaluka.value != 'All') count++;
+    if (selectedArea.value != 'All') count++;
+    if (selectedEducation.value != 'Any') count++;
+    if (selectedOccupation.value != 'Any') count++;
+    if (selectedIncomeFrom.value.isNotEmpty ||
+        selectedIncomeTo.value.isNotEmpty)
+      count++;
+    return count;
+  }
   final RxString selectedEducation = 'Any'.obs;
   final RxString selectedOccupation = 'Any'.obs;
   final RxString selectedIncomeFrom = ''.obs;

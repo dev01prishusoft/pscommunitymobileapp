@@ -16,10 +16,8 @@ import 'package:pscommunitymobileapp/core/models/dropdown_item.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_avatar.dart';
 import 'package:pscommunitymobileapp/core/widgets/paginated_list_view.dart';
 import 'package:pscommunitymobileapp/core/models/member.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/member/controllers/find_member_controller.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
 
 class FindMemberPage extends StatefulWidget {
   const FindMemberPage({super.key});
@@ -43,7 +41,8 @@ class _FindMemberPageState extends State<FindMemberPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Scaffold(
+      child: DynamicAdScaffold(
+        route: AppRouter.findMember,
         appBar: AppBar(
           title: _isSearchVisible
               ? CupertinoSearchbar(
@@ -82,7 +81,18 @@ class _FindMemberPageState extends State<FindMemberPage> {
                 },
               ),
               IconButton(
-                icon: const Icon(Iconsax.filter_search_copy),
+                icon: Obx(() {
+                  final count = _controller.activeFilterCount;
+                  if (count > 0) {
+                    return Badge(
+                      label: Text('$count'),
+                      backgroundColor: AppColors.primary,
+                      textColor: AppColors.white,
+                      child: const Icon(Iconsax.filter_search_copy),
+                    );
+                  }
+                  return const Icon(Iconsax.filter_search_copy);
+                }),
                 onPressed: () {
                   Get.dialog<void>(const _FindMemberFilterDialog());
                 },
@@ -90,23 +100,12 @@ class _FindMemberPageState extends State<FindMemberPage> {
             ],
           ],
         ),
-        body: Column(
-          children: [
-            AdPlacementSlot(
-              placement: AdPlacement.memberDirectory,
-              layout: AdLayout.card,
-              padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 4.h),
-            ),
-            Expanded(
-              child: PaginatedListView<Member, FindMemberController>(
-                emptyMessage: LK.noMembersFound.tr,
-                padding: AppSpacing.pagePadding,
-                separatorBuilder: (val, val2) => SizedBox(height: 6.h),
-                itemBuilder: (context, index, member) =>
-                    _FindMemberCard(member: member),
-              ),
-            ),
-          ],
+        body: PaginatedListView<Member, FindMemberController>(
+          emptyMessage: LK.noMembersFound.tr,
+          padding: AppSpacing.pagePadding,
+          separatorBuilder: (val, val2) => SizedBox(height: 6.h),
+          itemBuilder: (context, index, member) =>
+              _FindMemberCard(member: member),
         ),
       ),
     );
@@ -470,7 +469,9 @@ class _FindMemberFilterDialogState extends State<_FindMemberFilterDialog> {
   }
 
   bool get _hasSelection =>
-      _tempState != null || _tempDistrict != null || _tempTaluka != null;
+      _tempState != null ||
+      _tempDistrict != null ||
+      _tempTaluka != null;
 
   @override
   Widget build(BuildContext context) {

@@ -20,9 +20,7 @@ import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_pdf_viewer_page.dart';
 import 'package:pscommunitymobileapp/features/events/controllers/events_controller.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 
 class EventDetailsPage extends StatelessWidget {
   final int eventId;
@@ -33,7 +31,8 @@ class EventDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(EventDetailsController(eventId, Get.find()));
 
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.eventDetails,
       appBar: AppBar(title: Text(LK.event_details_title.tr)),
       bottomNavigationBar: Obx(() {
         if (controller.isLoading.value || controller.hasError.value)
@@ -83,12 +82,6 @@ class EventDetailsPage extends StatelessWidget {
                   SizedBox(height: 16.h),
                   _buildPleaseNoteSection(event),
                 ],
-                SizedBox(height: 16.h),
-                AdPlacementSlot(
-                  placement: AdPlacement.eventDetail,
-                  layout: AdLayout.card,
-                  padding: EdgeInsets.zero,
-                ),
               ],
             ).paddingSymmetric(horizontal: 10.w),
           ),

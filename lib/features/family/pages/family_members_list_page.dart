@@ -10,6 +10,8 @@ import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_separator.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_snackbar.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
 import 'package:pscommunitymobileapp/core/widgets/member_tile.dart';
@@ -61,7 +63,8 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.familyMembers,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
@@ -161,7 +164,11 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
                             _controller.filteredFamilies.length +
                             (_controller.hasMoreFamilies.value ? 1 : 0),
                         separatorBuilder: (context, index) =>
-                            SizedBox(height: 16.h),
+                            DynamicAdSeparator(
+                              index: index,
+                              route: AppRouter.familyMembers,
+                              regularSeparator: SizedBox(height: 16.h),
+                            ),
                         itemBuilder: (context, index) {
                           if (index == _controller.filteredFamilies.length) {
                             return Center(

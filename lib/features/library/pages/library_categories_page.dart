@@ -6,9 +6,8 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_category_card.dart';
 import 'package:pscommunitymobileapp/core/widgets/library_search_bar.dart';
-import 'package:pscommunitymobileapp/features/advertisement/models/ad_placement.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/ad_placement_slot.dart';
-import 'package:pscommunitymobileapp/features/advertisement/widgets/advertisement_card.dart';
+import 'package:pscommunitymobileapp/core/constants/app_router.dart';
+import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
 import 'package:pscommunitymobileapp/features/library/controllers/library_controller.dart';
 
 class LibraryCategoriesPage extends StatelessWidget {
@@ -20,7 +19,8 @@ class LibraryCategoriesPage extends StatelessWidget {
         ? Get.find<LibraryController>()
         : Get.put(LibraryController());
 
-    return Scaffold(
+    return DynamicAdScaffold(
+      route: AppRouter.libraryCategories,
       backgroundColor: AppColors.sfBackground,
       appBar: AppBar(title: Text(LK.library_categories_title.tr)),
       body: Obx(() {
@@ -60,29 +60,10 @@ class LibraryCategoriesPage extends StatelessWidget {
                     itemCount: controller.categories.length,
                     itemBuilder: (context, index) {
                       final category = controller.categories[index];
-                      final categoryCard = LibraryCategoryCard(
+                      return LibraryCategoryCard(
                         category: category,
                         onTap: () => controller.selectCategory(category),
                       );
-
-                      // In-feed advertisement placed inside the list (between items)
-                      final adTargetIndex = controller.categories.length >= 3
-                          ? 1
-                          : (controller.categories.length >= 2 ? 0 : 0);
-                      if (index == adTargetIndex) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            categoryCard,
-                            AdPlacementSlot(
-                              placement: AdPlacement.libraryList,
-                              layout: AdLayout.card,
-                              padding: EdgeInsets.only(bottom: 12.h),
-                            ),
-                          ],
-                        );
-                      }
-                      return categoryCard;
                     },
                   ),
                 ),
