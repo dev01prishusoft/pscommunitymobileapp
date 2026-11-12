@@ -289,7 +289,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
           ? userPic
           : samajController.samaj.value?.logoUrl;
       final name = member != null
-          ? '${member.firstName} ${member.lastName}'.trim()
+          ? member.fullName
           : (samajController.samaj.value?.name ?? LK.samajName.tr);
       final subtitle = member?.mobileNo?.isNotEmpty == true
           ? member!.mobileNo!
@@ -397,7 +397,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
   }
 
   Widget _buildSettingsGroup({
-    required String title,
     required List<Widget> items,
   }) {
     final validItems = items.where((widget) => widget is! SizedBox).toList();
@@ -406,18 +405,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.only(left: 4.w, bottom: 6.h),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12.5.sp,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF64748B),
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -468,14 +455,11 @@ class _HomePageState extends State<HomePage> with RouteAware {
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         child: Column(
           children: [
-            // Top Profile Card from Drawer (Solid Primary Color Background)
             _buildProfileCard(context),
 
             SizedBox(height: 16.h),
 
-            // 1. Navigation & Services (matching drawer list, without Home, Edit Profile, Advertisement)
             _buildSettingsGroup(
-              title: 'Navigation & Services'.tr,
               items: [
                 _SettingsTile(
                   icon: Iconsax.people_copy,
@@ -529,9 +513,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
             SizedBox(height: 14.h),
 
-            // 2. Account Actions
             _buildSettingsGroup(
-              title: 'Account Actions'.tr,
               items: [
                 _SettingsTile(
                   icon: Iconsax.user_remove_copy,

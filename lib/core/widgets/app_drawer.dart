@@ -155,7 +155,7 @@ class AppDrawer extends StatelessWidget {
                 }
                 final member = userController.member.value;
                 final name = member != null
-                    ? '${member.firstName} ${member.lastName}'
+                    ? member.fullName
                     : (samajController.samaj.value?.name ?? LK.samajName.tr);
                 return Text(
                   name,

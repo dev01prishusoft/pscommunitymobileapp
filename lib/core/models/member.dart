@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 
 class Member {
@@ -140,12 +141,12 @@ class Member {
       age: json['age'] ?? 0,
       memberId: (json['memberId'] ?? json['id']) as int? ?? 0,
       memberNo: getString('memberNo'),
-      firstName: getString('firstName') ?? fallbackFirst,
-      firstNameEnglish: getString('firstNameEnglish'),
+      firstName: getString('firstName', 'FirstName') ?? fallbackFirst,
+      firstNameEnglish: getString('firstNameEnglish', 'FirstNameEnglish'),
       middleNameEnglish: getString('middleNameEnglish', 'MiddleNameEnglish'),
-      middleName: getString('middleName'),
-      lastName: getString('lastName') ?? fallbackLast,
-      lastNameEnglish: getString('lastNameEnglish'),
+      middleName: getString('middleName', 'MiddleName'),
+      lastName: getString('lastName', 'LastName') ?? fallbackLast,
+      lastNameEnglish: getString('lastNameEnglish', 'LastNameEnglish'),
       nativePlaceId: (json['nativePlaceId'] ?? json['NativePlaceId']) as int?,
       nativePlaceName: getString('nativePlaceName', 'NativePlaceName', 'nativePlace', 'NativePlace'),
       fullNameSearchText: getString('fullNameSearchText'),
@@ -356,8 +357,46 @@ class Member {
   final String? signName;
   final bool? issameAddressasMyFamilyHeadAddress;
 
-  String get fullName =>
-      '$firstName ${middleName ?? ''} $lastName'.replaceFirst('  ', ' ').trim();
+  String get fullNameEnglish {
+    final parts = [
+      firstNameEnglish,
+      middleNameEnglish,
+      lastNameEnglish,
+    ]
+        .where((s) => s != null && s.trim().isNotEmpty)
+        .map((s) => s!.trim())
+        .toList();
+    return parts.join(' ');
+  }
+
+  String get fullNameNative {
+    final parts = [
+      firstName,
+      middleName,
+      lastName,
+    ]
+        .where((s) => s != null && s.trim().isNotEmpty)
+        .map((s) => s!.trim())
+        .toList();
+    return parts.join(' ');
+  }
+
+  String get fullName {
+    final isEnglish = Get.locale?.languageCode == 'en';
+    if (isEnglish) {
+      final en = fullNameEnglish;
+      if (en.isNotEmpty) return en;
+      final native = fullNameNative;
+      if (native.isNotEmpty) return native;
+    } else {
+      final native = fullNameNative;
+      if (native.isNotEmpty) return native;
+      final en = fullNameEnglish;
+      if (en.isNotEmpty) return en;
+    }
+    return '';
+  }
+
   String get name => fullName;
   String get gender => genderName ?? '';
   String get occupation => occupationName ?? occupationTypeName ?? '';

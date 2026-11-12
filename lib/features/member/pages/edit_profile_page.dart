@@ -466,6 +466,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     () => AppFormTextField(
                       controller: controller.middleNameCtrl,
                       label: '${LK.middleName.tr}$_nativeLangSuffix',
+                      originalValue: controller.currentMember?.middleName ?? '',
                       prefixIcon: const Icon(Icons.person_outline),
                       maxLength: 100,
                       updateStatus: controller.getUpdateStatus('MiddleName'),
@@ -484,18 +485,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ),
                 AppSpacing.vM,
+                Obx(
+                  () => AppFormTextField(
+                    controller: controller.firstNameEnCtrl,
+                    label: LK.firstNameEnglish.tr,
+                    isRequired: true,
+                    originalValue:
+                        controller.currentMember?.firstNameEnglish ?? '',
+                    prefixIcon: const Icon(Icons.language),
+                    maxLength: 100,
+                    updateStatus: controller.getUpdateStatus(
+                      'FirstNameEnglish',
+                    ),
+                  ),
+                ),
+                AppSpacing.vM,
                 _buildFieldPair(
                   Obx(
                     () => AppFormTextField(
-                      controller: controller.firstNameEnCtrl,
-                      label: LK.firstNameEnglish.tr,
-                      isRequired: true,
+                      controller: controller.middleNameEnCtrl,
+                      label: LK.Middle_Name_English.tr,
                       originalValue:
-                          controller.currentMember?.firstNameEnglish ?? '',
+                          controller.currentMember?.middleNameEnglish ?? '',
                       prefixIcon: const Icon(Icons.language),
                       maxLength: 100,
                       updateStatus: controller.getUpdateStatus(
-                        'FirstNameEnglish',
+                        'MiddleNameEnglish',
                       ),
                     ),
                   ),

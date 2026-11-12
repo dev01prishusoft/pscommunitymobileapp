@@ -58,11 +58,15 @@ class MarriageFilterApplicator {
       final query = filters.searchQuery.toLowerCase();
       result = result.where((m) {
         final fullName = m.fullName.toLowerCase();
+        final fullNameEnglish = m.fullNameEnglish.toLowerCase();
+        final fullNameNative = m.fullNameNative.toLowerCase();
         final occupation = m.occupation.toLowerCase();
         final age = m.age.toString();
         final memberNo = (m.memberNo ?? '').toLowerCase();
         final mobile = (m.mobileNo ?? '').toLowerCase();
         return fullName.contains(query) ||
+            fullNameEnglish.contains(query) ||
+            fullNameNative.contains(query) ||
             occupation.contains(query) ||
             age.contains(query) ||
             memberNo.contains(query) ||

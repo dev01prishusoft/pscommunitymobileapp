@@ -33,8 +33,6 @@ class ShareAppPage extends StatelessWidget {
             padding: AppSpacing.pagePadding,
             child: Column(
               children: [
-                _AppLinkCard(ctrl: controller),
-                const SizedBox(height: 10),
                 _QrCard(ctrl: controller),
                 const SizedBox(height: 10),
                 Row(
@@ -101,121 +99,69 @@ class _AppLinkCard extends GetView<SamajController> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration(radius: 16),
-      child: Column(
-        spacing: 15.w,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            spacing: 15.w,
+    return Row(
+      spacing: 15.w,
+      children: [
+        Obx(() {
+          final logoUrl = controller.samaj.value?.logoUrl;
+          return Container(
+            width: 76.w,
+            height: 76.h,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: logoUrl != null && logoUrl.isNotEmpty
+                  ? CachedImg(
+                      url: logoUrl,
+                      width: 76.w,
+                      height: 76.h,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          Image.asset(FallBackImage, fit: BoxFit.cover),
+                    )
+                  : Image.asset(FallBackImage, fit: BoxFit.cover),
+            ),
+          );
+        }),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Obx(() {
-                final logoUrl = controller.samaj.value?.logoUrl;
-                return Container(
-                  width: 76.w,
-                  height: 76.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: logoUrl != null && logoUrl.isNotEmpty
-                        ? CachedImg(
-                            url: logoUrl,
-                            width: 76.w,
-                            height: 76.h,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Image.asset(FallBackImage, fit: BoxFit.cover),
-                          )
-                        : Image.asset(FallBackImage, fit: BoxFit.cover),
+                final samajName =
+                    controller.samaj.value?.name ?? LK.samajName.tr;
+                return Text(
+                  samajName,
+                  style: AppTextStyles.headlineLarge.copyWith(
+                    color: AppColors.black,
+                    letterSpacing: 0.2,
                   ),
                 );
               }),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Obx(() {
-                      final samajName =
-                          controller.samaj.value?.name ?? LK.samajName.tr;
-                      return Text(
-                        samajName,
-                        style: AppTextStyles.headlineLarge.copyWith(
-                          color: AppColors.black,
-                          letterSpacing: 0.2,
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 6),
-                    Text(
-                      LK.joinCommunity.tr,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 6),
+              Text(
+                LK.joinCommunity.tr,
+                style: AppTextStyles.titleSmall.copyWith(
+                  color: Colors.grey.shade600,
                 ),
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    ctrl.appLink,
-                    style: AppTextStyles.labelLarge.copyWith(fontSize: 13),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
-                InkWell(
-                  onTap: ctrl.copyLink,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.copy_rounded,
-                        size: 14,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        LK.copyLink.tr,
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -240,6 +186,8 @@ class _QrCard extends StatelessWidget {
         decoration: _cardDecoration(),
         child: Column(
           children: [
+            _AppLinkCard(ctrl: ctrl),
+            SizedBox(height: 20.h),
             Container(
               height: 48,
               padding: const EdgeInsets.all(4),
@@ -345,37 +293,37 @@ class _QrCard extends StatelessWidget {
                   );
                 },
                 borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primary, width: 1.5),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.share_rounded,
-                      size: 16,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      LK.shareQR.tr,
-                      style: AppTextStyles.labelLarge.copyWith(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary, width: 1.5),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.share_rounded,
+                        size: 16,
                         color: AppColors.primary,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(
+                        LK.shareQR.tr,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
         ),
       );
     });

@@ -116,6 +116,20 @@ class FamilyTreeNode {
   });
 
   factory FamilyTreeNode.fromJson(Map<String, dynamic> json) {
+    String? getString(
+      String key, [
+      String? fallbackKey1,
+      String? fallbackKey2,
+    ]) {
+      final val =
+          json[key] ??
+          (fallbackKey1 != null ? json[fallbackKey1] : null) ??
+          (fallbackKey2 != null ? json[fallbackKey2] : null);
+      if (val == null) return null;
+      final s = val.toString().trim();
+      return s.isEmpty ? null : s;
+    }
+
     FamilyTreeNode? partnerNode;
     if (json['partner'] != null && json['partner'] is Map<String, dynamic>) {
       partnerNode = FamilyTreeNode.fromJson(
@@ -132,27 +146,42 @@ class FamilyTreeNode {
       }
     }
 
+    final rawFullName =
+        getString('fullName', 'FullName', 'memberName') ?? getString('name');
+    final fallbackFullName = [
+      getString('firstName', 'FirstName'),
+      getString('middleName', 'MiddleName'),
+      getString('lastName', 'LastName'),
+    ]
+        .where((s) => s != null && s.trim().isNotEmpty)
+        .map((s) => s!.trim())
+        .join(' ');
+
+    final effectiveFullName = (rawFullName != null && rawFullName.isNotEmpty)
+        ? rawFullName
+        : fallbackFullName;
+
     return FamilyTreeNode(
-      memberId: json['memberId'] as int? ?? 0,
+      memberId: (json['memberId'] ?? json['id']) as int? ?? 0,
       familyMemberId: json['familyMemberId'] as int?,
       memberNo: json['memberNo']?.toString() ?? '',
-      firstName: json['firstName'] as String?,
-      middleName: json['middleName'] as String?,
-      lastName: json['lastName'] as String?,
-      fullName: json['fullName'] as String? ??
-          '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
-      genderId: json['genderId'] as int?,
-      genderEnglishName: json['genderEnglishName'] as String?,
-      genderName: json['genderName'] as String?,
-      relationTypeId: json['relationTypeId'] as int?,
-      relationTypeName: json['relationTypeName'] as String?,
-      relationTypeCode: json['relationTypeCode'] as String?,
+      firstName: getString('firstName', 'FirstName'),
+      middleName: getString('middleName', 'MiddleName'),
+      lastName: getString('lastName', 'LastName'),
+      fullName: effectiveFullName,
+      genderId: (json['genderId'] ?? json['GenderId']) as int?,
+      genderEnglishName: getString('genderEnglishName', 'GenderEnglishName'),
+      genderName: getString('genderName', 'GenderName'),
+      relationTypeId:
+          (json['relationTypeId'] ?? json['RelationTypeId']) as int?,
+      relationTypeName: getString('relationTypeName', 'RelationTypeName'),
+      relationTypeCode: getString('relationTypeCode', 'RelationTypeCode'),
       isHead: json['isHead'] as bool? ?? false,
       isLifePartner: json['isLifePartner'] as bool? ?? false,
       relatedToMemberId: json['relatedToMemberId'] as int?,
       partnerMemberId: json['partnerMemberId'] as int?,
       partner: partnerNode,
-      profilePhotoUrl: json['profilePhotoUrl'] as String?,
+      profilePhotoUrl: getString('profilePhotoUrl', 'ProfilePhotoUrl'),
       isDemised: json['isDemised'] as bool? ?? false,
       demisedDate: json['demisedDate']?.toString(),
       dateOfBirth: json['dateOfBirth']?.toString(),
@@ -168,6 +197,7 @@ class FamilyTreeNode {
   final String? middleName;
   final String? lastName;
   final String fullName;
+  String get name => fullName;
   final int? genderId;
   final String? genderEnglishName;
   final String? genderName;
