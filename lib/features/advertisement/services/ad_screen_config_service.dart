@@ -1,20 +1,29 @@
 import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/api_endpoints.dart';
 import 'package:pscommunitymobileapp/core/utils/crash_reporter.dart';
 import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
+import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 import '../models/ad_screen_config.dart';
 
 class AdScreenConfigService extends GetxService {
   final ApiClient? _apiClient;
   final SecureStorageService? _storageService;
+  final TokenManager? _tokenManager;
+  final AuthState? _authState;
   static const String _storageKey = 'ad_screen_config_cache';
 
   final Rx<AdGlobalConfig> config = AdGlobalConfig.defaults().obs;
   final RxBool isLoading = false.obs;
 
-  AdScreenConfigService([this._apiClient, this._storageService]);
+  AdScreenConfigService([
+    this._apiClient,
+    this._storageService,
+    this._tokenManager,
+    this._authState,
+  ]);
 
   static AdScreenConfigService get to {
     if (Get.isRegistered<AdScreenConfigService>()) {
@@ -24,14 +33,59 @@ class AdScreenConfigService extends GetxService {
     final storage = Get.isRegistered<SecureStorageService>()
         ? Get.find<SecureStorageService>()
         : null;
-    final service = AdScreenConfigService(client, storage);
+    final tokenManager = Get.isRegistered<TokenManager>()
+        ? Get.find<TokenManager>()
+        : null;
+    final authState = Get.isRegistered<AuthState>()
+        ? Get.find<AuthState>()
+        : null;
+    final service = AdScreenConfigService(
+      client,
+      storage,
+      tokenManager,
+      authState,
+    );
     Get.put(service, permanent: true);
     return service;
   }
 
+  bool get isLoggedIn {
+    if (_authState != null) {
+      return _authState.isAuthenticated.value;
+    }
+    if (Get.isRegistered<AuthState>()) {
+      return Get.find<AuthState>().isAuthenticated.value;
+    }
+    if (_tokenManager != null) {
+      return _tokenManager.hasToken;
+    }
+    if (Get.isRegistered<TokenManager>()) {
+      return Get.find<TokenManager>().hasToken;
+    }
+    return false;
+  }
+
   Future<void> init() async {
     await _loadFromCache();
-    await fetchScreenConfig();
+    _listenToAuthChanges();
+    if (isLoggedIn) {
+      await fetchScreenConfig();
+    }
+  }
+
+  void _listenToAuthChanges() {
+    try {
+      final auth =
+          _authState ??
+          (Get.isRegistered<AuthState>() ? Get.find<AuthState>() : null);
+      if (auth != null) {
+        ever<bool>(auth.isAuthenticated, (authenticated) {
+          if (authenticated) {
+            fetchScreenConfig();
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadFromCache() async {
@@ -53,6 +107,8 @@ class AdScreenConfigService extends GetxService {
   }
 
   Future<void> fetchScreenConfig() async {
+    if (!isLoggedIn) return;
+
     final client = _apiClient ??
         (Get.isRegistered<ApiClient>() ? Get.find<ApiClient>() : null);
     if (client == null) return;
@@ -62,7 +118,6 @@ class AdScreenConfigService extends GetxService {
       final response = await client.get(ApiEndpoints.advertisementScreenConfig);
       if (response.statusCode == 200 && response.data != null) {
         dynamic data = response.data;
-        printInfo(info: 'AdScreenConfig fetched raw: ${jsonEncode(data)}');
 
         // Unpack nested response if wrapped in data or result
         if (data is Map<String, dynamic>) {
@@ -82,11 +137,6 @@ class AdScreenConfigService extends GetxService {
 
         if (parsed != null) {
           config.value = parsed;
-          printInfo(
-            info:
-                'AdScreenConfig loaded successfully with ${parsed.screens.length} screens: ${parsed.screens.keys.toList()}',
-          );
-
           // Persist to storage for offline/instant startup
           try {
             final storage = _storageService ??

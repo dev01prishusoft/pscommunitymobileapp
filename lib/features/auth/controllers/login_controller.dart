@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/models/auth_tokens.dart';
 import 'package:pscommunitymobileapp/features/auth/repositories/login_usecase.dart';
 import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/features/samaj/controllers/samaj_controller.dart';
+import 'package:pscommunitymobileapp/features/advertisement/services/ad_screen_config_service.dart';
 
 enum LoginResult { success, requirePasswordReset, failure }
 
@@ -76,6 +77,9 @@ class LoginController extends GetxController with FormStateMixin {
       );
       Get.changeTheme(AppTheme.light);
       await Get.find<SamajController>().fetchSamajDetail();
+      if (Get.isRegistered<AdScreenConfigService>()) {
+        unawaited(Get.find<AdScreenConfigService>().fetchScreenConfig());
+      }
       return result.data.isDefaultPassword
           ? LoginResult.requirePasswordReset
           : LoginResult.success;

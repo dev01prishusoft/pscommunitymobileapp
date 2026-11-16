@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/auth/auth_state.dart';
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
+import 'package:pscommunitymobileapp/core/services/firebase_database_service.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/network/connectivity_service.dart';
@@ -60,7 +61,9 @@ class DI {
   static Future<void> bootstrap() async {
     try {
       await Future(() async {
-        AppEnvironment.init();
+        final firebaseDatabaseService = FirebaseDatabaseService();
+        Get.put(firebaseDatabaseService, permanent: true);
+        await AppEnvironment.init(firebaseService: firebaseDatabaseService);
         final secureStorage = SecureStorageService();
         Get.put(secureStorage, permanent: true);
         final tokenManager = TokenManager(secureStorage);
@@ -181,7 +184,12 @@ class DI {
         );
         Get.put(advertisementTrackingService, permanent: true);
 
-        final adScreenConfigService = AdScreenConfigService(apiClient);
+        final adScreenConfigService = AdScreenConfigService(
+          apiClient,
+          secureStorage,
+          tokenManager,
+          authState,
+        );
         await adScreenConfigService.init();
         Get.put(adScreenConfigService, permanent: true);
 
