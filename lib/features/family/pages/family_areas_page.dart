@@ -635,7 +635,9 @@ class _AreasList extends StatelessWidget {
                 AppRouter.familyMembers,
                 arguments: {
                   'areaId': area.id,
-                  'areaName': '${area.location} (${area.title})',
+                  'areaName': controller.filterBy.value == 1
+                      ? '${area.location} (${area.title})'
+                      : '${area.title}',
                   'membersCount': area.members,
                   'familiesCount': area.families,
                   'byArea': controller.filterBy.value == 1,
