@@ -23,8 +23,8 @@ class FamilyRepositoryImpl implements FamilyRepository {
       final Map<String, dynamic> dataMap = response.data is Map<String, dynamic>
           ? response.data as Map<String, dynamic>
           : (response.data is String
-              ? jsonDecode(response.data as String) as Map<String, dynamic>
-              : <String, dynamic>{});
+                ? jsonDecode(response.data as String) as Map<String, dynamic>
+                : <String, dynamic>{});
       final treeResponse = FamilyTreeResponse.fromJson(dataMap);
       return treeResponse.data;
     }
@@ -53,8 +53,10 @@ class FamilyRepositoryImpl implements FamilyRepository {
 
   @override
   Future<List<EducationModel>> getMemberEducations(int memberId) async {
-    final response = await _apiClient.get('/api/v1/MemberEducation/mobile/member/$memberId');
-    
+    final response = await _apiClient.get(
+      '/api/v1/MemberEducation/mobile/member/$memberId',
+    );
+
     if (response.statusCode == 200 && response.data != null) {
       final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
       return data.map((e) {
@@ -139,11 +141,13 @@ class FamilyRepositoryImpl implements FamilyRepository {
 
   @override
   Future<List<FamilyArea>> getFamilyAreas({
+    int? FilterBy,
     int? stateId,
     int? districtId,
     int? talukaId,
     int pageNo = 1,
     int pageSize = 20,
+    String? Search,
   }) async {
     final queryParameters = <String, dynamic>{
       if (stateId != null && stateId > 0) 'stateId': stateId,
@@ -151,6 +155,8 @@ class FamilyRepositoryImpl implements FamilyRepository {
       if (talukaId != null && talukaId > 0) 'talukaId': talukaId,
       'pageNumber': pageNo,
       'pageSize': pageSize,
+      if (FilterBy != null) 'FilterBy': FilterBy,
+      if (Search != null && Search.trim().isNotEmpty) 'Search': Search.trim(),
     };
 
     try {
@@ -171,16 +177,19 @@ class FamilyRepositoryImpl implements FamilyRepository {
     int areaId, {
     int pageNo = 1,
     int pageSize = 20,
+    bool byArea = true,
   }) async {
     final queryParameters = <String, dynamic>{
-      'areaId': areaId,
+      if (byArea) 'areaId': areaId else 'nativePlaceId': areaId,
       'pageNumber': pageNo,
       'pageSize': pageSize,
     };
 
     try {
       final response = await _apiClient.getPaginated<Family>(
-        ApiEndpoints.getFamiliesByArea,
+        byArea
+            ? ApiEndpoints.getFamiliesByArea
+            : ApiEndpoints.GetFamilyByNativeplace,
         queryParameters: queryParameters,
         listKey: 'families',
         fromJsonT: (json) => Family.fromJson(json as Map<String, dynamic>),

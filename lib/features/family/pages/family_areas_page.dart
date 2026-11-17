@@ -12,6 +12,7 @@ import 'package:pscommunitymobileapp/core/theme/app_theme.dart';
 import 'package:pscommunitymobileapp/core/theme/app_spacing.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_empty_state.dart';
 import 'package:pscommunitymobileapp/core/widgets/app_state_view.dart';
+import 'package:pscommunitymobileapp/core/widgets/cupertino_searchbar.dart';
 import 'package:pscommunitymobileapp/core/widgets/custom_dropdown.dart';
 import 'package:pscommunitymobileapp/core/models/family_area.dart';
 import 'package:pscommunitymobileapp/features/family/controllers/family_controller.dart';
@@ -26,10 +27,13 @@ class FamilyAreasPage extends StatefulWidget {
 class _FamilyAreasPageState extends State<FamilyAreasPage> {
   final controller = Get.find<FamilyController>();
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearchVisible = false;
 
   @override
   void initState() {
     super.initState();
+    controller.filterBy.value = 1;
     controller.resetFilters();
     controller.loadStates();
     _scrollController.addListener(_onScroll);
@@ -37,15 +41,39 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    if (!_scrollController.hasClients) return;
+    if (controller.isNextPageLoading.value ||
+        !controller.hasMore.value ||
+        controller.state.value == AppState.loading) {
+      return;
+    }
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (maxScroll > 0 && currentScroll > 0 && maxScroll - currentScroll <= 200) {
       controller.loadNextPage();
     }
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  void _onResetAll() {
+    _searchController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+      _isSearchVisible = false;
+    });
+    _scrollToTop();
+    controller.resetFilters();
   }
 
   @override
@@ -53,55 +81,98 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
     return DynamicAdScaffold(
       route: AppRouter.familyAreas,
       appBar: AppBar(
-        title: Text(LK.familyByArea.tr),
+        title: _isSearchVisible && controller.filterBy.value == 2
+            ? CupertinoSearchbar(
+                hintText: LK.searchHint.tr,
+                controller: _searchController,
+                onTapSuffix: () {
+                  _searchController.clear();
+                  controller.clearNativePlaceSearch();
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  setState(() {
+                    _isSearchVisible = false;
+                  });
+                },
+                onChanged: (value) {
+                  controller.updateNativePlaceSearch(value.trim());
+                  if (value.isEmpty) {
+                    _searchController.clear();
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _isSearchVisible = false;
+                    });
+                  }
+                },
+              )
+            : Text(LK.familyByArea.tr),
         actions: [
-          IconButton(
-            icon: Obx(() {
-              final count = controller.activeFilterCount;
-              if (count > 0) {
-                return Badge(
-                  label: Text('$count'),
-                  backgroundColor: AppColors.primary,
-                  textColor: AppColors.white,
-                  child: const Icon(Iconsax.filter_search_copy),
+          if (!_isSearchVisible)
+            Obx(() {
+              final filterBy = controller.filterBy.value;
+              if (filterBy == 2) {
+                return IconButton(
+                  icon: const Icon(Iconsax.search_normal_copy),
+                  onPressed: () {
+                    setState(() {
+                      _isSearchVisible = true;
+                    });
+                  },
                 );
               }
-              return const Icon(Iconsax.filter_search_copy);
+              final count = controller.activeFilterCount;
+              if (count > 0) {
+                return IconButton(
+                  icon: Badge(
+                    label: Text('$count'),
+                    backgroundColor: AppColors.primary,
+                    textColor: AppColors.white,
+                    child: const Icon(Iconsax.filter_search_copy),
+                  ),
+                  onPressed: () {
+                    Get.dialog<void>(const _FilterDialog());
+                  },
+                );
+              }
+              return IconButton(
+                icon: const Icon(Iconsax.filter_search_copy),
+                onPressed: () {
+                  Get.dialog<void>(const _FilterDialog());
+                },
+              );
             }),
-            onPressed: () {
-              Get.dialog<void>(const _FilterDialog());
-            },
-          ),
         ],
       ),
-      body: Obx(() {
-        final state = controller.state.value;
-        if (state == AppState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (state == AppState.empty && controller.areas.isEmpty) {
-          return const Center(
-            child: _EmptyState(),
-          ).paddingSymmetric(horizontal: 16.w);
-        }
+      body: Column(
+        children: [
+          _buildFilterRadioButtons(),
+          Expanded(
+            child: Obx(() {
+              final state = controller.state.value;
+              if (state == AppState.empty && controller.areas.isEmpty) {
+                return Center(
+                  child: _EmptyState(onReset: _onResetAll),
+                ).paddingSymmetric(horizontal: 16.w);
+              }
 
-        return SingleChildScrollView(
-          controller: _scrollController,
-          child: Padding(
-            padding: AppSpacing.pagePadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Obx(
-                  () => AppStateView(
-                    state: controller.state.value,
-                    onRetry: controller.loadAreas,
+              return AppStateView(
+                state: state,
+                onRetry: () {
+                  _scrollToTop();
+                  controller.loadAreas();
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Padding(
+                    padding: AppSpacing.pagePadding,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _AreasList(areas: controller.areas),
+                        _AreasList(areas: controller.areas.toList()),
                         if (controller.isNextPageLoading.value)
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                            ),
                             child: const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -110,11 +181,124 @@ class _FamilyAreasPageState extends State<FamilyAreasPage> {
                     ),
                   ),
                 ),
-              ],
-            ),
+              );
+            }),
           ),
-        );
-      }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterRadioButtons() {
+    return Obx(() {
+      final filterBy = controller.filterBy.value;
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.all(4.w),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: AppColors.grey.withValues(alpha: 0.15),
+            width: 1.w,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildRadioOption(
+                title: LK.area.tr.replaceFirst(RegExp(r':$'), ''),
+                value: 1,
+                isSelected: filterBy == 1,
+                icon: Icons.location_on_rounded,
+                onTap: () {
+                  setState(() {
+                    if (_isSearchVisible) {
+                      _isSearchVisible = false;
+                      _searchController.clear();
+                    }
+                  });
+                  _scrollToTop();
+                  controller.setFilterBy(1);
+                },
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: _buildRadioOption(
+                title: LK.Native_Place.tr,
+                value: 2,
+                isSelected: filterBy == 2,
+                icon: Icons.home_work_rounded,
+                onTap: () {
+                  setState(() {});
+                  _scrollToTop();
+                  controller.setFilterBy(2);
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildRadioOption({
+    required String title,
+    required int value,
+    required bool isSelected,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            width: 1.2.w,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16.sp,
+              color: isSelected ? AppColors.primary : AppColors.grey.shade600,
+            ),
+            SizedBox(width: 6.w),
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  fontSize: 13.sp,
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.grey.shade700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -202,21 +386,20 @@ class _FilterDialogState extends State<_FilterDialog> {
     setState(() => _tempTaluka = value);
   }
 
-  Future<void> _applyFilters() async {
+  void _applyFilters() {
     controller.districts.assignAll(_localDistricts);
     controller.talukas.assignAll(_localTalukas);
-
-    await controller.applyFilters(
+    Get.back<void>();
+    controller.applyFilters(
       state: _tempState,
       district: _tempDistrict,
       taluka: _tempTaluka,
     );
-    Get.back<void>();
   }
 
-  Future<void> _resetFilters() async {
-    await controller.resetFilters();
+  void _resetFilters() {
     Get.back<void>();
+    controller.resetFilters();
   }
 
   bool get _hasSelection =>
@@ -416,6 +599,7 @@ class _AreasList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<FamilyController>();
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -423,11 +607,12 @@ class _AreasList extends StatelessWidget {
       separatorBuilder: (context, index) => DynamicAdSeparator(
         route: AppRouter.familyAreas,
         index: index,
-        regularSeparator: SizedBox(height: 12.h),
+        regularSeparator: SizedBox(height: 10.h),
       ),
       itemBuilder: (context, index) {
         final area = areas[index];
         return Container(
+          key: ValueKey('${area.id}_${area.title}'),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16.r),
@@ -453,6 +638,7 @@ class _AreasList extends StatelessWidget {
                   'areaName': '${area.location} (${area.title})',
                   'membersCount': area.members,
                   'familiesCount': area.families,
+                  'byArea': controller.filterBy.value == 1,
                 },
               );
             },
@@ -486,7 +672,8 @@ class _AreasList extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4.h),
+                        if (controller.filterBy.value == 1) ...[
+                          SizedBox(height: 4.h),
                         Row(
                           children: [
                             Icon(
@@ -508,6 +695,7 @@ class _AreasList extends StatelessWidget {
                             ),
                           ],
                         ),
+                        ],
                         SizedBox(height: 10.h),
                         Row(
                           children: [
@@ -614,23 +802,25 @@ class _AreasList extends StatelessWidget {
 }
 
 class _EmptyState extends GetView<FamilyController> {
-  const _EmptyState();
+  const _EmptyState({this.onReset});
+  final VoidCallback? onReset;
 
   @override
   Widget build(BuildContext context) {
     final bool hasActiveFilters =
         controller.selectedState.value != null ||
         controller.selectedDistrict.value != null ||
-        controller.selectedTaluka.value != null;
+        controller.selectedTaluka.value != null ||
+        controller.nativePlaceSearchQuery.value.isNotEmpty;
 
     return AppEmptyState(
       icon: Icons.map_outlined,
       secondaryIcon: Icons.location_on,
-      title: LK.noAreasFound.tr,
+      title: LK.noDataFound.tr,
       subtitle: LK.trySelectingDifferentFilters.tr,
       actionButton: hasActiveFilters
           ? ElevatedButton.icon(
-              onPressed: controller.resetFilters,
+              onPressed: onReset ?? controller.resetFilters,
               icon: const Icon(Icons.refresh_rounded),
               label: Text(LK.reset.tr),
               style: ElevatedButton.styleFrom(

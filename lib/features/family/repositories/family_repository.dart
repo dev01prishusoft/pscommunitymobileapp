@@ -13,11 +13,14 @@ abstract class FamilyRepository {
     int? talukaId,
     int pageNo = 1,
     int pageSize = 20,
+    int? FilterBy,
+    String? Search,
   });
   Future<List<Family>> getFamiliesByArea(
     int areaId, {
     int pageNo = 1,
     int pageSize = 20,
+    bool byArea = true,
   });
   Future<Member> getMemberDetails(int memberId);
   Future<List<MemberAddress>> getMemberAddresses(int memberId);

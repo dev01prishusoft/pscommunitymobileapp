@@ -33,6 +33,7 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
   late String _areaName;
   late int _membersCount;
   late int _familiesCount;
+  late bool _byArea;
 
   @override
   void initState() {
@@ -42,14 +43,15 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
     _areaName = args['areaName'] as String? ?? '';
     _membersCount = args['membersCount'] as int? ?? 0;
     _familiesCount = args['familiesCount'] as int? ?? 0;
+    _byArea = args['byArea'] as bool? ?? (_controller.filterBy.value == 1);
 
     _controller.memberSearchQuery.value = '';
-    _controller.loadFamilies(_areaId);
+    _controller.loadFamilies(_areaId, byArea: _byArea);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 200) {
-        _controller.loadFamilies(_areaId, isRefresh: false);
+        _controller.loadFamilies(_areaId, byArea: _byArea, isRefresh: false);
       }
     });
   }
@@ -133,7 +135,8 @@ class _FamilyMembersListPageState extends State<FamilyMembersListPage> {
             child: Obx(
               () => AppStateView(
                 state: _controller.familyListState.value,
-                onRetry: () => _controller.loadFamilies(_areaId),
+                onRetry: () =>
+                    _controller.loadFamilies(_areaId, byArea: _byArea),
                 child: _controller.filteredFamilies.isEmpty
                     ? LayoutBuilder(
                         builder: (context, constraints) =>

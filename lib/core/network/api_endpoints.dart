@@ -11,7 +11,7 @@ class ApiEndpoints {
   static String members = '/api/v1/member/list';
   static String memberSearch = '/api/v1/member/MemberSearch';
   static String memberUsingOccupation = '/api/v1/member/MemberUsingOccupation';
-  static String familyAreas = '/api/v1/family/GetFamilyAreaForSamaj';
+  static String familyAreas = '/api/v2/family/GetFamilyAreaForSamaj';
   static String getFamiliesByArea = '/api/v1/family/GetFamilyByArea';
   static String families = '/api/v1/Area/list';
   static String committees = '/api/v1/committee/list';
@@ -87,4 +87,6 @@ class ApiEndpoints {
   static String nativePlaceDropdown = '/api/v1/NativePlace/dropdown';
   static String categoryItems = "/api/v1/Library/mobile/items";
   static String itemDetails(id) => "/api/v1/Library/mobile/item/$id";
+  static String GetFamilyByNativeplace =
+      "/api/v1/family/GetFamilyByNativeplace";
 }

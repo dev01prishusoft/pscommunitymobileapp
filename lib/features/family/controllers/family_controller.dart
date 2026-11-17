@@ -37,6 +37,35 @@ class FamilyController extends GetxController {
   final Rxn<DropdownItem> selectedDistrict = Rxn<DropdownItem>();
   final Rxn<DropdownItem> selectedTaluka = Rxn<DropdownItem>();
 
+  /// Filter by type for Family Areas (1: by Area, 2: by Native Place)
+  final RxInt filterBy = 1.obs;
+  final RxString nativePlaceSearchQuery = ''.obs;
+  String _lastNativePlaceSearchQuery = '';
+
+  void updateNativePlaceSearch(String query) {
+    nativePlaceSearchQuery.value = query;
+  }
+
+  void clearNativePlaceSearch() {
+    if (nativePlaceSearchQuery.value.isEmpty) return;
+    _lastNativePlaceSearchQuery = '';
+    nativePlaceSearchQuery.value = '';
+    loadAreas();
+  }
+
+  void setFilterBy(int value) {
+    if (filterBy.value == value) return;
+    filterBy.value = value;
+    _lastNativePlaceSearchQuery = '';
+    nativePlaceSearchQuery.value = '';
+    selectedState.value = null;
+    selectedDistrict.value = null;
+    selectedTaluka.value = null;
+    districts.clear();
+    talukas.clear();
+    loadAreas();
+  }
+
   int get activeFilterCount {
     int count = 0;
     if (selectedState.value != null) count++;
@@ -184,6 +213,16 @@ class FamilyController extends GetxController {
       (_) => _filterFamilies(),
       time: Duration(milliseconds: 300),
     );
+    debounce(
+      nativePlaceSearchQuery,
+      (query) {
+        if (query != _lastNativePlaceSearchQuery) {
+          _lastNativePlaceSearchQuery = query;
+          loadAreas();
+        }
+      },
+      time: const Duration(milliseconds: 400),
+    );
   }
 
   void _filterFamilies() {
@@ -225,7 +264,7 @@ class FamilyController extends GetxController {
   }
 
   Future<void> loadNextPage() async {
-    if (!hasMore.value || isNextPageLoading.value) return;
+    if (!hasMore.value || isNextPageLoading.value || state.value == AppState.loading) return;
     isNextPageLoading.value = true;
     await _fetchAreas(isRefresh: false);
   }
@@ -234,12 +273,19 @@ class FamilyController extends GetxController {
     final requestId = ++_currentLoadRequestId;
 
     try {
+      final searchParam =
+          filterBy.value == 2 && nativePlaceSearchQuery.value.trim().isNotEmpty
+              ? nativePlaceSearchQuery.value.trim()
+              : null;
+
       final results = await _repository.getFamilyAreas(
         stateId: selectedState.value?.id ?? 0,
         districtId: selectedDistrict.value?.id ?? 0,
         talukaId: selectedTaluka.value?.id ?? 0,
         pageNo: _currentPage,
         pageSize: _pageSize,
+        FilterBy: filterBy.value,
+        Search: searchParam,
       );
 
       if (requestId != _currentLoadRequestId) return;
@@ -293,7 +339,12 @@ class FamilyController extends GetxController {
   final RxBool hasMoreFamilies = true.obs;
   final RxBool isNextPageFamiliesLoading = false.obs;
 
-  Future<void> loadFamilies(int areaId, {bool isRefresh = true}) async {
+  Future<void> loadFamilies(
+    int areaId, {
+    bool? byArea,
+    bool isRefresh = true,
+  }) async {
+    final effectiveByArea = byArea ?? (filterBy.value == 1);
     if (isRefresh) {
       _familiesPage = 1;
       hasMoreFamilies.value = true;
@@ -309,6 +360,7 @@ class FamilyController extends GetxController {
         areaId,
         pageNo: _familiesPage,
         pageSize: _pageSize,
+        byArea: effectiveByArea,
       );
 
       if (results.isEmpty) {
@@ -362,6 +414,8 @@ class FamilyController extends GetxController {
     districts.clear();
 
     talukas.clear();
+    _lastNativePlaceSearchQuery = '';
+    nativePlaceSearchQuery.value = '';
     await loadAreas();
   }
 
