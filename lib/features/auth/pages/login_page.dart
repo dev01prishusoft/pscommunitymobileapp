@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   final mobileController = TextEditingController();
   final passwordController = TextEditingController();
+  Timer? _longPressTimer;
 
   @override
   void initState() {
@@ -36,9 +38,26 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    _longPressTimer?.cancel();
     mobileController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  void _startLongPressTimer() {
+    _longPressTimer?.cancel();
+    _longPressTimer = Timer(const Duration(seconds: 5), _applyCustomBaseUrl);
+  }
+
+  void _cancelLongPressTimer() {
+    _longPressTimer?.cancel();
+  }
+
+  void _applyCustomBaseUrl() {
+    _cancelLongPressTimer();
+    final customUrl = "http://122.170.12.63:5001";
+    AppEnvironment.updateCustomUrls(customUrl: customUrl);
+    HapticFeedback.vibrate();
   }
 
   @override
@@ -108,11 +127,22 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: 160.h),
-                  child: Image.asset(
-                    'assets/images/banner_logo.png',
-                    fit: BoxFit.contain,
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPressDown: (_) => _startLongPressTimer(),
+                  onLongPressStart: (_) {},
+                  onLongPressEnd: (_) => _cancelLongPressTimer(),
+                  onLongPressCancel: _cancelLongPressTimer,
+                  onSecondaryLongPressDown: (_) => _startLongPressTimer(),
+                  onSecondaryLongPressStart: (_) {},
+                  onSecondaryLongPressEnd: (_) => _cancelLongPressTimer(),
+                  onSecondaryLongPressCancel: _cancelLongPressTimer,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 160.h),
+                    child: Image.asset(
+                      'assets/images/banner_logo.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 AppSpacing.vXxl,

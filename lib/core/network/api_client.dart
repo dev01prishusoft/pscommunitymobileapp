@@ -24,18 +24,17 @@ class ApiClient {
            connectTimeout: AppEnvironment.I.connectTimeout,
            receiveTimeout: AppEnvironment.I.receiveTimeout,
          ),
-       ) {
-    final refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl));
-
-    refreshDio.interceptors.add(
-      RetryInterceptor(dio: refreshDio, maxRetries: 1),
+       ),
+       _refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl)) {
+    _refreshDio.interceptors.add(
+      RetryInterceptor(dio: _refreshDio, maxRetries: 1),
     );
 
     _dio.interceptors.addAll([
       LanguageInterceptor(),
       AuthInterceptor(
         tokenManager: tokenManager,
-        refreshDio: refreshDio,
+        refreshDio: _refreshDio,
         mainDio: _dio,
         onAuthFailure: onAuthFailure,
       ),
@@ -44,7 +43,13 @@ class ApiClient {
     ]);
   }
   final Dio _dio;
+  final Dio _refreshDio;
   final ConnectivityService _connectivity;
+
+  void updateBaseUrl(String newBaseUrl) {
+    _dio.options.baseUrl = newBaseUrl;
+    _refreshDio.options.baseUrl = newBaseUrl;
+  }
 
   Future<Response<dynamic>> request(
     String path, {

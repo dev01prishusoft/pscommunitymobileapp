@@ -1,4 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/services/firebase_database_service.dart';
 
 enum Flavor { dev, prod }
@@ -17,12 +19,44 @@ class AppEnvironment {
   });
 
   static AppEnvironment? _instance;
+  static AppEnvironment? _defaultInstance;
 
   static AppEnvironment get I {
     if (_instance == null) {
       throw StateError('AppEnvironment not initialized. Call init() first.');
     }
     return _instance!;
+  }
+
+  /// Updates only apiBaseUrl, devUrl, and stagingUrl with a custom URL
+  static void updateCustomUrls({required String customUrl}) {
+    final current = _instance;
+    if (current == null) return;
+    _instance = AppEnvironment._(
+      flavor: current.flavor,
+      apiBaseUrl: customUrl,
+      uiBaseUrl: current.uiBaseUrl,
+      devUrl: customUrl,
+      stagingUrl: customUrl,
+      devUiBaseUrl: current.devUiBaseUrl,
+      connectTimeout: current.connectTimeout,
+      receiveTimeout: current.receiveTimeout,
+      enableLogging: current.enableLogging,
+    );
+
+    if (Get.isRegistered<ApiClient>()) {
+      Get.find<ApiClient>().updateBaseUrl(customUrl);
+    }
+  }
+
+  /// Resets apiBaseUrl, devUrl, and stagingUrl back to the original default environment configuration
+  static void resetToDefault() {
+    if (_defaultInstance != null) {
+      _instance = _defaultInstance;
+      if (Get.isRegistered<ApiClient>()) {
+        Get.find<ApiClient>().updateBaseUrl(_defaultInstance!.apiBaseUrl);
+      }
+    }
   }
 
   final Flavor flavor;
@@ -88,5 +122,6 @@ class AppEnvironment {
       receiveTimeout: const Duration(seconds: 10),
       enableLogging: flavor == Flavor.dev,
     );
+    _defaultInstance = _instance;
   }
 }

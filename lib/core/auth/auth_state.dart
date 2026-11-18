@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
+import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/core/localization/localization_service.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart'
@@ -46,6 +47,7 @@ class AuthState {
     locService.resetToDefaultLocale();
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
+    AppEnvironment.resetToDefault();
   }
 
   Future<void> _revokeTokenCall() async {
@@ -116,6 +118,7 @@ class AuthState {
       await locService.resetToDefaultLocale();
       PaintingBinding.instance.imageCache.clear();
       PaintingBinding.instance.imageCache.clearLiveImages();
+      AppEnvironment.resetToDefault();
       if (Get.currentRoute != AppRouter.login) {
         await Get.offAllNamed<void>(AppRouter.login);
       }
