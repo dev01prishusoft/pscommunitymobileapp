@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' hide Response;
 import 'package:pscommunitymobileapp/core/constants/app_environment.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/network/api_response.dart';
@@ -9,7 +8,6 @@ import 'package:pscommunitymobileapp/core/network/error_mapping_interceptor.dart
 import 'package:pscommunitymobileapp/core/network/language_interceptor.dart';
 import 'package:pscommunitymobileapp/core/network/network_exception_mapper.dart';
 import 'package:pscommunitymobileapp/core/network/retry_interceptor.dart';
-import 'package:pscommunitymobileapp/core/services/global_network_error_service.dart';
 import 'package:pscommunitymobileapp/core/utils/token_manager.dart';
 
 class ApiClient {
@@ -17,7 +15,7 @@ class ApiClient {
     required TokenManager tokenManager,
     required ConnectivityService connectivity,
     required VoidCallback onAuthFailure,
-  }) : _connectivity = connectivity,
+  }) : connectivity = connectivity,
        _dio = Dio(
          BaseOptions(
            baseUrl: AppEnvironment.I.apiBaseUrl,
@@ -27,7 +25,7 @@ class ApiClient {
        ),
        _refreshDio = Dio(BaseOptions(baseUrl: AppEnvironment.I.apiBaseUrl)) {
     _refreshDio.interceptors.add(
-      RetryInterceptor(dio: _refreshDio, maxRetries: 1),
+      RetryInterceptor(dio: _refreshDio, maxRetries: 3),
     );
 
     _dio.interceptors.addAll([
@@ -38,13 +36,13 @@ class ApiClient {
         mainDio: _dio,
         onAuthFailure: onAuthFailure,
       ),
-      RetryInterceptor(dio: _dio, maxRetries: 1),
+      RetryInterceptor(dio: _dio, maxRetries: 3),
       ErrorMappingInterceptor(),
     ]);
   }
   final Dio _dio;
   final Dio _refreshDio;
-  final ConnectivityService _connectivity;
+  final ConnectivityService connectivity;
 
   void updateBaseUrl(String newBaseUrl) {
     _dio.options.baseUrl = newBaseUrl;
@@ -59,11 +57,6 @@ class ApiClient {
     CancelToken? cancelToken,
     Options? options,
   }) async {
-    final bool skipErrorScreen =
-        (options?.extra?['skipErrorScreen'] as bool?) ??
-        (options?.extra?['silent'] as bool?) ??
-        false;
-    await _checkConnectivity(skipErrorScreen: skipErrorScreen);
     try {
       return await _dio.request(
         path,
@@ -215,18 +208,6 @@ class ApiClient {
       );
     } catch (e) {
       return Error(NetworkExceptionMapper.map(e));
-    }
-  }
-
-  Future<void> _checkConnectivity({bool skipErrorScreen = false}) async {
-    final hasConnection = await _connectivity.hasConnection();
-    if (!hasConnection) {
-      if (!skipErrorScreen && Get.isRegistered<GlobalNetworkErrorService>()) {
-        GlobalNetworkErrorService.to.handleNetworkError(
-          type: NetworkErrorType.noInternet,
-        );
-      }
-      throw NetworkFailure();
     }
   }
 

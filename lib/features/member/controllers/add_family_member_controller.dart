@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/constants/failures.dart';
 import 'package:pscommunitymobileapp/core/localization/translation_keys.dart';
@@ -118,8 +119,10 @@ class AddFamilyMemberController extends ProfileFormController {
               filename: fileName,
             );
           } else if (personalInfo.isPhotoRemoved.value) {
-            formDataMap['ProfileImage'] = null;
-            formDataMap['ProfilePhotoPath'] = null;
+            formDataMap['ProfilePhotoPath'] = '""';
+            formDataMap['RemovePhoto'] = 'true';
+            formDataMap['IsPhotoRemoved'] = 'true';
+            formDataMap['IsRemovePhoto'] = 'true';
           }
           formDataMap.removeWhere((key, value) => key.startsWith('_dummy_'));
 
@@ -297,7 +300,12 @@ class AddFamilyMemberController extends ProfileFormController {
           }
 
           if (!hasProfileUpdates && !hasEducationUpdates) {
-            if (navigateBack) {
+            if (personalInfo.isPhotoRemoved.value) {
+            PaintingBinding.instance.imageCache.clear();
+            PaintingBinding.instance.imageCache.clearLiveImages();
+          }
+
+          if (navigateBack) {
               await Future<void>.delayed(const Duration(milliseconds: 500));
               Get.back<dynamic>(result: true);
             } else {
@@ -322,6 +330,11 @@ class AddFamilyMemberController extends ProfileFormController {
                 ToastCard(title: LK.success.tr, subtitle: snackbarMsg),
           ).show();
 
+          if (personalInfo.isPhotoRemoved.value) {
+            PaintingBinding.instance.imageCache.clear();
+            PaintingBinding.instance.imageCache.clearLiveImages();
+          }
+
           if (navigateBack) {
             await Future<void>.delayed(const Duration(milliseconds: 1500));
             Get.back<dynamic>(result: true);
@@ -332,7 +345,12 @@ class AddFamilyMemberController extends ProfileFormController {
           success = true;
         } catch (e) {
           if (e is Failure && e.message == 'No member changes found.') {
-            if (navigateBack) {
+            if (personalInfo.isPhotoRemoved.value) {
+            PaintingBinding.instance.imageCache.clear();
+            PaintingBinding.instance.imageCache.clearLiveImages();
+          }
+
+          if (navigateBack) {
               await Future<void>.delayed(const Duration(milliseconds: 500));
               Get.back<dynamic>(result: true);
             } else {

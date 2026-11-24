@@ -558,8 +558,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     label: LK.BornPlace.tr,
                     isRequired: false,
                     onLocationSelected: (location, lat, lng) {
-                      if (location.isEmpty || location == "") return;
-                      controller.bornPlaceCtrl.text = location;
+                      if (controller.bornPlaceCtrl.text != location) {
+                        controller.bornPlaceCtrl.text = location;
+                      }
                       controller.bornPlaceLat.value = lat;
                       controller.bornPlaceLng.value = lng;
                     },

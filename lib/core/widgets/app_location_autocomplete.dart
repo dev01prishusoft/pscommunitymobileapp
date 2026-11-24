@@ -18,6 +18,7 @@ class AppLocationAutoComplete extends StatefulWidget {
   final Widget? prefixIcon;
   final ProfileUpdateStatus? updateStatus;
   final Function(String location, double lat, double lng)? onLocationSelected;
+  final bool allowCustomInput;
 
   const AppLocationAutoComplete({
     super.key,
@@ -27,6 +28,7 @@ class AppLocationAutoComplete extends StatefulWidget {
     this.isRequired = false,
     this.prefixIcon,
     this.onLocationSelected,
+    this.allowCustomInput = true,
   });
 
   @override
@@ -320,6 +322,7 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
           ),
         ).paddingOnly(left: 5.w, bottom: 6.h),
         Autocomplete<Map<String, dynamic>>(
+          initialValue: TextEditingValue(text: widget.controller.text),
           optionsBuilder: (TextEditingValue textEditingValue) async {
             if (textEditingValue.text.length < 3) {
               return const Iterable<Map<String, dynamic>>.empty();
@@ -369,6 +372,14 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                   if (widget.controller.text !=
                       fieldTextEditingController.text) {
                     widget.controller.text = fieldTextEditingController.text;
+                    if (fieldTextEditingController.text !=
+                        _lastSelectedLocation) {
+                      widget.onLocationSelected?.call(
+                        fieldTextEditingController.text,
+                        0.0,
+                        0.0,
+                      );
+                    }
                   }
                 });
 
@@ -403,7 +414,8 @@ class _AppLocationAutoCompleteState extends State<AppLocationAutoComplete> {
                         (value == null || value.trim().isEmpty)) {
                       return '${widget.label.replaceAll('*', '').trim()} ${LK.isRequired.tr}';
                     }
-                    if (value != null &&
+                    if (!widget.allowCustomInput &&
+                        value != null &&
                         value.trim().isNotEmpty &&
                         value != _lastSelectedLocation) {
                       return LK.selectValidLocation.tr;

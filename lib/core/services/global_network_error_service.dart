@@ -76,7 +76,13 @@ class GlobalNetworkErrorService extends GetxService {
             currentErrorType.value = NetworkErrorType.serverDown;
           }
         } else if (!hasLocalNetwork && !isErrorScreenOpen.value) {
-          handleNetworkError(type: NetworkErrorType.noInternet);
+          await Future<void>.delayed(const Duration(milliseconds: 2500));
+          if (!isErrorScreenOpen.value) {
+            final hasNet = await _connectivityService.hasConnection();
+            if (!hasNet && !isErrorScreenOpen.value) {
+              handleNetworkError(type: NetworkErrorType.noInternet);
+            }
+          }
         }
       },
     );
