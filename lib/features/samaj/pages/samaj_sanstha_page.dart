@@ -209,7 +209,7 @@ class _SansthaCardState extends State<_SansthaCard> {
     final hasDescription = displayDescription.isNotEmpty;
 
     return AppCard(
-      margin: const EdgeInsets.symmetric(vertical: 14.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
       padding: const EdgeInsets.all(16.0),
       elevation: _isExpanded ? 0.08 : 0.03,
       border: Border.all(

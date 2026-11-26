@@ -144,140 +144,101 @@ class SupportPage extends StatelessWidget {
                                 ],
                                 border: Border.all(color: Colors.grey.shade100),
                               ),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  dividerColor: Colors.transparent,
-                                  splashColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                ),
-                                child: ExpansionTile(
-                                  tilePadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 6,
+                              child: Material(
+                                color: AppColors.transparent,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    dividerColor: Colors.transparent,
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
                                   ),
-                                  iconColor: AppColors.primary,
-                                  collapsedIconColor: Colors.grey.shade400,
-                                  leading: MemberAvatar(
-                                    imageUrl: member.profileImage,
-                                    fallbackName: _getInitials(
-                                      member.displayName,
+                                  child: ExpansionTile(
+                                    tilePadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 6,
                                     ),
-                                    radius: 24,
-                                  ),
-                                  title: Text(
-                                    member.displayName,
-                                    style: AppTextStyles.titleMedium.copyWith(
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  // Representative label + View Profile in one row
-                                  subtitle: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        LK.representative.tr,
-                                        style: AppTextStyles.labelSmall
-                                            .copyWith(
-                                              color: Colors.grey.shade500,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                    iconColor: AppColors.primary,
+                                    collapsedIconColor: Colors.grey.shade400,
+                                    leading: MemberAvatar(
+                                      imageUrl: member.profileImage,
+                                      fallbackName: _getInitials(
+                                        member.displayName,
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Get.toNamed<void>(
-                                            AppRouter.memberProfile,
-                                            arguments: {
-                                              'memberId': member.memberId,
-                                            },
-                                          );
-                                        },
-                                        child: Text(
-                                          LK.viewProfile.tr,
+                                      radius: 24,
+                                    ),
+                                    title: Text(
+                                      member.displayName,
+                                      style: AppTextStyles.titleMedium.copyWith(
+                                        color: AppColors.black,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    // Representative label + View Profile in one row
+                                    subtitle: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          LK.representative.tr,
                                           style: AppTextStyles.labelSmall
                                               .copyWith(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.w700,
+                                                color: Colors.grey.shade500,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  childrenPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  children: [
-                                    Divider(
-                                      color: Colors.grey.shade100,
-                                      height: 1,
+                                        GestureDetector(
+                                          onTap: () {
+                                            Get.toNamed<void>(
+                                              AppRouter.memberProfile,
+                                              arguments: {
+                                                'memberId': member.memberId,
+                                              },
+                                            );
+                                          },
+                                          child: Text(
+                                            LK.viewProfile.tr,
+                                            style: AppTextStyles.labelSmall
+                                                .copyWith(
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    // Phone + Email in one horizontal row
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
+                                    childrenPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    children: [
+                                      Divider(
+                                        color: Colors.grey.shade100,
+                                        height: 1,
                                       ),
-                                      child: Row(
-                                        children: [
-                                          if (member.mobileNumber != null &&
-                                              member
-                                                  .mobileNumber!
-                                                  .isNotEmpty) ...[
-                                            Icon(
-                                              Icons.phone_rounded,
-                                              size: 15,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            GestureDetector(
-                                              onTap: () =>
-                                                  controller.launchSafeUrl(
-                                                    'tel:${member.mobileNumber}',
-                                                  ),
-                                              child: Text(
-                                                member.mobileNumber!,
-                                                style: AppTextStyles.bodyMedium
-                                                    .copyWith(
-                                                      color: AppColors.blue,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
+                                      // Phone + Email in one horizontal row
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            if (member.mobileNumber != null &&
+                                                member
+                                                    .mobileNumber!
+                                                    .isNotEmpty) ...[
+                                              Icon(
+                                                Icons.phone_rounded,
+                                                size: 15,
+                                                color: Colors.grey.shade600,
                                               ),
-                                            ),
-                                          ],
-                                          if (member.mobileNumber != null &&
-                                              member.mobileNumber!.isNotEmpty &&
-                                              member.email != null &&
-                                              member.email!.isNotEmpty)
-                                            Container(
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                              ),
-                                              width: 1,
-                                              height: 14,
-                                              color: Colors.grey.shade300,
-                                            ),
-                                          if (member.email != null &&
-                                              member.email!.isNotEmpty) ...[
-                                            Icon(
-                                              Icons.email_rounded,
-                                              size: 15,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Flexible(
-                                              child: GestureDetector(
+                                              const SizedBox(width: 6),
+                                              GestureDetector(
                                                 onTap: () =>
                                                     controller.launchSafeUrl(
-                                                      'mailto:${member.email}',
+                                                      'tel:${member.mobileNumber}',
                                                     ),
                                                 child: Text(
-                                                  member.email!,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: AppTextStyles
-                                                      .bodyMedium
+                                                  member.mobileNumber!,
+                                                  style: AppTextStyles.bodyMedium
                                                       .copyWith(
                                                         color: AppColors.blue,
                                                         fontWeight:
@@ -285,12 +246,54 @@ class SupportPage extends StatelessWidget {
                                                       ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
+                                            if (member.mobileNumber != null &&
+                                                member.mobileNumber!.isNotEmpty &&
+                                                member.email != null &&
+                                                member.email!.isNotEmpty)
+                                              Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                ),
+                                                width: 1,
+                                                height: 14,
+                                                color: Colors.grey.shade300,
+                                              ),
+                                            if (member.email != null &&
+                                                member.email!.isNotEmpty) ...[
+                                              Icon(
+                                                Icons.email_rounded,
+                                                size: 15,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Flexible(
+                                                child: GestureDetector(
+                                                  onTap: () =>
+                                                      controller.launchSafeUrl(
+                                                        'mailto:${member.email}',
+                                                      ),
+                                                  child: Text(
+                                                    member.email!,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: AppTextStyles
+                                                        .bodyMedium
+                                                        .copyWith(
+                                                          color: AppColors.blue,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ],
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

@@ -120,7 +120,8 @@ class PsCommunityApp extends StatelessWidget {
         builder: (context, child) {
           return Obx(
             () => SafeArea(
-              top: false,
+              top: Platform.isAndroid,
+              bottom: Platform.isAndroid,
               child: AnnotatedRegion<SystemUiOverlayStyle>(
                 value: SystemUiOverlayStyle(
                   statusBarColor: AppColors.white,

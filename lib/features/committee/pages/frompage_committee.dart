@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
@@ -47,7 +49,7 @@ class _FromPageCommitteeState extends State<FromPageCommittee> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      bottom: true,
+      bottom: Platform.isAndroid,
       child: DynamicAdScaffold(
         route: AppRouter.frompageCommittee,
         appBar: AppBar(title: Text(LK.memberDetails.tr)),

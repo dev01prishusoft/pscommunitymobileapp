@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -37,6 +39,7 @@ class _CommitteeDetailsPageState extends State<CommitteeDetailsPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
+      bottom: Platform.isAndroid,
       child: DynamicAdScaffold(
         route: AppRouter.committeeDetails,
         appBar: AppBar(title: Text(node.name)),

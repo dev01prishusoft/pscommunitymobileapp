@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:pscommunitymobileapp/core/constants/app_router.dart';
 import 'package:pscommunitymobileapp/features/advertisement/widgets/dynamic_ad_scaffold.dart';
@@ -46,7 +48,7 @@ class _FromPageOccupationState extends State<FromPageOccupation> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      bottom: true,
+      bottom: Platform.isAndroid,
       child: DynamicAdScaffold(
         route: AppRouter.frompageOccupation,
         appBar: AppBar(title: Text(LK.memberDetails.tr)),

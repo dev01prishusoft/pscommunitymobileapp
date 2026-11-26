@@ -168,7 +168,8 @@ class _ProfileHeader extends StatelessWidget {
                         color: AppColors.black,
                       ),
                     ),
-                    Row(
+                    Wrap(
+                      runSpacing: 6.h,
                       spacing: 8.w,
                       children: [
                         if (member.memberNo != null &&

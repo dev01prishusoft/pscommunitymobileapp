@@ -106,7 +106,7 @@ class _DynamicAdBodyState extends State<DynamicAdBody> {
             SmartAdWidget(
               placementCode: bottomCode,
               layout: AdLayout.banner,
-            ),
+            ).paddingOnly(bottom: 20.0),
         ],
       );
     });

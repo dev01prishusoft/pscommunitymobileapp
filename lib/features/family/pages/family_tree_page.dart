@@ -265,7 +265,7 @@ class _LegendBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 7.0),
+      padding: const EdgeInsets.only(left: 12.0,right:12.0, top: 10.0,bottom: 20),
       decoration: BoxDecoration(
         color: AppColors.white.withValues(alpha: 0.95),
         border: Border(top: BorderSide(color: AppColors.grey.shade200)),

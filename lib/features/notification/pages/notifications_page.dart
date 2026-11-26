@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +26,7 @@ class NotificationsPage extends GetView<NotificationController> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
+      bottom: Platform.isAndroid,
       child: DynamicAdScaffold(
         route: AppRouter.notifications,
         appBar: AppBar(
@@ -192,6 +195,7 @@ class NotificationsPage extends GetView<NotificationController> {
                   return DynamicAdSeparator(
                     route: AppRouter.notifications,
                     index: index,
+                    padding: EdgeInsets.symmetric(horizontal: 15.w),
                   );
                 },
                 itemBuilder: (context, index) {

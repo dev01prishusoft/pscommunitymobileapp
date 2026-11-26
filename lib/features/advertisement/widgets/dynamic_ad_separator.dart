@@ -157,7 +157,7 @@ class DynamicAdSeparator extends StatelessWidget {
             placementCode: code,
             layout: layout,
             height: height,
-            padding: padding ?? EdgeInsets.symmetric(horizontal: 10.w),
+            padding: padding ?? EdgeInsets.symmetric(horizontal: 0.w),
             adIndex: adSlot,
           ),
           spacing,
