@@ -63,9 +63,12 @@ class DI {
       await Future(() async {
         final firebaseDatabaseService = FirebaseDatabaseService();
         Get.put(firebaseDatabaseService, permanent: true);
-        await AppEnvironment.init(firebaseService: firebaseDatabaseService);
         final secureStorage = SecureStorageService();
         Get.put(secureStorage, permanent: true);
+        await AppEnvironment.init(
+          firebaseService: firebaseDatabaseService,
+          secureStorage: secureStorage,
+        );
         final tokenManager = TokenManager(secureStorage);
         await tokenManager.bootstrap();
 

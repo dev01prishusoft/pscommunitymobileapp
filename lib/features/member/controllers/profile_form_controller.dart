@@ -2189,8 +2189,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 filename: fileName,
               );
             } else if (personalInfo.isPhotoRemoved.value) {
-              formDataMap['ProfileImage'] = null;
-              formDataMap['ProfilePhotoPath'] = null;
+              formDataMap['ProfileImage'] = 'null';
+              formDataMap['ProfilePhotoPath'] = 'null';
             }
           } else {
             int? getId(
@@ -2467,8 +2467,8 @@ class ProfileFormController extends GetxController with FormStateMixin {
                 filename: fileName,
               );
             } else if (personalInfo.isPhotoRemoved.value) {
-              formDataMap['ProfileImage'] = null;
-              formDataMap['ProfilePhotoPath'] = null;
+              formDataMap['ProfileImage'] = 'null';
+              formDataMap['ProfilePhotoPath'] = 'null';
             }
           }
 

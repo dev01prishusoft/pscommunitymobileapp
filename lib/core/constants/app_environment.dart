@@ -2,10 +2,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:pscommunitymobileapp/core/network/api_client.dart';
 import 'package:pscommunitymobileapp/core/services/firebase_database_service.dart';
+import 'package:pscommunitymobileapp/core/utils/secure_storage_service.dart';
 
 enum Flavor { dev, prod }
 
 class AppEnvironment {
+  static const String _customUrlStorageKey = 'custom_api_base_url';
   AppEnvironment._({
     required this.flavor,
     required this.apiBaseUrl,
@@ -28,8 +30,21 @@ class AppEnvironment {
     return _instance!;
   }
 
+  static SecureStorageService _resolveStorage(
+    SecureStorageService? secureStorage,
+  ) {
+    if (secureStorage != null) return secureStorage;
+    if (Get.isRegistered<SecureStorageService>()) {
+      return Get.find<SecureStorageService>();
+    }
+    return SecureStorageService();
+  }
+
   /// Updates only apiBaseUrl, devUrl, and stagingUrl with a custom URL
-  static void updateCustomUrls({required String customUrl}) {
+  static Future<void> updateCustomUrls({
+    required String customUrl,
+    bool persist = true,
+  }) async {
     final current = _instance;
     if (current == null) return;
     _instance = AppEnvironment._(
@@ -47,16 +62,21 @@ class AppEnvironment {
     if (Get.isRegistered<ApiClient>()) {
       Get.find<ApiClient>().updateBaseUrl(customUrl);
     }
+
+    if (persist) {
+      await _resolveStorage(null).write(_customUrlStorageKey, customUrl);
+    }
   }
 
   /// Resets apiBaseUrl, devUrl, and stagingUrl back to the original default environment configuration
-  static void resetToDefault() {
+  static Future<void> resetToDefault() async {
     if (_defaultInstance != null) {
       _instance = _defaultInstance;
       if (Get.isRegistered<ApiClient>()) {
         Get.find<ApiClient>().updateBaseUrl(_defaultInstance!.apiBaseUrl);
       }
     }
+    await _resolveStorage(null).delete(_customUrlStorageKey);
   }
 
   final Flavor flavor;
@@ -77,6 +97,7 @@ class AppEnvironment {
 
   static Future<void> init({
     FirebaseDatabaseService? firebaseService,
+    SecureStorageService? secureStorage,
     String? docId,
   }) async {
     if (_instance != null) return;
@@ -123,5 +144,15 @@ class AppEnvironment {
       enableLogging: flavor == Flavor.dev,
     );
     _defaultInstance = _instance;
+
+    final savedCustomUrl = await _resolveStorage(
+      secureStorage,
+    ).read(_customUrlStorageKey);
+    if (savedCustomUrl != null && savedCustomUrl.trim().isNotEmpty) {
+      await updateCustomUrls(
+        customUrl: savedCustomUrl.trim(),
+        persist: false,
+      );
+    }
   }
 }
